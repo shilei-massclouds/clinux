@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: GPL-2.0
+
+PHONY := _clean
+
+curdir := $(subst _clean_, , $(obj))
+
+include $(curdir)/Makefile
+
+files := $(extra_y) *.o *.ko *.elf *.bin *.map
+
+_clean:
+	@rm -f $(addprefix $(curdir)/, $(files))
+
+.PHONY: $(PHONY)
