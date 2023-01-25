@@ -8,7 +8,7 @@ PREDIRS := prebuilt
 
 SUBDIRS := startup
 
-CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS))
+CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
 
 PHONY += $(SUBDIRS)
 PHONY += $(PREDIRS)
@@ -31,6 +31,7 @@ $(CLEAN_DIRS):
 
 clean: $(CLEAN_DIRS)
 	@rm -f ./prebuilt/*.h ./prebuilt/*.s
+	@find ./output/* | grep -v README.md | xargs rm -f
 
 dump:
 	$(OBJDUMP) -D -m riscv:rv64 -EL -b binary ./startup/startup.bin
