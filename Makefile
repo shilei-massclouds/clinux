@@ -2,7 +2,7 @@
 
 include scripts/Makefile.include
 
-PHONY := all clean
+PHONY := all clean dump
 
 PREDIRS := prebuilt
 

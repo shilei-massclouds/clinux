@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-target_y := bin
+target_y := startup.bin
 
 obj_y := head.o
 obj_y += entry.o

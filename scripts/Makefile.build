@@ -9,8 +9,8 @@ include $(curdir)/Makefile
 
 mod_lds := scripts/module.lds
 elf_lds := $(curdir)/$(elf_lds)
-_target	:= $(if $(target_y), $(curdir)/$(obj).$(target_y))
-_test	:= $(if $(target_y), $(curdir)/test_$(obj).ko)
+_target	:= $(curdir)/$(target_y)
+_test	:= $(curdir)/test_$(obj).ko
 obj_y	:= $(addprefix $(curdir)/, $(obj_y))
 extra_y := $(addprefix $(curdir)/, $(extra_y))
 test_y	:= $(filter $(curdir)/test%.o, \
@@ -35,6 +35,10 @@ $(curdir)/%.s: $(curdir)/%.c
 $(curdir)/%.lds: $(curdir)/%.lds.S
 	@printf "AS\t$<\n"
 	$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
+
+$(curdir)/%.h: $(curdir)/%.s
+	@printf "GEN\t$@\n"
+	$(call filechk,offsets,__ASM_OFFSETS_H__)
 
 _build: $(extra_y) $(_target) $(_test)
 	@:
