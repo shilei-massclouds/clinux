@@ -42,7 +42,7 @@ struct vm_area_struct;
  * Address for flash
  * The flash is used for module
  */
-#define FLASH_SIZE      0x0000000004000000UL
+#define FLASH_SIZE      0x0000000002000000UL
 #define FLASH_PA        0x0000000020000000UL
 
 #define FLASH_VA \
