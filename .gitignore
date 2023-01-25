@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+*.bin
+*.lds
+tags
+*.swp
+prebuilt/*.s
+prebuilt/*.h

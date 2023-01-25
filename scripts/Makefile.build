@@ -16,9 +16,13 @@ extra_y := $(addprefix $(curdir)/, $(extra_y))
 test_y	:= $(filter $(curdir)/test%.o, \
 	$(patsubst %.c,%.o,$(wildcard $(curdir)/*.c)))
 
+$(curdir)/%.s: $(curdir)/%.S
+	@printf "CPP\t$<\n"
+	$(CPP) $(AS_FLAGS) $(INCLUDES) -o $@ $<
+
 $(curdir)/%.o: $(curdir)/%.S
-	@printf "CC\t$<\n"
-	$(CC) $(AS_FLAGS) $(INCLUDES) -D__ASSEMBLY__ -c -o $@ $<
+	@printf "AS\t$<\n"
+	$(CC) $(AS_FLAGS) $(INCLUDES) -c -o $@ $<
 
 $(curdir)/%.o: $(curdir)/%.c
 	@printf "CC\t$<\n"
