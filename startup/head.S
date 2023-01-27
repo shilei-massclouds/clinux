@@ -13,6 +13,14 @@
 .section .head.text, "ax"
 .globl _start
 _start:
+    /*
+     * Image header expected by Linux boot-loaders. The image header data
+     * structure is described in asm/image.h.
+     * Do not modify it without modifying the structure and all bootloaders
+     * that expects this header format!!
+     */
+
+    /* jump to start kernel */
     j _start_kernel                 /* code0 */
     .word  0                        /* code1 */
     .dword RISCV_TEXT_OFFSET        /* text_offset: Image load offset */
@@ -80,13 +88,22 @@ setup_trap_vector:
 
 .section .init.text, "ax"
 _start_kernel:
-    mv s0, a0
-    mv s1, a1
+    /* Mask all interrupts */
+    csrw sie, zero
+    csrw sip, zero
 
+    /* Load the global pointer */
 .option push
 .option norelax
     la gp, __global_pointer$
 .option pop
+
+    /*
+     * Disable FPU to detect illegal usage of
+     * floating point in kernel space
+     */
+    li t0, SR_FS
+    csrc sstatus, t0
 
     /* Clear BSS for flat non-ELF images */
     la a3, _bss_start
@@ -98,22 +115,29 @@ clear_bss:
     blt a3, a4, clear_bss
 clear_bss_done:
 
-    # Init stack for C function
+    /* Save hart ID and DTB physical address */
+    mv s0, a0
+    mv s1, a1
+
+    la a2, boot_cpu_hartid
+    sd a0, (a2)
+
+    /* Init stack for calling C function */
     la sp, init_stack_top
 
-    # Init early pgd
+    /* Init early paging */
     mv a0, s1
-    call setup_early_pgd
+    call setup_vm_early
 
-    # Enable paging
+    /* Enable paging */
     call relocate
 
     call setup_trap_vector
 
-    # Setup init_task
+    /* Setup init_task */
     la tp, init_task
 
-    # Restore stack for C function
+    /* Restore stack for C function */
     la sp, init_stack_top
 
     call load_modules

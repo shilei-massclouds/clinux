@@ -60,3 +60,19 @@ void sbi_puts(const char *s)
     }
 }
 EXPORT_SYMBOL(sbi_puts);
+
+void sbi_put_u64(unsigned long n)
+{
+    for (int i = 1; i <= 16; i++) {
+        char c = (n >> ((16 - i)*4)) & 0xF;
+        if (c >= 10) {
+            c -= 10;
+            c += 'A';
+        } else {
+            c += '0';
+        }
+        sbi_putchar(c);
+    }
+
+}
+EXPORT_SYMBOL(sbi_put_u64);

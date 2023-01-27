@@ -148,6 +148,7 @@ static uintptr_t
 modules_source_base(void)
 {
     uintptr_t base = (FLASH_VA + FLASH_HEAD_SIZE);
+    sbi_puts("startup: init_other_modules ...\n");
     struct image_header *hdr = (struct image_header *) base;
     return ROUND_UP((base + hdr->image_size), 8);
 }
@@ -491,6 +492,8 @@ void load_modules(void)
 {
     struct module *mod;
 
+    sbi_puts("startup: load_modules ...\n");
+
     init_kernel_module();
 
     init_other_modules();
@@ -498,4 +501,6 @@ void load_modules(void)
     list_for_each_entry(mod, &modules, list) {
         do_init_module(mod);
     }
+
+    sbi_puts("startup: load_modules ok!\n");
 }

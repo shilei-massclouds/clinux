@@ -39,7 +39,7 @@ EXPORT_SYMBOL(do_page_fault_func);
 
 extern char _start[];
 
-void setup_early_pgd(uintptr_t dtb_pa)
+void setup_vm_early(uintptr_t dtb_pa)
 {
     uintptr_t load_pa = (uintptr_t)(&_start);
     uintptr_t pgd_idx = pgd_index(PAGE_OFFSET);

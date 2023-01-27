@@ -16,4 +16,10 @@
 #define __ASM_STR(x)    #x
 #endif
 
+#define _UL(x)      (_AC(x, UL))
+#define _ULL(x)     (_AC(x, ULL))
+
+#define UL(x)       (_UL(x))
+#define ULL(x)      (_ULL(x))
+
 #endif /* _CONST_H */
