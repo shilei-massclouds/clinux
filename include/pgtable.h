@@ -44,9 +44,7 @@ struct vm_area_struct;
  */
 #define FLASH_SIZE      0x0000000002000000UL
 #define FLASH_PA        0x0000000020000000UL
-
-#define FLASH_VA \
-    _ALIGN_DOWN((FIXADDR_START - FLASH_SIZE - PGDIR_SIZE), FLASH_PA)
+#define FLASH_VA        FLASH_PA
 
 #define FLASH_HEAD_SIZE 0x100
 

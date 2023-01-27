@@ -17,4 +17,6 @@ early_puts(unsigned long val)
     __asm__ __volatile__("csrw 0x0, %0\n" ::"r"(val):);
 }
 
+void sbi_srst_power_off(void);
+
 #endif /* _SBI_H */

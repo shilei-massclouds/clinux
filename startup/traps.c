@@ -8,7 +8,8 @@ static void
 do_trap_error(struct pt_regs *regs, int signo, int code,
               unsigned long addr, const char *str)
 {
-    sbi_puts(__func__);
+    sbi_puts(str);
+    sbi_srst_power_off();
 }
 
 #define DO_ERROR_INFO(name, signo, code, str)   \

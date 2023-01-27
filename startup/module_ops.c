@@ -457,6 +457,7 @@ init_other_modules(void)
     struct module *mod;
 
     uintptr_t src_addr = modules_source_base();
+    sbi_puts("startup: init_other_modules step1\n");
     uintptr_t dst_addr = ROUND_UP((uintptr_t)_end, 8);
 
     while (1) {

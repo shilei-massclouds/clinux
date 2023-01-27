@@ -12,6 +12,28 @@ enum sbi_ext_id {
     SBI_EXT_0_1_REMOTE_SFENCE_VMA = 0x6,
     SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID = 0x7,
     SBI_EXT_0_1_SHUTDOWN = 0x8,
+    SBI_EXT_BASE = 0x10,
+    SBI_EXT_TIME = 0x54494D45,
+    SBI_EXT_IPI = 0x735049,
+    SBI_EXT_RFENCE = 0x52464E43,
+    SBI_EXT_HSM = 0x48534D,
+    SBI_EXT_SRST = 0x53525354,
+    SBI_EXT_PMU = 0x504D55,
+};
+
+enum sbi_ext_srst_fid {
+    SBI_EXT_SRST_RESET = 0,
+};
+
+enum sbi_srst_reset_type {
+    SBI_SRST_RESET_TYPE_SHUTDOWN = 0,
+    SBI_SRST_RESET_TYPE_COLD_REBOOT,
+    SBI_SRST_RESET_TYPE_WARM_REBOOT,
+};
+
+enum sbi_srst_reset_reason {
+    SBI_SRST_RESET_REASON_NONE = 0,
+    SBI_SRST_RESET_REASON_SYS_FAILURE,
 };
 
 struct sbiret {
@@ -76,3 +98,16 @@ void sbi_put_u64(unsigned long n)
 
 }
 EXPORT_SYMBOL(sbi_put_u64);
+
+static void sbi_srst_reset(unsigned long type,
+                           unsigned long reason)
+{
+    sbi_ecall(SBI_EXT_SRST, SBI_EXT_SRST_RESET,
+              type, reason, 0, 0, 0, 0);
+}
+
+void sbi_srst_power_off(void)
+{
+    sbi_srst_reset(SBI_SRST_RESET_TYPE_SHUTDOWN,
+                   SBI_SRST_RESET_REASON_NONE);
+}
