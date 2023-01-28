@@ -6,7 +6,7 @@ PHONY := all clean dump qemu run
 
 PREDIRS := prebuilt
 
-SUBDIRS := startup
+SUBDIRS := startup init
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
 
