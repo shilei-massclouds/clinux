@@ -9,7 +9,7 @@ include $(curdir)/Makefile
 
 mod_lds := scripts/module.lds
 elf_lds := $(curdir)/$(elf_lds)
-_target	:= $(curdir)/$(target_y)
+_target := $(if $(target_y), $(curdir)/$(target_y), $(curdir)/$(obj).ko)
 _test	:= $(curdir)/test_$(obj).ko
 obj_y	:= $(addprefix $(curdir)/, $(obj_y))
 extra_y := $(addprefix $(curdir)/, $(extra_y))

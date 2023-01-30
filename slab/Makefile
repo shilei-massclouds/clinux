@@ -1,4 +1,3 @@
 # SPDX-License-Identifier: GPL-2.0
 
-obj_y := init.o
-obj_y += userboot.o
+obj_y := slab.o
