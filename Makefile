@@ -6,7 +6,17 @@ PHONY := all clean dump qemu run
 
 PREDIRS := prebuilt
 
-SUBDIRS := startup lib rbtree slab fork sched init
+SUBDIRS := \
+	startup lib rbtree hashtable \
+	workqueue scatterlist xarray mempool \
+	early_dt \
+	softirq \
+	mm memblock pgalloc buddy slab kalloc gup \
+	fs dcache filemap \
+	kobject bio iov_iter block genhd backing-dev \
+	readahead \
+	fork sched \
+	init
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
 

@@ -3,6 +3,8 @@
 #ifndef _LINUX_HASH_TABLE_H_
 #define _LINUX_HASH_TABLE_H_
 
+#include <list.h>
+
 #define HASH_ZERO   0x00000004  /* Zero allocated hash table */
 
 void *

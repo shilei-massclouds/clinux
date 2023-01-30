@@ -111,3 +111,4 @@ void sbi_srst_power_off(void)
     sbi_srst_reset(SBI_SRST_RESET_TYPE_SHUTDOWN,
                    SBI_SRST_RESET_REASON_NONE);
 }
+EXPORT_SYMBOL(sbi_srst_power_off);
