@@ -2,7 +2,7 @@
 
 PHONY := all clean
 
-SUBDIRS := mk_rootfs
+SUBDIRS := mk_rootfs mk_bootrd
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS))
 

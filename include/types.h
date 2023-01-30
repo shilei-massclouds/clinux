@@ -204,14 +204,6 @@ typedef unsigned int slab_flags_t;
  */
 #define pgoff_t unsigned long
 
-struct hlist_head {
-    struct hlist_node *first;
-};
-
-struct hlist_node {
-    struct hlist_node *next, **pprev;
-};
-
 static inline u32 __swab32p(const u32 *p)
 {
     return swab32(*p);
