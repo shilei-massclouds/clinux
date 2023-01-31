@@ -2,7 +2,7 @@
 
 include scripts/Makefile.include
 
-PHONY := all clean dump qemu run
+PHONY := all clean dump run
 
 PREDIRS := prebuilt
 
@@ -46,12 +46,11 @@ clean: $(CLEAN_DIRS)
 	@$(MAKE) -C tools clean
 	@find ./output/* | grep -v README.md | xargs rm -f
 
-run: all qemu
+run: all
+	@$(MAKE) -C tools run
+	@ ./scripts/qemu.sh
 
 dump:
 	$(OBJDUMP) -D -m riscv:rv64 -EL -b binary ./startup/startup.bin
-
-qemu:
-	@ ./scripts/qemu.sh
 
 .PHONY: $(PHONY)

@@ -8,8 +8,13 @@
 
 #include "module.h"
 #include "../../include/config.h"
+#include "../../include/bootrd.h"
 
 #define KMODULE_DIR "../../output/"
+#define BOOTRD_FILENAME KMODULE_DIR "bootrd.disk"
+
+/* Bootrd file is used as qemu.pflash */
+#define BOOTRD_SIZE 32*1024*1024L   /* 32M */
 
 static uint32_t ksym_ptr;
 static uint32_t ksym_num;
@@ -415,10 +420,57 @@ sort_func(const char *name, void *opaque)
     printf("%s: name %s\n", __func__, name);
 }
 
+FILE *
+create_bootrd()
+{
+    struct bootrd_header header;
+    memcpy(&header.magic, &BOOTRD_MAGIC, sizeof(header.magic));
+    header.version = 1;
+
+#if 1
+    /* Just for test */
+    header.total_size = 1234;
+    header.mod_offset = 0x1000;
+    header.mod_num = 16;
+    header.profile_offset = 0x1000;
+    header.profile_num = 32;
+    header.current_profile = 1;
+#endif
+
+    FILE *fp = fopen(BOOTRD_FILENAME, "rb+");
+    if (fp == NULL) {
+        printf("%s: no base bootrd file!\n", __func__);
+        exit(-1);
+    }
+    if (fwrite(&header, sizeof(header), 1, fp) != 1) {
+        printf("%s: cannot write header to bootrd file!\n", __func__);
+        exit(-1);
+    }
+    printf("######## write(%s)\n", BOOTRD_FILENAME);
+    return fp;
+}
+
 void
+complete_bootrd(FILE *fp)
+{
+    /* Todo: fulfill other fields of header */
+    fseek(fp, 0, SEEK_END);
+    if (ftell(fp) != BOOTRD_SIZE) {
+        printf("%s: bad bootrd file (%ld != 32M).\n",
+               __func__, ftell(fp));
+        exit(-1);
+    }
+    fclose(fp);
+}
+
+int
 main()
 {
+    FILE* fp;
+    fp = create_bootrd();
     sort_modules(sort_func, NULL);
+    complete_bootrd(fp);
     clear_symbols();
     clear_modules();
+    return 0;
 }

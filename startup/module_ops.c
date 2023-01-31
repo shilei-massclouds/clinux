@@ -10,6 +10,7 @@
 #include <bug.h>
 #include <pgtable.h>
 #include <mm.h>
+#include <bootrd.h>
 
 /* n must be power of 2 */
 #define ROUND_UP(x, n) (((x) + (n) - 1UL) & ~((n) - 1UL))
@@ -147,10 +148,13 @@ setup_load_info(uintptr_t base, struct load_info *info)
 static uintptr_t
 modules_source_base(void)
 {
-    uintptr_t base = (FLASH_VA + FLASH_HEAD_SIZE);
-    sbi_puts("startup: init_other_modules ...\n");
-    struct image_header *hdr = (struct image_header *) base;
-    return ROUND_UP((base + hdr->image_size), 8);
+    struct bootrd_header *header = (struct bootrd_header *) FLASH_VA;
+    sbi_puts("startup: init_other_modules ... [\n");
+    sbi_put_u64(header->magic);
+    sbi_puts("\n]\n");
+    halt();
+    //return ROUND_UP((base + hdr->image_size), 8);
+    return 0;
 }
 
 static void

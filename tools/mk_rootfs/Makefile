@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-PHONY := all clean
+PHONY := all clean run
 
 TARGET := rootfs.ext2
 
@@ -13,5 +13,8 @@ $(TARGET):
 
 clean:
 	@ ./clr.sh
+
+run:
+	@:
 
 .PHONY: $(PHONY)

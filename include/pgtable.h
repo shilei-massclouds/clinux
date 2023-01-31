@@ -40,13 +40,11 @@ struct vm_area_struct;
 
 /*
  * Address for flash
- * The flash is used for module
+ * The flash is used for modules repository
  */
 #define FLASH_SIZE      0x0000000002000000UL
-#define FLASH_PA        0x0000000020000000UL
+#define FLASH_PA        0x0000000022000000UL
 #define FLASH_VA        FLASH_PA
-
-#define FLASH_HEAD_SIZE 0x100
 
 #define PAGE_COPY           PAGE_READ
 #define PAGE_COPY_EXEC      PAGE_EXEC
