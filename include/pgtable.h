@@ -39,8 +39,9 @@ struct vm_area_struct;
 #define FIXADDR_START   (FIXADDR_TOP - FIXADDR_SIZE)
 
 /*
- * Address for flash
- * The flash is used for modules repository
+ * Qemu pflash is used for modules repository
+ * Note: we should select the second pflash (unit=1),
+ * because the first pflash only acts as BIOS.
  */
 #define FLASH_SIZE      0x0000000002000000UL
 #define FLASH_PA        0x0000000022000000UL

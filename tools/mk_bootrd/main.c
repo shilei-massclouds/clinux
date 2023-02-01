@@ -5,10 +5,14 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
 #include "module.h"
 #include "../../include/config.h"
 #include "../../include/bootrd.h"
+
+/* n must be power of 2 */
+#define ROUND_UP(x, n) (((x) + (n) - 1UL) & ~((n) - 1UL))
 
 #define KMODULE_DIR "../../output/"
 #define BOOTRD_FILENAME KMODULE_DIR "bootrd.disk"
@@ -19,8 +23,12 @@
 static uint32_t ksym_ptr;
 static uint32_t ksym_num;
 
+static int num_modules = 0;
 static LIST_HEAD(modules);
 static LIST_HEAD(symbols);
+
+static int num_profile_mods = 0;
+static uint64_t *profile_mods = NULL;
 
 static bool
 check_module(const char *name)
@@ -56,6 +64,7 @@ discover_modules(void)
             INIT_LIST_HEAD(&(mod->undef_syms));
             INIT_LIST_HEAD(&(mod->dependencies));
             list_add_tail(&(mod->list), &modules);
+            num_modules++;
         } else if (!strcmp(namelist[n]->d_name, "startup.bin")) {
             has_startup = true;
         } else if (!strcmp(namelist[n]->d_name, "System.map")) {
@@ -323,7 +332,7 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
 {
     list_head *p, *n;
 
-    printf("### %s: '%s' (%d)\n", __func__, mod->name, mod->status);
+    //printf("### %s: '%s' (%d)\n", __func__, mod->name, mod->status);
 
     if (mod->status)
         return;
@@ -333,7 +342,7 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
     list_for_each_safe(p, n, &mod->dependencies) {
         depend *d = list_entry(p, depend, list);
 
-        printf("%s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
+        //printf("%s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
 
         traverse_dependency(d->mod, cb, opaque);
         if (d->mod->status != M_STATUS_DONE) {
@@ -354,13 +363,41 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
     cb(mod->name, opaque);
 }
 
+static void
+write_profile(struct bootrd_header *hdr, void *opaque)
+{
+    uint64_t ret;
+    FILE *fp = (FILE *) opaque;
+
+    struct profile_header header;
+    memcpy(&header.magic, &PROFILE_MAGIC, sizeof(header.magic));
+    header.version = 1;
+    header.total_size = sizeof(struct profile_header) +
+        sizeof(uint64_t) * num_profile_mods;
+    header.mod_num = num_profile_mods;
+
+    if (fwrite(&header, sizeof(header), 1, fp) != 1) {
+        printf("%s: cannot write profile header to bootrd file!\n",
+               __func__);
+        exit(-1);
+    }
+    ret = fwrite(profile_mods, sizeof(uint64_t), num_profile_mods, fp);
+    if (ret != num_profile_mods) {
+        printf("%s: cannot profile data into bootrd file!\n", __func__);
+        exit(-1);
+    }
+
+    hdr->profile_num++;
+}
+
 void
-sort_modules(sort_callback cb, void *opaque)
+sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
 {
     list_head *p, *n;
     module *mod;
 
     discover_modules();
+    hdr->mod_num = num_modules;
 
     /* Init ksymtab based on startup.bin. */
     init_symtable();
@@ -371,6 +408,8 @@ sort_modules(sort_callback cb, void *opaque)
     list_for_each_entry(mod, &modules, list)
         build_dependency(mod);
 
+    profile_mods = calloc(sizeof(uint64_t), num_modules);
+
     list_for_each_entry(mod, &modules, list) {
         traverse_dependency(mod, cb, opaque);
         if (mod->status != M_STATUS_DONE) {
@@ -378,6 +417,14 @@ sort_modules(sort_callback cb, void *opaque)
             exit(-1);
         }
     }
+
+    hdr->profile_offset = ftell((FILE *) opaque);
+    hdr->current_profile = hdr->profile_offset;
+    write_profile(hdr, opaque);
+
+    free(profile_mods);
+    profile_mods = NULL;
+    num_profile_mods = 0;
 }
 
 void
@@ -408,68 +455,135 @@ clear_modules(void)
     }
 }
 
+/* Since e_phoff makes no sense, use it to save module length. */
+static inline void
+elf64_hdr_set_length(void *ptr, uint64_t length)
+{
+    if (memcmp(ptr, ELFMAG, SELFMAG)) {
+        printf("%s: bad elf64 header\n", __func__);
+        exit(-1);
+    }
+    struct elf64_hdr *hdr = (struct elf64_hdr *)ptr;
+    hdr->e_phoff = length;
+}
+
+static uint8_t *
+read_module(const char *filename, long *psize)
+{
+    struct stat info;
+    FILE *fp = fopen(filename, "rb");
+    if (fp == NULL || fstat(fileno(fp), &info) < 0) {
+        printf("%s: bad filename %s\n", __func__, filename);
+        exit(-1);
+    }
+
+    *psize = ROUND_UP((size_t) info.st_size, 8);
+
+    uint8_t *data = calloc(1, *psize);
+    if (data == NULL) {
+        printf("%s: alloc memory failed!\n", __func__);
+        exit(-1);
+    }
+    if (fread(data, 1, (size_t) info.st_size, fp) != info.st_size) {
+        printf("%s: read file failed!\n", __func__);
+        exit(-1);
+    }
+
+    /* HACK!!! */
+    elf64_hdr_set_length(data, (uint64_t)info.st_size);
+    fclose(fp);
+
+    return data;
+}
+
 static void
 sort_func(const char *name, void *opaque)
 {
-    /*
-    device_t *dev = (device_t *)opaque;
+    size_t size = 0;
     char filename[256] = {0};
     sprintf(filename, "%s%s", KMODULE_DIR, name);
-    flash_add_file(dev, filename);
-    */
-    printf("%s: name %s\n", __func__, name);
+    uint8_t *data = read_module(filename, &size);
+    if (data == NULL || size == 0) {
+        printf("cannont read module '%s'!\n", filename);
+        exit(-1);
+    }
+
+    FILE *fp = (FILE *) opaque;
+    uint64_t offset = ftell(fp);
+    if (fwrite(data, 1, size, fp) != size) {
+        printf("%s: cannot module data into bootrd file!\n", __func__);
+        exit(-1);
+    }
+    free(data);
+    data = NULL;
+
+    if (num_profile_mods == num_modules) {
+        printf("%s: find too many modules %d, limit is %d!\n",
+               __func__, num_profile_mods, num_modules);
+        exit(-1);
+    }
+    profile_mods[num_profile_mods++] = offset;
+    printf("%s: mod '%s'; size '%ld'; offset '%ld'\n",
+           __func__, name, size, offset);
 }
 
 FILE *
-create_bootrd()
+create_bootrd(struct bootrd_header *hdr)
 {
-    struct bootrd_header header;
-    memcpy(&header.magic, &BOOTRD_MAGIC, sizeof(header.magic));
-    header.version = 1;
-
-#if 1
-    /* Just for test */
-    header.total_size = 1234;
-    header.mod_offset = 0x1000;
-    header.mod_num = 16;
-    header.profile_offset = 0x1000;
-    header.profile_num = 32;
-    header.current_profile = 1;
-#endif
+    memcpy(&(hdr->magic), &BOOTRD_MAGIC, sizeof(hdr->magic));
+    hdr->version = 1;
+    hdr->mod_offset = sizeof(*hdr);
 
     FILE *fp = fopen(BOOTRD_FILENAME, "rb+");
     if (fp == NULL) {
         printf("%s: no base bootrd file!\n", __func__);
         exit(-1);
     }
-    if (fwrite(&header, sizeof(header), 1, fp) != 1) {
-        printf("%s: cannot write header to bootrd file!\n", __func__);
-        exit(-1);
-    }
-    printf("######## write(%s)\n", BOOTRD_FILENAME);
+    fseek(fp, sizeof(*hdr), SEEK_SET);
     return fp;
 }
 
 void
-complete_bootrd(FILE *fp)
+complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
-    /* Todo: fulfill other fields of header */
+    hdr->total_size = ftell(fp);
+
+#if 1
+    printf("%s: magic %x\n", __func__, hdr->magic);
+    printf("%s: version %x\n", __func__, hdr->version);
+    printf("%s: total_size %x\n", __func__, hdr->total_size);
+    printf("%s: mod_offset %x\n", __func__, hdr->mod_offset);
+    printf("%s: mod_num %x\n", __func__, hdr->mod_num);
+    printf("%s: profile_offset %x\n", __func__, hdr->profile_offset);
+    printf("%s: profile_num %x\n", __func__, hdr->profile_num);
+    printf("%s: current_profile %x\n", __func__, hdr->current_profile);
+#endif
+
     fseek(fp, 0, SEEK_END);
     if (ftell(fp) != BOOTRD_SIZE) {
         printf("%s: bad bootrd file (%ld != 32M).\n",
                __func__, ftell(fp));
         exit(-1);
     }
+
+    /* overwrite bootrd header */
+    fseek(fp, 0, SEEK_SET);
+    if (fwrite(hdr, sizeof(*hdr), 1, fp) != 1) {
+        printf("%s: cannot overwrite bootrd header!\n", __func__);
+        exit(-1);
+    }
+
     fclose(fp);
 }
 
 int
-main()
+main(void)
 {
-    FILE* fp;
-    fp = create_bootrd();
-    sort_modules(sort_func, NULL);
-    complete_bootrd(fp);
+    struct bootrd_header hdr;
+    memset(&hdr, 0, sizeof(hdr));
+    FILE* fp = create_bootrd(&hdr);
+    sort_modules(&hdr, sort_func, fp);
+    complete_bootrd(&hdr, fp);
     clear_symbols();
     clear_modules();
     return 0;

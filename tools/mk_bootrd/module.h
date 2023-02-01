@@ -38,21 +38,18 @@ typedef struct _symbol {
 
 typedef void (*sort_callback)(const char *name, void *opaque);
 
-void
-sort_modules(sort_callback cb, void *opaque);
-
-void
-clear_modules(void);
-
 /*
  * ELF64
  */
 
-#define SHT_SYMTAB      2
+#define SHT_SYMTAB  2
 
-#define SHN_UNDEF       0x0
+#define SHN_UNDEF   0x0
 
-#define EI_NIDENT       16
+#define ELFMAG      "\177ELF"
+#define SELFMAG     4
+
+#define EI_NIDENT   16
 
 typedef struct elf64_hdr {
   unsigned char e_ident[EI_NIDENT]; /* ELF "magic number" */
