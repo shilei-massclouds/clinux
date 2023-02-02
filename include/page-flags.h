@@ -186,6 +186,9 @@ PAGEFLAG(Dirty, dirty, PF_HEAD)
 PAGEFLAG(Error, error, PF_NO_TAIL)
     TESTCLEARFLAG(Error, error, PF_NO_TAIL)
 
+TESTPAGEFLAG(Writeback, writeback, PF_NO_TAIL)
+    TESTSCFLAG(Writeback, writeback, PF_NO_TAIL)
+
 PAGEFLAG(MappedToDisk, mappedtodisk, PF_NO_TAIL)
 
 PAGEFLAG(Readahead, reclaim, PF_NO_COMPOUND)

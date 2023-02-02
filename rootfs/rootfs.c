@@ -19,6 +19,7 @@
 extern char boot_command_line[];
 extern bool ext2_initialized;
 extern bool serial_ready;
+extern bool blk_ready;
 
 dev_t ROOT_DEV;
 
@@ -252,6 +253,7 @@ init_module(void)
 {
     printk("module[rootfs]: init begin ...\n");
     BUG_ON(!serial_ready);
+    BUG_ON(!blk_ready);
     BUG_ON(!ext2_initialized);
     init_mount_tree();
     rootfs_initialized = true;

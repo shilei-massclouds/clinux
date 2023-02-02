@@ -177,6 +177,43 @@ void __do_page_cache_readahead(struct address_space *mapping,
 }
 EXPORT_SYMBOL(__do_page_cache_readahead);
 
+/**
+ * page_cache_async_readahead - file readahead for marked pages
+ * @mapping: address_space which holds the pagecache and I/O vectors
+ * @ra: file_ra_state which holds the readahead state
+ * @filp: passed on to ->readpage() and ->readpages()
+ * @page: The page at @index which triggered the readahead call.
+ * @index: Index of first page to be read.
+ * @req_count: Total number of pages being read by the caller.
+ *
+ * page_cache_async_readahead() should be called when a page is used which
+ * is marked as PageReadahead; this is a marker to suggest that the application
+ * has used up enough of the readahead window that we should start pulling in
+ * more pages.
+ */
+void
+page_cache_async_readahead(struct address_space *mapping,
+               struct file_ra_state *ra, struct file *filp,
+               struct page *page, pgoff_t index,
+               unsigned long req_count)
+{
+    /* no read-ahead */
+    if (!ra->ra_pages)
+        return;
+
+    /*
+     * Same bit is used for PG_readahead and PG_reclaim.
+     */
+    if (PageWriteback(page))
+        return;
+
+    ClearPageReadahead(page);
+
+    /* do read-ahead */
+    ondemand_readahead(mapping, ra, filp, true, index, req_count);
+}
+EXPORT_SYMBOL(page_cache_async_readahead);
+
 static int
 init_module(void)
 {

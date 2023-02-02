@@ -199,8 +199,10 @@ ssize_t generic_file_buffered_read(struct kiocb *iocb,
                 panic("no cached page!");
         }
 
-        if (PageReadahead(page))
-            panic("page readahead!");
+        if (PageReadahead(page)) {
+            page_cache_async_readahead(mapping, ra, filp, page,
+                                       index, last_index - index);
+        }
         if (!PageUptodate(page))
             while (!PageUptodate(page));
 

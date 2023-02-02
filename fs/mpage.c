@@ -10,6 +10,7 @@
 #include <pagemap.h>
 #include <page-flags.h>
 #include <buffer_head.h>
+#include <highmem.h>
 
 struct mpage_readpage_args {
     struct bio *bio;
@@ -130,6 +131,8 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
         bdev = map_bh->b_bdev;
     }
 
+    printk("%s: step1 first_hole(%u)\n", __func__, first_hole);
+
     /*
      * Then do more get_blocks calls until we are done with this page.
      */
@@ -145,6 +148,9 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
             args->first_logical_block = block_in_file;
         }
 
+    printk("%s: step2 first_hole(%u) page_block(%u)\n",
+           __func__, first_hole, page_block);
+
         if (!buffer_mapped(map_bh)) {
             fully_mapped = 0;
             if (first_hole == blocks_per_page)
@@ -153,6 +159,9 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
             block_in_file++;
             continue;
         }
+
+    printk("%s: step3 first_hole(%u) page_block(%u)\n",
+           __func__, first_hole, page_block);
 
         /* some filesystems will copy data into the page during
          * the get_block call, in which case we don't want to
@@ -184,11 +193,24 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
     }
 
     if (first_hole != blocks_per_page) {
-        panic("first_hole(%u)", first_hole);
+        zero_user_segment(page, first_hole << blkbits, PAGE_SIZE);
+        if (first_hole == 0) {
+            SetPageUptodate(page);
+            //unlock_page(page);
+            goto out;
+        }
     } else if (fully_mapped) {
         SetPageMappedToDisk(page);
     }
 
+    if (fully_mapped && blocks_per_page == 1 && !PageUptodate(page)) {
+        SetPageUptodate(page);
+        panic("confused!");
+    }
+
+    /*
+     * This page will go to BIO.  Do we need to send this BIO off first?
+     */
     if (args->bio && (args->last_block_in_bio != blocks[0] - 1))
         args->bio = mpage_bio_submit(REQ_OP_READ, op_flags, args->bio);
 
@@ -217,6 +239,8 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
     } else {
         args->last_block_in_bio = blocks[blocks_per_page - 1];
     }
+
+ out:
     return args->bio;
 }
 

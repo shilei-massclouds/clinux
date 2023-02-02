@@ -147,4 +147,11 @@ static inline pgoff_t page_to_pgoff(struct page *page)
     return page->index;
 }
 
+void page_cache_async_readahead(struct address_space *,
+                                struct file_ra_state *,
+                                struct file *,
+                                struct page *,
+                                pgoff_t index,
+                                unsigned long req_count);
+
 #endif /* _LINUX_PAGEMAP_H */

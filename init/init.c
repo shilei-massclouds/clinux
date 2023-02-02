@@ -7,7 +7,6 @@
 #include <printk.h>
 #include <platform.h>
 
-extern bool blk_ready;
 extern bool virtio_mmio_ready;
 extern uintptr_t kernel_size;
 extern void arch_call_rest_init(void);
@@ -31,7 +30,6 @@ init_module(void)
 {
     printk("module[init]: init begin ...\n");
 
-    BUG_ON(!blk_ready);
     BUG_ON(!virtio_mmio_ready);
     BUG_ON(!rootfs_initialized);
     start_kernel_fn = start_kernel;
