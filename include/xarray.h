@@ -6,6 +6,24 @@
 #include <list.h>
 #include <kernel.h>
 
+enum xa_lock_type {
+    XA_LOCK_IRQ = 1,
+    XA_LOCK_BH  = 2,
+};
+
+/*
+ * Values for xa_flags.  The radix tree stores its GFP flags in the xa_flags,
+ * and we remain compatible with that.
+ */
+#define XA_FLAGS_LOCK_IRQ   ((gfp_t) XA_LOCK_IRQ)
+#define XA_FLAGS_LOCK_BH    ((gfp_t) XA_LOCK_BH)
+#define XA_FLAGS_TRACK_FREE ((gfp_t) 4U)
+#define XA_FLAGS_ZERO_BUSY  ((gfp_t) 8U)
+#define XA_FLAGS_ALLOC_WRAPPED  ((gfp_t) 16U)
+#define XA_FLAGS_ACCOUNT    ((gfp_t) 32U)
+#define XA_FLAGS_MARK(mark) \
+    ((gfp_t)((1U << __GFP_BITS_SHIFT) << (unsigned)(mark)))
+
 #define XA_CHUNK_SHIFT  6
 #define XA_CHUNK_SIZE   (1UL << XA_CHUNK_SHIFT)
 #define XA_CHUNK_MASK   (XA_CHUNK_SIZE - 1)
@@ -42,10 +60,12 @@ struct xa_node {
 };
 
 struct xarray {
+    gfp_t xa_flags;
     void *xa_head;
 };
 
 #define XARRAY_INIT(name, flags) {  \
+    .xa_flags = flags,              \
     .xa_head = NULL,                \
 }
 
@@ -226,6 +246,23 @@ static inline struct xa_node *
 xa_parent(const struct xarray *xa, const struct xa_node *node)
 {
     return node->parent;
+}
+
+/**
+ * xa_init_flags() - Initialise an empty XArray with flags.
+ * @xa: XArray.
+ * @flags: XA_FLAG values.
+ *
+ * If you need to initialise an XArray with special flags (eg you need
+ * to take the lock from interrupt context), use this function instead
+ * of xa_init().
+ *
+ * Context: Any context.
+ */
+static inline void xa_init_flags(struct xarray *xa, gfp_t flags)
+{
+    xa->xa_flags = flags;
+    xa->xa_head = NULL;
 }
 
 #endif /* _LINUX_XARRAY_H */

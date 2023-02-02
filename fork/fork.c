@@ -216,6 +216,23 @@ task_struct_whitelist(unsigned long *offset, unsigned long *size)
         *offset += offsetof(struct task_struct, thread);
 }
 
+struct vm_area_struct *_vm_area_dup(struct vm_area_struct *orig)
+{
+    struct vm_area_struct *new = kmem_cache_alloc(vm_area_cachep, GFP_KERNEL);
+
+    if (new) {
+        /*
+         * orig->shared.rb may be modified concurrently, but the clone
+         * will be reinitialized.
+         */
+        *new = *orig;
+        //INIT_LIST_HEAD(&new->anon_vma_chain);
+        new->vm_next = new->vm_prev = NULL;
+    }
+    return new;
+}
+EXPORT_SYMBOL(vm_area_dup);
+
 #define ARCH_MIN_TASKALIGN  0
 
 void fork_init(void)
@@ -243,6 +260,7 @@ init_module(void)
     proc_caches_init();
 
     vm_area_alloc = _vm_area_alloc;
+    vm_area_dup = _vm_area_dup;
 
     printk("module[fork]: init end!\n");
 

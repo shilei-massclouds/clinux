@@ -101,9 +101,20 @@ elf_map(struct file *filep, unsigned long addr,
     if (!size)
         return addr;
 
-    if (total_size)
-        panic("total size is NOT zero!");
-    else
+    /*
+    * total_size is the size of the ELF (interpreter) image.
+    * The _first_ mmap needs to know the full size, otherwise
+    * randomization might put this image into an overlapping
+    * position with the ELF binary image. (since size < total_size)
+    * So we first map the 'big' image - and unmap the remainder at
+    * the end. (which unmap is needed for ELF images with holes.)
+    */
+    if (total_size) {
+        total_size = ELF_PAGEALIGN(total_size);
+        map_addr = vm_mmap(filep, addr, total_size, prot, type, off);
+        if (!BAD_ADDR(map_addr))
+            vm_munmap(map_addr+size, total_size-size);
+    } else
         map_addr = vm_mmap(filep, addr, size, prot, type, off);
 
     if ((type & MAP_FIXED_NOREPLACE) &&
@@ -281,6 +292,25 @@ static int padzero(unsigned long elf_bss)
     return 0;
 }
 
+static unsigned long
+total_mapping_size(const struct elf_phdr *cmds, int nr)
+{
+    int i, first_idx = -1, last_idx = -1;
+
+    for (i = 0; i < nr; i++) {
+        if (cmds[i].p_type == PT_LOAD) {
+            last_idx = i;
+            if (first_idx == -1)
+                first_idx = i;
+        }
+    }
+    if (first_idx == -1)
+        return 0;
+
+    return cmds[last_idx].p_vaddr + cmds[last_idx].p_memsz -
+        ELF_PAGESTART(cmds[first_idx].p_vaddr);
+}
+
 static int load_elf_binary(struct linux_binprm *bprm)
 {
     int i;
@@ -304,6 +334,8 @@ static int load_elf_binary(struct linux_binprm *bprm)
     struct elfhdr *interp_elf_ex = NULL;
     struct file *interpreter = NULL; /* to shut gcc up */
     struct elf_phdr *interp_elf_phdata = NULL;
+    unsigned long load_bias = 0;
+    unsigned long reloc_func_desc = 0;
 
     retval = -ENOEXEC;
     /* First of all, some simple consistency checks */
@@ -469,10 +501,33 @@ static int load_elf_binary(struct linux_binprm *bprm)
 
         vaddr = elf_ppnt->p_vaddr;
 
+        /*
+         * If we are loading ET_EXEC or we have already performed
+         * the ET_DYN load_addr calculations, proceed normally.
+         */
         if (elf_ex->e_type == ET_EXEC || load_addr_set) {
             elf_flags |= MAP_FIXED;
         } else if (elf_ex->e_type == ET_DYN) {
-            panic("bad e_type ET_DYN!");
+            if (interpreter) {
+                load_bias = ELF_ET_DYN_BASE;
+                elf_flags |= MAP_FIXED;
+            } else
+                load_bias = 0;
+
+            /*
+             * Since load_bias is used for all subsequent loading
+             * calculations, we must lower it by the first vaddr
+             * so that the remaining calculations based on the
+             * ELF vaddrs will be correctly offset. The result
+             * is then page aligned.
+             */
+            load_bias = ELF_PAGESTART(load_bias - vaddr);
+
+            total_size = total_mapping_size(elf_phdata, elf_ex->e_phnum);
+            if (!total_size) {
+                retval = -EINVAL;
+                panic("out_free_dentry");
+            }
         }
 
         error = elf_map(bprm->file, vaddr, elf_ppnt,
@@ -483,8 +538,11 @@ static int load_elf_binary(struct linux_binprm *bprm)
         if (!load_addr_set) {
             load_addr_set = 1;
             load_addr = (elf_ppnt->p_vaddr - elf_ppnt->p_offset);
-            if (elf_ex->e_type == ET_DYN)
-                panic("ET_DYN");
+            if (elf_ex->e_type == ET_DYN) {
+                load_bias += error - ELF_PAGESTART(load_bias + vaddr);
+                load_addr += load_bias;
+                reloc_func_desc = load_bias;
+            }
         }
 
         k = elf_ppnt->p_vaddr;

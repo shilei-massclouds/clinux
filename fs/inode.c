@@ -16,6 +16,14 @@ static struct hlist_head *inode_hashtable;
 
 static struct kmem_cache *inode_cachep;
 
+static void __address_space_init_once(struct address_space *mapping)
+{
+    xa_init_flags(&mapping->i_pages, XA_FLAGS_LOCK_IRQ | XA_FLAGS_ACCOUNT);
+    //INIT_LIST_HEAD(&mapping->private_list);
+    //spin_lock_init(&mapping->private_lock);
+    mapping->i_mmap = RB_ROOT_CACHED;
+}
+
 void
 inode_init_once(struct inode *inode)
 {
@@ -27,7 +35,7 @@ inode_init_once(struct inode *inode)
     INIT_LIST_HEAD(&inode->i_wb_list);
     INIT_LIST_HEAD(&inode->i_lru);
     */
-    //__address_space_init_once(&inode->i_data);
+    __address_space_init_once(&inode->i_data);
     //i_size_ordered_init(inode);
 }
 EXPORT_SYMBOL(inode_init_once);

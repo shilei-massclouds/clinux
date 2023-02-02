@@ -315,4 +315,23 @@ static inline bool want_init_on_alloc(gfp_t flags)
 
 char *strndup_user(const char *s, long n);
 
+extern int vm_munmap(unsigned long, size_t);
+
+extern int do_munmap(struct mm_struct *, unsigned long, size_t,
+                     struct list_head *uf);
+
+extern int
+__vma_adjust(struct vm_area_struct *vma,
+             unsigned long start, unsigned long end,
+             pgoff_t pgoff, struct vm_area_struct *insert,
+             struct vm_area_struct *expand);
+
+static inline int
+vma_adjust(struct vm_area_struct *vma,
+           unsigned long start, unsigned long end,
+           pgoff_t pgoff, struct vm_area_struct *insert)
+{
+    return __vma_adjust(vma, start, end, pgoff, insert, NULL);
+}
+
 #endif /* _RISCV_MM_H_ */

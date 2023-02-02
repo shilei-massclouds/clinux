@@ -341,8 +341,10 @@ mmap_region(struct file *file, unsigned long addr,
     struct mm_struct *mm = current->mm;
 
     /* Clear old maps */
-    while (find_vma_links(mm, addr, addr + len, &prev, &rb_link, &rb_parent))
-        panic("can not find vma links!");
+    while (find_vma_links(mm, addr, addr + len, &prev, &rb_link, &rb_parent)) {
+        if (do_munmap(mm, addr, len, uf))
+            return -ENOMEM;
+    }
 
     /*
      * Private writable mapping: check memory availability
@@ -549,3 +551,173 @@ int vm_brk_flags(unsigned long addr, unsigned long request,
     return ret;
 }
 EXPORT_SYMBOL(vm_brk_flags);
+
+int vm_munmap(unsigned long start, size_t len)
+{
+    printk("%s: TODO: NOT IMPLEMENTED yet!\n", __func__);
+    return 0;
+    //return __vm_munmap(start, len, false);
+}
+EXPORT_SYMBOL(vm_munmap);
+
+static void __vma_link_file(struct vm_area_struct *vma)
+{
+    struct file *file;
+
+    file = vma->vm_file;
+    if (file) {
+        panic("%s: todo:", __func__);
+#if 0
+        struct address_space *mapping = file->f_mapping;
+
+        if (vma->vm_flags & VM_DENYWRITE)
+            atomic_dec(&file_inode(file)->i_writecount);
+        if (vma->vm_flags & VM_SHARED)
+            atomic_inc(&mapping->i_mmap_writable);
+
+        flush_dcache_mmap_lock(mapping);
+        vma_interval_tree_insert(vma, &mapping->i_mmap);
+        flush_dcache_mmap_unlock(mapping);
+#endif
+    }
+}
+
+/*
+ * We cannot adjust vm_start, vm_end, vm_pgoff fields of a vma that
+ * is already present in an i_mmap tree without adjusting the tree.
+ * The following helper function should be used when such adjustments
+ * are necessary.  The "insert" vma (if any) is to be inserted
+ * before we drop the necessary locks.
+ */
+int __vma_adjust(struct vm_area_struct *vma,
+                 unsigned long start, unsigned long end,
+                 pgoff_t pgoff, struct vm_area_struct *insert,
+                 struct vm_area_struct *expand)
+{
+    struct anon_vma *anon_vma = NULL;
+    struct address_space *mapping = NULL;
+    struct rb_root_cached *root = NULL;
+    struct file *file = vma->vm_file;
+
+    struct vm_area_struct *next = vma->vm_next, *orig_vma = vma;
+
+    if (next && !insert) {
+        panic("%s: step1!", __func__);
+    }
+
+    if (file) {
+        mapping = file->f_mapping;
+        root = &mapping->i_mmap;
+
+        if (insert) {
+            /*
+             * Put into interval tree now, so instantiated pages
+             * are visible to arm/parisc __flush_dcache_page
+             * throughout; but we cannot insert into address
+             * space until vma start or end is updated.
+             */
+            __vma_link_file(insert);
+        }
+    }
+
+    anon_vma = vma->anon_vma;
+    panic("%s: todo!", __func__);
+}
+
+/*
+ * __split_vma() bypasses sysctl_max_map_count checking.  We use this where it
+ * has already been checked or doesn't make sense to fail.
+ */
+int __split_vma(struct mm_struct *mm, struct vm_area_struct *vma,
+                unsigned long addr, int new_below)
+{
+    int err;
+    struct vm_area_struct *new;
+
+    new = vm_area_dup(vma);
+    if (!new)
+        return -ENOMEM;
+
+    if (new_below)
+        new->vm_end = addr;
+    else {
+        new->vm_start = addr;
+        new->vm_pgoff += ((addr - vma->vm_start) >> PAGE_SHIFT);
+    }
+
+    if (new_below)
+        err = vma_adjust(vma, addr, vma->vm_end, vma->vm_pgoff +
+                         ((addr - new->vm_start) >> PAGE_SHIFT), new);
+    else
+        err = vma_adjust(vma, vma->vm_start, addr, vma->vm_pgoff, new);
+
+    /* Success. */
+    if (!err)
+        return 0;
+
+    panic("%s: todo!", __func__);
+}
+
+/* Munmap is split into 2 main parts -- this part which finds
+ * what needs doing, and the areas themselves, which do the
+ * work.  This now handles partial unmappings.
+ * Jeremy Fitzhardinge <jeremy@goop.org>
+ */
+int __do_munmap(struct mm_struct *mm, unsigned long start, size_t len,
+                struct list_head *uf, bool downgrade)
+{
+    unsigned long end;
+    struct vm_area_struct *vma, *prev, *last;
+
+    if ((offset_in_page(start)) ||
+        start > TASK_SIZE || len > TASK_SIZE-start)
+        return -EINVAL;
+
+    len = PAGE_ALIGN(len);
+    end = start + len;
+    if (len == 0)
+        return -EINVAL;
+
+    /* Find the first overlapping VMA */
+    vma = find_vma(mm, start);
+    if (!vma)
+        return 0;
+    prev = vma->vm_prev;
+    /* we have  start < vma->vm_end  */
+
+    /* if it doesn't overlap, we have nothing.. */
+    if (vma->vm_start >= end)
+        return 0;
+
+    /*
+     * If we need to split any vma, do it now to save pain later.
+     *
+     * Note: mremap's move_vma VM_ACCOUNT handling assumes a partially
+     * unmapped vm_area_struct will remain in use: so lower split_vma
+     * places tmp vma above, and higher split_vma places tmp vma below.
+     */
+    if (start > vma->vm_start) {
+        int error;
+
+        /*
+         * Make sure that map_count on return from munmap() will
+         * not exceed its limit; but let map_count go just above
+         * its limit temporarily, to help free resources as expected.
+         */
+        if (end < vma->vm_end)
+            return -ENOMEM;
+
+        error = __split_vma(mm, vma, start, 0);
+        if (error)
+            return error;
+        prev = vma;
+    }
+
+    panic("%s: todo!", __func__);
+}
+
+int do_munmap(struct mm_struct *mm, unsigned long start, size_t len,
+              struct list_head *uf)
+{
+    return __do_munmap(mm, start, len, uf, false);
+}

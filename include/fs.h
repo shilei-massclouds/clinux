@@ -141,6 +141,8 @@ struct address_space {
     unsigned long   nrpages;
     gfp_t           gfp_mask;
 
+    struct rb_root_cached   i_mmap;
+
     const struct address_space_operations *a_ops;
 } __attribute__((aligned(sizeof(long))));
 

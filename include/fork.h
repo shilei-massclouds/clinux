@@ -11,6 +11,10 @@ typedef struct vm_area_struct *
 (*vm_area_alloc_t)(struct mm_struct *mm);
 extern vm_area_alloc_t vm_area_alloc;
 
+typedef struct vm_area_struct *
+(*vm_area_dup_t)(struct vm_area_struct *orig);
+extern vm_area_dup_t vm_area_dup;
+
 void set_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file);
 
 pid_t kernel_thread(int (*fn)(void *), void *arg, unsigned long flags);

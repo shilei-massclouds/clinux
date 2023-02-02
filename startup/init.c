@@ -92,6 +92,9 @@ EXPORT_SYMBOL(kmemdup_nul);
 vm_area_alloc_t vm_area_alloc;
 EXPORT_SYMBOL(vm_area_alloc);
 
+vm_area_dup_t vm_area_dup;
+EXPORT_SYMBOL(vm_area_dup);
+
 /* For specific cache allocation */
 kmem_cache_alloc_t kmem_cache_alloc;
 EXPORT_SYMBOL(kmem_cache_alloc);

@@ -123,6 +123,16 @@ struct vm_area_struct {
 
     struct mm_struct *vm_mm;    /* The address space we belong to. */
 
+    /*
+     * A file's MAP_PRIVATE vma can be in both i_mmap tree and anon_vma
+     * list, after a COW of one of the file pages.  A MAP_SHARED vma
+     * can only be in the i_mmap tree.  An anonymous MAP_PRIVATE, stack
+     * or brk vma (with NULL file) can only be in an anon_vma list.
+     */
+    struct list_head anon_vma_chain; /* Serialized by mmap_lock &
+                                      * page_table_lock */
+    struct anon_vma *anon_vma;  /* Serialized by page_table_lock */
+
     pgprot_t vm_page_prot;
     unsigned long vm_flags;     /* Flags, see mm.h. */
 
@@ -148,7 +158,7 @@ vma_init(struct vm_area_struct *vma, struct mm_struct *mm)
     memset(vma, 0, sizeof(*vma));
     vma->vm_mm = mm;
     vma->vm_ops = &dummy_vm_ops;
-    //INIT_LIST_HEAD(&vma->anon_vma_chain);
+    INIT_LIST_HEAD(&vma->anon_vma_chain);
 }
 
 static inline void vma_set_anonymous(struct vm_area_struct *vma)
