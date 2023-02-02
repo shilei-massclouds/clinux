@@ -547,4 +547,6 @@ vfs_write(struct file *file, const char *buf, size_t count, loff_t *pos);
 
 int nonseekable_open(struct inode *inode, struct file *filp);
 
+extern struct file * open_exec(const char *);
+
 #endif /* _LINUX_FS_H */

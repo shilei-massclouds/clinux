@@ -559,3 +559,14 @@ void finalize_exec(struct linux_binprm *bprm)
     current->signal->rlim[RLIMIT_STACK] = bprm->rlim_stack;
 }
 EXPORT_SYMBOL(finalize_exec);
+
+struct file *open_exec(const char *name)
+{
+    struct filename *filename = getname_kernel(name);
+    struct file *f = ERR_CAST(filename);
+
+    if (!IS_ERR(filename))
+        f = do_open_execat(AT_FDCWD, filename, 0);
+    return f;
+}
+EXPORT_SYMBOL(open_exec);

@@ -14,6 +14,7 @@
 #include <uaccess.h>
 #include <processor.h>
 #include <mman-common.h>
+#include <limits.h>
 
 #define ELF_MIN_ALIGN       PAGE_SIZE
 #define ELF_PAGESTART(_v)   ((_v) & ~(unsigned long)(ELF_MIN_ALIGN-1))
@@ -300,7 +301,9 @@ static int load_elf_binary(struct linux_binprm *bprm)
     int executable_stack = EXSTACK_DEFAULT;
     struct elf_phdr *elf_property_phdata = NULL;
     struct elfhdr *elf_ex = (struct elfhdr *)bprm->buf;
+    struct elfhdr *interp_elf_ex = NULL;
     struct file *interpreter = NULL; /* to shut gcc up */
+    struct elf_phdr *interp_elf_phdata = NULL;
 
     retval = -ENOEXEC;
     /* First of all, some simple consistency checks */
@@ -330,7 +333,49 @@ static int load_elf_binary(struct linux_binprm *bprm)
         if (elf_ppnt->p_type != PT_INTERP)
             continue;
 
-        panic("is interp!");
+        /*
+         * This is the program interpreter used for shared libraries -
+         * for now assume that this is an a.out format binary.
+         */
+        retval = -ENOEXEC;
+        if (elf_ppnt->p_filesz > PATH_MAX || elf_ppnt->p_filesz < 2)
+            panic("out_free_ph");
+
+        retval = -ENOMEM;
+        elf_interpreter = kmalloc(elf_ppnt->p_filesz, GFP_KERNEL);
+        if (!elf_interpreter)
+            panic("out_free_ph");
+
+        retval = elf_read(bprm->file, elf_interpreter,
+                          elf_ppnt->p_filesz, elf_ppnt->p_offset);
+        if (retval < 0)
+            panic("out_free_interp");
+        /* make sure path is NULL terminated */
+        retval = -ENOEXEC;
+        if (elf_interpreter[elf_ppnt->p_filesz - 1] != '\0')
+            panic("out_free_interp");
+
+        printk("%s: interp[%s]\n", __func__, elf_interpreter);
+
+        interpreter = open_exec(elf_interpreter);
+        kfree(elf_interpreter);
+        retval = PTR_ERR(interpreter);
+        if (IS_ERR(interpreter))
+            panic("out_free_ph");
+
+        interp_elf_ex = kmalloc(sizeof(*interp_elf_ex), GFP_KERNEL);
+        if (!interp_elf_ex) {
+            retval = -ENOMEM;
+            panic("out_free_ph");
+        }
+
+        /* Get the exec headers */
+        retval = elf_read(interpreter, interp_elf_ex,
+                          sizeof(*interp_elf_ex), 0);
+        if (retval < 0)
+            panic("out_free_dentry");
+
+        break;
     }
 
     elf_ppnt = elf_phdata;
@@ -349,8 +394,36 @@ static int load_elf_binary(struct linux_binprm *bprm)
         }
     }
 
-    if (interpreter)
-        panic("is interpreter!");
+    /* Some simple consistency checks for the interpreter */
+    if (interpreter) {
+        retval = -ELIBBAD;
+        /* Not an ELF interpreter */
+        if (memcmp(interp_elf_ex->e_ident, ELFMAG, SELFMAG) != 0)
+            panic("out_free_dentry");
+        /* Verify the interpreter has a valid arch */
+        if (!elf_check_arch(interp_elf_ex))
+            panic("out_free_dentry");
+
+        /* Load the interpreter program headers */
+        interp_elf_phdata = load_elf_phdrs(interp_elf_ex, interpreter);
+        if (!interp_elf_phdata)
+            panic("out_free_dentry");
+
+        /* Pass PT_LOPROC..PT_HIPROC headers to arch code */
+        elf_property_phdata = NULL;
+        elf_ppnt = interp_elf_phdata;
+        for (i = 0; i < interp_elf_ex->e_phnum; i++, elf_ppnt++) {
+            switch (elf_ppnt->p_type) {
+            case PT_GNU_PROPERTY:
+                elf_property_phdata = elf_ppnt;
+                break;
+
+            case PT_LOPROC ... PT_HIPROC:
+                panic("bad p_type!");
+                break;
+            }
+        }
+    }
 
     printk("%s: p(%lx)!\n", __func__, bprm->p);
     retval = begin_new_exec(bprm);
