@@ -7,15 +7,16 @@ PHONY := all clean dump run
 PREDIRS := prebuilt
 
 SUBDIRS := \
-	startup lib rbtree hashtable \
+	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
-	early_dt \
-	softirq \
-	mm memblock pgalloc buddy slab kalloc gup \
-	fs dcache filemap \
+	early_dt of of_serial of_irq platform \
+	intc plic irq softirq \
+	mm memblock pgalloc buddy slab kalloc \
+	vma ioremap gup devres \
+	fs dcache filemap readahead \
 	kobject bio iov_iter block genhd backing-dev \
-	readahead \
 	fork sched \
+	ext2 ramfs rootfs \
 	init
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
