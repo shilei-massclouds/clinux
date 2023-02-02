@@ -54,9 +54,12 @@ void setup_vm_early(uintptr_t dtb_pa)
     early_pmd[pmd_idx] =
         pfn_pmd(PFN_DOWN(load_pa), PAGE_KERNEL_EXEC);
 
+    early_pmd[pmd_idx + 1] =
+        pfn_pmd(PFN_DOWN(load_pa + PMD_SIZE), PAGE_KERNEL_EXEC);
+
     /* Qemu pflash acts as the repository of modules,
      * startup loads modules from it.
-     * The pflash is located at 0x20000000 in PA,
+     * The pflash is located at 0x22000000 in PA,
      * just setup identity-mapping for the first pgdir temporily. */
     early_pgd[0] = pfn_pgd(PFN_DOWN(0), PAGE_KERNEL);
 

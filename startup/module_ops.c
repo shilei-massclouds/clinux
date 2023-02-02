@@ -145,16 +145,31 @@ setup_load_info(uintptr_t base, struct load_info *info)
     }
 }
 
-static uintptr_t
-modules_source_base(void)
+static uint64_t *
+mod_indexes_in_flash(uint32_t *pnum)
 {
-    struct bootrd_header *header = (struct bootrd_header *) FLASH_VA;
-    sbi_puts("startup: init_other_modules ... [\n");
-    sbi_put_u64(header->magic);
-    sbi_puts("\n]\n");
-    halt();
-    //return ROUND_UP((base + hdr->image_size), 8);
-    return 0;
+    struct bootrd_header *bh = (struct bootrd_header *) FLASH_VA;
+    if (memcmp(&bh->magic, &BOOTRD_MAGIC, sizeof(bh->magic))) {
+        sbi_puts("bootrd: bad magic\n");
+        halt();
+    }
+    if (bh->version != 1) {
+        sbi_puts("bootrd: bad version\n");
+        halt();
+    }
+
+    struct profile_header *ph =
+        (struct profile_header *) (FLASH_VA + bh->current_profile);
+    if (memcmp(&ph->magic, &PROFILE_MAGIC, sizeof(ph->magic))) {
+        sbi_puts("profile: bad magic\n");
+        halt();
+    }
+    if (ph->version != 1) {
+        sbi_puts("profile: bad version\n");
+        halt();
+    }
+    *pnum = ph->mod_num;
+    return (uint64_t *) ((uintptr_t) ph + sizeof(*ph));
 }
 
 static void
@@ -236,14 +251,16 @@ simplify_symbols(const struct load_info *info)
 }
 
 static void
-apply_relocate_add(Elf64_Shdr *sechdrs, const char *strtab,
-                   unsigned int symindex, unsigned int relsec)
+apply_relocate_add(const struct load_info *info, unsigned int relsec)
 {
     int i;
     u32 *location;
     Elf64_Sym *sym;
     unsigned int type;
     u64 v;
+    const char *strtab = info->strtab;
+    unsigned int symindex = info->index.sym;
+    Elf64_Shdr *sechdrs = info->sechdrs;
     Elf64_Shdr *shdr = sechdrs + relsec;
     Elf64_Rela *rel = (void *)shdr->sh_addr;
 
@@ -398,8 +415,7 @@ apply_relocations(const struct load_info *info)
             continue;
 
         if (info->sechdrs[i].sh_type == SHT_RELA)
-            apply_relocate_add(info->sechdrs,
-                               info->strtab, info->index.sym, i);
+            apply_relocate_add(info, i);
     }
 }
 
@@ -453,22 +469,43 @@ do_init_module(struct module *mod)
         mod->init();
 }
 
+/*
+ * Qemu pflash(cfi-flash) cannot be write directly,
+ * so copy module to a temporary area for writing.
+ * From PAGE_OFFSET, the first pmd holds startup code.
+ * We just use the back half of the second pmd for temporary
+ * area. NOTE: check module size less than (PMD_SIZE / 2).
+ */
+#define TEMP_MOD_AREA_VA    (PAGE_OFFSET + PMD_SIZE / 2)
+
+static uintptr_t
+copy_mod_to_temp_area(uintptr_t src)
+{
+    Elf64_Ehdr *hdr = (Elf64_Ehdr *) src;
+    /* HACK! e_phoff holds size of this module */
+    memcpy((void *)TEMP_MOD_AREA_VA, (void *)src, hdr->e_phoff);
+    return TEMP_MOD_AREA_VA;
+}
+
 static void
 init_other_modules(void)
 {
     int i;
     struct load_info info;
     struct module *mod;
+    uint32_t num_mod = 0;
 
-    uintptr_t src_addr = modules_source_base();
-    sbi_puts("startup: init_other_modules step1\n");
+    uint64_t *indexes = mod_indexes_in_flash(&num_mod);
     uintptr_t dst_addr = ROUND_UP((uintptr_t)_end, 8);
 
-    while (1) {
+    for (i = 0; i < num_mod; i++) {
+        uintptr_t src_addr = FLASH_VA + indexes[i];
         /* should start with "ELF" magic number */
         if (memcmp((void *)src_addr, ELFMAG, SELFMAG))
             break;
 
+        /* Reset source address, now it's the temporary middle area. */
+        src_addr = copy_mod_to_temp_area(src_addr);
         memset((void*)&info, 0, sizeof(struct load_info));
 
         setup_load_info(src_addr, &info);
@@ -479,6 +516,11 @@ init_other_modules(void)
 
         move_module(dst_addr, &info);
 
+#if 0
+    sbi_puts("1[\n");
+    sbi_put_u64(dst_addr);
+    sbi_puts("\n]\n");
+#endif
         simplify_symbols(&info);
 
         apply_relocations(&info);
@@ -486,7 +528,6 @@ init_other_modules(void)
         mod = finalize_module(dst_addr, &info);
 
         /* next */
-        src_addr += ROUND_UP(info.len, 8);
         dst_addr += ROUND_UP(info.layout.size, 8);
     }
 

@@ -381,6 +381,15 @@ write_profile(struct bootrd_header *hdr, void *opaque)
                __func__);
         exit(-1);
     }
+    printf("###### %s: num_profile_mods (%d)\n", __func__, num_profile_mods);
+#if 0
+    {
+        int i = 0;
+        for (i = 0; i < num_profile_mods; i++) {
+            printf("###### %s: (%d)\n", __func__, profile_mods[i]);
+        }
+    }
+#endif
     ret = fwrite(profile_mods, sizeof(uint64_t), num_profile_mods, fp);
     if (ret != num_profile_mods) {
         printf("%s: cannot profile data into bootrd file!\n", __func__);
@@ -408,7 +417,7 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
     list_for_each_entry(mod, &modules, list)
         build_dependency(mod);
 
-    profile_mods = calloc(sizeof(uint64_t), num_modules);
+    profile_mods = calloc(num_modules, sizeof(uint64_t));
 
     list_for_each_entry(mod, &modules, list) {
         traverse_dependency(mod, cb, opaque);
@@ -479,7 +488,7 @@ read_module(const char *filename, long *psize)
 
     *psize = ROUND_UP((size_t) info.st_size, 8);
 
-    uint8_t *data = calloc(1, *psize);
+    uint8_t *data = calloc(*psize, 1);
     if (data == NULL) {
         printf("%s: alloc memory failed!\n", __func__);
         exit(-1);

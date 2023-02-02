@@ -9,6 +9,7 @@ do_trap_error(struct pt_regs *regs, int signo, int code,
               unsigned long addr, const char *str)
 {
     sbi_puts(str);
+    sbi_puts("\n");
     sbi_srst_power_off();
 }
 
