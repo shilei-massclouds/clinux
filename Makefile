@@ -16,6 +16,7 @@ SUBDIRS := \
 	fs dcache filemap readahead \
 	kobject bio iov_iter block genhd backing-dev \
 	fork sched \
+	virtio virtio_mmio virtio_blk \
 	ext2 ramfs rootfs \
 	init
 
