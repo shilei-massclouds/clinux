@@ -137,7 +137,6 @@ handle_syscall:
     addi s2, s2, 0x4
     sd s2, PT_EPC(sp)
 check_syscall_nr:
-    csrw 0x0, a7
     /* Check to make sure we don't jump to a bogus syscall number. */
     li t0, __NR_syscalls
     la s0, sys_ni_syscall

@@ -18,6 +18,7 @@ SUBDIRS := \
 	fork sched \
 	virtio virtio_mmio virtio_blk \
 	ext2 ramfs rootfs \
+	sys \
 	init
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))

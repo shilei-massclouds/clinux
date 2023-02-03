@@ -13,7 +13,10 @@ long sys_ni_syscall(void);
  */
 long sys_ni_syscall(void)
 {
-    sbi_puts("non-implemented system!\n");
+    register uintptr_t a7 asm ("a7");
+    sbi_puts("sysnr[");
+    sbi_put_u64(a7);
+    sbi_puts("] NOT-Implemented yet!\n");
     halt();
     return -ENOSYS;
 }

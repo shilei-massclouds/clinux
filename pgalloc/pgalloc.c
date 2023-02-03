@@ -389,6 +389,8 @@ static vm_fault_t wp_page_copy(struct vm_fault *vmf)
 #endif
         }
     }
+
+    printk("--- %s: 3\n", __func__);
     return page_copied ? VM_FAULT_WRITE : 0;
 
  oom:
