@@ -5,6 +5,9 @@
 #include <acgcc.h>
 #include <types.h>
 
+#define UL_STR_SIZE 17  /* include '\0' */
+extern int ul_to_str(unsigned long n, char *str, size_t len);
+
 extern void *memset(void *, int, __kernel_size_t);
 extern void *memcpy(void *, const void *, size_t);
 extern int memcmp(const void *cs, const void *ct, size_t count);

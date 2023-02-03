@@ -73,3 +73,25 @@ int strcmp(const char *cs, const char *ct)
     return 0;
 }
 EXPORT_SYMBOL(strcmp);
+
+int ul_to_str(unsigned long n, char *str, size_t len)
+{
+    /* include '\0' */
+    if (len != 17)
+        return -1;
+
+    for (int i = 1; i <= 16; i++) {
+        char c = (n >> ((16 - i)*4)) & 0xF;
+        if (c >= 10) {
+            c -= 10;
+            c += 'A';
+        } else {
+            c += '0';
+        }
+        str[i-1] = c;
+    }
+    str[16] = '\0';
+
+    return 0;
+}
+EXPORT_SYMBOL(ul_to_str);
