@@ -11,6 +11,14 @@
 #include <pgalloc.h>
 #include <pgtable.h>
 #include <syscalls.h>
+#include <linkage.h>
+
+unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)]
+    __page_aligned_bss;
+EXPORT_SYMBOL(empty_zero_page);
+
+unsigned long zero_pfn;
+EXPORT_SYMBOL(zero_pfn);
 
 static unsigned long fault_around_bytes = rounddown_pow_of_two(65536);
 
@@ -242,6 +250,151 @@ static vm_fault_t do_fault(struct vm_fault *vmf)
     return ret;
 }
 
+static inline bool
+cow_user_page(struct page *dst, struct page *src, struct vm_fault *vmf)
+{
+    unsigned long addr = vmf->address;
+    struct vm_area_struct *vma = vmf->vma;
+
+    if (likely(src)) {
+        copy_user_highpage(dst, src, addr, vma);
+        return true;
+    }
+
+    panic("%s: todo!", __func__);
+}
+
+/*
+ * Handle the case of a page which we actually need to copy to a new page.
+ *
+ * Called with mmap_lock locked and the old page referenced, but
+ * without the ptl held.
+ *
+ * High level logic flow:
+ *
+ * - Allocate a page, copy the content of the old page to the new one.
+ * - Handle book keeping and accounting - cgroups, mmu-notifiers, etc.
+ * - Take the PTL. If the pte changed, bail out and release the allocated page
+ * - If the pte is still the way we remember it, update the page table and all
+ *   relevant references. This includes dropping the reference the page-table
+ *   held to the old page, as well as updating the rmap.
+ * - In any case, unlock the PTL and drop the reference we took to the old page.
+ */
+static vm_fault_t wp_page_copy(struct vm_fault *vmf)
+{
+    pte_t entry;
+    int page_copied = 0;
+    struct page *new_page = NULL;
+    struct page *old_page = vmf->page;
+    struct vm_area_struct *vma = vmf->vma;
+    struct mm_struct *mm = vma->vm_mm;
+
+    /* Todo: */
+#if 0
+    if (unlikely(anon_vma_prepare(vma)))
+        goto oom;
+#endif
+
+    if (is_zero_pfn(pte_pfn(vmf->orig_pte))) {
+        new_page = alloc_zeroed_user_highpage_movable(vma, vmf->address);
+        if (!new_page)
+            goto oom;
+    } else {
+        printk("--- %s: 1.2\n", __func__);
+        new_page = alloc_page_vma(GFP_HIGHUSER_MOVABLE, vma, vmf->address);
+        if (!new_page)
+            goto oom;
+
+        if (!cow_user_page(new_page, old_page, vmf)) {
+            /*
+             * COW failed, if the fault was solved by other,
+             * it's fine. If not, userspace would re-fault on
+             * the same address and we will handle the fault
+             * from the second attempt.
+             */
+            return 0;
+        }
+    }
+
+    __SetPageUptodate(new_page);
+
+    /*
+     * Re-check the pte - we dropped the lock
+     */
+    vmf->pte = pte_offset_map_lock(mm, vmf->pmd, vmf->address);
+    if (likely(pte_same(*vmf->pte, vmf->orig_pte))) {
+        entry = mk_pte(new_page, vma->vm_page_prot);
+        entry = pte_sw_mkyoung(entry);
+        entry = maybe_mkwrite(pte_mkdirty(entry), vma);
+        /*
+         * Clear the pte entry and flush it first, before updating the
+         * pte with the new entry. This will avoid a race condition
+         * seen in the presence of one thread doing SMC and another
+         * thread doing COW.
+         */
+        //page_add_new_anon_rmap(new_page, vma, vmf->address, false);
+        //lru_cache_add_inactive_or_unevictable(new_page, vma);
+
+        /*
+         * We call the notify macro here because, when using secondary
+         * mmu page tables (such as kvm shadow page tables), we want the
+         * new page to be mapped directly into the secondary page table.
+         */
+        set_pte_at_notify(mm, vmf->address, vmf->pte, entry);
+        update_mmu_cache(vma, vmf->address, vmf->pte);
+        if (old_page) {
+            /*
+             * Only after switching the pte to the new page may
+             * we remove the mapcount here. Otherwise another
+             * process may come and find the rmap count decremented
+             * before the pte is switched to the new page, and
+             * "reuse" the old page writing into it while our pte
+             * here still points into it and can be read by other
+             * threads.
+             *
+             * The critical issue is to order this
+             * page_remove_rmap with the ptp_clear_flush above.
+             * Those stores are ordered by (if nothing else,)
+             * the barrier present in the atomic_add_negative
+             * in page_remove_rmap.
+             *
+             * Then the TLB flush in ptep_clear_flush ensures that
+             * no process can access the old page before the
+             * decremented mapcount is visible. And the old page
+             * cannot be reused until after the decremented
+             * mapcount is visible. So transitively, TLBs to
+             * old page will be flushed before it can be reused.
+             */
+            //page_remove_rmap(old_page, false);
+        }
+
+        /* Free the old page.. */
+        new_page = old_page;
+        page_copied = 1;
+    } else {
+        //update_mmu_tlb(vma, vmf->address, vmf->pte);
+        panic("%s: 2.2!", __func__);
+    }
+
+    if (old_page) {
+        /*
+         * Don't let another task, with possibly unlocked vma,
+         * keep the mlocked page.
+         */
+        if (page_copied && (vma->vm_flags & VM_LOCKED)) {
+            panic("VM_LOCKED!");
+#if 0
+            if (PageMlocked(old_page))
+                munlock_vma_page(old_page);
+#endif
+        }
+    }
+    return page_copied ? VM_FAULT_WRITE : 0;
+
+ oom:
+    return VM_FAULT_OOM;
+}
+
 /*
  * This routine handles present pages, when users try to write
  * to a shared page. It is done by copying the page to a new address
@@ -262,7 +415,43 @@ static vm_fault_t do_fault(struct vm_fault *vmf)
  */
 static vm_fault_t do_wp_page(struct vm_fault *vmf)
 {
-    panic("%s: todo!");
+    struct vm_area_struct *vma = vmf->vma;
+
+    vmf->page = vm_normal_page(vma, vmf->address, vmf->orig_pte);
+    if (!vmf->page) {
+#if 0
+        /*
+         * VM_MIXEDMAP !pfn_valid() case, or VM_SOFTDIRTY clear on a
+         * VM_PFNMAP VMA.
+         *
+         * We should not cow pages in a shared writeable mapping.
+         * Just mark the pages writable and/or call ops->pfn_mkwrite.
+         */
+        if ((vma->vm_flags & (VM_WRITE|VM_SHARED)) == (VM_WRITE|VM_SHARED))
+            return wp_pfn_shared(vmf);
+
+        pte_unmap_unlock(vmf->pte, vmf->ptl);
+        return wp_page_copy(vmf);
+#endif
+        panic("%s: 1!", __func__);
+    }
+
+    /*
+     * Take out anonymous pages first, anonymous shared vmas are
+     * not dirty accountable.
+     */
+    if (PageAnon(vmf->page)) {
+        panic("%s: PageAnon!", __func__);
+    } else if (unlikely((vma->vm_flags & (VM_WRITE|VM_SHARED)) ==
+                        (VM_WRITE|VM_SHARED))) {
+        panic("%s: wp_page_shared!", __func__);
+        //return wp_page_shared(vmf);
+    }
+
+    /*
+     * Ok, we need to copy. Oh, well..
+     */
+    return wp_page_copy(vmf);
 }
 
 static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
@@ -407,7 +596,9 @@ static vm_fault_t pte_alloc_one_map(struct vm_fault *vmf)
 
 void page_add_file_rmap(struct page *page, bool compound)
 {
-    panic("%s: !", __func__);
+    /* Todo */
+    printk("%s: NOT implemented!\n", __func__);
+    //panic("%s: !", __func__);
 }
 
 /**
@@ -541,6 +732,8 @@ init_module(void)
 
     handle_mm_fault = _handle_mm_fault;
     do_sys_brk = _do_sys_brk;
+
+    zero_pfn = page_to_pfn(ZERO_PAGE(0));
 
     printk("module[pgalloc]: init end!\n");
 

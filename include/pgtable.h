@@ -90,6 +90,13 @@ struct vm_area_struct;
 /* Number of PGD entries that a user-mode program can use */
 #define USER_PTRS_PER_PGD   (TASK_SIZE / PGDIR_SIZE)
 
+/*
+ * ZERO_PAGE is a global shared page that is always zero,
+ * used for zero-mapped memory areas, etc.
+ */
+extern unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)];
+#define ZERO_PAGE(vaddr) (virt_to_page(empty_zero_page))
+
 #define pmd_addr_end(addr, end)                     \
 ({  unsigned long __boundary = ((addr) + PMD_SIZE) & PMD_MASK;  \
     (__boundary - 1 < (end) - 1)? __boundary: (end);        \
@@ -203,6 +210,7 @@ set_pte_at(struct mm_struct *mm, unsigned long addr, pte_t *ptep, pte_t pteval)
 {
     set_pte(ptep, pteval);
 }
+#define set_pte_at_notify set_pte_at
 
 #define mk_pte(page, prot)  pfn_pte(page_to_pfn(page), prot)
 
@@ -275,6 +283,12 @@ ptep_set_access_flags(struct vm_area_struct *vma,
      * the case that the PTE changed and the spurious fault case.
      */
     return true;
+}
+
+static inline int is_zero_pfn(unsigned long pfn)
+{
+    extern unsigned long zero_pfn;
+    return pfn == zero_pfn;
 }
 
 /* Commit new configuration to MMU hardware */

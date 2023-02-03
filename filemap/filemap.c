@@ -387,7 +387,7 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
      * that it's up-to-date. If not, it is going to be due to an error.
      */
     if (unlikely(!PageUptodate(page)))
-        panic("page not uptodate!");
+        panic("page not uptodate! We really need a page lock!");
 
     /*
      * We've made it this far and we had to drop our mmap_lock, now is the
