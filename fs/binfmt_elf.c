@@ -590,11 +590,8 @@ static int load_elf_binary(struct linux_binprm *bprm)
     if (retval)
         panic("set brk error!");
 
-    printk("--- --- %s: step2\n", __func__);
-
     if (likely(elf_bss != elf_brk) && unlikely(padzero(elf_bss)))
         panic("pad zero to bss error!");
-    printk("--- --- %s: step3\n", __func__);
 
     if (interpreter) {
         panic("interpreter!");
@@ -626,6 +623,7 @@ static int load_elf_binary(struct linux_binprm *bprm)
     start_thread(regs, elf_entry, bprm->p);
     retval = 0;
 
+    printk("--- --- %s: step5\n", __func__);
  out:
     return retval;
 }
