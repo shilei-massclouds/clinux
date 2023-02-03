@@ -17,7 +17,7 @@ SUBDIRS := \
 	kobject bio iov_iter block genhd backing-dev \
 	fork sched \
 	virtio virtio_mmio virtio_blk \
-	ext2 ramfs rootfs \
+	ext2 ramfs rootfs procfs \
 	sys \
 	init
 

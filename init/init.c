@@ -7,6 +7,7 @@
 #include <printk.h>
 #include <platform.h>
 
+extern bool procfs_ready;
 extern bool sys_ready;
 extern bool virtio_mmio_ready;
 extern uintptr_t kernel_size;
@@ -33,6 +34,7 @@ init_module(void)
 
     BUG_ON(!virtio_mmio_ready);
     BUG_ON(!rootfs_initialized);
+    BUG_ON(!procfs_ready);
     BUG_ON(!sys_ready);
     start_kernel_fn = start_kernel;
 
