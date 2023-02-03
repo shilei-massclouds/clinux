@@ -246,4 +246,53 @@ static inline pte_t pte_mkdirty(pte_t pte)
     return __pte(pte_val(pte) | _PAGE_DIRTY);
 }
 
+static inline int pte_same(pte_t pte_a, pte_t pte_b)
+{
+    return pte_val(pte_a) == pte_val(pte_b);
+}
+
+static inline int pte_write(pte_t pte)
+{
+    return pte_val(pte) & _PAGE_WRITE;
+}
+
+static inline pte_t pte_mkyoung(pte_t pte)
+{
+    return __pte(pte_val(pte) | _PAGE_ACCESSED);
+}
+
+static inline int
+ptep_set_access_flags(struct vm_area_struct *vma,
+                      unsigned long address, pte_t *ptep,
+                      pte_t entry, int dirty)
+{
+    if (!pte_same(*ptep, entry)) {
+        panic("%s: !pte_same", __func__);
+        //set_pte_at(vma->vm_mm, address, ptep, entry);
+    }
+    /*
+     * update_mmu_cache will unconditionally execute, handling both
+     * the case that the PTE changed and the spurious fault case.
+     */
+    return true;
+}
+
+/* Commit new configuration to MMU hardware */
+static inline void
+update_mmu_cache(struct vm_area_struct *vma,
+                 unsigned long address, pte_t *ptep)
+{
+    /*
+     * The kernel assumes that TLBs don't cache invalid entries, but
+     * in RISC-V, SFENCE.VMA specifies an ordering constraint, not a
+     * cache flush; it is necessary even after writing invalid entries.
+     * Relying on flush_tlb_fix_spurious_fault would suffice, but
+     * the extra traps reduce performance.  So, eagerly SFENCE.VMA.
+     */
+    local_flush_tlb_page(address);
+}
+
+#define flush_tlb_fix_spurious_fault(vma, address) \
+    flush_tlb_page(vma, address)
+
 #endif /* _LINUX_PGTABLE_H */

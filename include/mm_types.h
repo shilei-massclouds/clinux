@@ -225,4 +225,10 @@ typedef vm_fault_t
                      unsigned int flags, struct pt_regs *regs);
 extern handle_mm_fault_t handle_mm_fault;
 
+void flush_tlb_all(void);
+void flush_tlb_mm(struct mm_struct *mm);
+void flush_tlb_page(struct vm_area_struct *vma, unsigned long addr);
+void flush_tlb_range(struct vm_area_struct *vma,
+                     unsigned long start, unsigned long end);
+
 #endif /* _LINUX_MM_TYPES_H */

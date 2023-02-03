@@ -212,12 +212,7 @@ static inline mm_segment_t force_uaccess_begin(void)
     return fs;
 }
 
-static inline unsigned long
-__clear_user(void *to, unsigned long n)
-{
-    memset((void __force *)to, 0, n);
-    return 0;
-}
+unsigned long __clear_user(void *addr, unsigned long n);
 
 static inline
 unsigned long clear_user(void *to, unsigned long n)

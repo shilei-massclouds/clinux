@@ -7,3 +7,4 @@ obj_y += context.o
 obj_y += util.o
 obj_y += gup.o
 obj_y += mprotect.o
+obj_y += tlbflush.o

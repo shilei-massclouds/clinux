@@ -576,7 +576,7 @@ static int load_elf_binary(struct linux_binprm *bprm)
         }
     }
 
-    printk("%s: code(%lx, %lx) data(%lx, %lx) bss(%lx) brk(%lx)\n",
+    printk("--- --- %s: code(%lx, %lx) data(%lx, %lx) bss(%lx) brk(%lx)\n",
            __func__, start_code, end_code, start_data, end_data, elf_bss, elf_brk);
 
     e_entry = elf_ex->e_entry;
@@ -590,8 +590,11 @@ static int load_elf_binary(struct linux_binprm *bprm)
     if (retval)
         panic("set brk error!");
 
+    printk("--- --- %s: step2\n", __func__);
+
     if (likely(elf_bss != elf_brk) && unlikely(padzero(elf_bss)))
         panic("pad zero to bss error!");
+    printk("--- --- %s: step3\n", __func__);
 
     if (interpreter) {
         panic("interpreter!");

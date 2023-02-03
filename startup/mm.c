@@ -88,6 +88,10 @@ asm_copy_from_user(void *to, const void *from, unsigned long n)
 }
 EXPORT_SYMBOL(asm_copy_from_user);
 
+extern unsigned long
+__clear_user(void *addr, unsigned long n);
+EXPORT_SYMBOL(__clear_user);
+
 void do_page_fault(struct pt_regs *regs)
 {
     do_page_fault_func(regs);

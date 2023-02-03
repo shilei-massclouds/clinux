@@ -216,6 +216,7 @@ static vm_fault_t do_cow_fault(struct vm_fault *vmf)
     if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY)))
         panic("uncharge out!");
 
+    printk("%s: step2\n", __func__);
     return ret;
 }
 
@@ -241,8 +242,35 @@ static vm_fault_t do_fault(struct vm_fault *vmf)
     return ret;
 }
 
+/*
+ * This routine handles present pages, when users try to write
+ * to a shared page. It is done by copying the page to a new address
+ * and decrementing the shared-page counter for the old page.
+ *
+ * Note that this routine assumes that the protection checks have been
+ * done by the caller (the low-level page fault routine in most cases).
+ * Thus we can safely just mark it writable once we've done any necessary
+ * COW.
+ *
+ * We also mark the page dirty at this point even though the page will
+ * change only once the write actually happens. This avoids a few races,
+ * and potentially makes it more efficient.
+ *
+ * We enter with non-exclusive mmap_lock (to exclude vma changes,
+ * but allow concurrent faults), with pte both mapped and locked.
+ * We return with mmap_lock still held, but pte unmapped and unlocked.
+ */
+static vm_fault_t do_wp_page(struct vm_fault *vmf)
+{
+    panic("%s: todo!");
+}
+
 static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
 {
+    pte_t entry;
+
+    printk("--- %s: vmf: addr(%x) flags(%x) pgoff(%x)\n",
+           __func__, vmf->address, vmf->flags, vmf->pgoff);
     if (unlikely(pmd_none(*vmf->pmd))) {
         /*
          * Leave __pte_alloc() until later: because vm_ops->fault may
@@ -280,7 +308,41 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
             return do_fault(vmf);
     }
 
-    panic("%s: !", __func__);
+    if (!pte_present(vmf->orig_pte)) {
+        panic("do_swap_page");
+        //return do_swap_page(vmf);
+    }
+
+    entry = vmf->orig_pte;
+    if (unlikely(!pte_same(*vmf->pte, entry)))
+        goto unlock;
+
+    if (vmf->flags & FAULT_FLAG_WRITE) {
+        if (!pte_write(entry))
+            return do_wp_page(vmf);
+        entry = pte_mkdirty(entry);
+    }
+
+    entry = pte_mkyoung(entry);
+    if (ptep_set_access_flags(vmf->vma, vmf->address, vmf->pte, entry,
+                              vmf->flags & FAULT_FLAG_WRITE)) {
+        update_mmu_cache(vmf->vma, vmf->address, vmf->pte);
+    } else {
+        /* Skip spurious TLB flush for retried page fault */
+        if (vmf->flags & FAULT_FLAG_TRIED)
+            goto unlock;
+        /*
+         * This is needed only for protection faults but the arch code
+         * is not yet telling us if this is a protection fault or not.
+         * This still avoids useless tlb flushes for .text page faults
+         * with threads.
+         */
+        if (vmf->flags & FAULT_FLAG_WRITE)
+            flush_tlb_fix_spurious_fault(vmf->vma, vmf->address);
+    }
+
+ unlock:
+    return 0;
 }
 
 static vm_fault_t
@@ -345,7 +407,24 @@ static vm_fault_t pte_alloc_one_map(struct vm_fault *vmf)
 
 void page_add_file_rmap(struct page *page, bool compound)
 {
-    /* Todo: */
+    panic("%s: !", __func__);
+}
+
+/**
+ * page_add_new_anon_rmap - add pte mapping to a new anonymous page
+ * @page:   the page to add the mapping to
+ * @vma:    the vm area in which the mapping is added
+ * @address:    the user virtual address mapped
+ * @compound:   charge the page as compound or small page
+ *
+ * Same as page_add_anon_rmap but must only be called on *new* pages.
+ * This means the inc-and-test can be bypassed.
+ * Page does not have to be locked.
+ */
+void page_add_new_anon_rmap(struct page *page, struct vm_area_struct *vma,
+                            unsigned long address, bool compound)
+{
+    panic("%s: !", __func__);
 }
 
 vm_fault_t alloc_set_pte(struct vm_fault *vmf, struct page *page)
@@ -370,15 +449,18 @@ vm_fault_t alloc_set_pte(struct vm_fault *vmf, struct page *page)
         entry = maybe_mkwrite(pte_mkdirty(entry), vma);
     /* copy-on-write page */
     if (write && !(vma->vm_flags & VM_SHARED)) {
-        /* Todo: */
         /*
         page_add_new_anon_rmap(page, vma, vmf->address, false);
         lru_cache_add_inactive_or_unevictable(page, vma);
         */
+        //panic("%s: !", __func__);
     } else {
         page_add_file_rmap(page, false);
     }
+    printk("%s: addr(%x) entry(%x)\n", __func__, vmf->address, entry);
     set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);
+    /* no need to invalidate: a not-present page won't be cached */
+    update_mmu_cache(vma, vmf->address, vmf->pte);
     return 0;
 }
 EXPORT_SYMBOL(alloc_set_pte);

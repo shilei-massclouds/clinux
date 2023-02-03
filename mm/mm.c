@@ -185,12 +185,16 @@ void _do_page_fault(struct pt_regs *regs)
     cause = regs->cause;
     addr = regs->badaddr;
 
+    printk("--- --- %s: cause(%x) addr(%x)\n",
+           __func__, cause, addr);
+
     tsk = current;
     mm = tsk->mm;
 
     if (user_mode(regs))
         flags |= FAULT_FLAG_USER;
 
+ retry:
     vma = find_vma(mm, addr);
     if (unlikely(!vma))
         panic("bad area!");
@@ -233,6 +237,29 @@ void _do_page_fault(struct pt_regs *regs)
      * the fault.
      */
     fault = handle_mm_fault(vma, addr, flags, regs);
+
+    if (unlikely(fault & VM_FAULT_ERROR)) {
+        if (fault & VM_FAULT_OOM)
+            panic("out_of_memory");
+        else if (fault & VM_FAULT_SIGBUS)
+            panic("do_sigbus");
+        BUG();
+    }
+
+    if (flags & FAULT_FLAG_ALLOW_RETRY) {
+        if (fault & VM_FAULT_RETRY) {
+            flags |= FAULT_FLAG_TRIED;
+
+            /*
+             * No need to mmap_read_unlock(mm) as we would
+             * have already released it in __lock_page_or_retry
+             * in mm/filemap.c.
+             */
+            goto retry;
+        }
+    }
+
+    //printk("--- --- %s: flags(%x)\n", __func__, flags);
     //panic("%s: !", __func__);
     return;
 }
