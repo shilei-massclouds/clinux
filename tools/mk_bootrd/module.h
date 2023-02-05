@@ -36,7 +36,9 @@ typedef struct _symbol {
     list_head   list;
 } symbol;
 
-typedef void (*sort_callback)(const char *name, void *opaque);
+typedef void (*sort_callback)(const char *name, void *opaque,
+                              int *num_profile_mods,
+                              uint64_t *profile_mods);
 
 /*
  * ELF64

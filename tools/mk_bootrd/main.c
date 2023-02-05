@@ -21,18 +21,12 @@
 /* Bootrd file is used as qemu.pflash */
 #define BOOTRD_SIZE 32*1024*1024L   /* 32M */
 
-#define DEFAULT_PROFILE "./profile.json"
-static json_object *profile_top = NULL;
-
 static uint32_t ksym_ptr;
 static uint32_t ksym_num;
 
 static int num_modules = 0;
 static LIST_HEAD(modules);
 static LIST_HEAD(symbols);
-
-static int num_profile_mods = 0;
-static uint64_t *profile_mods = NULL;
 
 static bool
 check_module(const char *name)
@@ -332,7 +326,9 @@ analysis_module(module *mod)
 }
 
 static void
-traverse_dependency(module *mod, sort_callback cb, void *opaque)
+traverse_dependency(module *mod, json_object *json_top,
+                    int *num_profile_mods, uint64_t *profile_mods,
+                    sort_callback cb, void *opaque)
 {
     list_head *p, *n;
 
@@ -350,7 +346,9 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
 
         //printf("%s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
 
-        traverse_dependency(d->mod, cb, opaque);
+        traverse_dependency(d->mod, json_top,
+                            num_profile_mods, profile_mods,
+                            cb, opaque);
         if (d->mod->status != M_STATUS_DONE) {
             printf("%s: cyclic chain: '%s'\n", __func__, d->mod->name);
             return;
@@ -363,7 +361,7 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
         free(d);
     }
 
-    json_object_object_add(profile_top, mod->name, dep_mods);
+    json_object_object_add(json_top, mod->name, dep_mods);
 
     if (!list_empty(&(mod->dependencies))) {
         printf("'%s' broken dependencies!\n", mod->name);
@@ -371,11 +369,12 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
     }
 
     mod->status = M_STATUS_DONE;
-    cb(mod->name, opaque);
+    cb(mod->name, opaque, num_profile_mods, profile_mods);
 }
 
 static void
-write_profile(struct bootrd_header *hdr, void *opaque)
+write_profile_to_bootrd(int num_profile_mods, uint64_t *profile_mods,
+                        struct bootrd_header *hdr, void *opaque)
 {
     uint64_t ret;
     FILE *fp = (FILE *) opaque;
@@ -393,17 +392,17 @@ write_profile(struct bootrd_header *hdr, void *opaque)
         exit(-1);
     }
     printf("###### %s: num_profile_mods (%d)\n", __func__, num_profile_mods);
-#if 0
+#if 1
     {
         int i = 0;
         for (i = 0; i < num_profile_mods; i++) {
-            printf("###### %s: (%d)\n", __func__, profile_mods[i]);
+            printf("###### %s: (%ld)\n", __func__, profile_mods[i]);
         }
     }
 #endif
     ret = fwrite(profile_mods, sizeof(uint64_t), num_profile_mods, fp);
     if (ret != num_profile_mods) {
-        printf("%s: cannot profile data into bootrd file!\n", __func__);
+        printf("%s: cannot write profile data into bootrd file!\n", __func__);
         exit(-1);
     }
 
@@ -415,6 +414,7 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
 {
     list_head *p, *n;
     module *mod;
+    bool first_profile = true;
 
     discover_modules();
     hdr->mod_num = num_modules;
@@ -434,29 +434,44 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
     list_for_each_entry(mod, &modules, list)
         build_dependency(mod);
 
-    profile_mods = calloc(num_modules, sizeof(uint64_t));
-
     /* Traverse modules based on their dependency chains,
      * try to build bootrd and profiles */
     list_for_each_entry(mod, &modules, list) {
-        traverse_dependency(mod, cb, opaque);
+        char filename[260];
+        /* Only top_xxx can act as start point */
+        if (strncmp(mod->name, "top_", 4))
+            continue;
+
+        int num_profile_mods = 0;
+        uint64_t *profile_mods = calloc(num_modules, sizeof(uint64_t));
+
+        sprintf(filename, "./%s.json", mod->name);
+        json_object *json_top = json_object_new_object();
+
+        traverse_dependency(mod, json_top,
+                            &num_profile_mods, profile_mods,
+                            cb, opaque);
         if (mod->status != M_STATUS_DONE) {
             printf("%s: cyclic chain: '%s'.\n", __func__, mod->name);
             exit(-1);
         }
+
+        /* Create module profile(json-style) for human */
+        json_object_to_file(filename, json_top);
+        json_object_put(json_top);
+
+        /* Add module profiles into bootrd */
+        if (first_profile) {
+            hdr->profile_offset = ftell((FILE *) opaque);
+            hdr->current_profile = hdr->profile_offset;
+            first_profile = false;
+        }
+        write_profile_to_bootrd(num_profile_mods, profile_mods, hdr, opaque);
+
+        free(profile_mods);
+        profile_mods = NULL;
+        num_profile_mods = 0;
     }
-
-    /* Create module profile(json-style) for human */
-    json_object_to_file(DEFAULT_PROFILE, profile_top);
-
-    /* Add module profiles into bootrd */
-    hdr->profile_offset = ftell((FILE *) opaque);
-    hdr->current_profile = hdr->profile_offset;
-    write_profile(hdr, opaque);
-
-    free(profile_mods);
-    profile_mods = NULL;
-    num_profile_mods = 0;
 }
 
 void
@@ -529,7 +544,10 @@ read_module(const char *filename, long *psize)
 }
 
 static void
-sort_func(const char *name, void *opaque)
+sort_func(const char *name,
+          void *opaque,
+          int *num_profile_mods,
+          uint64_t *profile_mods)
 {
     size_t size = 0;
     char filename[256] = {0};
@@ -549,13 +567,13 @@ sort_func(const char *name, void *opaque)
     free(data);
     data = NULL;
 
-    if (num_profile_mods == num_modules) {
+    if (*num_profile_mods == num_modules) {
         printf("%s: find too many modules %d, limit is %d!\n",
-               __func__, num_profile_mods, num_modules);
+               __func__, *num_profile_mods, num_modules);
         exit(-1);
     }
-    profile_mods[num_profile_mods++] = offset;
-#if 0
+    profile_mods[(*num_profile_mods)++] = offset;
+#if 1
     printf("%s: mod '%s'; size '%ld'; offset '%ld'\n",
            __func__, name, size, offset);
 #endif
@@ -582,7 +600,7 @@ complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
     hdr->total_size = ftell(fp);
 
-#if 0
+#if 1
     printf("%s: magic %x\n", __func__, hdr->magic);
     printf("%s: version %x\n", __func__, hdr->version);
     printf("%s: total_size %x\n", __func__, hdr->total_size);
@@ -616,19 +634,11 @@ main(void)
     struct bootrd_header hdr;
     memset(&hdr, 0, sizeof(hdr));
 
-    if (!profile_top)
-        profile_top = json_object_new_object();
-
     FILE* fp = create_bootrd(&hdr);
     sort_modules(&hdr, sort_func, fp);
     complete_bootrd(&hdr, fp);
     clear_symbols();
     clear_modules();
-
-    if (profile_top) {
-        json_object_put(profile_top);
-        profile_top = NULL;
-    }
 
     return 0;
 }
