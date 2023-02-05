@@ -19,7 +19,7 @@ SUBDIRS := \
 	virtio virtio_mmio virtio_blk \
 	ext2 ramfs rootfs procfs \
 	sys \
-	init
+	userboot
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
 

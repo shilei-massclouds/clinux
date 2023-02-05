@@ -1,12 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
+#include <mm.h>
 #include <fs.h>
+#include <fdt.h>
 #include <bug.h>
 #include <fork.h>
 #include <errno.h>
 #include <sched.h>
 #include <limits.h>
 #include <printk.h>
+#include <platform.h>
+
+extern bool procfs_ready;
+extern bool sys_ready;
+extern bool virtio_mmio_ready;
+extern uintptr_t kernel_size;
+extern void arch_call_rest_init(void);
 
 /*
  * Boot command-line arguments
@@ -74,4 +83,34 @@ void rest_init(void)
 void arch_call_rest_init(void)
 {
     rest_init();
+}
+
+static void
+start_kernel(void)
+{
+    printk("start_kernel: init ...\n");
+
+    if (kernel_size >= PMD_SIZE)
+        panic("kernel size (%lu) is over PME_SIZE!", kernel_size);
+
+    /* Do the rest non-__init'ed, we're now alive */
+    arch_call_rest_init();
+
+    printk("start_kernel: init ok!\n");
+}
+
+static int
+init_module(void)
+{
+    printk("module[userboot]: init begin ...\n");
+
+    BUG_ON(!virtio_mmio_ready);
+    BUG_ON(!rootfs_initialized);
+    BUG_ON(!procfs_ready);
+    BUG_ON(!sys_ready);
+    start_kernel_fn = start_kernel;
+
+    printk("module[userboot]: init end!\n");
+
+    return 0;
 }

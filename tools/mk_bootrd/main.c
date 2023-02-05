@@ -422,14 +422,22 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
     /* Init ksymtab based on startup.bin. */
     init_symtable();
 
+    /* For each module, register its exported symbols into a list */
     list_for_each_entry(mod, &modules, list)
         analysis_module(mod);
 
+    /*
+     * For each module, try to match its undef symbols with
+     * those in the above symbol list.
+     * By this way, we can build dependency chains among these modules.
+     */
     list_for_each_entry(mod, &modules, list)
         build_dependency(mod);
 
     profile_mods = calloc(num_modules, sizeof(uint64_t));
 
+    /* Traverse modules based on their dependency chains,
+     * try to build bootrd and profiles */
     list_for_each_entry(mod, &modules, list) {
         traverse_dependency(mod, cb, opaque);
         if (mod->status != M_STATUS_DONE) {
@@ -438,9 +446,10 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
         }
     }
 
-    /* Add module into profile(json-style) */
+    /* Create module profile(json-style) for human */
     json_object_to_file(DEFAULT_PROFILE, profile_top);
 
+    /* Add module profiles into bootrd */
     hdr->profile_offset = ftell((FILE *) opaque);
     hdr->current_profile = hdr->profile_offset;
     write_profile(hdr, opaque);
