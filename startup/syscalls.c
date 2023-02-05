@@ -58,8 +58,15 @@ SYSCALL_DEFINE5(mount, char *, dev_name, char *, dir_name,
 ksys_write_t ksys_write;
 EXPORT_SYMBOL(ksys_write);
 
-SYSCALL_DEFINE3(write, unsigned int, fd,
-                const char *, buf, size_t, count)
+SYSCALL_DEFINE3(write, unsigned int, fd, const char *, buf, size_t, count)
 {
     return ksys_write(fd, buf, count);
+}
+
+do_faccessat_t do_faccessat;
+EXPORT_SYMBOL(do_faccessat);
+
+SYSCALL_DEFINE3(faccessat, int, dfd, const char *, filename, int, mode)
+{
+    return do_faccessat(dfd, filename, mode, 0);
 }

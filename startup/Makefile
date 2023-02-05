@@ -4,6 +4,7 @@ target_y := startup.bin
 
 obj_y := head.o
 obj_y += entry.o
+#obj_y += fpu.o
 obj_y += mm.o
 obj_y += sbi.o
 obj_y += traps.o

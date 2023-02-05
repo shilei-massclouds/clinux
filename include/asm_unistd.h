@@ -5,6 +5,9 @@
 __SYSCALL(__NR_mount, sys_mount)
 
 /* fs/open.c */
+#define __NR_faccessat 48
+__SYSCALL(__NR_faccessat, sys_faccessat)
+
 #define __NR_openat 56
 __SYSCALL(__NR_openat, sys_openat)
 

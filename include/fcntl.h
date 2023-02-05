@@ -32,6 +32,11 @@
 
 #define O_NDELAY    O_NONBLOCK
 
+#define AT_SYMLINK_NOFOLLOW 0x100   /* Do not follow symbolic links. */
+#define AT_EACCESS          0x200   /* Test access permitted for
+                                       effective IDs, not real IDs. */
+#define AT_EMPTY_PATH       0x1000  /* Allow empty relative pathname */
+
 /* List of all valid flags for the open/openat flags argument: */
 #define VALID_OPEN_FLAGS \
     (O_RDONLY | O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | \

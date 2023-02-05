@@ -15,6 +15,7 @@
 #include <processor.h>
 #include <mman-common.h>
 #include <limits.h>
+#include <switch_to.h>
 
 #define ELF_MIN_ALIGN       PAGE_SIZE
 #define ELF_PAGESTART(_v)   ((_v) & ~(unsigned long)(ELF_MIN_ALIGN-1))
@@ -269,8 +270,15 @@ void start_thread(struct pt_regs *regs,
                   unsigned long sp)
 {
     regs->status = SR_PIE;
+    regs->status |= SR_FS_INITIAL;
+    /*
+    * Restore the initial value to the FP register
+    * before starting the user program.
+    */
+    fstate_restore(current, regs);
     regs->epc = pc;
     regs->sp = sp;
+
     set_fs(USER_DS);
 }
 

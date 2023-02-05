@@ -317,7 +317,52 @@ _do_sys_open(int dfd, const char *filename, int flags, umode_t mode)
     return do_sys_openat2(dfd, filename, &how);
 }
 
+long
+_do_faccessat(int dfd, const char *filename, int mode, int flags)
+{
+    struct path path;
+    struct inode *inode;
+    int res;
+    unsigned int lookup_flags = LOOKUP_FOLLOW;
+    const struct cred *old_cred = NULL;
+
+    if (mode & ~S_IRWXO)    /* where's F_OK, X_OK, W_OK, R_OK? */
+        return -EINVAL;
+
+    if (flags & ~(AT_EACCESS | AT_SYMLINK_NOFOLLOW | AT_EMPTY_PATH))
+        return -EINVAL;
+
+    if (flags & AT_SYMLINK_NOFOLLOW)
+        lookup_flags &= ~LOOKUP_FOLLOW;
+    if (flags & AT_EMPTY_PATH)
+        lookup_flags |= LOOKUP_EMPTY;
+
+#if 0
+    if (!(flags & AT_EACCESS)) {
+        old_cred = access_override_creds();
+        if (!old_cred)
+            return -ENOMEM;
+    }
+#endif
+
+    res = user_path_at(dfd, filename, lookup_flags, &path);
+    if (res)
+        goto out;
+
+    panic("%s: todo! filename(%s)",
+          __func__, path.dentry->d_name.name);
+
+ out:
+#if 0
+    if (old_cred)
+        revert_creds(old_cred);
+#endif
+
+    return res;
+}
+
 void init_open(void)
 {
     do_sys_open = _do_sys_open;
+    do_faccessat = _do_faccessat;
 }

@@ -62,6 +62,12 @@ extern do_sys_open_t do_sys_open;
 
 long sys_openat(int dfd, const char *filename, int flags, umode_t mode);
 
+typedef long (*do_faccessat_t)(int dfd, const char *filename,
+                               int mode, int flags);
+extern do_faccessat_t do_faccessat;
+
+long sys_faccessat(int dfd, const char *filename, int mode, int flags);
+
 typedef long (*do_sys_brk_t)(unsigned long brk);
 extern do_sys_brk_t do_sys_brk;
 

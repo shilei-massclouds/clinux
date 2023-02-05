@@ -222,9 +222,30 @@ __follow_mount_rcu(struct nameidata *nd, struct path *path,
 }
 
 static inline int
+traverse_mounts(struct path *path, bool *jumped,
+                unsigned lookup_flags)
+{
+    unsigned flags = path->dentry->d_flags;
+
+    /* fastpath */
+    if (likely(!(flags & DCACHE_MANAGED_DENTRY))) {
+        *jumped = false;
+        printk("--- %s: 1 flags(%x)\n", __func__, flags);
+        if (unlikely(d_flags_negative(flags)))
+            return -ENOENT;
+        return 0;
+    }
+    panic("%s: todo!", __func__);
+    //return __traverse_mounts(path, flags, jumped, lookup_flags);
+}
+
+static inline int
 handle_mounts(struct nameidata *nd, struct dentry *dentry,
               struct path *path, struct inode **inode)
 {
+    bool jumped;
+    int ret;
+
     path->mnt = nd->path.mnt;
     path->dentry = dentry;
     printk("%s: 1 dir(%s) flags(%lx)\n",
@@ -234,17 +255,36 @@ handle_mounts(struct nameidata *nd, struct dentry *dentry,
             return -ENOENT;
         if (likely(__follow_mount_rcu(nd, path, inode)))
             return 0;
+        path->mnt = nd->path.mnt;
+        path->dentry = dentry;
     }
 
-    *inode = d_backing_inode(path->dentry);
-    return 0;
+    ret = traverse_mounts(path, &jumped, nd->flags);
+    if (jumped) {
+        if (unlikely(nd->flags & LOOKUP_NO_XDEV))
+            ret = -EXDEV;
+        else
+            nd->flags |= LOOKUP_JUMPED;
+    }
+    if (unlikely(ret)) {
+#if 0
+        dput(path->dentry);
+        if (path->mnt != nd->path.mnt)
+            mntput(path->mnt);
+#endif
+    } else {
+        *inode = d_backing_inode(path->dentry);
+    }
+    return ret;
 }
 
 static const char *
 step_into(struct nameidata *nd, struct dentry *dentry, struct inode *inode)
 {
     struct path path;
-    handle_mounts(nd, dentry, &path, &inode);
+    int err = handle_mounts(nd, dentry, &path, &inode);
+    if (err < 0)
+        return ERR_PTR(err);
 
     printk("%s: dentry(%s) inode(%lx)\n",
            __func__, dentry->d_name.name, inode);
@@ -554,8 +594,8 @@ path_lookupat(struct nameidata *nd, unsigned flags, struct path *path)
            (s = lookup_last(nd)) != NULL)
         ;
 
-    printk(">>>>>>>>>>>>>>>>>> %s 2: name(%s) dir(%s)\n",
-           __func__, s, nd->path.dentry->d_name.name);
+    printk(">>>>>>>>>>>>>>>>>> %s 2: name(%s) dir(%s) err(%d)\n",
+           __func__, s, nd->path.dentry->d_name.name, err);
 
     if (!err) {
         *path = nd->path;
