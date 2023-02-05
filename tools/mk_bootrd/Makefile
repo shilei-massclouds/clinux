@@ -19,7 +19,7 @@ $(TARGET): main.c
 	@$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $^ $(LDFLAGS)
 
 clean:
-	@rm -rf *.o $(TARGET)
+	@rm -rf *.o *.json $(TARGET)
 
 run: $(TARGET)
 	@rm -f $(BOOTRD_FILE)

@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <json.h>
 
 #include "module.h"
 #include "../../include/config.h"
@@ -19,6 +20,9 @@
 
 /* Bootrd file is used as qemu.pflash */
 #define BOOTRD_SIZE 32*1024*1024L   /* 32M */
+
+#define DEFAULT_PROFILE "./profile.json"
+static json_object *profile_top = NULL;
 
 static uint32_t ksym_ptr;
 static uint32_t ksym_num;
@@ -339,6 +343,8 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
 
     mod->status = M_STATUS_DOING;
 
+    json_object *dep_mods = json_object_new_array();
+
     list_for_each_safe(p, n, &mod->dependencies) {
         depend *d = list_entry(p, depend, list);
 
@@ -350,9 +356,14 @@ traverse_dependency(module *mod, sort_callback cb, void *opaque)
             return;
         }
 
+        json_object_array_add(dep_mods,
+                              json_object_new_string(d->mod->name));
+
         list_del(&(d->list));
         free(d);
     }
+
+    json_object_object_add(profile_top, mod->name, dep_mods);
 
     if (!list_empty(&(mod->dependencies))) {
         printf("'%s' broken dependencies!\n", mod->name);
@@ -426,6 +437,9 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
             exit(-1);
         }
     }
+
+    /* Add module into profile(json-style) */
+    json_object_to_file(DEFAULT_PROFILE, profile_top);
 
     hdr->profile_offset = ftell((FILE *) opaque);
     hdr->current_profile = hdr->profile_offset;
@@ -532,8 +546,10 @@ sort_func(const char *name, void *opaque)
         exit(-1);
     }
     profile_mods[num_profile_mods++] = offset;
+#if 0
     printf("%s: mod '%s'; size '%ld'; offset '%ld'\n",
            __func__, name, size, offset);
+#endif
 }
 
 FILE *
@@ -557,7 +573,7 @@ complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
     hdr->total_size = ftell(fp);
 
-#if 1
+#if 0
     printf("%s: magic %x\n", __func__, hdr->magic);
     printf("%s: version %x\n", __func__, hdr->version);
     printf("%s: total_size %x\n", __func__, hdr->total_size);
@@ -590,10 +606,20 @@ main(void)
 {
     struct bootrd_header hdr;
     memset(&hdr, 0, sizeof(hdr));
+
+    if (!profile_top)
+        profile_top = json_object_new_object();
+
     FILE* fp = create_bootrd(&hdr);
     sort_modules(&hdr, sort_func, fp);
     complete_bootrd(&hdr, fp);
     clear_symbols();
     clear_modules();
+
+    if (profile_top) {
+        json_object_put(profile_top);
+        profile_top = NULL;
+    }
+
     return 0;
 }
