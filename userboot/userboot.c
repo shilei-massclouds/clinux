@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <mm.h>
-#include <fs.h>
-#include <fdt.h>
 #include <bug.h>
 #include <fork.h>
 #include <errno.h>
 #include <sched.h>
+#include <export.h>
 #include <limits.h>
 #include <printk.h>
-#include <platform.h>
 
 extern bool procfs_ready;
 extern bool sys_ready;
 extern bool virtio_mmio_ready;
 extern uintptr_t kernel_size;
 extern void arch_call_rest_init(void);
+
+bool userboot_ready = false;
+EXPORT_SYMBOL(userboot_ready);
 
 /*
  * Boot command-line arguments
@@ -109,6 +110,8 @@ init_module(void)
     BUG_ON(!procfs_ready);
     BUG_ON(!sys_ready);
     start_kernel_fn = start_kernel;
+
+    userboot_ready = true;
 
     printk("module[userboot]: init end!\n");
 
