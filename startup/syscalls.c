@@ -70,3 +70,18 @@ SYSCALL_DEFINE3(faccessat, int, dfd, const char *, filename, int, mode)
 {
     return do_faccessat(dfd, filename, mode, 0);
 }
+
+do_group_exit_t do_group_exit;
+EXPORT_SYMBOL(do_group_exit);
+
+/*
+ * this kills every thread in the thread group. Note that any externally
+ * wait4()-ing process will get the correct exit code - even if this
+ * thread is not the thread group leader.
+ */
+SYSCALL_DEFINE1(exit_group, int, error_code)
+{
+    do_group_exit((error_code & 0xff) << 8);
+    /* NOTREACHED */
+    return 0;
+}

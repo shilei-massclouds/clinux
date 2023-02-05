@@ -107,4 +107,9 @@ extern ksys_write_t ksys_write;
 
 long sys_write(unsigned int fd, const char *buf, size_t count);
 
+typedef void (*do_group_exit_t)(int exit_code);
+extern do_group_exit_t do_group_exit;
+
+long sys_exit_group(int error_code);
+
 #endif /* _LINUX_SYSCALLS_H */

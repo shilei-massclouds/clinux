@@ -19,6 +19,10 @@ __SYSCALL(__NR_write, sys_write)
 #define __NR_readlinkat 78
 __SYSCALL(__NR_readlinkat, sys_readlinkat)
 
+/* kernel/exit.c */
+#define __NR_exit_group 94
+__SYSCALL(__NR_exit_group, sys_exit_group)
+
 /* sys/sys.c */
 #define __NR_uname 160
 __SYSCALL(__NR_uname, sys_newuname)

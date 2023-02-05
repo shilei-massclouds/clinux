@@ -11,6 +11,8 @@
 bool sys_ready = false;
 EXPORT_SYMBOL(sys_ready);
 
+void _do_group_exit(int exit_code);
+
 long _do_sys_newuname(struct new_utsname *name)
 {
     struct new_utsname tmp;
@@ -27,6 +29,7 @@ init_module(void)
     printk("module[sys]: init begin ...\n");
 
     do_sys_newuname = _do_sys_newuname;
+    do_group_exit = _do_group_exit;
 
     sys_ready = true;
 
