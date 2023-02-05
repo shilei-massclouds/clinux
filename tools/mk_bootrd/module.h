@@ -21,7 +21,9 @@ typedef struct _module {
     list_head   list;
 
     list_head   undef_syms;
+
     list_head   dependencies;
+    int num_dependencies;
 } module;
 
 typedef struct _depend {

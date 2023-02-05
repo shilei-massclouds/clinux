@@ -61,6 +61,7 @@ discover_modules(void)
             printf("%s: \n", mod->name);
             INIT_LIST_HEAD(&(mod->undef_syms));
             INIT_LIST_HEAD(&(mod->dependencies));
+            mod->num_dependencies = 0;
             list_add_tail(&(mod->list), &modules);
             num_modules++;
         } else if (!strcmp(namelist[n]->d_name, "startup.bin")) {
@@ -251,6 +252,7 @@ build_dependency(module *mod)
             depend *d = calloc(1, sizeof(depend));
             d->mod = sym->mod;
             list_add_tail(&(d->list), &(mod->dependencies));
+            mod->num_dependencies++;
         }
 
         list_del(&(undef->list));
@@ -341,6 +343,7 @@ traverse_dependency(module *mod, json_object *json_top,
 
     json_object *dep_mods = json_object_new_array();
 
+    int handled = 0;
     list_for_each_safe(p, n, &mod->dependencies) {
         depend *d = list_entry(p, depend, list);
 
@@ -357,13 +360,12 @@ traverse_dependency(module *mod, json_object *json_top,
         json_object_array_add(dep_mods,
                               json_object_new_string(d->mod->name));
 
-        list_del(&(d->list));
-        free(d);
+        handled++;
     }
 
     json_object_object_add(json_top, mod->name, dep_mods);
 
-    if (!list_empty(&(mod->dependencies))) {
+    if (handled != mod->num_dependencies) {
         printf("'%s' broken dependencies!\n", mod->name);
         exit(-1);
     }
@@ -409,12 +411,23 @@ write_profile_to_bootrd(int num_profile_mods, uint64_t *profile_mods,
     hdr->profile_num++;
 }
 
+static void
+reset_modules_status(void)
+{
+    list_head *p, *n;
+    module *mod;
+
+    list_for_each_safe(p, n, &modules) {
+        mod = list_entry(p, module, list);
+        mod->status = M_STATUS_NONE;
+    }
+}
+
 void
 sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
 {
     list_head *p, *n;
     module *mod;
-    bool first_profile = true;
 
     discover_modules();
     hdr->mod_num = num_modules;
@@ -461,16 +474,20 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
         json_object_put(json_top);
 
         /* Add module profiles into bootrd */
-        if (first_profile) {
+        if (hdr->profile_offset == 0) {
             hdr->profile_offset = ftell((FILE *) opaque);
             hdr->current_profile = hdr->profile_offset;
-            first_profile = false;
         }
+        if (strncmp(mod->name, "top_linux", 9) == 0)
+            hdr->current_profile = ftell((FILE *) opaque);
+
         write_profile_to_bootrd(num_profile_mods, profile_mods, hdr, opaque);
 
         free(profile_mods);
         profile_mods = NULL;
         num_profile_mods = 0;
+
+        reset_modules_status();
     }
 }
 
