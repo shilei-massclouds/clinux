@@ -544,6 +544,7 @@ void load_modules(void)
 
     init_other_modules();
 
+    sbi_puts("startup: init_modules ...\n");
     list_for_each_entry(mod, &modules, list) {
         do_init_module(mod);
     }

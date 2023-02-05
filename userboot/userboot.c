@@ -87,9 +87,9 @@ void arch_call_rest_init(void)
 }
 
 static void
-start_kernel(void)
+start_user(void)
 {
-    printk("start_kernel: init ...\n");
+    printk("start_user: init ...\n");
 
     if (kernel_size >= PMD_SIZE)
         panic("kernel size (%lu) is over PME_SIZE!", kernel_size);
@@ -97,7 +97,7 @@ start_kernel(void)
     /* Do the rest non-__init'ed, we're now alive */
     arch_call_rest_init();
 
-    printk("start_kernel: init ok!\n");
+    printk("start_user: init ok!\n");
 }
 
 static int
@@ -109,9 +109,9 @@ init_module(void)
     BUG_ON(!rootfs_initialized);
     BUG_ON(!procfs_ready);
     BUG_ON(!sys_ready);
-    start_kernel_fn = start_kernel;
-
     userboot_ready = true;
+
+    start_user();
 
     printk("module[userboot]: init end!\n");
 

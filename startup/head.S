@@ -142,4 +142,4 @@ clear_bss_done:
 
     call load_modules
 
-    tail start_kernel
+    tail unreachable

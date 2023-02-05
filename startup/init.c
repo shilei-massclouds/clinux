@@ -121,12 +121,6 @@ extern struct task_struct *
 __switch_to(struct task_struct *, struct task_struct *);
 EXPORT_SYMBOL(__switch_to);
 
-/*
- * Init
- */
-start_kernel_t start_kernel_fn;
-EXPORT_SYMBOL(start_kernel_fn);
-
 extern void ret_from_kernel_thread(void);
 EXPORT_SYMBOL(ret_from_kernel_thread);
 
@@ -135,11 +129,8 @@ void schedule_tail(struct task_struct *p)
     schedule_tail_func(p);
 }
 
-void start_kernel(void)
+void unreachable(void)
 {
-    if (start_kernel_fn)
-        start_kernel_fn();
-
     sbi_puts("\n##########################");
     sbi_puts("\nImpossible to come here!\n");
     sbi_puts("##########################\n");
