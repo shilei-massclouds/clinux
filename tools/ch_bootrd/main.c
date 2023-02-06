@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <errno.h>
 
-//#include "../../include/config.h"
 #include "../../include/bootrd.h"
 
 static u32
@@ -34,12 +33,42 @@ next_profile(FILE *fp, u32 offset)
     return (offset + ph.total_size);
 }
 
+static void
+overwrite_current_profile_index(FILE *fp, u32 offset,
+                                struct bootrd_header *bh)
+{
+    if (bh->current_profile == offset)
+        return;
+
+    bh->current_profile = offset;
+
+    /* overwrite bootrd header */
+    fseek(fp, 0, SEEK_SET);
+    if (fwrite(bh, sizeof(*bh), 1, fp) != 1) {
+        printf("%s: cannot overwrite bootrd header!\n", __func__);
+        exit(-1);
+    }
+    printf("%s: current offset(%x)\n", __func__, offset);
+}
+
 int
 main(int argc, char *argv[])
 {
-    if (argc != 2) {
-        printf("usage: %s [bootrd filename]\n", argv[0]);
+    int index = -1;
+
+    if (argc != 2 && argc != 4) {
+        printf("usage: %s bootrd_file [-s profile_index]\n", argv[0]);
+        printf("View or change(with -s) profiles of bootrdusage\n");
         exit(-1);
+    }
+
+    if (argc == 4) {
+        if (strncmp(argv[2], "-s", 2) != 0) {
+            printf("bad argument '%s'\n", argv[2]);
+            exit(-1);
+        }
+
+        index = atoi(argv[3]);
     }
 
     printf("Bootrd filename: %s\n\n", argv[1]);
@@ -66,6 +95,11 @@ main(int argc, char *argv[])
     }
 
     printf("Bootrd profiles: total[%d]:\n", bh.profile_num);
+    if (index >= (int)bh.profile_num) {
+        printf("bad profile index(%d), it should be in [0, %u)\n",
+               index, bh.profile_num);
+        exit(-1);
+    }
     printf("Bootrd profiles: offset(%x) curr[%x]:\n",
            bh.profile_offset, bh.current_profile);
 
@@ -73,6 +107,10 @@ main(int argc, char *argv[])
 
     int i;
     for (i = 0; i < bh.profile_num; i++) {
+        if (index == i) {
+            overwrite_current_profile_index(fp, offset, &bh);
+        }
+
         char *prefix = (offset == bh.current_profile) ? "-> " : "   ";
         printf("%s[%d]: offset[%x]:\n", prefix, i, offset);
         offset = next_profile(fp, offset);
