@@ -28,6 +28,9 @@ static int num_modules = 0;
 static LIST_HEAD(modules);
 static LIST_HEAD(symbols);
 
+static uint8_t *
+read_module(const char *filename, long *psize);
+
 static bool
 check_module(const char *name)
 {
@@ -41,7 +44,29 @@ check_module(const char *name)
 }
 
 static void
-discover_modules(void)
+write_mod_to_bootrd(module *mod, FILE *fp)
+{
+    size_t size = 0;
+
+    char filename[256] = {0};
+    sprintf(filename, "%s%s", KMODULE_DIR, mod->name);
+    uint8_t *data = read_module(filename, &size);
+    if (data == NULL || size == 0) {
+        printf("cannont read module '%s'!\n", filename);
+        exit(-1);
+    }
+
+    mod->offset_in_file = ftell(fp);
+    if (fwrite(data, 1, size, fp) != size) {
+        printf("%s: cannot module data into bootrd file!\n", __func__);
+        exit(-1);
+    }
+    free(data);
+    data = NULL;
+}
+
+static void
+discover_modules(FILE *fp)
 {
     int n;
     struct dirent **namelist;
@@ -64,6 +89,9 @@ discover_modules(void)
             mod->num_dependencies = 0;
             list_add_tail(&(mod->list), &modules);
             num_modules++;
+
+            /* write into bootrd disk */
+            write_mod_to_bootrd(mod, fp);
         } else if (!strcmp(namelist[n]->d_name, "startup.bin")) {
             has_startup = true;
         } else if (!strcmp(namelist[n]->d_name, "System.map")) {
@@ -330,7 +358,7 @@ analysis_module(module *mod)
 static void
 traverse_dependency(module *mod, json_object *json_top,
                     int *num_profile_mods, uint64_t *profile_mods,
-                    sort_callback cb, void *opaque)
+                    sort_callback cb, FILE *fp)
 {
     list_head *p, *n;
 
@@ -351,7 +379,7 @@ traverse_dependency(module *mod, json_object *json_top,
 
         traverse_dependency(d->mod, json_top,
                             num_profile_mods, profile_mods,
-                            cb, opaque);
+                            cb, fp);
         if (d->mod->status != M_STATUS_DONE) {
             printf("%s: cyclic chain: '%s'\n", __func__, d->mod->name);
             return;
@@ -371,15 +399,14 @@ traverse_dependency(module *mod, json_object *json_top,
     }
 
     mod->status = M_STATUS_DONE;
-    cb(mod->name, opaque, num_profile_mods, profile_mods);
+    cb(mod, num_profile_mods, profile_mods);
 }
 
 static void
 write_profile_to_bootrd(int num_profile_mods, uint64_t *profile_mods,
-                        struct bootrd_header *hdr, void *opaque)
+                        struct bootrd_header *hdr, FILE *fp)
 {
     uint64_t ret;
-    FILE *fp = (FILE *) opaque;
 
     struct profile_header header;
     memcpy(&header.magic, &PROFILE_MAGIC, sizeof(header.magic));
@@ -424,12 +451,12 @@ reset_modules_status(void)
 }
 
 void
-sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
+sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
 {
     list_head *p, *n;
     module *mod;
 
-    discover_modules();
+    discover_modules(fp);
     hdr->mod_num = num_modules;
 
     /* Init ksymtab based on startup.bin. */
@@ -463,7 +490,7 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
 
         traverse_dependency(mod, json_top,
                             &num_profile_mods, profile_mods,
-                            cb, opaque);
+                            cb, fp);
         if (mod->status != M_STATUS_DONE) {
             printf("%s: cyclic chain: '%s'.\n", __func__, mod->name);
             exit(-1);
@@ -475,13 +502,13 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, void *opaque)
 
         /* Add module profiles into bootrd */
         if (hdr->profile_offset == 0) {
-            hdr->profile_offset = ftell((FILE *) opaque);
+            hdr->profile_offset = ftell(fp);
             hdr->current_profile = hdr->profile_offset;
         }
         if (strncmp(mod->name, "top_linux", 9) == 0)
-            hdr->current_profile = ftell((FILE *) opaque);
+            hdr->current_profile = ftell(fp);
 
-        write_profile_to_bootrd(num_profile_mods, profile_mods, hdr, opaque);
+        write_profile_to_bootrd(num_profile_mods, profile_mods, hdr, fp);
 
         free(profile_mods);
         profile_mods = NULL;
@@ -561,38 +588,17 @@ read_module(const char *filename, long *psize)
 }
 
 static void
-sort_func(const char *name,
-          void *opaque,
-          int *num_profile_mods,
-          uint64_t *profile_mods)
+sort_func(module *mod, int *num_profile_mods, uint64_t *profile_mods)
 {
-    size_t size = 0;
-    char filename[256] = {0};
-    sprintf(filename, "%s%s", KMODULE_DIR, name);
-    uint8_t *data = read_module(filename, &size);
-    if (data == NULL || size == 0) {
-        printf("cannont read module '%s'!\n", filename);
-        exit(-1);
-    }
-
-    FILE *fp = (FILE *) opaque;
-    uint64_t offset = ftell(fp);
-    if (fwrite(data, 1, size, fp) != size) {
-        printf("%s: cannot module data into bootrd file!\n", __func__);
-        exit(-1);
-    }
-    free(data);
-    data = NULL;
-
     if (*num_profile_mods == num_modules) {
         printf("%s: find too many modules %d, limit is %d!\n",
                __func__, *num_profile_mods, num_modules);
         exit(-1);
     }
-    profile_mods[(*num_profile_mods)++] = offset;
+    profile_mods[(*num_profile_mods)++] = mod->offset_in_file;
 #if 1
-    printf("%s: mod '%s'; size '%ld'; offset '%ld'\n",
-           __func__, name, size, offset);
+    printf("%s: mod '%s'; offset '%ld'\n",
+           __func__, mod->name, mod->offset_in_file);
 #endif
 }
 

@@ -24,6 +24,7 @@ typedef struct _module {
 
     list_head   dependencies;
     int num_dependencies;
+    uint64_t    offset_in_file;   
 } module;
 
 typedef struct _depend {
@@ -38,7 +39,7 @@ typedef struct _symbol {
     list_head   list;
 } symbol;
 
-typedef void (*sort_callback)(const char *name, void *opaque,
+typedef void (*sort_callback)(module *mod,
                               int *num_profile_mods,
                               uint64_t *profile_mods);
 
