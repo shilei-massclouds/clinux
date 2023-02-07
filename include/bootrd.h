@@ -43,6 +43,7 @@ struct profile_header {
     u32     version;
     u32     total_size; /* include header itself */
     u32     mod_num;    /* number of modules in this profile */
+    char    sname[16];   /* short name */
 };
 
 #endif /* _BOOTRD_H_ */

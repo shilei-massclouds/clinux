@@ -7,30 +7,25 @@
 
 #include "../../include/bootrd.h"
 
-static u32
-next_profile(FILE *fp, u32 offset)
+static void
+get_profile_header(FILE *fp, u32 offset, struct profile_header *ph)
 {
     fseek(fp, offset, SEEK_SET);
 
-    struct profile_header ph;
-    memset(&ph, 0, sizeof(ph));
-    if (fread(&ph, sizeof(ph), 1, fp) != 1) {
+    memset(ph, 0, sizeof(*ph));
+    if (fread(ph, sizeof(*ph), 1, fp) != 1) {
         printf("cannot read profile err[%d]\n", errno);
         exit(-1);
     }
 
-    if (memcmp(&ph.magic, &PROFILE_MAGIC, sizeof(ph.magic))) {
+    if (memcmp(&(ph->magic), &PROFILE_MAGIC, sizeof(ph->magic))) {
         printf("profile: bad magic\n");
         exit(-1);
     }
-    if (ph.version != 1) {
+    if (ph->version != 1) {
         printf("profile: bad version\n");
         exit(-1);
     }
-
-    printf("profile: offset(%x) total_size(%x)\n",
-           offset, ph.total_size);
-    return (offset + ph.total_size);
 }
 
 static void
@@ -48,7 +43,7 @@ overwrite_current_profile_index(FILE *fp, u32 offset,
         printf("%s: cannot overwrite bootrd header!\n", __func__);
         exit(-1);
     }
-    printf("%s: current offset(%x)\n", __func__, offset);
+    //printf("%s: current offset(%x)\n", __func__, offset);
 }
 
 int
@@ -57,7 +52,7 @@ main(int argc, char *argv[])
     int index = -1;
 
     if (argc != 2 && argc != 4) {
-        printf("usage: %s bootrd_file [-s profile_index]\n", argv[0]);
+        printf("usage: %s BOOTRD_FILE [-s profile_index]\n", argv[0]);
         printf("View or change(with -s) profiles of bootrdusage\n");
         exit(-1);
     }
@@ -107,13 +102,20 @@ main(int argc, char *argv[])
 
     int i;
     for (i = 0; i < bh.profile_num; i++) {
-        if (index == i) {
+        struct profile_header ph;
+        get_profile_header(fp, offset, &ph);
+
+        char *prefix = "     ";
+        if (index < 0) {
+            if (offset == bh.current_profile)
+                prefix = "  -> ";
+        } else if (index == i) {
             overwrite_current_profile_index(fp, offset, &bh);
+            prefix = "  -> ";
         }
 
-        char *prefix = (offset == bh.current_profile) ? "-> " : "   ";
-        printf("%s[%d]: offset[%x]:\n", prefix, i, offset);
-        offset = next_profile(fp, offset);
+        printf("%s[%d]: %s[%x]\n", prefix, i, ph.sname, offset);
+        offset += ph.total_size;
     }
 
     fclose(fp);

@@ -12,6 +12,8 @@
 #include "../../include/config.h"
 #include "../../include/bootrd.h"
 
+#define MIN(i, j) (((i) < (j)) ? (i) : (j))
+
 /* n must be power of 2 */
 #define ROUND_UP(x, n) (((x) + (n) - 1UL) & ~((n) - 1UL))
 
@@ -437,16 +439,33 @@ traverse_dependency(module *mod,
 
 static void
 write_profile_to_bootrd(int num_profile_mods, uint64_t *profile_mods,
-                        struct bootrd_header *hdr, FILE *fp)
+                        struct bootrd_header *hdr, FILE *fp,
+                        const char *name)
 {
-    uint64_t ret;
+    /* Remove prefix and suffix of the name */
+    if (strncmp(name, "top_", strlen("top_") != 0)) {
+        printf("%s: bad name '%s' which must start with 'top_'\n",
+               __func__, name);
+        exit(-1);
+    }
 
     struct profile_header header;
+    memset(&header, 0, sizeof(header));
     memcpy(&header.magic, &PROFILE_MAGIC, sizeof(header.magic));
     header.version = 1;
     header.total_size = sizeof(struct profile_header) +
         sizeof(uint64_t) * num_profile_mods;
     header.mod_num = num_profile_mods;
+
+    size_t len = 0;
+    const char *end_name = strrchr(name, '.');
+    if (end_name)
+        len = end_name - name;
+    else
+        len = strlen(name);
+    len -= strlen("top_");
+    len = MIN(len, (sizeof(header.sname) - 1));
+    strncpy(header.sname, name + strlen("top_"), len);
 
     if (fwrite(&header, sizeof(header), 1, fp) != 1) {
         printf("%s: cannot write profile header to bootrd file!\n",
@@ -462,6 +481,7 @@ write_profile_to_bootrd(int num_profile_mods, uint64_t *profile_mods,
         }
     }
 #endif
+    uint64_t ret;
     ret = fwrite(profile_mods, sizeof(uint64_t), num_profile_mods, fp);
     if (ret != num_profile_mods) {
         printf("%s: cannot write profile data into bootrd file!\n", __func__);
@@ -548,7 +568,8 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
         if (strncmp(mod->name, "top_linux", 9) == 0)
             hdr->current_profile = ftell(fp);
 
-        write_profile_to_bootrd(num_profile_mods, profile_mods, hdr, fp);
+        write_profile_to_bootrd(num_profile_mods, profile_mods,
+                                hdr, fp, mod->name);
 
         free(profile_mods);
         profile_mods = NULL;
