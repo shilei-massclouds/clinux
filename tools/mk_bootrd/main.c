@@ -355,8 +355,27 @@ analysis_module(module *mod)
     fclose(fp);
 }
 
+static bool
+verify_dependency(const char *name, const char *dep_name,
+                  json_object *json_top)
+{
+    printf("%s: verify '%s' depend '%s'\n", __func__, name, dep_name);
+
+    struct json_object *cur = NULL;
+    json_object_object_get_ex(json_top, name, &cur);
+    for (int i = 0; i < json_object_array_length(cur); i++) {
+        json_object *obj = json_object_array_get_idx(cur, i);
+        const char *n = json_object_get_string(obj);
+        if (strncmp(dep_name, n, strlen(dep_name)) == 0)
+            return true;
+    }
+    json_object_put(cur);
+    return false;
+}
+
 static void
-traverse_dependency(module *mod, json_object *json_top,
+traverse_dependency(module *mod,
+                    json_object *json_top, bool verify,
                     int *num_profile_mods, uint64_t *profile_mods,
                     sort_callback cb, FILE *fp)
 {
@@ -369,7 +388,7 @@ traverse_dependency(module *mod, json_object *json_top,
 
     mod->status = M_STATUS_DOING;
 
-    json_object *dep_mods = json_object_new_array();
+    json_object *dep_mods = NULL;
 
     int handled = 0;
     list_for_each_safe(p, n, &mod->dependencies) {
@@ -377,7 +396,7 @@ traverse_dependency(module *mod, json_object *json_top,
 
         //printf("%s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
 
-        traverse_dependency(d->mod, json_top,
+        traverse_dependency(d->mod, json_top, verify,
                             num_profile_mods, profile_mods,
                             cb, fp);
         if (d->mod->status != M_STATUS_DONE) {
@@ -385,13 +404,27 @@ traverse_dependency(module *mod, json_object *json_top,
             return;
         }
 
-        json_object_array_add(dep_mods,
-                              json_object_new_string(d->mod->name));
+        if (verify) {
+            printf("%s: verify '%s' depend '%s'\n",
+                   __func__, mod->name, d->mod->name);
+            if (!verify_dependency(mod->name, d->mod->name, json_top)) {
+                printf("%s: no dependency '%s' -> '%s' in this profile.\n",
+                       __func__, mod->name, d->mod->name);
+                exit(-1);
+            }
+        } else {
+            if (dep_mods == NULL)
+                dep_mods = json_object_new_array();
+
+            json_object_array_add(dep_mods,
+                                  json_object_new_string(d->mod->name));
+        }
 
         handled++;
     }
 
-    json_object_object_add(json_top, mod->name, dep_mods);
+    if (!verify)
+        json_object_object_add(json_top, mod->name, dep_mods);
 
     if (handled != mod->num_dependencies) {
         printf("'%s' broken dependencies!\n", mod->name);
@@ -485,10 +518,17 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
         int num_profile_mods = 0;
         uint64_t *profile_mods = calloc(num_modules, sizeof(uint64_t));
 
+        /* If profile exists, we just verify dependencies based on it;
+         * Or we will create a profile and fill in all dependencies. */
+        bool verify = true;
         sprintf(filename, "./%s.json", mod->name);
-        json_object *json_top = json_object_new_object();
+        json_object *json_top = json_object_from_file(filename);
+        if (json_top == NULL) {
+            json_top = json_object_new_object();
+            verify = false;
+        }
 
-        traverse_dependency(mod, json_top,
+        traverse_dependency(mod, json_top, verify,
                             &num_profile_mods, profile_mods,
                             cb, fp);
         if (mod->status != M_STATUS_DONE) {
