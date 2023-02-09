@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <json.h>
+#include <assert.h>
 
 #include "module.h"
 #include "../../include/config.h"
@@ -23,12 +24,18 @@
 /* Bootrd file is used as qemu.pflash */
 #define BOOTRD_SIZE 32*1024*1024L   /* 32M */
 
+typedef depend* (*match_callback)(module *mod, symbol *sym);
+static bool need_handle_candidates = false;
+
+static module mod_startup;
+
 static uint32_t ksym_ptr;
 static uint32_t ksym_num;
 
 static int num_modules = 0;
 static LIST_HEAD(modules);
 static LIST_HEAD(symbols);
+static LIST_HEAD(fixups);
 
 static uint8_t *
 read_module(const char *filename, long *psize);
@@ -153,6 +160,11 @@ static void
 export_symbols(const char *start, const char *end,
                list_head *sym_list, module *mod)
 {
+    if (mod == NULL) {
+        printf("%s: no module\n", __func__);
+        exit(-1);
+    }
+
     while (start < end) {
         symbol *sym = calloc(1, sizeof(symbol));
         sym->name = strdup(start);
@@ -186,7 +198,7 @@ init_symtable(void)
     buf = calloc(ksym_num, 1);
     fread(buf, 1, ksym_num, fp);
 
-    export_symbols(buf, buf + ksym_num, &symbols, NULL);
+    export_symbols(buf, buf + ksym_num, &symbols, &mod_startup);
 
     free(buf);
     fclose(fp);
@@ -238,30 +250,77 @@ discover_undef_syms(module *mod,
     free(sym);
 }
 
-static symbol *
-match_undef(const char *name)
-{
-    symbol *sym;
-
-    list_for_each_entry(sym, &(symbols), list) {
-        if (strcmp(sym->name, name) == 0)
-            return sym;
-    }
-
-    return NULL;
-}
-
-static bool
+static depend *
 find_dependency(module *cur, module *target)
 {
     depend *dep;
 
     list_for_each_entry(dep, &(cur->dependencies), list) {
         if (dep->mod == target)
-            return true;
+            return dep;
     }
 
-    return false;
+    return NULL;
+}
+
+static depend *
+on_match(module *mod, symbol *sym)
+{
+    assert(sym->mod != NULL);
+    //printf("%s: mod '%s' sym '%s'\n", __func__, mod->name, sym->name);
+
+    depend *d = find_dependency(mod, sym->mod);
+    if (d == NULL) {
+        d = calloc(1, sizeof(depend));
+        d->mod = sym->mod;
+        list_add_tail(&(d->list), &(mod->dependencies));
+        mod->num_dependencies++;
+    }
+    return d;
+}
+
+static void
+match_undef(const char *name, match_callback cb, module *mod)
+{
+    symbol *sym;
+
+    depend *head = NULL;
+    list_for_each_entry(sym, &(symbols), list) {
+        if (strcmp(sym->name, name) == 0) {
+            depend *cur = cb(mod, sym);
+            assert(cur);
+
+            if (head == NULL) {
+                head = cur;
+            } else {
+                cur->next = head;
+                head = cur;
+            }
+        }
+    }
+
+    if (head == NULL) {
+        printf("mod '%s': undef sym '%s' cannot be resolved!\n",
+               mod->name, name);
+        exit(-1);
+    }
+
+    if (head->next == NULL)
+        return;
+
+    /* Okay, now there're more than one module that can solve
+     * this undef symbol. Report this in the profile and require
+     * manual intervention. */
+    depend *p = head;
+    while (p) {
+        printf("%s: mod '%s'\n", __func__, p->mod->name);
+        p->flags |= DEPEND_FLAGS_CANDIDATE;
+        p = p->next;
+    }
+
+    depend *fixup = calloc(1, sizeof(depend));
+    fixup->next = head;
+    list_add_tail(&(fixup->list), &fixups);
 }
 
 static void
@@ -269,22 +328,10 @@ build_dependency(module *mod)
 {
     list_head *p, *n;
 
+    printf("%s: mod '%s'\n", __func__, mod->name);
     list_for_each_safe(p, n, &(mod->undef_syms)) {
         symbol *undef = list_entry(p, symbol, list);
-        symbol *sym = match_undef(undef->name);
-        if (sym == NULL) {
-            printf("mod '%s': undef sym '%s' cannot be resolved!\n",
-                   mod->name, undef->name);
-            exit(-1);
-        }
-
-        if (sym->mod && !find_dependency(mod, sym->mod)) {
-            depend *d = calloc(1, sizeof(depend));
-            d->mod = sym->mod;
-            list_add_tail(&(d->list), &(mod->dependencies));
-            mod->num_dependencies++;
-        }
-
+        match_undef(undef->name, on_match, mod);
         list_del(&(undef->list));
         free(undef);
     }
@@ -346,8 +393,10 @@ analysis_module(module *mod)
             const char *name = secstrings + shdr->sh_name;
             if (strcmp(name, "_ksymtab_strings") == 0) {
                 char *ksym_str = get_strtab(shdr, fp);
+#if 1
                 export_symbols(ksym_str, ksym_str + shdr->sh_size,
                                &symbols, mod);
+#endif
             }
         }
     }
@@ -361,10 +410,18 @@ static bool
 verify_dependency(const char *name, const char *dep_name,
                   json_object *json_top)
 {
-    printf("%s: verify '%s' depend '%s'\n", __func__, name, dep_name);
+    //printf("%s: verify '%s' depend '%s'\n", __func__, name, dep_name);
+
+    /* Of course, module 'startup' always exists. */
+    if (strncmp(dep_name, "startup", strlen("startup")) == 0)
+        return true;
+
+    struct json_object *depend_obj = NULL;
+    json_object_object_get_ex(json_top, "dependencies", &depend_obj);
+    assert(depend_obj != NULL);
 
     struct json_object *cur = NULL;
-    json_object_object_get_ex(json_top, name, &cur);
+    json_object_object_get_ex(depend_obj, name, &cur);
     for (int i = 0; i < json_object_array_length(cur); i++) {
         json_object *obj = json_object_array_get_idx(cur, i);
         const char *n = json_object_get_string(obj);
@@ -375,11 +432,26 @@ verify_dependency(const char *name, const char *dep_name,
     return false;
 }
 
+static bool
+in_list(const char *name, list_head *list)
+{
+    list_head *p, *n;
+    wb_item *item;
+
+    list_for_each_safe(p, n, list) {
+        item = list_entry(p, wb_item, list);
+        if (strncmp(name, item->mod_name, strlen(name)) == 0)
+            return true;
+    }
+    return false;
+}
+
 static void
 traverse_dependency(module *mod,
                     json_object *json_top, bool verify,
                     int *num_profile_mods, uint64_t *profile_mods,
-                    sort_callback cb, FILE *fp)
+                    sort_callback cb, FILE *fp,
+                    list_head *whitelist, list_head *blacklist)
 {
     list_head *p, *n;
 
@@ -396,19 +468,33 @@ traverse_dependency(module *mod,
     list_for_each_safe(p, n, &mod->dependencies) {
         depend *d = list_entry(p, depend, list);
 
+        if (d->flags & DEPEND_FLAGS_CANDIDATE) {
+            if (in_list(d->mod->name, blacklist)) {
+                handled++;
+                continue;
+            }
+
+            if (!in_list(d->mod->name, whitelist))
+                need_handle_candidates = true;
+
+            printf("%s: item '%s'\n", __func__, d->mod->name);
+        }
+
         //printf("%s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
 
         traverse_dependency(d->mod, json_top, verify,
                             num_profile_mods, profile_mods,
-                            cb, fp);
+                            cb, fp, whitelist, blacklist);
         if (d->mod->status != M_STATUS_DONE) {
             printf("%s: cyclic chain: '%s'\n", __func__, d->mod->name);
             return;
         }
 
         if (verify) {
+#if 0
             printf("%s: verify '%s' depend '%s'\n",
                    __func__, mod->name, d->mod->name);
+#endif
             if (!verify_dependency(mod->name, d->mod->name, json_top)) {
                 printf("%s: no dependency '%s' -> '%s' in this profile.\n",
                        __func__, mod->name, d->mod->name);
@@ -418,15 +504,22 @@ traverse_dependency(module *mod,
             if (dep_mods == NULL)
                 dep_mods = json_object_new_array();
 
-            json_object_array_add(dep_mods,
-                                  json_object_new_string(d->mod->name));
+            if (strncmp(d->mod->name, "startup", strlen("startup")) != 0) {
+                json_object_array_add(dep_mods,
+                                      json_object_new_string(d->mod->name));
+            }
         }
 
         handled++;
+        //printf("%s: end '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
     }
 
-    if (!verify)
-        json_object_object_add(json_top, mod->name, dep_mods);
+    if (!verify) {
+        struct json_object *depend_obj = NULL;
+        json_object_object_get_ex(json_top, "dependencies", &depend_obj);
+        assert(depend_obj != NULL);
+        json_object_object_add(depend_obj, mod->name, dep_mods);
+    }
 
     if (handled != mod->num_dependencies) {
         printf("'%s' broken dependencies!\n", mod->name);
@@ -472,8 +565,8 @@ write_profile_to_bootrd(int num_profile_mods, uint64_t *profile_mods,
                __func__);
         exit(-1);
     }
+#if 0
     printf("###### %s: num_profile_mods (%d)\n", __func__, num_profile_mods);
-#if 1
     {
         int i = 0;
         for (i = 0; i < num_profile_mods; i++) {
@@ -503,11 +596,107 @@ reset_modules_status(void)
     }
 }
 
+static void
+append_fixups_to_profile(json_object *json_top)
+{
+    if (list_empty(&fixups))
+        return;
+
+    struct json_object *depend_obj = NULL;
+    json_object_object_get_ex(json_top, "dependencies", &depend_obj);
+    assert(depend_obj != NULL);
+
+    json_object *json_fixups = json_object_new_array();
+    json_object_object_add(json_top, "fixups", json_fixups);
+
+    depend *fixup;
+    list_for_each_entry(fixup, &fixups, list) {
+        json_object *candidates = NULL;
+
+        depend *p = fixup->next;
+        while (p) {
+            struct json_object *obj = NULL;
+            json_object_object_get_ex(depend_obj, p->mod->name, &obj);
+            if (obj == NULL)
+                break;
+
+            printf("############### Candidates: %s: mod '%s'\n",
+                   __func__, p->mod->name);
+
+            if (candidates == NULL)
+                candidates = json_object_new_array();
+
+            json_object_array_add(candidates,
+                                  json_object_new_string(p->mod->name));
+
+            p = p->next;
+        }
+
+        if (candidates == NULL)
+            continue;
+
+        json_object *json_fixup = json_object_new_object();
+        json_object_object_add(json_fixup, "candidates", candidates);
+        json_object_object_add(json_fixup, "select",
+                               json_object_new_string(""));
+
+        json_object_array_add(json_fixups, json_fixup);
+    }
+}
+
+static void
+setup_white_black_list(json_object *fixups,
+                       list_head *whitelist,
+                       list_head *blacklist)
+{
+    for (int i = 0; i < json_object_array_length(fixups); i++) {
+        json_object *obj = json_object_array_get_idx(fixups, i);
+
+        json_object *select = NULL;
+        json_object_object_get_ex(obj, "select", &select);
+        if (select == NULL)
+            goto err;
+
+        const char *str_select = json_object_get_string(select);
+        if (str_select == NULL || strlen(str_select) == 0)
+            goto err;
+        printf("%s: select '%s'\n", __func__, str_select);
+        wb_item *item = calloc(1, sizeof(wb_item));
+        item->mod_name = strdup(str_select);
+        list_add_tail(&(item->list), whitelist);
+
+        struct json_object *candidates = NULL;
+        json_object_object_get_ex(obj, "candidates", &candidates);
+        if (candidates == NULL)
+            goto err;
+
+        for (int i = 0; i < json_object_array_length(candidates); i++) {
+            json_object *candidate = json_object_array_get_idx(candidates, i);
+            const char *n = json_object_get_string(candidate);
+            printf("%s: candidate '%s'\n", __func__, n);
+            if (strncmp(str_select, n, strlen(str_select)) != 0) {
+                wb_item *item = calloc(1, sizeof(wb_item));
+                item->mod_name = strdup(n);
+                list_add_tail(&(item->list), blacklist);
+            }
+        }
+    }
+
+    return;
+
+ err:
+    printf("Fill in 'select' from 'candidates' for each fixup items.\n");
+}
+
 void
 sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
 {
     list_head *p, *n;
     module *mod;
+
+    /* Init startup module */
+    mod_startup.name = "startup";
+    mod_startup.status = M_STATUS_DONE;
 
     discover_modules(fp);
     hdr->mod_num = num_modules;
@@ -535,6 +724,11 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
         if (strncmp(mod->name, "top_", 4))
             continue;
 
+        list_head whitelist;
+        INIT_LIST_HEAD(&whitelist);
+        list_head blacklist;
+        INIT_LIST_HEAD(&blacklist);
+
         int num_profile_mods = 0;
         uint64_t *profile_mods = calloc(num_modules, sizeof(uint64_t));
 
@@ -543,21 +737,34 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
         bool verify = true;
         sprintf(filename, "./%s.json", mod->name);
         json_object *json_top = json_object_from_file(filename);
-        if (json_top == NULL) {
+        if (json_top != NULL) {
+            json_object *json_fixups;
+            json_object_object_get_ex(json_top, "fixups", &json_fixups);
+            if (json_fixups != NULL) {
+                printf("################################## fixups\n");
+                setup_white_black_list(json_fixups, &whitelist, &blacklist);
+            }
+        } else {
             json_top = json_object_new_object();
+            json_object *depend_obj = json_object_new_object();
+            json_object_object_add(json_top, "dependencies", depend_obj);
             verify = false;
         }
 
         traverse_dependency(mod, json_top, verify,
                             &num_profile_mods, profile_mods,
-                            cb, fp);
+                            cb, fp, &whitelist, &blacklist);
         if (mod->status != M_STATUS_DONE) {
             printf("%s: cyclic chain: '%s'.\n", __func__, mod->name);
             exit(-1);
         }
 
-        /* Create module profile(json-style) for human */
-        json_object_to_file(filename, json_top);
+        if (!verify) {
+            /* Create module profile(json-style) for human */
+            append_fixups_to_profile(json_top);
+
+            json_object_to_file(filename, json_top);
+        }
         json_object_put(json_top);
 
         /* Add module profiles into bootrd */
@@ -657,7 +864,7 @@ sort_func(module *mod, int *num_profile_mods, uint64_t *profile_mods)
         exit(-1);
     }
     profile_mods[(*num_profile_mods)++] = mod->offset_in_file;
-#if 1
+#if 0
     printf("%s: mod '%s'; offset '%ld'\n",
            __func__, mod->name, mod->offset_in_file);
 #endif
@@ -682,6 +889,15 @@ create_bootrd(struct bootrd_header *hdr)
 void
 complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
+    if (need_handle_candidates) {
+        fclose(fp);
+        remove(BOOTRD_FILENAME);
+
+        printf("Find conflicts, reserve only one among candidates!\n");
+        printf("Then run mk_bootfd again!\n");
+        return;
+    }
+
     hdr->total_size = ftell(fp);
 
 #if 1

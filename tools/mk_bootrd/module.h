@@ -24,12 +24,18 @@ typedef struct _module {
 
     list_head   dependencies;
     int num_dependencies;
-    uint64_t    offset_in_file;   
+    uint64_t    offset_in_file;
 } module;
+
+#define DEPEND_FLAGS_CANDIDATE  0x1
 
 typedef struct _depend {
     module      *mod;
     list_head   list;
+
+    uint64_t    flags;
+    /* pointer to the candidate */
+    struct _depend *next;
 } depend;
 
 typedef struct _symbol {
@@ -38,6 +44,12 @@ typedef struct _symbol {
 
     list_head   list;
 } symbol;
+
+/* Item for white/black list */
+typedef struct _wb_item {
+    list_head   list;
+    const char *mod_name;
+} wb_item;
 
 typedef void (*sort_callback)(module *mod,
                               int *num_profile_mods,

@@ -18,6 +18,7 @@ SUBDIRS := \
 	fork sched \
 	virtio virtio_mmio virtio_blk \
 	ext2 ramfs rootfs procfs \
+	rs_ext2 \
 	sys \
 	userboot \
 	top_linux top_hello_world

@@ -231,7 +231,6 @@ struct vm_area_struct *_vm_area_dup(struct vm_area_struct *orig)
     }
     return new;
 }
-EXPORT_SYMBOL(vm_area_dup);
 
 #define ARCH_MIN_TASKALIGN  0
 
