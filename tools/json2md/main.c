@@ -28,6 +28,42 @@ complete_markdown(FILE *fp)
     fclose(fp);
 }
 
+static void
+mark_candidates_group(struct json_object *fixups, FILE *fp)
+{
+    if (fixups == NULL)
+        return;
+
+    for (int i = 0; i < json_object_array_length(fixups); i++) {
+        json_object *fixup = json_object_array_get_idx(fixups, i);
+        if (fixup == NULL)
+            continue;
+
+        json_object *candidates = NULL;
+        json_object_object_get_ex(fixup, "candidates", &candidates);
+        if (candidates == NULL)
+            continue;
+
+        json_object *select = NULL;
+        json_object_object_get_ex(fixup, "select", &select);
+        assert(select);
+        const char *str_select = json_object_get_string(select);
+
+        fprintf(fp, "subgraph %d\n", i);
+        fprintf(fp, "direction LR\n");
+        for (int i = 0; i < json_object_array_length(candidates); i++) {
+            json_object *candidate = json_object_array_get_idx(candidates, i);
+            const char *n = json_object_get_string(candidate);
+            if (str_select && strncmp(str_select, n, strlen(n)) == 0)
+                fprintf(fp, "%s[[%s]]\n", n, n);
+            else
+                fprintf(fp, "%s\n", n);
+
+        }
+        fprintf(fp, "end\n");
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2) {
@@ -41,12 +77,12 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
+    FILE *fp = make_markdown_header(argv[1]);
+    assert(fp != NULL);
+
     struct json_object *fixups= NULL;
     json_object_object_get_ex(root, "fixups", &fixups);
-    if (fixups == NULL) {
-        printf("no fixups\n");
-        exit(-1);
-    }
+    mark_candidates_group(fixups, fp);
 
     struct json_object *depend= NULL;
     json_object_object_get_ex(root, "dependencies", &depend);
@@ -54,9 +90,6 @@ int main(int argc, char *argv[])
         printf("no dependencies\n");
         exit(-1);
     }
-
-    FILE *fp = make_markdown_header(argv[1]);
-    assert(fp != NULL);
 
     json_object_object_foreach(depend, key, val) {
         int num = json_object_array_length(val);
