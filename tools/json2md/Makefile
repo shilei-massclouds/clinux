@@ -21,6 +21,6 @@ clean:
 	@rm -rf *.o *.json $(TARGET)
 
 run: $(TARGET)
-	./$(TARGET)
+	@:
 
 .PHONY: $(PHONY)

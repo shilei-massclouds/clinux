@@ -20,7 +20,7 @@ SUBDIRS := \
 	ext2 ramfs rootfs procfs \
 	sys \
 	userboot \
-	top_linux top_hello_world rs_ext2
+	top_linux top_hello_world #rs_ext2
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
 
