@@ -3,7 +3,7 @@
 ./clr.sh
 
 dd if=/dev/zero of=./rootfs.ext2 bs=1M count=32
-mkfs.ext2 ./rootfs.ext2
+mkfs.ext2 -b 1024 -I 128 ./rootfs.ext2
 mkdir fs
 sudo mount -o loop rootfs.ext2 ./fs/
 sudo mkdir fs/sbin

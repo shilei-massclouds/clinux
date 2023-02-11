@@ -429,7 +429,6 @@ static int load_elf_binary(struct linux_binprm *bprm)
             break;
 
         case PT_LOPROC ... PT_HIPROC:
-            panic("bad p_type!");
             break;
         }
     }

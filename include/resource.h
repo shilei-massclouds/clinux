@@ -72,4 +72,9 @@ struct rlimit {
     __kernel_ulong_t    rlim_max;
 };
 
+struct rlimit64 {
+    __u64 rlim_cur;
+    __u64 rlim_max;
+};
+
 #endif /* _UAPI_LINUX_RESOURCE_H */

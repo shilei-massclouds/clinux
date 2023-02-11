@@ -15,6 +15,7 @@
 #include <pgalloc.h>
 #include <mm_types.h>
 #include <user_namespace.h>
+#include <syscalls.h>
 
 #define allocate_mm()   (kmem_cache_alloc(mm_cachep, GFP_KERNEL))
 
@@ -249,6 +250,14 @@ void fork_init(void)
                                    useroffset, usersize, NULL);
 }
 
+static long _do_set_tid_address(int *tidptr)
+{
+    return 0;
+    //current->clear_child_tid = tidptr;
+
+    //return task_pid_vnr(current);
+}
+
 static int
 init_module(void)
 {
@@ -260,6 +269,7 @@ init_module(void)
 
     vm_area_alloc = _vm_area_alloc;
     vm_area_dup = _vm_area_dup;
+    do_set_tid_address = _do_set_tid_address;
 
     printk("module[fork]: init end!\n");
 

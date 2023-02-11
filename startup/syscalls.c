@@ -85,3 +85,56 @@ SYSCALL_DEFINE1(exit_group, int, error_code)
     /* NOTREACHED */
     return 0;
 }
+
+do_set_tid_address_t do_set_tid_address;
+EXPORT_SYMBOL(do_set_tid_address);
+
+/* fork/fork.c */
+SYSCALL_DEFINE1(set_tid_address, int *, tidptr)
+{
+    return do_set_tid_address(tidptr);
+}
+
+/**
+ * sys_set_robust_list() - Set the robust-futex list head of a task
+ * @head:   pointer to the list-head
+ * @len:    length of the list-head, as userspace expects
+ */
+SYSCALL_DEFINE2(set_robust_list,
+                struct robust_list_head *, head,
+                size_t, len)
+{
+    return -ENOSYS;
+#if 0
+    if (!futex_cmpxchg_enabled)
+        return -ENOSYS;
+    /*
+     * The kernel knows only one size for now:
+     */
+    if (unlikely(len != sizeof(*head)))
+        return -EINVAL;
+
+    current->robust_list = head;
+
+    return 0;
+#endif
+}
+
+SYSCALL_DEFINE4(prlimit64, pid_t, pid, unsigned int, resource,
+                const struct rlimit64 *, new_rlim,
+                struct rlimit64 *, old_rlim)
+{
+    return -ENOSYS;
+}
+
+SYSCALL_DEFINE3(getrandom, char *, buf, size_t, count,
+                unsigned int, flags)
+{
+    return -ENOSYS;
+}
+
+SYSCALL_DEFINE2(clock_gettime, const clockid_t, which_clock,
+                struct __kernel_timespec *, tp)
+{
+    return 0;
+}

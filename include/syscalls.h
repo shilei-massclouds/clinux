@@ -5,6 +5,8 @@
 
 #include <types.h>
 #include <utsname.h>
+#include <futex.h>
+#include <time_types.h>
 
 /* Are two types/vars the same type (ignoring qualifiers)? */
 #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
@@ -111,5 +113,21 @@ typedef void (*do_group_exit_t)(int exit_code);
 extern do_group_exit_t do_group_exit;
 
 long sys_exit_group(int error_code);
+
+typedef long (*do_set_tid_address_t)(int *tidptr);
+extern do_set_tid_address_t do_set_tid_address;
+
+long sys_set_tid_address(int *tidptr);
+
+long sys_set_robust_list(struct robust_list_head *head, size_t len);
+
+long sys_prlimit64(pid_t pid, unsigned int resource,
+                   const struct rlimit64 *new_rlim,
+                   struct rlimit64 *old_rlim);
+
+long sys_getrandom(char *buf, size_t count, unsigned int flags);
+
+long sys_clock_gettime(clockid_t which_clock,
+                       struct __kernel_timespec *tp);
 
 #endif /* _LINUX_SYSCALLS_H */
