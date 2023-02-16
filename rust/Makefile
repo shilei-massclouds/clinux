@@ -38,26 +38,26 @@ $(obj)/core.o: private skip_clippy = 1
 $(obj)/core.o: private skip_flags = -Dunreachable_pub
 $(obj)/core.o: private rustc_target_flags = $(core-cfgs) -Aunused-imports
 $(obj)/core.o: $(RUST_LIB_SRC)/core/src/lib.rs $(obj)/target.json
-	$(rustc_library)
+	@$(rustc_library)
 
 $(obj)/compiler_builtins.o: private rustc_objcopy = -w -W '__*'
 $(obj)/compiler_builtins.o: $(obj)/compiler_builtins.rs $(obj)/core.o
-	$(rustc_library)
+	@$(rustc_library)
 
 $(obj)/kernel.o: private rustc_target_flags = --extern alloc \
 	--extern build_error --extern macros --extern bindings
 $(obj)/kernel.o: $(obj)/kernel/lib.rs $(obj)/alloc.o $(obj)/build_error.o \
 	$(obj)/libmacros.so $(obj)/bindings.o
-	$(rustc_library)
+	@$(rustc_library)
 
 $(obj)/alloc.o: private skip_clippy = 1
 $(obj)/alloc.o: private skip_flags = -Dunreachable_pub
 $(obj)/alloc.o: private rustc_target_flags = $(alloc-cfgs)
 $(obj)/alloc.o: $(obj)/alloc/lib.rs $(obj)/compiler_builtins.o
-	$(rustc_library)
+	@$(rustc_library)
 
 $(obj)/build_error.o: $(obj)/build_error.rs $(obj)/compiler_builtins.o
-	$(rustc_library)
+	@$(rustc_library)
 
 rustc_procmacro = \
 	$(RUSTC) $(rust_common_flags) \
@@ -71,13 +71,12 @@ rustc_procmacro = \
 # Therefore, to get `libmacros.so` automatically recompiled when the compiler
 # version changes, we add `core.o` as a dependency (even if it is not needed).
 $(obj)/libmacros.so: $(obj)/macros/lib.rs $(obj)/core.o
-	$(rustc_procmacro)
+	@$(rustc_procmacro)
 
 # $(obj)/bindings/bindings_generated.rs
 # $(obj)/bindings/bindings_helpers_generated.rs
 $(obj)/bindings.o: $(obj)/bindings/lib.rs $(obj)/compiler_builtins.o
-	$(rustc_library)
+	@$(rustc_library)
 
 clean:
-	@printf "clean rust\n"
-	rm -f *.o *.d *.rmeta *.so
+	@rm -f *.o *.d *.rmeta *.so

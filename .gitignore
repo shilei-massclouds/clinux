@@ -64,3 +64,4 @@ tools/ch_bootrd/ch_bootrd
 tools/json2md/json2md
 output/*
 *.json
+*.rmeta

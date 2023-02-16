@@ -5,8 +5,8 @@ CROSS_ := riscv64-linux-gnu-
 CC  := $(CROSS_)gcc
 CPP := $(CC) -E
 AR  := $(CROSS_)ar
-LD  := @$(CROSS_)ld
-NM  := @$(CROSS_)nm
+LD  := $(CROSS_)ld
+NM  := $(CROSS_)nm
 
 SHELL = sh
 RUSTC = rustc
@@ -14,12 +14,12 @@ BINDGEN = bindgen
 
 export CC RUSTC BINDGEN
 
-READELF := @$(CROSS_)readelf
+READELF := $(CROSS_)readelf
 
 MAKE := @make --no-print-directory
 
 OBJCOPY := $(CROSS_)objcopy
-OBJDUMP := @$(CROSS_)objdump
+OBJDUMP := $(CROSS_)objdump
 
 OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S
 

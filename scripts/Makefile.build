@@ -21,15 +21,15 @@ test_y	:= $(filter $(curdir)/test%.o, \
 
 $(curdir)/%.s: $(curdir)/%.S
 	@printf "CPP\t$<\n"
-	$(CPP) $(AS_FLAGS) $(INCLUDES) -o $@ $<
+	@$(CPP) $(AS_FLAGS) $(INCLUDES) -o $@ $<
 
 $(curdir)/%.o: $(curdir)/%.S
 	@printf "AS\t$<\n"
-	$(CC) $(AS_FLAGS) $(INCLUDES) -c -o $@ $<
+	@$(CC) $(AS_FLAGS) $(INCLUDES) -c -o $@ $<
 
 $(curdir)/%.o: $(curdir)/%.c
 	@printf "CC\t$<\n"
-	$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
+	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
 
 # Compile Rust sources (.rs)
 # ----------------------------------------------------------
@@ -52,11 +52,11 @@ $(curdir)/%.o: $(curdir)/%.rs
 
 $(curdir)/%.s: $(curdir)/%.c
 	@printf "CC\t$<\n"
-	$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -S -o $@ $<
+	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -S -o $@ $<
 
 $(curdir)/%.lds: $(curdir)/%.lds.S
 	@printf "AS\t$<\n"
-	$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
+	@$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
 
 $(curdir)/%.h: $(curdir)/%.s
 	@printf "GEN\t$@\n"
@@ -67,23 +67,23 @@ _build: $(extra_y) $(_target) $(_test)
 
 $(curdir)/$(obj).ko: $(obj_y) $(mod_lds)
 	@printf "LD\t$@\n"
-	$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(obj_y)
-	$(READELF) -p _ksymtab_strings $@ > $(curdir)/$(obj).map 2> /dev/null
+	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(obj_y)
+	@$(READELF) -p _ksymtab_strings $@ > $(curdir)/$(obj).map 2> /dev/null
 
 $(curdir)/$(obj).elf: $(obj_y) $(elf_lds)
 	@printf "LD\t$@\n"
-	$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
+	@$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
 
 $(curdir)/$(obj).bin: $(curdir)/$(obj).elf $(curdir)/System.map
 	@printf "COPY\t$@\n"
-	$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
+	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
 
 $(curdir)/System.map: $(curdir)/$(obj).elf
-	$(NM) -n $< | \
+	@$(NM) -n $< | \
 		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
 
 $(curdir)/test_$(obj).ko: $(test_y)
 	@printf "LD\t$@\n"
-	$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(test_y)
+	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(test_y)
 
 .PHONY: $(PHONY)
