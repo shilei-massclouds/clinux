@@ -77,3 +77,7 @@ $(obj)/libmacros.so: $(obj)/macros/lib.rs $(obj)/core.o
 # $(obj)/bindings/bindings_helpers_generated.rs
 $(obj)/bindings.o: $(obj)/bindings/lib.rs $(obj)/compiler_builtins.o
 	$(rustc_library)
+
+clean:
+	@printf "clean rust\n"
+	rm -f *.o *.d *.rmeta *.so

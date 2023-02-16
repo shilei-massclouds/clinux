@@ -6,7 +6,7 @@ curdir := $(subst _clean_, , $(obj))
 
 include $(curdir)/Makefile
 
-files := $(extra_y) *.o *.ko *.elf *.bin *.map
+files := $(extra_y) *.o *.ko *.elf *.bin *.map *.d
 
 _clean:
 	@rm -f $(addprefix $(curdir)/, $(files))

@@ -56,6 +56,7 @@ $(CLEAN_DIRS):
 clean: $(CLEAN_DIRS)
 	@rm -f ./prebuilt/*.h ./prebuilt/*.s
 	@$(MAKE) -C tools clean
+	@$(MAKE) -C rust clean
 	@find ./output/* | grep -v README.md | xargs rm -f
 
 run: all
