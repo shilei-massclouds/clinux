@@ -2,7 +2,10 @@
 
 include scripts/Makefile.include
 
-PHONY := all clean dump run
+PHONY := all clean dump run profiles bootrd
+
+# Default module output directory
+export KMODULE_DIR := ./output
 
 # Allows the usage of unstable features in stable compilers.
 export RUSTC_BOOTSTRAP := 1
@@ -28,8 +31,8 @@ SUBDIRS := \
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
 
 all: $(SUBDIRS) startup/startup.bin tools
-	@cp ./startup/System.map ./output/
-	@cp ./startup/startup.bin ./output/
+	@cp ./startup/System.map $(KMODULE_DIR)
+	@cp ./startup/startup.bin $(KMODULE_DIR)
 
 PHONY += $(PREDIRS)
 $(PREDIRS):
@@ -38,7 +41,7 @@ $(PREDIRS):
 PHONY += $(SUBDIRS)
 $(SUBDIRS): $(PREDIRS) rust
 	@$(MAKE) -f ./scripts/Makefile.build obj=$@
-	$(if $(filter-out startup, $@), @cp ./$@/*.ko ./output/)
+	$(if $(filter-out startup, $@), @cp ./$@/*.ko $(KMODULE_DIR))
 
 PHONY += rust
 rust:
@@ -57,11 +60,20 @@ clean: $(CLEAN_DIRS)
 	@rm -f ./prebuilt/*.h ./prebuilt/*.s
 	@$(MAKE) -C tools clean
 	@$(MAKE) -C rust clean
-	@find ./output/* | grep -v README.md | xargs rm -f
+	@find $(KMODULE_DIR)/* | grep -v README.md | xargs rm -f
 
-run: all
+$(KMODULE_DIR)/bootrd.disk:
+	@ ./tools/mk_bootrd/mk_bootrd
+
+bootrd: $(KMODULE_DIR)/bootrd.disk
+	@:
+
+run: all bootrd
 	@$(MAKE) -C tools run
 	@ ./scripts/qemu.sh
+
+profiles: bootrd
+	@ ./tools/ch_bootrd/ch_bootrd $(KMODULE_DIR)/bootrd.disk
 
 dump:
 	$(OBJDUMP) -D -m riscv:rv64 -EL -b binary ./startup/startup.bin

@@ -7,7 +7,6 @@ CC := gcc
 INCLUDES := -I.
 CFLAGS := $(shell pkg-config --cflags json-c) -DCL_TOOLS
 LDFLAGS := $(shell pkg-config --libs json-c)
-BOOTRD_FILE := ../../output/bootrd.disk
 
 TARGET := mk_bootrd
 
@@ -21,9 +20,7 @@ $(TARGET): main.c
 clean:
 	@rm -rf *.o *.json $(TARGET)
 
-run: $(TARGET)
-	@rm -f $(BOOTRD_FILE)
-	@dd if=/dev/zero of=$(BOOTRD_FILE) bs=1M count=32
-	./$(TARGET)
+run:
+	@:
 
 .PHONY: $(PHONY)

@@ -18,11 +18,13 @@
 /* n must be power of 2 */
 #define ROUND_UP(x, n) (((x) + (n) - 1UL) & ~((n) - 1UL))
 
-#define KMODULE_DIR "../../output/"
-#define BOOTRD_FILENAME KMODULE_DIR "bootrd.disk"
+#define BOOTRD_FILENAME "bootrd.disk"
 
 /* Bootrd file is used as qemu.pflash */
 #define BOOTRD_SIZE 32*1024*1024L   /* 32M */
+
+/* The main output directory for modules */
+char *kmod_dir = NULL;
 
 typedef depend* (*match_callback)(module *mod, symbol *sym);
 static bool need_handle_candidates = false;
@@ -58,7 +60,7 @@ write_mod_to_bootrd(module *mod, FILE *fp)
     size_t size = 0;
 
     char filename[256] = {0};
-    sprintf(filename, "%s%s", KMODULE_DIR, mod->name);
+    sprintf(filename, "%s/%s", kmod_dir, mod->name);
     uint8_t *data = read_module(filename, &size);
     if (data == NULL || size == 0) {
         printf("cannont read module '%s'!\n", filename);
@@ -82,7 +84,7 @@ discover_modules(FILE *fp)
     bool has_startup = false;
     bool has_system_map = false;
 
-    n = scandir(KMODULE_DIR, &namelist, NULL, NULL);
+    n = scandir(kmod_dir, &namelist, NULL, NULL);
     if (n == -1) {
         printf("%s: error when scandir!\n", __func__);
         exit(-1);
@@ -130,7 +132,9 @@ detect_syms_range(void)
     uint64_t start = 0;
     uint64_t end = 0;
 
-    fp = fopen(KMODULE_DIR "System.map", "r");
+    char filename[256] = {0};
+    sprintf(filename, "%s/System.map", kmod_dir);
+    fp = fopen(filename, "r");
     if (fp == NULL) {
         printf("No System.map\n");
         exit(-1);
@@ -187,7 +191,9 @@ init_symtable(void)
     detect_syms_range();
     printf("range(0x%x, 0x%x)\n", ksym_ptr, ksym_num);
 
-    fp = fopen(KMODULE_DIR "startup.bin", "rb");
+    char filename[256] = {0};
+    sprintf(filename, "%s/startup.bin", kmod_dir);
+    fp = fopen(filename, "rb");
     if (fp == NULL) {
         printf("No System.map\n");
         exit(-1);
@@ -353,7 +359,7 @@ analysis_module(module *mod)
     char filename[256] = {0};
 
     printf("%s: %s\n", __func__, mod->name);
-    sprintf(filename, "%s%s", KMODULE_DIR, mod->name);
+    sprintf(filename, "%s/%s", kmod_dir, mod->name);
     fp = fopen(filename, "rb");
     if (fp == NULL) {
         printf("bad file (%s)\n", filename);
@@ -877,9 +883,11 @@ create_bootrd(struct bootrd_header *hdr)
     hdr->version = 1;
     hdr->mod_offset = sizeof(*hdr);
 
-    FILE *fp = fopen(BOOTRD_FILENAME, "rb+");
+    char filename[256] = {0};
+    sprintf(filename, "%s/%s", kmod_dir, BOOTRD_FILENAME);
+    FILE *fp = fopen(filename, "w+");
     if (fp == NULL) {
-        printf("%s: no base bootrd file!\n", __func__);
+        printf("%s: no base bootrd file [%s]!\n", __func__, filename);
         exit(-1);
     }
     fseek(fp, sizeof(*hdr), SEEK_SET);
@@ -890,8 +898,10 @@ void
 complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
     if (need_handle_candidates) {
+        char filename[256] = {0};
+        sprintf(filename, "%s/%s", kmod_dir, BOOTRD_FILENAME);
         fclose(fp);
-        remove(BOOTRD_FILENAME);
+        remove(filename);
 
         printf("Find conflicts, reserve only one among candidates!\n");
         printf("Then run mk_bootfd again!\n");
@@ -912,8 +922,8 @@ complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 #endif
 
     fseek(fp, 0, SEEK_END);
-    if (ftell(fp) != BOOTRD_SIZE) {
-        printf("%s: bad bootrd file (%ld != 32M).\n",
+    if (ftell(fp) > BOOTRD_SIZE) {
+        printf("%s: bad bootrd file (%ld > 32M).\n",
                __func__, ftell(fp));
         exit(-1);
     }
@@ -925,12 +935,31 @@ complete_bootrd(struct bootrd_header *hdr, FILE *fp)
         exit(-1);
     }
 
+    /* extend bootrd disk to specific size */
+    fseek(fp, BOOTRD_SIZE - 1, SEEK_SET);
+    char zero = 0;
+    if (fwrite(&zero, sizeof(zero), 1, fp) != 1) {
+        printf("%s: cannot extend bootrd disk!\n", __func__);
+        exit(-1);
+    }
+
     fclose(fp);
 }
 
 int
-main(void)
+main(int argc, char *argv[])
 {
+    kmod_dir = getenv("KMODULE_DIR");
+    if (kmod_dir == NULL) {
+        if (argc != 2) {
+            printf("no module output directory, "
+                   "set env 'KMODULE_DIR=[path]' or input the path\n");
+            exit(-1);
+        }
+        kmod_dir = argv[1];
+    }
+    printf("KMODULE_DIR: %s\n", kmod_dir);
+
     struct bootrd_header hdr;
     memset(&hdr, 0, sizeof(hdr));
 
