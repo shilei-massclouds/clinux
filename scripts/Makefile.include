@@ -2,17 +2,23 @@
 
 CROSS_ := riscv64-linux-gnu-
 
-CC  := @$(CROSS_)gcc
+CC  := $(CROSS_)gcc
 CPP := $(CC) -E
 AR  := $(CROSS_)ar
 LD  := @$(CROSS_)ld
 NM  := @$(CROSS_)nm
 
+SHELL = sh
+RUSTC = rustc
+BINDGEN = bindgen
+
+export CC RUSTC BINDGEN
+
 READELF := @$(CROSS_)readelf
 
 MAKE := @make --no-print-directory
 
-OBJCOPY := @$(CROSS_)objcopy
+OBJCOPY := $(CROSS_)objcopy
 OBJDUMP := @$(CROSS_)objdump
 
 OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S
@@ -23,6 +29,8 @@ AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64 -march=rv64imafdc \
 CFLAGS := -nostdinc -fno-PIE -mabi=lp64 -march=rv64imafdc \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug
+
+basetarget = $(basename $(notdir $@))
 
 define sed-offsets
     's:^[[:space:]]*\.ascii[[:space:]]*"\(.*\)".*:\1:; \
@@ -54,3 +62,63 @@ define filechk
 		mv -f $@.tmp $@; \
 	fi
 endef
+
+# These flags apply to all Rust code in the tree, including the kernel and
+# host programs.
+export rust_common_flags := --edition=2021 \
+                -Zbinary_dep_depinfo=y \
+                -Dunsafe_op_in_unsafe_fn -Drust_2018_idioms \
+                -Dunreachable_pub -Dnon_ascii_idents \
+                -Wmissing_docs \
+                -Drustdoc::missing_crate_level_docs \
+                -Dclippy::correctness -Dclippy::style \
+                -Dclippy::suspicious -Dclippy::complexity \
+                -Dclippy::perf \
+                -Dclippy::let_unit_value -Dclippy::mut_mut \
+                -Dclippy::needless_bitwise_bool \
+                -Dclippy::needless_continue \
+                -Wclippy::dbg_macro
+
+KBUILD_RUSTFLAGS := $(rust_common_flags) \
+            --target=./rust/target.json \
+            -Cpanic=abort -Cembed-bitcode=n -Clto=n \
+            -Cforce-unwind-tables=n -Ccodegen-units=1 \
+            -Csymbol-mangling-version=v0 \
+            -Crelocation-model=static \
+            -Zfunction-sections=n \
+            -Dclippy::float_arithmetic
+
+KBUILD_RUSTFLAGS += -Copt-level=2
+
+# Always set `debug-assertions` and `overflow-checks` because their default
+# depends on `opt-level` and `debug-assertions`, respectively.
+KBUILD_RUSTFLAGS += -Cdebug-assertions=n
+KBUILD_RUSTFLAGS += -Coverflow-checks=y
+KBUILD_RUSTFLAGS += -Cforce-frame-pointers=y
+KBUILD_RUSTFLAGS += -Ctarget-cpu=generic-rv64
+
+KBUILD_RUSTFLAGS_MODULE := --cfg MODULE
+RUSTFLAGS_MODULE =
+
+modkern_rustflags = $(KBUILD_RUSTFLAGS_MODULE) $(RUSTFLAGS_MODULE)
+
+_rust_flags = $(KBUILD_RUSTFLAGS)
+rust_flags = $(_rust_flags) $(modkern_rustflags) @./include/generated/rustc_cfg
+
+# Convenient variables
+comma   := ,
+quote   := "
+squote  := '
+empty   :=
+space   := $(empty) $(empty)
+space_escape := _-_SPACE_-_
+pound := \#
+
+###
+# Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+dot-target = $(dir $@).$(notdir $@)
+
+###
+# The temporary file to save gcc -MMD generated dependencies must not
+# contain a comma
+depfile = $(subst $(comma),_,$(dot-target).d)

@@ -7,6 +7,9 @@ curdir := $(obj)
 include scripts/Makefile.include
 include $(curdir)/Makefile
 
+__modname = $(basetarget)
+modfile = $(addprefix $(obj)/,$(__modname))
+
 mod_lds := scripts/module.lds
 elf_lds := $(curdir)/$(elf_lds)
 _target := $(if $(target_y), $(curdir)/$(target_y), $(curdir)/$(obj).ko)
@@ -27,6 +30,25 @@ $(curdir)/%.o: $(curdir)/%.S
 $(curdir)/%.o: $(curdir)/%.c
 	@printf "CC\t$<\n"
 	$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
+
+# Compile Rust sources (.rs)
+# ----------------------------------------------------------
+
+
+rust_allowed_features := allocator_api,const_refs_to_cell
+
+rust_common_cmd = \
+	RUST_MODFILE=$(modfile) $(RUSTC) $(rust_flags) \
+	-Zallow-features=$(rust_allowed_features) \
+	-Zcrate-attr=no_std \
+	-Zcrate-attr='feature($(rust_allowed_features))' \
+	--extern alloc --extern kernel \
+	--crate-type rlib --out-dir $(obj) -L ./rust/ \
+	--crate-name $(obj)
+
+$(curdir)/%.o: $(curdir)/%.rs
+	@printf "CC\t$<\n"
+	@$(rust_common_cmd) --emit=dep-info,obj $<
 
 $(curdir)/%.s: $(curdir)/%.c
 	@printf "CC\t$<\n"

@@ -4,6 +4,9 @@ include scripts/Makefile.include
 
 PHONY := all clean dump run
 
+# Allows the usage of unstable features in stable compilers.
+export RUSTC_BOOTSTRAP := 1
+
 PREDIRS := prebuilt
 
 SUBDIRS := \
@@ -20,7 +23,7 @@ SUBDIRS := \
 	ext2 ramfs rootfs procfs \
 	sys \
 	userboot \
-	top_linux top_hello_world #rs_ext2
+	top_linux top_hello_world rs_hello #rs_ext2
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
 
@@ -33,9 +36,14 @@ $(PREDIRS):
 	@$(MAKE) -f ./scripts/Makefile.build obj=$@
 
 PHONY += $(SUBDIRS)
-$(SUBDIRS): $(PREDIRS)
+$(SUBDIRS): $(PREDIRS) rust
 	@$(MAKE) -f ./scripts/Makefile.build obj=$@
 	$(if $(filter-out startup, $@), @cp ./$@/*.ko ./output/)
+
+PHONY += rust
+rust:
+	@$(SHELL) ./scripts/rust_is_available.sh -v
+	@$(MAKE) -f ./scripts/Makefile.build obj=$@
 
 PHONY += tools
 tools:
