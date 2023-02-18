@@ -12,7 +12,7 @@ export RUSTC_BOOTSTRAP := 1
 
 PREDIRS := prebuilt
 
-SUBDIRS := \
+modules := \
 	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
 	early_dt of of_serial of_irq platform \
@@ -28,25 +28,30 @@ SUBDIRS := \
 	userboot \
 	top_linux top_hello_world rs_hello #rs_ext2
 
-CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS) $(PREDIRS))
+CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 
-all: $(SUBDIRS) startup/startup.bin tools
+all: $(modules) startup/startup.bin tools
 	@cp ./startup/System.map $(KMODULE_DIR)
 	@cp ./startup/startup.bin $(KMODULE_DIR)
+
+PHONY += prepare0
+prepare0:
+	@$(MAKE) -f ./scripts/Makefile.build obj=scripts/mod
 
 PHONY += $(PREDIRS)
 $(PREDIRS):
 	@$(MAKE) -f ./scripts/Makefile.build obj=$@
 
-PHONY += $(SUBDIRS)
-$(SUBDIRS): $(PREDIRS) rust
-	@$(MAKE) -f ./scripts/Makefile.build obj=$@
+PHONY += $(modules)
+$(modules): $(PREDIRS) prepare
+	@$(MAKE) -f ./scripts/Makefile.modpost obj=$@
+	@$(MAKE) -f ./scripts/Makefile.modfinal obj=$@
 	$(if $(filter-out startup, $@), @cp ./$@/*.ko $(KMODULE_DIR))
 
-PHONY += rust
-rust:
+PHONY += prepare
+prepare: prepare0
 	@$(SHELL) ./scripts/rust_is_available.sh -v
-	@$(MAKE) -f ./scripts/Makefile.build obj=$@
+	@$(MAKE) -f ./scripts/Makefile.build obj=rust
 
 PHONY += tools
 tools:
@@ -57,7 +62,7 @@ $(CLEAN_DIRS):
 	@$(MAKE) -f ./scripts/Makefile.clean obj=$@
 
 clean: $(CLEAN_DIRS)
-	@rm -f ./prebuilt/*.h ./prebuilt/*.s
+	@rm -f ./prebuilt/*.h ./prebuilt/*.s ./scripts/mod/modpost
 	@$(MAKE) -C tools clean
 	@$(MAKE) -C rust clean
 	@find $(KMODULE_DIR)/* | grep -v README.md | xargs rm -f

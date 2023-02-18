@@ -2,88 +2,12 @@
 
 PHONY := _build
 
-curdir := $(obj)
-
+include $(obj)/Makefile
 include scripts/Makefile.include
-include $(curdir)/Makefile
 
-__modname = $(basetarget)
-modfile = $(addprefix $(obj)/,$(__modname))
-
-mod_lds := scripts/module.lds
-elf_lds := $(curdir)/$(elf_lds)
-_target := $(if $(target_y), $(curdir)/$(target_y), $(curdir)/$(obj).ko)
-_test	:= $(curdir)/test_$(obj).ko
-obj_y	:= $(addprefix $(curdir)/, $(obj_y))
-extra_y := $(addprefix $(curdir)/, $(extra_y))
-test_y	:= $(filter $(curdir)/test%.o, \
-	$(patsubst %.c,%.o,$(wildcard $(curdir)/*.c)))
-
-$(curdir)/%.s: $(curdir)/%.S
-	@printf "CPP\t$<\n"
-	@$(CPP) $(AS_FLAGS) $(INCLUDES) -o $@ $<
-
-$(curdir)/%.o: $(curdir)/%.S
-	@printf "AS\t$<\n"
-	@$(CC) $(AS_FLAGS) $(INCLUDES) -c -o $@ $<
-
-$(curdir)/%.o: $(curdir)/%.c
-	@printf "CC\t$<\n"
-	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
-
-# Compile Rust sources (.rs)
-# ----------------------------------------------------------
-
-
-rust_allowed_features := allocator_api,const_refs_to_cell
-
-rust_common_cmd = \
-	RUST_MODFILE=$(modfile) $(RUSTC) $(rust_flags) \
-	-Zallow-features=$(rust_allowed_features) \
-	-Zcrate-attr=no_std \
-	-Zcrate-attr='feature($(rust_allowed_features))' \
-	--extern alloc --extern kernel \
-	--crate-type rlib --out-dir $(obj) -L ./rust/ \
-	--crate-name $(obj)
-
-$(curdir)/%.o: $(curdir)/%.rs
-	@printf "CC\t$<\n"
-	@$(rust_common_cmd) --emit=dep-info,obj $<
-
-$(curdir)/%.s: $(curdir)/%.c
-	@printf "CC\t$<\n"
-	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -S -o $@ $<
-
-$(curdir)/%.lds: $(curdir)/%.lds.S
-	@printf "AS\t$<\n"
-	@$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
-
-$(curdir)/%.h: $(curdir)/%.s
-	@printf "GEN\t$@\n"
-	$(call filechk,offsets,__ASM_OFFSETS_H__)
-
-_build: $(extra_y) $(_target) $(_test)
+_build: $(extra_y) $(_target) $(_hostprogs) $(_test)
 	@:
 
-$(curdir)/$(obj).ko: $(obj_y) $(mod_lds)
-	@printf "LD\t$@\n"
-	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(obj_y)
-	@$(READELF) -p _ksymtab_strings $@ > $(curdir)/$(obj).map 2> /dev/null
-
-$(curdir)/$(obj).elf: $(obj_y) $(elf_lds)
-	@printf "LD\t$@\n"
-	@$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
-
-$(curdir)/$(obj).bin: $(curdir)/$(obj).elf $(curdir)/System.map
-	@printf "COPY\t$@\n"
-	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
-
-$(curdir)/System.map: $(curdir)/$(obj).elf
-	@$(NM) -n $< | \
-		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
-
-$(curdir)/test_$(obj).ko: $(test_y)
-	@printf "LD\t$@\n"
-	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(test_y)
+include scripts/Makefile.library
 
 .PHONY: $(PHONY)
