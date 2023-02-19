@@ -593,10 +593,9 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
 	default:
 		/* All exported symbols */
 		if (strstarts(symname, "__ksymtab_")) {
+#if 0
 			const char *name, *secname;
 
-            printf("%s: ksymtab: '%s'\n", __func__, symname);
-            exit(-1);
 
 			name = symname + strlen("__ksymtab_");
 			secname = sec_name(info, get_secindex(info, sym));
@@ -605,6 +604,10 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
 				sym_add_exported(name, mod, true);
 			else if (strstarts(secname, "___ksymtab+"))
 				sym_add_exported(name, mod, false);
+#endif
+            printf("%s: prefix __ksymtab_ not support: '%s'\n",
+                   __func__, symname);
+            exit(-1);
 		} else if (strcmp(symname, "init_module") == 0) {
 			mod->has_init = true;
         } else if (strcmp(symname, "cleanup_module") == 0) {
@@ -1696,8 +1699,10 @@ static void check_exports(struct module *mod)
 		exp = find_symbol(s->name);
 		if (!exp || exp->shndx == SHN_UNDEF) {
 			if (!s->weak && nr_unresolved++ < MAX_UNRESOLVED_REPORTS)
+#if 0
 				printf("\"%s\" [%s.ko] undefined!\n",
                        s->name, mod->name);
+#endif
                 /*
 				modpost_log(warn_unresolved ? LOG_WARN : LOG_ERROR,
                             "\"%s\" [%s.ko] undefined!\n",
@@ -1969,9 +1974,7 @@ static void write_mod_c_file(struct module *mod)
 	int ret;
 
 	check_modname_len(mod);
-    printf("%s: ----------------------------------\n", __func__);
 	check_exports(mod);
-    printf("%s: ----------------------------------\n", __func__);
 
 	add_header(&buf, mod);
 	add_exported_symbols(&buf, mod);
@@ -1999,7 +2002,6 @@ static void write_dump(struct module *mod, const char *fname)
 	struct symbol *sym;
     char fpath[PATH_MAX];
 
-    printf("%s: '%s'\n", __func__, fname);
     if (mod->from_dump) {
         printf("%s: cannot support from_dump\n", __func__);
         exit(-1);
@@ -2098,8 +2100,6 @@ int main(int argc, char **argv)
     else
         write_mod_c_file(mod);
 
-    printf("%s: ==================================\n", __func__);
-
     if (missing_namespace_deps)
 		write_namespace_deps_files(mod, missing_namespace_deps);
 
@@ -2109,11 +2109,11 @@ int main(int argc, char **argv)
 		error("Section mismatches detected.\n"
 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
 
-    printf("%s: ==================================\n", __func__);
+#if 0
 	if (nr_unresolved > MAX_UNRESOLVED_REPORTS)
 		warn("suppressed %u unresolved symbol warnings because there were too many)\n",
 		     nr_unresolved - MAX_UNRESOLVED_REPORTS);
+#endif
 
-    printf("%s: step0 (%d)\n", __func__, error_occurred);
 	return error_occurred ? 1 : 0;
 }

@@ -42,6 +42,24 @@ static LIST_HEAD(fixups);
 static uint8_t *
 read_module(const char *filename, long *psize);
 
+static void
+clean_bootrd()
+{
+    if (kmod_dir == NULL)
+        return;
+
+    char filename[256] = {0};
+    sprintf(filename, "%s/%s", kmod_dir, BOOTRD_FILENAME);
+    remove(filename);
+}
+
+static void
+terminate()
+{
+    clean_bootrd();
+    exit(-1);
+}
+
 static bool
 check_module(const char *name)
 {
@@ -64,7 +82,7 @@ write_mod_to_bootrd(module *mod, FILE *fp)
     uint8_t *data = read_module(filename, &size);
     if (data == NULL || size == 0) {
         printf("cannont read module '%s'!\n", filename);
-        exit(-1);
+        terminate();
     }
 
     mod->offset_in_file = ftell(fp);
@@ -308,7 +326,7 @@ match_undef(const char *name, match_callback cb, module *mod)
     if (head == NULL) {
         printf("mod '%s': undef sym '%s' cannot be resolved!\n",
                mod->name, name);
-        exit(-1);
+        terminate();
     }
 
     if (head->next == NULL)
@@ -898,10 +916,8 @@ void
 complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
     if (need_handle_candidates) {
-        char filename[256] = {0};
-        sprintf(filename, "%s/%s", kmod_dir, BOOTRD_FILENAME);
         fclose(fp);
-        remove(filename);
+        clean_bootrd();
 
         printf("Find conflicts, reserve only one among candidates!\n");
         printf("Then run mk_bootfd again!\n");

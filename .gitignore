@@ -62,6 +62,7 @@ tools/mk_rootfs/rootfs.ext2
 tools/mk_bootrd/mk_bootrd
 tools/ch_bootrd/ch_bootrd
 tools/json2md/json2md
+scripts/mod/modpost
 output/*
 *.json
 *.rmeta

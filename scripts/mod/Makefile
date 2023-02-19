@@ -10,4 +10,5 @@ modpost_objs += sumversion.c
 modpost_objs := $(addprefix $(obj)/,$(modpost_objs))
 
 $(obj)/modpost: $(modpost_objs)
-	gcc -Wall -o $@ $^
+	@printf "MK\t$<\n"
+	@gcc -Wall -o $@ $^
