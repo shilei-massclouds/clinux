@@ -81,7 +81,7 @@ alloc_large_system_hash(const char *tablename,
 }
 EXPORT_SYMBOL(alloc_large_system_hash);
 
-static int
+int
 init_module(void)
 {
     printk("module[hashtable]: init begin ...\n");

@@ -432,7 +432,7 @@ virtio_mmio_init(void)
 }
 EXPORT_SYMBOL(virtio_mmio_init);
 
-static int
+int
 init_module(void)
 {
     printk("module[virtio_mmio]: init begin ...\n");

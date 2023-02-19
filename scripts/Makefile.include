@@ -1,4 +1,41 @@
 # SPDX-License-Identifier: GPL-2.0
+#
+# Convenient variables
+comma   := ,
+quote   := "
+squote  := '
+empty   :=
+space   := $(empty) $(empty)
+space_escape := _-_SPACE_-_
+pound := \#
+
+###
+# Quote a string to pass it to C files. foo => '"foo"'
+stringify = $(squote)$(quote)$1$(quote)$(squote)
+
+basetarget = $(basename $(notdir $@))
+__modname = $(basetarget)
+modname = $(subst $(space),:,$(__modname))
+modfile = $(addprefix $(obj)/,$(__modname))
+
+###
+# Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+dot-target = $(dir $@).$(notdir $@)
+
+###
+# The temporary file to save gcc -MMD generated dependencies must not
+# contain a comma
+depfile = $(subst $(comma),_,$(dot-target).d)
+
+name-fix-token = $(subst $(comma),_,$(subst -,_,$1))
+name-fix = $(call stringify,$(call name-fix-token,$1))
+
+modname_flags = -DKBUILD_MODNAME=$(call name-fix,$(modname))
+
+c_flags = -Wp,-MMD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE) \
+         -include $(srctree)/include/linux/compiler_types.h     \
+         $(_c_flags) $(modkern_cflags)                          \
+         $(basename_flags) $(modname_flags)
 
 CROSS_ := riscv64-linux-gnu-
 
@@ -28,9 +65,12 @@ AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64 -march=rv64imafdc \
 CFLAGS := -nostdinc -fno-PIE -mabi=lp64 -march=rv64imafdc \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug
+CC_FLAGS_CFI := -fsanitize=kcfi
 
-export MAKE OBJCOPYFLAGS
+export MAKE OBJCOPYFLAGS CC_FLAGS_CFI
 export INCLUDES AS_FLAGS CFLAGS LDFLAGS
+
+c_flags = $(modname_flags)
 
 mod_lds := scripts/module.lds
 elf_lds := $(obj)/$(elf_lds)
@@ -41,9 +81,6 @@ extra_y := $(addprefix $(obj)/, $(extra_y))
 test_y	:= $(filter $(obj)/test%.o, \
 	$(patsubst %.c,%.o,$(wildcard $(obj)/*.c)))
 _hostprogs := $(addprefix $(obj)/, $(hostprogs_y))
-
-
-basetarget = $(basename $(notdir $@))
 
 define sed-offsets
     's:^[[:space:]]*\.ascii[[:space:]]*"\(.*\)".*:\1:; \
@@ -75,6 +112,10 @@ define filechk
 		mv -f $@.tmp $@; \
 	fi
 endef
+
+$(obj)/%.mod.o: $(obj)/%.mod.c
+	@printf "CC\t$<\n"
+	$(CC) $(filter-out $(CC_FLAGS_CFI), $(CFLAGS)) $(c_flags) $(INCLUDES) -c -o $@ $<
 
 $(obj)/%.o: $(obj)/%.c
 	@printf "CC\t$<\n"
@@ -142,29 +183,8 @@ modkern_rustflags = $(KBUILD_RUSTFLAGS_MODULE) $(RUSTFLAGS_MODULE)
 _rust_flags = $(KBUILD_RUSTFLAGS)
 rust_flags = $(_rust_flags) $(modkern_rustflags) @./include/generated/rustc_cfg
 
-# Convenient variables
-comma   := ,
-quote   := "
-squote  := '
-empty   :=
-space   := $(empty) $(empty)
-space_escape := _-_SPACE_-_
-pound := \#
-
-###
-# Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
-dot-target = $(dir $@).$(notdir $@)
-
-###
-# The temporary file to save gcc -MMD generated dependencies must not
-# contain a comma
-depfile = $(subst $(comma),_,$(dot-target).d)
-
 # Compile Rust sources (.rs)
 # ----------------------------------------------------------
-
-__modname = $(basetarget)
-modfile = $(addprefix $(obj)/,$(__modname))
 
 rust_allowed_features := allocator_api,const_refs_to_cell
 

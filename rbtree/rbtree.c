@@ -557,7 +557,7 @@ struct rb_node *rb_next(const struct rb_node *node)
 }
 EXPORT_SYMBOL(rb_next);
 
-static int
+int
 init_module(void)
 {
     printk("module[rbtree]: init begin ...\n");

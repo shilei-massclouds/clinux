@@ -298,7 +298,7 @@ disk_get_part(struct gendisk *disk, int partno)
 }
 EXPORT_SYMBOL(disk_get_part);
 
-static int
+int
 init_module(void)
 {
     printk("module[genhd]: init begin ...\n");

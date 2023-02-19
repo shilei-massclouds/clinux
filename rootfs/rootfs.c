@@ -248,7 +248,7 @@ void console_on_rootfs(void)
     init_dup(file);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[rootfs]: init begin ...\n");

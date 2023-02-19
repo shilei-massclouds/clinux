@@ -279,7 +279,7 @@ void workqueue_init(void)
         init_worker_pool(pool);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[workqueue]: init begin ...\n");

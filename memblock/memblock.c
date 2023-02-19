@@ -596,7 +596,7 @@ __next_mem_range(u64 *idx,
     *idx = ULLONG_MAX;
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[memblock]: init begin ...\n");

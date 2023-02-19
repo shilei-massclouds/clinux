@@ -512,7 +512,7 @@ static struct kernel_param kernel_params[] = {
 static unsigned int
 num_kernel_params = sizeof(kernel_params) / sizeof(struct kernel_param);
 
-static int
+int
 init_module(void)
 {
     printk("module[early_dt]: init begin ...\n");

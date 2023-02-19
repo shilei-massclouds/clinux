@@ -214,7 +214,7 @@ page_cache_async_readahead(struct address_space *mapping,
 }
 EXPORT_SYMBOL(page_cache_async_readahead);
 
-static int
+int
 init_module(void)
 {
     printk("module[readahead]: init begin ...\n");

@@ -430,7 +430,7 @@ devres_free(void *res)
 }
 EXPORT_SYMBOL(devres_free);
 
-static int
+int
 init_module(void)
 {
     printk("module[devres]: init begin ...\n");

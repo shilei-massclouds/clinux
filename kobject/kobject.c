@@ -237,7 +237,7 @@ kobject_init_and_add(struct kobject *kobj, const char *fmt, ...)
 }
 EXPORT_SYMBOL(kobject_init_and_add);
 
-static int
+int
 init_module(void)
 {
     printk("module[kobject]: init begin ...\n");

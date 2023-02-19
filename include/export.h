@@ -24,4 +24,7 @@ struct kernel_symbol {
         "   .previous                           \n");               \
     _KSYMTAB_ENTRY(sym)
 
+extern struct module __this_module;
+#define THIS_MODULE (&__this_module)
+
 #endif /* _LINUX_EXPORT_H */

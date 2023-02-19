@@ -467,7 +467,7 @@ int generic_file_mmap(struct file *file, struct vm_area_struct *vma)
 }
 EXPORT_SYMBOL(generic_file_mmap);
 
-static int
+int
 init_module(void)
 {
     printk("module[filemap]: init begin ...\n");

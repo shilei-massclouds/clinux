@@ -61,7 +61,7 @@ sg_init_one(struct scatterlist *sg,
 }
 EXPORT_SYMBOL(sg_init_one);
 
-static int
+int
 init_module(void)
 {
     printk("module[scatterlist]: init begin ...\n");

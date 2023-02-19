@@ -115,7 +115,7 @@ void proc_init_kmemcache(void)
                               SLAB_ACCOUNT|SLAB_PANIC), init_once);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[procfs]: init begin ...\n");

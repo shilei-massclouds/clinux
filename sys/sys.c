@@ -23,7 +23,7 @@ long _do_sys_newuname(struct new_utsname *name)
     return 0;
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[sys]: init begin ...\n");

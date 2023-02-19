@@ -1748,25 +1748,29 @@ static void check_modname_len(struct module *mod)
  **/
 static void add_header(struct buffer *b, struct module *mod)
 {
-	buf_printf(b, "#include <linux/module.h>\n");
+	buf_printf(b, "#include <module.h>\n");
 	/*
 	 * Include build-salt.h after module.h in order to
 	 * inherit the definitions.
 	 */
+#if 0
 	buf_printf(b, "#define INCLUDE_VERMAGIC\n");
 	buf_printf(b, "#include <linux/build-salt.h>\n");
 	buf_printf(b, "#include <linux/elfnote-lto.h>\n");
 	buf_printf(b, "#include <linux/export-internal.h>\n");
 	buf_printf(b, "#include <linux/vermagic.h>\n");
-	buf_printf(b, "#include <linux/compiler.h>\n");
+	buf_printf(b, "#include <compiler.h>\n");
+#endif
 	buf_printf(b, "\n");
+#if 0
 	buf_printf(b, "BUILD_SALT;\n");
 	buf_printf(b, "BUILD_LTO_INFO;\n");
 	buf_printf(b, "\n");
 	buf_printf(b, "MODULE_INFO(vermagic, VERMAGIC_STRING);\n");
 	buf_printf(b, "MODULE_INFO(name, KBUILD_MODNAME);\n");
 	buf_printf(b, "\n");
-	buf_printf(b, "__visible struct module __this_module\n");
+#endif
+	buf_printf(b, "struct module __this_module\n");
 	buf_printf(b, "__section(\".gnu.linkonce.this_module\") = {\n");
 	buf_printf(b, "\t.name = KBUILD_MODNAME,\n");
 	if (mod->has_init)
@@ -1775,9 +1779,9 @@ static void add_header(struct buffer *b, struct module *mod)
 		buf_printf(b, "#ifdef CONFIG_MODULE_UNLOAD\n"
 			      "\t.exit = cleanup_module,\n"
 			      "#endif\n");
-	buf_printf(b, "\t.arch = MODULE_ARCH_INIT,\n");
 	buf_printf(b, "};\n");
 
+#if 0
 	if (!external_module)
 		buf_printf(b, "\nMODULE_INFO(intree, \"Y\");\n");
 
@@ -1792,6 +1796,7 @@ static void add_header(struct buffer *b, struct module *mod)
 
 	if (strstarts(mod->name, "tools/testing"))
 		buf_printf(b, "\nMODULE_INFO(test, \"Y\");\n");
+#endif
 }
 
 static void add_exported_symbols(struct buffer *buf, struct module *mod)
@@ -1944,6 +1949,7 @@ static void write_if_changed(struct buffer *b, const char *fname)
 
 static void write_vmlinux_export_c_file(struct module *mod)
 {
+#if 0
 	struct buffer buf = { };
 
 	buf_printf(&buf,
@@ -1952,6 +1958,7 @@ static void write_vmlinux_export_c_file(struct module *mod)
 	add_exported_symbols(&buf, mod);
 	write_if_changed(&buf, ".vmlinux.export.c");
 	free(buf.p);
+#endif
 }
 
 /* do sanity checks, and generate *.mod.c file */
@@ -1968,9 +1975,9 @@ static void write_mod_c_file(struct module *mod)
 
 	add_header(&buf, mod);
 	add_exported_symbols(&buf, mod);
-	add_versions(&buf, mod);
-	add_depends(&buf, mod);
-	add_srcversion(&buf, mod);
+	//add_versions(&buf, mod);
+	//add_depends(&buf, mod);
+	//add_srcversion(&buf, mod);
 
 	ret = snprintf(fname, sizeof(fname), "%s/%s.mod.c",
                    mod->name, mod->name);
@@ -2071,9 +2078,10 @@ int main(int argc, char **argv)
 		}
 	}
 
-    /* !!!NOTICE!!! Set "lib" as current test object! */
-    if (mod_name == NULL || strcmp(mod_name, "lib") != 0)
-        return 0;
+    if (mod_name == NULL) {
+        printf("%s: no module name!\n", __func__);
+        exit(-1);
+    }
 
     mod = new_module(mod_name);
 

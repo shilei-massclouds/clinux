@@ -14,7 +14,7 @@ all: $(TARGET)
 
 $(TARGET): main.c
 	@printf "MK\t$@\n"
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $^
+	@$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $^
 
 clean:
 	@rm -rf *.o $(TARGET)

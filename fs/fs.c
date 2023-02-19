@@ -260,7 +260,7 @@ init_pseudo(struct fs_context *fc, unsigned long magic)
 }
 EXPORT_SYMBOL(init_pseudo);
 
-static int
+int
 init_module(void)
 {
     printk("module[fs]: init begin ...\n");

@@ -366,7 +366,7 @@ devm_platform_ioremap_resource(struct platform_device *pdev,
 }
 EXPORT_SYMBOL(devm_platform_ioremap_resource);
 
-static int
+int
 init_module(void)
 {
     printk("module[platform]: init begin ...\n");

@@ -270,7 +270,7 @@ long get_user_pages_remote(struct mm_struct *mm,
 }
 EXPORT_SYMBOL(get_user_pages_remote);
 
-static int
+int
 init_module(void)
 {
     printk("module[gup]: init begin ...\n");

@@ -249,7 +249,7 @@ virtio_check_driver_offered_feature(const struct virtio_device *vdev,
 }
 EXPORT_SYMBOL(virtio_check_driver_offered_feature);
 
-static int
+int
 init_module(void)
 {
     printk("module[virtio]: init begin ...\n");

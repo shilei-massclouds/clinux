@@ -412,7 +412,7 @@ dcache_init(void)
     d_hash_shift = 32 - d_hash_shift;
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[dcache]: init begin ...\n");

@@ -100,7 +100,7 @@ start_user(void)
     printk("start_user: init ok!\n");
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[userboot]: init begin ...\n");

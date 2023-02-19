@@ -243,7 +243,7 @@ void radix_tree_init(void)
                           radix_tree_node_ctor);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[radix-tree]: init begin ...\n");

@@ -54,7 +54,7 @@ void __bitmap_set(unsigned long *map, unsigned int start, int len)
 }
 EXPORT_SYMBOL(__bitmap_set);
 
-static int
+int
 init_module(void)
 {
     printk("module[bitmap]: init begin ...\n");

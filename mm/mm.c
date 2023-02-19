@@ -264,7 +264,7 @@ void _do_page_fault(struct pt_regs *regs)
     return;
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[mm]: init begin ...\n");

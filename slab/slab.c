@@ -1247,7 +1247,7 @@ _kmem_cache_free(struct kmem_cache *cachep, void *objp)
     __cache_free(cachep, objp, _RET_IP_);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[slab]: init begin ...\n");

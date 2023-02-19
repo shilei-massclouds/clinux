@@ -87,7 +87,7 @@ riscv_intc_init(struct device_node *node,
     return 0;
 }
 
-static int
+int
 init_module(void)
 {
     struct of_device_id matchs[] = {

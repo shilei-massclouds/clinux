@@ -1072,7 +1072,7 @@ unsigned long get_zeroed_page(gfp_t gfp_mask)
 }
 EXPORT_SYMBOL(get_zeroed_page);
 
-static int
+int
 init_module(void)
 {
     printk("module[buddy]: init begin ...\n");

@@ -149,7 +149,7 @@ static struct file_system_type ramfs_fs_type = {
     .fs_flags = FS_USERNS_MOUNT,
 };
 
-static int
+int
 init_module(void)
 {
     printk("module[ramfs]: init begin ...\n");

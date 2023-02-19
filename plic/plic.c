@@ -219,7 +219,7 @@ plic_init(struct device_node *node, struct device_node *parent)
     return 0;
 }
 
-static int
+int
 init_module(void)
 {
     struct of_device_id match = {

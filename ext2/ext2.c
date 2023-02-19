@@ -9,7 +9,7 @@ extern int init_ext2_fs(void);
 bool ext2_initialized = false;
 EXPORT_SYMBOL(ext2_initialized);
 
-static int
+int
 init_module(void)
 {
     printk("module[ext2]: init begin ...\n");

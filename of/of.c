@@ -597,7 +597,7 @@ const void *of_device_get_match_data(const struct device *dev)
 }
 EXPORT_SYMBOL(of_device_get_match_data);
 
-static int
+int
 init_module(void)
 {
     printk("module[of]: init begin ...\n");

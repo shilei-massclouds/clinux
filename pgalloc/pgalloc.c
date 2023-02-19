@@ -727,7 +727,7 @@ out:
     return retval;
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[pgalloc]: init begin ...\n");

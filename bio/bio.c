@@ -268,7 +268,7 @@ static int init_bio(void)
     return 0;
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[bio]: init begin ...\n");

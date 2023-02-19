@@ -546,7 +546,7 @@ static struct virtio_driver virtio_blk = {
     .feature_table_size_legacy  = ARRAY_SIZE(features_legacy),
 };
 
-static int
+int
 init_module(void)
 {
     printk("module[virtio_blk]: init begin ...\n");

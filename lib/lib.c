@@ -2,7 +2,7 @@
 
 #include <printk.h>
 
-static int
+int
 init_module(void)
 {
     printk("module[lib]: init begin ...\n");

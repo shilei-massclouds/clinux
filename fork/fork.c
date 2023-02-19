@@ -258,7 +258,7 @@ static long _do_set_tid_address(int *tidptr)
     //return task_pid_vnr(current);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[fork]: init begin ...\n");

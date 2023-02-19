@@ -144,7 +144,7 @@ size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
 }
 EXPORT_SYMBOL(_copy_to_iter);
 
-static int
+int
 init_module(void)
 {
     printk("module[iov_iter]: init begin ...\n");

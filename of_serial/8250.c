@@ -581,7 +581,7 @@ static void serial8250_init(void)
         panic("bad driver!");
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[of_serial]: init begin ...\n");

@@ -329,7 +329,7 @@ void xarray_init(void)
                                        xa_node_ctor);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[xarray]: init begin ...\n");

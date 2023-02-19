@@ -289,7 +289,7 @@ void sched_init(void)
     init_idle(current, 0);
 }
 
-static int
+int
 init_module(void)
 {
     printk("module[sched]: init begin ...\n");

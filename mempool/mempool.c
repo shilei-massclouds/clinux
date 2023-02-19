@@ -80,7 +80,7 @@ int mempool_init(mempool_t *pool, int min_nr, mempool_alloc_t *alloc_fn,
 }
 EXPORT_SYMBOL(mempool_init);
 
-static int
+int
 init_module(void)
 {
     printk("module[mempool]: init begin ...\n");

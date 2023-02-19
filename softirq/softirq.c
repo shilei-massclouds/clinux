@@ -82,7 +82,7 @@ void __do_softirq(void)
 }
 EXPORT_SYMBOL(__do_softirq);
 
-static int
+int
 init_module(void)
 {
     printk("module[softirq]: init begin ...\n");

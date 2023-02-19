@@ -6,7 +6,7 @@ $(obj)/$(obj).bin: $(obj)/$(obj).elf $(obj)/System.map
 
 $(obj)/$(obj).elf: $(obj_y) $(elf_lds)
 	@printf "LD\t$@\n"
-	@$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
+	$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
 
 $(obj)/$(obj).ko: $(obj_y) $(mod_lds)
 	@printf "LD\t$@\n"

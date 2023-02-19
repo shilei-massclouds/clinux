@@ -5,7 +5,7 @@
 
 extern bool userboot_ready;
 
-static int
+int
 init_module(void)
 {
     printk("module[top_linux]: init begin ...\n");

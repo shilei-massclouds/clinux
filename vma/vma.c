@@ -560,7 +560,7 @@ free_vm_area(struct vm_struct *area)
 }
 EXPORT_SYMBOL(free_vm_area);
 
-static int
+int
 init_module(void)
 {
     printk("module[vma]: init begin ...\n");

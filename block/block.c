@@ -41,7 +41,7 @@ blk_queue_max_segments(struct request_queue *q,
 }
 EXPORT_SYMBOL(blk_queue_max_segments);
 
-static int
+int
 init_module(void)
 {
     printk("module[block]: init begin ...\n");

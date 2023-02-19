@@ -3,7 +3,7 @@
 #include <printk.h>
 #include <irqflags.h>
 
-static int
+int
 init_module(void)
 {
     printk("module[irq]: init begin ...\n");

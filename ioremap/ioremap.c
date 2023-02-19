@@ -144,7 +144,7 @@ ioremap_prot(phys_addr_t addr, size_t size, unsigned long prot)
 }
 EXPORT_SYMBOL(ioremap_prot);
 
-static int
+int
 init_module(void)
 {
     printk("module[ioremap]: init begin ...\n");

@@ -42,7 +42,7 @@ struct backing_dev_info *bdi_alloc(void)
 }
 EXPORT_SYMBOL(bdi_alloc);
 
-static int
+int
 init_module(void)
 {
     printk("module[backing-dev]: init begin ...\n");
