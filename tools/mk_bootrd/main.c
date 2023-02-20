@@ -796,8 +796,15 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
             hdr->profile_offset = ftell(fp);
             hdr->current_profile = hdr->profile_offset;
         }
-        if (strncmp(mod->name, "top_linux", 9) == 0)
+#if 0
+        if (strncmp(mod->name, "top_linux",
+                    strlen("top_linux")) == 0)
             hdr->current_profile = ftell(fp);
+#else
+        if (strncmp(mod->name, "top_hello_world",
+                    strlen("top_hello_world")) == 0)
+            hdr->current_profile = ftell(fp);
+#endif
 
         write_profile_to_bootrd(num_profile_mods, profile_mods,
                                 hdr, fp, mod->name);

@@ -5,6 +5,29 @@
 use kernel::prelude::*;
 use kernel::print::printk;
 
+/***************************/
+/* substitue for EXPORT_SYMBOL */
+
+#[no_mangle]
+#[link_section = "_ksymtab_strings"]
+static EXPORT_STR: [u8; 6] = [b'r', b'e', b'a', b'd', b'y', 0];
+
+struct kernel_symbol {
+    value: *const fn(),
+    name: *const u8,
+}
+
+unsafe impl Sync for kernel_symbol {}
+
+#[no_mangle]
+#[link_section = "_ksymtab"]
+static EXPORT_SYM: kernel_symbol = kernel_symbol {
+    value: RustHello::ready as *const fn(),
+    name: &EXPORT_STR as *const u8,
+};
+
+/***************************/
+
 trait IBase {
     fn ready() -> bool;
 }
@@ -40,3 +63,4 @@ impl Drop for RustHello {
     fn drop(&mut self) {
     }
 }
+

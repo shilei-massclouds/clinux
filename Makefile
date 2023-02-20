@@ -26,7 +26,7 @@ modules := \
 	ext2 ramfs rootfs procfs \
 	sys \
 	userboot \
-	top_linux top_hello_world rs_hello #rs_ext2
+	top_linux top_hello_world rs_hello #c_hello #rs_ext2
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 
@@ -62,7 +62,7 @@ $(CLEAN_DIRS):
 	@$(MAKE) -f ./scripts/Makefile.clean obj=$@
 
 clean: $(CLEAN_DIRS)
-	@rm -f ./prebuilt/*.h ./prebuilt/*.s ./scripts/mod/modpost
+	@rm -f ./prebuilt/*.h ./prebuilt/*.s ./scripts/mod/modpost ./top*.json
 	@$(MAKE) -C tools clean
 	@$(MAKE) -C rust clean
 	@find $(KMODULE_DIR)/* | grep -v README.md | xargs rm -f
