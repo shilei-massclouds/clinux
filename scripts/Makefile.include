@@ -115,7 +115,7 @@ endef
 
 $(obj)/%.mod.o: $(obj)/%.mod.c
 	@printf "CC\t$<\n"
-	$(CC) $(filter-out $(CC_FLAGS_CFI), $(CFLAGS)) $(c_flags) $(INCLUDES) -c -o $@ $<
+	@$(CC) $(filter-out $(CC_FLAGS_CFI), $(CFLAGS)) $(c_flags) $(INCLUDES) -c -o $@ $<
 
 $(obj)/%.o: $(obj)/%.c
 	@printf "CC\t$<\n"

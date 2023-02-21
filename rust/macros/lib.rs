@@ -5,9 +5,16 @@
 mod concat_idents;
 mod helpers;
 mod module;
+mod interface;
 mod vtable;
 
 use proc_macro::TokenStream;
+
+/// Declares a interface(trait) for a component(module).
+#[proc_macro]
+pub fn provide(ts: TokenStream) -> TokenStream {
+    interface::provide(ts)
+}
 
 /// Declares a kernel module.
 ///

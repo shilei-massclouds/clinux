@@ -370,6 +370,7 @@ static void sym_update_namespace(const char *symname, const char *namespace)
 	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
 }
 
+#if 0
 static struct symbol *sym_add_exported(const char *name, struct module *mod,
 				       bool gpl_only)
 {
@@ -389,6 +390,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
 
 	return s;
 }
+#endif
 
 static void *grab_file(const char *filename, size_t *size)
 {
@@ -625,6 +627,7 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
 	}
 }
 
+#if 0
 /**
  * Parse tag=value strings from .modinfo section
  **/
@@ -671,6 +674,7 @@ static char *get_modinfo(struct elf_info *info, const char *tag)
 {
 	return get_next_modinfo(info, tag, NULL);
 }
+#endif
 
 static const char *sym_name(struct elf_info *elf, Elf_Sym *sym)
 {
@@ -1629,7 +1633,6 @@ static char *remove_dot(char *s)
 static void read_symbols(struct module *mod, const char *objname)
 {
 	const char *symname;
-    char *version;
 	struct elf_info info = { };
 	Elf_Sym *sym;
 
@@ -1822,6 +1825,7 @@ static void add_exported_symbols(struct buffer *buf, struct module *mod)
 	}
 }
 
+#if 0
 /**
  * Record CRCs for unresolved symbols
  **/
@@ -1852,7 +1856,9 @@ static void add_versions(struct buffer *b, struct module *mod)
 
 	buf_printf(b, "};\n");
 }
+#endif
 
+#if 0
 static void add_depends(struct buffer *b, struct module *mod)
 {
 	struct symbol *s;
@@ -1885,15 +1891,7 @@ static void add_depends(struct buffer *b, struct module *mod)
 	}
 	buf_printf(b, "\");\n");
 }
-
-static void add_srcversion(struct buffer *b, struct module *mod)
-{
-	if (mod->srcversion[0]) {
-		buf_printf(b, "\n");
-		buf_printf(b, "MODULE_INFO(srcversion, \"%s\");\n",
-			   mod->srcversion);
-	}
-}
+#endif
 
 static void write_buf(struct buffer *b, const char *fname)
 {

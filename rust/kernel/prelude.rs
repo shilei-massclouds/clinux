@@ -15,7 +15,7 @@ pub use core::pin::Pin;
 
 pub use alloc::{boxed::Box, string::String, vec::Vec};
 
-pub use macros::{module, vtable};
+pub use macros::{module, vtable, provide};
 
 pub use super::build_assert;
 
@@ -34,3 +34,11 @@ pub use super::static_assert;
 pub use super::{error::code::*, Error, Result};
 
 pub use super::{str::CStr, ARef, ThisModule};
+
+#[doc(hidden)]
+pub struct ExportSymbol {
+    pub value: *const fn(),
+    pub name: *const u8,
+}
+
+unsafe impl Sync for ExportSymbol {}

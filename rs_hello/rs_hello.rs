@@ -8,28 +8,28 @@ use kernel::print::printk;
 /***************************/
 /* substitue for EXPORT_SYMBOL */
 
+/*
 #[no_mangle]
 #[link_section = "_ksymtab_strings"]
-static EXPORT_STR: [u8; 6] = [b'r', b'e', b'a', b'd', b'y', 0];
-
-struct kernel_symbol {
-    value: *const fn(),
-    name: *const u8,
-}
-
-unsafe impl Sync for kernel_symbol {}
+static EXPORT_STR: [u8; 6] = *b"ready\0";
 
 #[no_mangle]
 #[link_section = "_ksymtab"]
-static EXPORT_SYM: kernel_symbol = kernel_symbol {
+static EXPORT_SYM: ExportSymbol = ExportSymbol {
     value: RustHello::ready as *const fn(),
-    name: &EXPORT_STR as *const u8,
+    name: EXPORT_STR.as_ptr(),
 };
+*/
 
 /***************************/
 
 trait IBase {
     fn ready() -> bool;
+}
+
+provide! {
+    interface: IBase,
+    component: RustHello,
 }
 
 module! {
