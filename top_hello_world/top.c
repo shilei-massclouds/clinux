@@ -3,13 +3,13 @@
 #include <bug.h>
 #include <printk.h>
 
-extern bool ready();
+extern bool IBase_ready();
 
 int
 init_module(void)
 {
     printk("module[top_hello_world]: init begin ...\n");
-    BUG_ON(!ready());
+    BUG_ON(!IBase_ready());
     printk("module[top_hello_world]: init end!\n");
     return 0;
 }
