@@ -43,7 +43,6 @@ module! {
 struct RustHello {}
 
 impl IBase for RustHello {
-    #[no_mangle]
     fn ready() -> bool {
         true
     }

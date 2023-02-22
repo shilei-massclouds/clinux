@@ -92,6 +92,12 @@ pub(crate) fn provide(ts: TokenStream) -> TokenStream {
 
     format!(
         "
+            #[doc(hidden)]
+            #[no_mangle]
+            pub extern \"C\" fn {sym_name}() -> bool {{
+                {component}::ready()
+            }}
+
             #[no_mangle]
             #[link_section = \"_ksymtab_strings\"]
             static EXPORT_STR_{sym_name}: [u8; {len}+1] = *b\"{sym_name}\\0\";
@@ -99,7 +105,7 @@ pub(crate) fn provide(ts: TokenStream) -> TokenStream {
             #[no_mangle]
             #[link_section = \"_ksymtab\"]
             static EXPORT_SYM_{sym_name}: ExportSymbol = ExportSymbol {{
-                value: {component}::ready as *const fn(),
+                value: {sym_name} as *const fn(),
                 name: EXPORT_STR_{sym_name}.as_ptr(),
             }};
         ",
