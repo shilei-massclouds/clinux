@@ -78,6 +78,58 @@ impl ProvideInfo {
     }
 }
 
+fn export_symbol_for_method(
+    interface: &String, method: &String,
+    decl_args: &String, rtype: &Option<String>,
+    call_args: &String, buffer: &mut String) {
+
+    let symbol = format!("{interface}_{method}",
+                         interface = interface,
+                         method = method);
+
+    let mut signature = format!("fn {symbol}({decl_args})",
+                                symbol = symbol,
+                                decl_args = decl_args);
+    if let Some(t) = &rtype {
+        write!(&mut signature, " -> {t}", t = t);
+    }
+
+    let call_method = format!("{method}({call_args})",
+                              method = method,
+                              call_args = call_args);
+
+    write!(
+        buffer,
+        "
+            #[doc(hidden)]
+            #[no_mangle]
+            pub extern \"C\" {signature} {{
+                if let Some(m) = unsafe {{ &__MOD }} {{
+                    return m.{call_method};
+                }}
+                // Todo: Implement panic
+                loop {{}}
+            }}
+
+            #[no_mangle]
+            #[link_section = \"_ksymtab_strings\"]
+            static EXPORT_STR_{symbol}: [u8; {len}+1] = *b\"{symbol}\\0\";
+
+            #[no_mangle]
+            #[link_section = \"_ksymtab\"]
+            static EXPORT_SYM_{symbol}: ExportSymbol = ExportSymbol {{
+                value: {symbol} as *const fn(),
+                name: EXPORT_STR_{symbol}.as_ptr(),
+            }};
+        ",
+        signature = signature,
+        call_method = call_method,
+        symbol = symbol,
+        len = symbol.len(),
+    )
+    .unwrap();
+}
+
 pub(crate) fn provide(ts: TokenStream) -> TokenStream {
     let mut it = ts.into_iter();
 
@@ -85,34 +137,29 @@ pub(crate) fn provide(ts: TokenStream) -> TokenStream {
 
     println!("provide {} for {}", info.interface, info.component);
 
-    let method = "ready";
-    let sym_name = format!("{interface}_{method}",
-                           interface = info.interface,
-                           method = method);
+    let mut buffer = String::new();
 
-    format!(
-        "
-            #[doc(hidden)]
-            #[no_mangle]
-            pub extern \"C\" fn {sym_name}() -> bool {{
-                {component}::ready()
-            }}
+    {
+        let method = String::from("ready");
+        let decl_args = String::from("");
+        let call_args = String::from("");
+        let rtype = Some(String::from("bool"));
 
-            #[no_mangle]
-            #[link_section = \"_ksymtab_strings\"]
-            static EXPORT_STR_{sym_name}: [u8; {len}+1] = *b\"{sym_name}\\0\";
+        export_symbol_for_method(&info.interface,
+                                 &method, &decl_args, &rtype,
+                                 &call_args, &mut buffer);
+    }
 
-            #[no_mangle]
-            #[link_section = \"_ksymtab\"]
-            static EXPORT_SYM_{sym_name}: ExportSymbol = ExportSymbol {{
-                value: {sym_name} as *const fn(),
-                name: EXPORT_STR_{sym_name}.as_ptr(),
-            }};
-        ",
-        sym_name = sym_name,
-        len = sym_name.len(),
-        component = info.component,
-    )
-    .parse()
-    .expect("Error parsing formatted string into token stream.")
+    {
+        let method = String::from("name");
+        let decl_args = String::from("");
+        let call_args = String::from("");
+        let rtype = Some(String::from("*const core::ffi::c_char"));
+
+        export_symbol_for_method(&info.interface,
+                                 &method, &decl_args, &rtype,
+                                 &call_args, &mut buffer);
+    }
+
+    buffer.parse().expect("Error parsing formatted string into token stream.")
 }

@@ -24,7 +24,8 @@ static EXPORT_SYM: ExportSymbol = ExportSymbol {
 /***************************/
 
 trait IBase {
-    fn ready() -> bool;
+    fn ready(&self) -> bool;
+    fn name(&self) -> *const core::ffi::c_char;
 }
 
 provide! {
@@ -43,15 +44,20 @@ module! {
 struct RustHello {}
 
 impl IBase for RustHello {
-    fn ready() -> bool {
+    fn ready(&self) -> bool {
         true
+    }
+
+    fn name(&self) -> *const core::ffi::c_char {
+        "rust_hello\0".as_ptr() as *const core::ffi::c_char
     }
 }
 
 impl kernel::Module for RustHello {
     fn init(_name: &'static CStr, _module: &'static ThisModule) -> Result<Self> {
         unsafe {
-            printk(b"Rust: Hello world!\n\0");
+            printk(b"module[RustHello]: init begin...\n\0");
+            printk(b"module[RustHello]: init end!\n\0");
         }
 
         Ok(RustHello { })
