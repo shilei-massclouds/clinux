@@ -1,27 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 
-//! Rust minimal sample.
-
 use kernel::prelude::*;
 use kernel::print::printk;
+use crate::component::Component;
 
-/***************************/
-/* substitue for EXPORT_SYMBOL */
-
-/*
-#[no_mangle]
-#[link_section = "_ksymtab_strings"]
-static EXPORT_STR: [u8; 6] = *b"ready\0";
-
-#[no_mangle]
-#[link_section = "_ksymtab"]
-static EXPORT_SYM: ExportSymbol = ExportSymbol {
-    value: RustHello::ready as *const fn(),
-    name: EXPORT_STR.as_ptr(),
-};
-*/
-
-/***************************/
+mod component;
 
 trait IBase {
     fn ready(&self) -> bool;
@@ -30,41 +13,43 @@ trait IBase {
 
 provide! {
     interface: IBase,
-    component: RustHello,
+    component: FrameWork,
 }
 
 module! {
-    type: RustHello,
+    type: FrameWork,
     name: "rust_hello",
     author: "Rust for Linux Contributors",
     description: "Rust hello_world sample",
     license: "GPL",
 }
 
-struct RustHello {}
+struct FrameWork {
+    com: Component,
+}
 
-impl IBase for RustHello {
+impl IBase for FrameWork {
     fn ready(&self) -> bool {
-        true
+        self.com.ready()
     }
 
     fn name(&self) -> *const core::ffi::c_char {
-        "rust_hello\0".as_ptr() as *const core::ffi::c_char
+        self.com.name()
     }
 }
 
-impl kernel::Module for RustHello {
+impl kernel::Module for FrameWork {
     fn init(_name: &'static CStr, _module: &'static ThisModule) -> Result<Self> {
         unsafe {
             printk(b"module[RustHello]: init begin...\n\0");
             printk(b"module[RustHello]: init end!\n\0");
         }
 
-        Ok(RustHello { })
+        Ok(FrameWork { com: Component {} })
     }
 }
 
-impl Drop for RustHello {
+impl Drop for FrameWork {
     fn drop(&mut self) {
     }
 }
