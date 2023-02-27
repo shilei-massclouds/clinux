@@ -47,7 +47,7 @@ $(obj)/compiler_builtins.o: $(obj)/compiler_builtins.rs $(obj)/core.o
 $(obj)/kernel.o: private rustc_target_flags = --extern alloc \
 	--extern build_error --extern macros --extern bindings
 $(obj)/kernel.o: $(obj)/kernel/lib.rs $(obj)/alloc.o $(obj)/build_error.o \
-	$(obj)/libmacros.so $(obj)/bindings.o
+	$(obj)/libmacros.so $(obj)/bindings.o $(obj)/kernel/*.rs $(obj)/kernel/interfaces/*.rs
 	@$(rustc_library)
 
 $(obj)/alloc.o: private skip_clippy = 1
@@ -70,7 +70,7 @@ rustc_procmacro = \
 # Procedural macros can only be used with the `rustc` that compiled it.
 # Therefore, to get `libmacros.so` automatically recompiled when the compiler
 # version changes, we add `core.o` as a dependency (even if it is not needed).
-$(obj)/libmacros.so: $(obj)/macros/lib.rs $(obj)/core.o
+$(obj)/libmacros.so: $(obj)/macros/lib.rs $(obj)/core.o $(obj)/macros/*.rs
 	@$(rustc_procmacro)
 
 # $(obj)/bindings/bindings_generated.rs

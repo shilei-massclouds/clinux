@@ -24,6 +24,21 @@ struct kernel_symbol {
         "   .previous                           \n");               \
     _KSYMTAB_ENTRY(sym)
 
+#define _KSYMTAB_ENTRY_ITF(sym, itf)                          \
+    static const struct kernel_symbol _ksymtab_##itf##_##sym    \
+    __attribute__((section("_ksymtab"), used))   \
+    __aligned(sizeof(void *))                                   \
+    = { (unsigned long)&sym, _kstrtab_##itf##_##sym }
+
+#define EXPORT_SYMBOL_ITF(sym, itf)                                          \
+    extern typeof(sym) sym;                                         \
+    extern const char _kstrtab_##itf##_##sym[];                     \
+    asm("   .section \"_ksymtab_strings\",\"aMS\",%progbits,1  \n" \
+        "_kstrtab_" #itf "_" #sym ":            \n"                 \
+        "   .asciz  \"" #itf "_" #sym "\"       \n"                 \
+        "   .previous                           \n");               \
+    _KSYMTAB_ENTRY_ITF(sym, itf)
+
 extern struct module __this_module;
 #define THIS_MODULE (&__this_module)
 

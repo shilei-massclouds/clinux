@@ -8,7 +8,7 @@ $(obj)/$(obj).elf: $(obj_y) $(elf_lds)
 	@printf "LD\t$@\n"
 	$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
 
-$(obj)/$(obj).ko: $(obj_y) $(mod_lds)
+$(obj)/$(obj).ko: $(obj_y) $(mod_lds) $(wildcard $(obj)/*.rs)
 	@printf "LD\t$@\n"
 	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(obj_y)
 	@$(READELF) -p _ksymtab_strings $@ > $(obj)/$(obj).map 2> /dev/null

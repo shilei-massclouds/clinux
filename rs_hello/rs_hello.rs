@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0
 
+//! Component [rs_hello].
+
 use kernel::prelude::*;
-use kernel::print::printk;
+use kernel::interfaces::ibase::IBase;
 use crate::component::Component;
 
+mod ilib_stub;
 mod component;
-
-trait IBase {
-    fn ready(&self) -> bool;
-    fn name(&self) -> *const core::ffi::c_char;
-}
 
 provide! {
     interface: IBase,
@@ -40,10 +38,8 @@ impl IBase for FrameWork {
 
 impl kernel::Module for FrameWork {
     fn init(_name: &'static CStr, _module: &'static ThisModule) -> Result<Self> {
-        unsafe {
-            printk(b"module[RustHello]: init begin...\n\0");
-            printk(b"module[RustHello]: init end!\n\0");
-        }
+        //printk!("module[RustHello]: init begin...\n");
+        //printk!("module[RustHello]: init end!\n");
 
         Ok(FrameWork { com: Component {} })
     }
@@ -53,4 +49,3 @@ impl Drop for FrameWork {
     fn drop(&mut self) {
     }
 }
-

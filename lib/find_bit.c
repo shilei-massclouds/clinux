@@ -60,3 +60,4 @@ find_next_bit(const unsigned long *addr,
     return _find_next_bit(addr, NULL, size, offset, 0UL);
 }
 EXPORT_SYMBOL(find_next_bit);
+EXPORT_SYMBOL_ITF(find_next_bit, lib);

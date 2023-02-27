@@ -44,6 +44,7 @@ void printk(const char *fmt, ...)
     va_end(args);
 }
 EXPORT_SYMBOL(printk);
+EXPORT_SYMBOL_ITF(printk, lib);
 
 static int
 try_enable_new_console(struct console *newcon, bool user_specified)

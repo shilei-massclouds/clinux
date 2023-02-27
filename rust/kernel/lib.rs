@@ -102,6 +102,9 @@ pub mod user_ptr;
 pub mod kunit;
 
 #[doc(hidden)]
+pub mod interfaces;
+
+#[doc(hidden)]
 pub use build_error::build_error;
 
 pub use crate::error::{to_result, Error, Result};

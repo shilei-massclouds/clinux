@@ -79,7 +79,6 @@ pub mod format_strings {
     pub static ERR: [u8; LENGTH] = generate(false, bindings::KERN_ERR);
     pub static WARNING: [u8; LENGTH] = generate(false, bindings::KERN_WARNING);
     pub static NOTICE: [u8; LENGTH] = generate(false, bindings::KERN_NOTICE);
-    #[no_mangle]
     pub static INFO: [u8; LENGTH] = generate(false, bindings::KERN_INFO);
     pub static DEBUG: [u8; LENGTH] = generate(false, bindings::KERN_DEBUG);
     pub static CONT: [u8; LENGTH] = generate(true, bindings::KERN_CONT);
@@ -96,7 +95,6 @@ pub mod format_strings {
 ///
 /// [`_printk`]: ../../../../include/linux/_printk.h
 #[doc(hidden)]
-#[no_mangle]
 #[cfg_attr(not(CONFIG_PRINTK), allow(unused_variables))]
 pub unsafe fn call_printk(
     format_string: &[u8; format_strings::LENGTH],
@@ -112,10 +110,6 @@ pub unsafe fn call_printk(
             &args as *const _ as *const c_void,
         );
     }
-}
-
-#[no_mangle]
-pub unsafe fn printk(module_name: &[u8]) {
 }
 
 /// Prints a message via the kernel's [`_printk`] for the `CONT` level.
