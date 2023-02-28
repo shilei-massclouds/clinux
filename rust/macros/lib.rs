@@ -16,6 +16,12 @@ pub fn provide(ts: TokenStream) -> TokenStream {
     interface::provide(ts)
 }
 
+/// Export symbol
+#[proc_macro]
+pub fn export_symbol(ts: TokenStream) -> TokenStream {
+    interface::export_symbol(ts)
+}
+
 /// Declares a kernel module.
 ///
 /// The `type` argument should be a type which implements the [`Module`]

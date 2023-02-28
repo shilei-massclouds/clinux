@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 
-target_y := rust_target
+.PHONY: rust_target
 
-obj_y += core.o compiler_builtins.o
-obj_y += alloc.o bindings.o kernel.o
-obj_y += build_error.o
+obj_y := rust.o
 
 rust_target: $(obj)/core.o $(obj)/compiler_builtins.o \
-	$(obj)/alloc.o $(obj)/bindings.o $(obj)/kernel.o $(obj)/build_error.o
+	$(obj)/alloc.o $(obj)/bindings.o $(obj)/kernel.o \
+	$(obj)/build_error.o $(obj)/rust.ko
 	@:
 
 core-cfgs = \
@@ -79,4 +78,4 @@ $(obj)/bindings.o: $(obj)/bindings/lib.rs $(obj)/compiler_builtins.o
 	@$(rustc_library)
 
 clean:
-	@rm -f *.o *.d *.rmeta *.so
+	@rm -f *.o *.d *.rmeta *.so *.ko *.map

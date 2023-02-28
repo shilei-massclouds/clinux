@@ -38,8 +38,8 @@ impl IBase for FrameWork {
 
 impl kernel::Module for FrameWork {
     fn init(_name: &'static CStr, _module: &'static ThisModule) -> Result<Self> {
-        //printk!("module[RustHello]: init begin...\n");
-        //printk!("module[RustHello]: init end!\n");
+        pr_info!("module[RustHello]: init begin...\n");
+        pr_info!("module[RustHello]: init end!\n");
 
         Ok(FrameWork { com: Component {} })
     }

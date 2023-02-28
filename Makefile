@@ -47,6 +47,7 @@ $(modules): $(PREDIRS) prepare
 	@$(MAKE) -f ./scripts/Makefile.modpost obj=$@
 	@$(MAKE) -f ./scripts/Makefile.modfinal obj=$@
 	$(if $(filter-out startup, $@), @cp ./$@/*.ko $(KMODULE_DIR))
+	@cp ./rust/rust.ko $(KMODULE_DIR)
 
 PHONY += prepare
 prepare: prepare0

@@ -12,6 +12,7 @@ use core::{
 };
 
 use crate::str::RawFormatter;
+use crate::prelude::ExportSymbol;
 
 #[cfg(CONFIG_PRINTK)]
 use crate::bindings;
@@ -79,6 +80,7 @@ pub mod format_strings {
     pub static ERR: [u8; LENGTH] = generate(false, bindings::KERN_ERR);
     pub static WARNING: [u8; LENGTH] = generate(false, bindings::KERN_WARNING);
     pub static NOTICE: [u8; LENGTH] = generate(false, bindings::KERN_NOTICE);
+    #[no_mangle]
     pub static INFO: [u8; LENGTH] = generate(false, bindings::KERN_INFO);
     pub static DEBUG: [u8; LENGTH] = generate(false, bindings::KERN_DEBUG);
     pub static CONT: [u8; LENGTH] = generate(true, bindings::KERN_CONT);
@@ -95,6 +97,7 @@ pub mod format_strings {
 ///
 /// [`_printk`]: ../../../../include/linux/_printk.h
 #[doc(hidden)]
+#[no_mangle]
 #[cfg_attr(not(CONFIG_PRINTK), allow(unused_variables))]
 pub unsafe fn call_printk(
     format_string: &[u8; format_strings::LENGTH],
@@ -347,9 +350,11 @@ macro_rules! pr_notice (
 #[doc(alias = "print")]
 macro_rules! pr_info (
     ($($arg:tt)*) => (
-        $crate::print_macro!($crate::print::format_strings::INFO, false, $($arg)*)
+        let info = b"\x016%s: %pA\0";
+        $crate::print_macro!(info, false, $($arg)*)
     )
 );
+//b"\x016%s: %pA\0"
 
 /// Prints a debug-level message (level 7).
 ///
