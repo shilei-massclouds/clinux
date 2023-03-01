@@ -7,6 +7,9 @@
 #include <types.h>
 #include <console.h>
 
+#define KERN_SOH    "\001"      /* ASCII Start Of Header */
+#define KERN_SOH_ASCII  '\001'
+
 #define _CP_RESET   "\033[0m"
 #define _CP_RED     "\033[31;1m"
 #define _CP_GREEN   "\033[32;1m"
@@ -42,5 +45,17 @@ int console_setup(char *param, char *value);
 void register_console(struct console *newcon);
 
 struct tty_driver *console_device(int *index);
+
+static inline int printk_get_level(const char *buffer)
+{
+    if (buffer[0] == KERN_SOH_ASCII && buffer[1]) {
+        switch (buffer[1]) {
+        case '0' ... '7':
+        case 'c':   /* KERN_CONT */
+            return buffer[1];
+        }
+    }
+    return 0;
+}
 
 #endif /* _PRINTK_H_ */

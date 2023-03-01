@@ -29,11 +29,17 @@ EXPORT_SYMBOL(console_drivers);
 static void
 vprintk_func(const char *fmt, va_list args)
 {
+    int offset = 0;
     static char textbuf[LOG_LINE_MAX];
 
     vsnprintf(textbuf, sizeof(textbuf), fmt, args);
 
-    sbi_puts(textbuf);
+    if (printk_get_level(textbuf) != 0) {
+        /* skip log level tag (2 bytes) */
+        offset = 2;
+    }
+
+    sbi_puts(textbuf + offset);
 }
 
 void printk(const char *fmt, ...)

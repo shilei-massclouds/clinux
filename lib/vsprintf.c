@@ -245,6 +245,10 @@ static char *
 pointer(const char *fmt, char *buf, char *end, void *ptr,
         struct printf_spec spec)
 {
+    if (*fmt == 'A') {
+        sbi_puts("\nneed rust component to register rust_fmt_argument.\n");
+    }
+
     return ptr_to_id(buf, end, ptr, spec);
 }
 
