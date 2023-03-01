@@ -1,0 +1,11 @@
+[package]
+name = "idl"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pest = "^1.0"
+pest_derive = "^1.0"
+string_template = "^0.2.1"

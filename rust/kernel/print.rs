@@ -12,7 +12,6 @@ use core::{
 };
 
 use crate::str::RawFormatter;
-use crate::prelude::ExportSymbol;
 
 #[cfg(CONFIG_PRINTK)]
 use crate::bindings;

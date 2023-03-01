@@ -3,7 +3,7 @@
 //! Component [rs_hello].
 
 use core::{
-    ffi::{c_char, c_void},
+    ffi::{c_char, c_void, c_int},
     fmt,
 };
 use kernel::prelude::*;
@@ -29,10 +29,12 @@ impl Drop for FrameWork {
     }
 }
 
+#[doc(hidden)]
 pub const FMT_LENGTH: usize = 10;
 
 extern "C" {
-    pub fn printk(fmt: *const core::ffi::c_char, ...) -> core::ffi::c_int;
+    #[doc(hidden)]
+    pub fn printk(fmt: *const c_char, ...) -> c_int;
 }
 
 #[doc(hidden)]

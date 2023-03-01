@@ -1,0 +1,5 @@
+interface IBase
+{
+    boolean ready();
+    string name();
+};
