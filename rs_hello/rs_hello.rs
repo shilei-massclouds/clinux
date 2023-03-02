@@ -4,54 +4,11 @@
 
 use kernel::prelude::*;
 use kernel::interfaces::ibase::IBase;
-use crate::component::Component;
+use kernel::interfaces::ilib::ILib;
+use crate::ilib_stub::get_ilib;
 
 mod ilib_stub;
-mod component;
-
-#[doc(hidden)]
-#[no_mangle]
-pub extern "C" fn IBase_ready() -> bool {
-    if let Some(m) = unsafe { &__MOD } {
-        return m.ready();
-    }
-    // Todo: Implement panic
-    loop {}
-}
-
-#[no_mangle]
-#[link_section = "_ksymtab_strings"]
-static EXPORT_STR_IBase_ready: [u8; 11+1] = *b"IBase_ready\0";
-
-#[no_mangle]
-#[link_section = "_ksymtab"]
-static EXPORT_SYM_IBase_ready: ExportSymbol = ExportSymbol {
-    value: IBase_ready as *const fn(),
-    name: EXPORT_STR_IBase_ready.as_ptr(),
-};
-
-#[doc(hidden)]
-#[no_mangle]
-pub extern "C" fn IBase_name() -> *const core::ffi::c_char {
-    if let Some(m) = unsafe { &__MOD } {
-        return m.name();
-    }
-    // Todo: Implement panic
-    loop {}
-}
-
-#[no_mangle]
-#[link_section = "_ksymtab_strings"]
-static EXPORT_STR_IBase_name: [u8; 10+1] = *b"IBase_name\0";
-
-#[no_mangle]
-#[link_section = "_ksymtab"]
-static EXPORT_SYM_IBase_name: ExportSymbol = ExportSymbol {
-    value: IBase_name as *const fn(),
-    name: EXPORT_STR_IBase_name.as_ptr(),
-};
-
-
+mod ibase_skeleton;
 
 module! {
     type: FrameWork,
@@ -61,17 +18,18 @@ module! {
     license: "GPL",
 }
 
-struct FrameWork {
-    com: Component,
-}
+struct FrameWork;
 
 impl IBase for FrameWork {
     fn ready(&self) -> bool {
-        self.com.ready()
+        true
     }
 
     fn name(&self) -> *const core::ffi::c_char {
-        self.com.name()
+        let bitmap: u64 = 0;
+        let itf_lib = get_ilib();
+        let _ = itf_lib.find_next_bit(&bitmap as *const u64, 64, 0);
+        "rust_hello\0".as_ptr() as *const core::ffi::c_char
     }
 }
 
@@ -80,7 +38,7 @@ impl kernel::Module for FrameWork {
         pr_info!("[rs_hello]: init begin...\n");
         pr_info!("[rs_hello]: init end!\n");
 
-        Ok(FrameWork { com: Component {} })
+        Ok(FrameWork { })
     }
 }
 
