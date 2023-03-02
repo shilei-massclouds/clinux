@@ -1952,16 +1952,20 @@ static void write_if_changed(struct buffer *b, const char *fname)
 
 static void write_vmlinux_export_c_file(struct module *mod)
 {
-#if 0
-	struct buffer buf = { };
+    int ret;
+    FILE *fp;
+    char fname[PATH_MAX];
 
-	buf_printf(&buf,
-		   "#include <linux/export-internal.h>\n");
+    ret = snprintf(fname, sizeof(fname), "%s/%s.mod.c",
+                   mod->name, mod->name);
+    if (ret >= sizeof(fname)) {
+        error("%s: too long path was truncated\n", fname);
+        return;
+    }
 
-	add_exported_symbols(&buf, mod);
-	write_if_changed(&buf, ".vmlinux.export.c");
-	free(buf.p);
-#endif
+    fp = fopen(fname, "w");
+    /* Todo: may write sth here */
+    fclose(fp);
 }
 
 /* do sanity checks, and generate *.mod.c file */
