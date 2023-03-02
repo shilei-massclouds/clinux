@@ -10,11 +10,13 @@ mod vtable;
 
 use proc_macro::TokenStream;
 
+/*
 /// Declares a interface(trait) for a component(module).
 #[proc_macro]
 pub fn provide(ts: TokenStream) -> TokenStream {
     interface::provide(ts)
 }
+*/
 
 /// Export symbol
 #[proc_macro]

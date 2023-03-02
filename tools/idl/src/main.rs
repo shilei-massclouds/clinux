@@ -270,19 +270,64 @@ fn make_rust_provide(itf: &Interface) {
 }
 */
 
+fn make_method_for_skeleton(method: &Method, itf_name: &str,
+                            block: &mut String)
+{
+    use std::fmt::Write;
+
+    /* read template from file */
+    let tpl = include_str!("./grammar/method_in_skeleton.tpl");
+    let template = Template::new(tpl);
+
+    let c_method = format!("{interface}_{method}",
+                           interface = itf_name,
+                           method = method.name);
+
+    let rtype;
+    if !method.rtype.is_empty() {
+        rtype = format!(" -> {}", type_idl_to_rust(&(method.rtype)));
+    } else {
+        rtype = String::new();
+    }
+
+    let mut decl_args = String::new();
+    let mut call_args = String::new();
+    for param in &(method.params) {
+        write!(decl_args, "{}: {}, ", param.name, param.ptype).unwrap();
+        write!(call_args, "{}, ", param.name).unwrap();
+    }
+
+    let mut args = HashMap::<&str, &str>::new();
+    args.insert("method", &(method.name));
+    args.insert("c_method", &c_method);
+    let c_method_len = c_method.len().to_string();
+    args.insert("len", &c_method_len);
+    args.insert("rtype", &rtype);
+    args.insert("decl_args", &decl_args);
+    args.insert("call_args", &call_args);
+
+    write!(block, "{}\n", template.render(&args)).unwrap();
+}
+
 fn make_rust_skeleton(itf: &Interface, com_name: &str) {
     use std::io::Write;
+
+    let mut methods_block = String::new();
+    for method in &(itf.methods) {
+        make_method_for_skeleton(method, &(itf.name),
+                                 &mut methods_block);
+    }
 
     /* read template from file */
     let tpl = include_str!("./grammar/skeleton.tpl");
     let template = Template::new(tpl);
-    println!("tpl: [{}]", tpl);
 
     let mut args = HashMap::new();
     args.insert("component", com_name);
     let module = &(itf.name).to_lowercase();
-    args.insert("module", module);
+    args.insert("module", &module);
     args.insert("interface", &(itf.name));
+    args.insert("methods_block", &methods_block);
     let s = template.render(&args);
     /* make skeleton code for rust component */
     let path = format!("{}.rs", com_name);

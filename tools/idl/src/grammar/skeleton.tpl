@@ -8,10 +8,7 @@ use crate::component::Component;
 
 mod component;
 
-provide! {
-    interface: {{interface}},
-    component: FrameWork,
-}
+{{methods_block}}
 
 module! {
     type: FrameWork,
