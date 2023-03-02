@@ -330,7 +330,7 @@ fn make_rust_skeleton(itf: &Interface, com_name: &str) {
     args.insert("methods_block", &methods_block);
     let s = template.render(&args);
     /* make skeleton code for rust component */
-    let path = format!("{}.rs", com_name);
+    let path = format!("{}_skeleton.rs", module);
     let mut file = File::create(path).unwrap();
 
     write!(file, "{}", s).unwrap();

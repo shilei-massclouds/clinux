@@ -1,7 +1,7 @@
 #[doc(hidden)]
 #[no_mangle]
-pub extern "C" fn {{c_method}}({{decl_args}}){{rtype}} {
-    if let Some(m) = unsafe { &__MOD } {
+extern "C" fn {{c_method}}({{decl_args}}){{rtype}} {
+    if let Some(m) = unsafe { &crate::__MOD } {
         return m.{{method}}({{call_args}});
     }
     // Todo: Implement panic
