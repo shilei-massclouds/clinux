@@ -112,7 +112,7 @@ fn type_idl_to_rust(itype: &str) -> &str {
 
 fn fe_process(pair: &Pair<Rule>, ctx: &mut Context) {
     let iter = pair.clone().into_inner();
-    println!("BEGIN: rust '{:?}': {}", pair.as_rule(), pair.as_str());
+    //println!("BEGIN: rust '{:?}': {}", pair.as_rule(), pair.as_str());
     match pair.as_rule() {
         Rule::interface_dcl => {
             assert!(ctx.scope_stack.is_empty());
@@ -220,7 +220,7 @@ fn fe_process(pair: &Pair<Rule>, ctx: &mut Context) {
             }
         }
     }
-    println!("END: rust '{:?}'", pair.as_rule());
+    //println!("END: rust '{:?}'", pair.as_rule());
 }
 
 fn make_rust_param(param: &Param, file: &mut File) {

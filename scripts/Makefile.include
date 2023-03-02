@@ -195,7 +195,7 @@ rust_common_cmd = \
 	-Zcrate-attr='feature($(rust_allowed_features))' \
 	--extern alloc --extern kernel \
 	--crate-type rlib --out-dir $(obj) -L ./rust/ \
-	--crate-name $(obj)
+	--crate-name $(basename $(notdir $@))
 
 $(obj)/%.o: $(obj)/%.rs
 	@printf "CC\t$<\n"
