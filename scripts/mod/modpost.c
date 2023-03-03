@@ -1963,6 +1963,9 @@ static void write_vmlinux_export_c_file(struct module *mod)
         return;
     }
 
+    if (access(fname, F_OK) == 0)
+        return;
+
     fp = fopen(fname, "w");
     /* Todo: may write sth here */
     fclose(fp);

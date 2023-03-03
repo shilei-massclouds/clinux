@@ -1,14 +1,15 @@
-use core::ffi::c_ulong;
 use kernel::interfaces::ilib::ILib;
 
 struct Stub;
 
 impl ILib for Stub {
-    fn find_next_bit(&self, addr: *const c_ulong, size: c_ulong,
-                     offset: c_ulong)
-        -> c_ulong {
+    fn find_next_bit(&self,
+                     bitmap: *const core::ffi::c_ulong,
+                     bitmap_size: core::ffi::c_uint,
+                     offset: core::ffi::c_uint)
+        -> core::ffi::c_uint {
         unsafe {
-            lib_find_next_bit(addr, size, offset)
+            lib_find_next_bit(bitmap, bitmap_size, offset)
         }
     }
 }
@@ -18,7 +19,9 @@ pub(crate) fn get_ilib() -> impl ILib {
 }
 
 extern "C" {
-    pub(crate) fn lib_find_next_bit(addr: *const c_ulong, size: c_ulong,
-                                    offset: c_ulong)
-        -> c_ulong;
+    pub(crate) fn lib_find_next_bit(
+            bitmap: *const core::ffi::c_ulong,
+            bitmap_size: core::ffi::c_uint,
+            offset: core::ffi::c_uint)
+        -> core::ffi::c_uint;
 }

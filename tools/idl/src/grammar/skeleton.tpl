@@ -1,4 +1,4 @@
-//! Component [{{component}}]
+//! Skeleton for [{{component}}]
 
 use kernel::prelude::*;
 use kernel::interfaces::{{module}}::{{interface}};

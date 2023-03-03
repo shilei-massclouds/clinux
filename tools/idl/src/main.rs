@@ -25,6 +25,7 @@ pub struct IdlParser;
 struct Param {
     name: String,
     ptype: String,
+    is_sequence: bool,
     attr: String,
 }
 
@@ -33,6 +34,7 @@ impl Param {
         Param {
             name: String::new(),
             ptype: String::new(),
+            is_sequence: false,
             attr: String::new(),
         }
     }
@@ -95,15 +97,15 @@ impl Context {
 fn type_idl_to_rust(itype: &str) -> &str {
     match itype {
         "string"    => "*const core::ffi::c_char",
-        "char"      => "c_char",
-        "octet"     => "c_uchar",
-        "short"     => "c_short",
-        "long"      => "c_int",
-        "long long" => "c_long",
+        "char"      => "core::ffi::c_char",
+        "octet"     => "core::ffi::c_uchar",
+        "short"     => "core::ffi::c_short",
+        "long"      => "core::ffi::c_int",
+        "long long" => "core::ffi::c_long",
         "boolean"   => "bool",
-        "unsigned short"     => "c_ushort",
-        "unsigned long"      => "c_uint",
-        "unsigned long long" => "c_ulong",
+        "unsigned short"     => "core::ffi::c_ushort",
+        "unsigned long"      => "core::ffi::c_uint",
+        "unsigned long long" => "core::ffi::c_ulong",
         _ => {
             panic!("no type '{}'", itype);
         }
@@ -112,7 +114,7 @@ fn type_idl_to_rust(itype: &str) -> &str {
 
 fn fe_process(pair: &Pair<Rule>, ctx: &mut Context) {
     let iter = pair.clone().into_inner();
-    //println!("BEGIN: rust '{:?}': {}", pair.as_rule(), pair.as_str());
+    println!("BEGIN: rust '{:?}': {}", pair.as_rule(), pair.as_str());
     match pair.as_rule() {
         Rule::interface_dcl => {
             assert!(ctx.scope_stack.is_empty());
@@ -175,8 +177,27 @@ fn fe_process(pair: &Pair<Rule>, ctx: &mut Context) {
         },
         Rule::type_spec => {
             if let Some(param) = &mut (ctx.cur_param) {
-                assert!(param.ptype.is_empty());
+                assert!(param.ptype.is_empty() ||
+                        param.ptype.starts_with("sequence"),
+                        "param type: {}", param.ptype);
                 param.ptype = String::from(pair.as_str().trim());
+                ctx.scope_stack.push(pair.as_rule());
+                for p in iter {
+                    fe_process(&p, ctx);
+                }
+                ctx.scope_stack.pop();
+            } else {
+                panic!("no param!");
+            }
+        },
+        Rule::sequence_type => {
+            if let Some(param) = &mut (ctx.cur_param) {
+                param.is_sequence = true;
+                ctx.scope_stack.push(pair.as_rule());
+                for p in iter {
+                    fe_process(&p, ctx);
+                }
+                ctx.scope_stack.pop();
             } else {
                 panic!("no param!");
             }
@@ -226,7 +247,14 @@ fn fe_process(pair: &Pair<Rule>, ctx: &mut Context) {
 fn make_rust_param(param: &Param, file: &mut File) {
     use std::io::Write;
 
-    write!(file, ", {}: {}", param.name, param.ptype).unwrap();
+    let ptype = type_idl_to_rust(&(param.ptype));
+
+    if param.is_sequence {
+        write!(file, ", {}: *const {}", param.name, ptype).unwrap();
+        write!(file, ", {}_size: core::ffi::c_uint", param.name).unwrap();
+    } else {
+        write!(file, ", {}: {}", param.name, ptype).unwrap();
+    }
 }
 
 fn make_rust_method(method: &Method, file: &mut File) {
@@ -261,18 +289,8 @@ fn make_rust_interface(itf: &Interface) {
     write!(file, "\n}}\n").unwrap();
 }
 
-/*
-fn make_rust_provide(itf: &Interface) {
-    let mut buf_methods = String::new();
-    for method in &(itf.methods) {
-        make_rust_provide_method(method, &mut buf_methods);
-    }
-}
-*/
-
 fn make_method_for_skeleton(method: &Method, itf_name: &str,
-                            block: &mut String)
-{
+                            block: &mut String) {
     use std::fmt::Write;
 
     /* read template from file */
@@ -293,7 +311,15 @@ fn make_method_for_skeleton(method: &Method, itf_name: &str,
     let mut decl_args = String::new();
     let mut call_args = String::new();
     for param in &(method.params) {
-        write!(decl_args, "{}: {}, ", param.name, param.ptype).unwrap();
+        let ptype = type_idl_to_rust(&(param.ptype));
+        if param.is_sequence {
+            write!(decl_args,
+                   ", {}: *const {}", param.name, ptype).unwrap();
+            write!(decl_args,
+                   ", {}_size: core::ffi::c_uint", param.name).unwrap();
+        } else {
+            write!(decl_args, "{}: {}, ", param.name, ptype).unwrap();
+        }
         write!(call_args, "{}, ", param.name).unwrap();
     }
 
@@ -336,25 +362,98 @@ fn make_rust_skeleton(itf: &Interface, com_name: &str) {
     write!(file, "{}", s).unwrap();
 }
 
+fn make_method_for_stub(method: &Method, itf_name: &str,
+                        methods: &mut String,
+                        funcs: &mut String) {
+    use std::fmt::Write;
+
+    /* read template from file */
+    let tpl = include_str!("./grammar/method_in_stub.tpl");
+    let template = Template::new(tpl);
+
+    let mut decl_args = String::new();
+    let mut call_args = String::new();
+    for param in &(method.params) {
+        let ptype = type_idl_to_rust(&(param.ptype));
+        if param.is_sequence {
+            write!(decl_args,
+                   ", {}: *const {}", param.name, ptype).unwrap();
+            write!(decl_args,
+                   ", {}_size: core::ffi::c_uint", param.name).unwrap();
+        } else {
+            write!(decl_args, ", {}: {}", param.name, ptype).unwrap();
+        }
+        write!(call_args, "{}, ", param.name).unwrap();
+    }
+
+    let rtype;
+    if !method.rtype.is_empty() {
+        rtype = format!(" -> {}", type_idl_to_rust(&(method.rtype)));
+    } else {
+        rtype = String::new();
+    }
+
+    let c_method = format!("{interface}_{method}",
+                           interface = itf_name,
+                           method = method.name);
+
+    let mut args = HashMap::<&str, &str>::new();
+    args.insert("method", &(method.name));
+    args.insert("c_method", &c_method);
+    args.insert("rtype", &rtype);
+    args.insert("decl_args", &decl_args);
+    args.insert("call_args", &call_args);
+
+    write!(methods, "{}\n", template.render(&args)).unwrap();
+
+    write!(funcs,
+    "
+    pub(crate) fn {c_method}({decl_args}){rtype};
+    ",
+    c_method = &c_method,
+    decl_args = &decl_args,
+    rtype = &rtype,
+    ).unwrap();
+}
+
+fn make_rust_stub(itf: &Interface) {
+    use std::io::Write;
+
+    let mut methods_block = String::new();
+    let mut extern_block = String::new();
+    for method in &(itf.methods) {
+        make_method_for_stub(method, &(itf.name),
+                             &mut methods_block,
+                             &mut extern_block);
+    }
+
+    /* read template from file */
+    let tpl = include_str!("./grammar/stub.tpl");
+    let template = Template::new(tpl);
+
+    let mut args = HashMap::<&str, &str>::new();
+    let module = &(itf.name).to_lowercase();
+    args.insert("module", &module);
+    args.insert("interface", &(itf.name));
+    args.insert("methods_block", &methods_block);
+    args.insert("extern_block", &extern_block);
+    let s = template.render(&args);
+    /* make skeleton code for rust component */
+    let path = format!("{}_stub.rs", module);
+    let mut file = File::create(path).unwrap();
+
+    write!(file, "{}", s).unwrap();
+}
+
 fn be_process(ctx: &Context) {
     for itf in &(ctx.interfaces) {
         println!("Interface '{}'", itf.name);
         match ctx.option.as_str() {
             "-i" => make_rust_interface(itf),
-            "-c" => panic!("no client size"),
+            "-c" => make_rust_stub(itf),
             "-s" => make_rust_skeleton(itf, &(ctx.component)),
             _ => panic!("bad option"),
         }
-        //make_rust_provide(itf);
-        /*
-        for method in &(itf.methods) {
-            println!("Method '{}': rtype '{}'", method.name, method.rtype);
-            for param in &(method.params) {
-                println!("Param '{}': ptype '{}', attr '{}'",
-                         param.name, param.ptype, param.attr);
-            }
-        }
-        */
     }
 }
 
