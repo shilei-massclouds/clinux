@@ -1,6 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
-
-//! Component [rs_hello]
+//! Skeleton for [rs_hello]
 
 use kernel::prelude::*;
 use kernel::interfaces::ibase::IBase;
@@ -46,4 +44,5 @@ static EXPORT_SYM_IBase_name: ExportSymbol = ExportSymbol {
     value: IBase_name as *const fn(),
     name: EXPORT_STR_IBase_name.as_ptr(),
 };
+
 

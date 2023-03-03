@@ -70,6 +70,9 @@ CC_FLAGS_CFI := -fsanitize=kcfi
 export MAKE OBJCOPYFLAGS CC_FLAGS_CFI
 export INCLUDES AS_FLAGS CFLAGS LDFLAGS
 
+IDL := tools/idl/target/debug/idl
+IDL_DIR := interfaces
+
 c_flags = $(modname_flags)
 
 mod_lds := scripts/module.lds
@@ -201,3 +204,10 @@ $(obj)/%.o: $(obj)/%.rs
 	@printf "CC\t$<\n"
 	@$(rust_common_cmd) --emit=dep-info,obj $<
 
+$(obj)/%_stub.rs: $(IDL_DIR)/%.idl
+	@printf "IDL\t$@\n"
+	$(IDL) -O $(obj) -c $(basename $(notdir $<))
+
+$(obj)/%_skeleton.rs: $(IDL_DIR)/%.idl
+	@printf "IDL\t$@\n"
+	$(IDL) -O $(obj) -s $(obj) $(basename $(notdir $<))
