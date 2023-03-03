@@ -71,6 +71,7 @@ impl Interface {
 }
 
 struct Context {
+    output_dir: String,
     option: String,
     component: String,
     interfaces: Vec<Interface>,
@@ -83,6 +84,7 @@ struct Context {
 impl Context {
     fn new() -> Context {
         Context {
+            output_dir: String::new(),
             option: String::new(),
             component: String::new(),
             interfaces: Vec::<Interface>::new(),
@@ -114,7 +116,7 @@ fn type_idl_to_rust(itype: &str) -> &str {
 
 fn fe_process(pair: &Pair<Rule>, ctx: &mut Context) {
     let iter = pair.clone().into_inner();
-    println!("BEGIN: rust '{:?}': {}", pair.as_rule(), pair.as_str());
+    //println!("BEGIN: rust '{:?}': {}", pair.as_rule(), pair.as_str());
     match pair.as_rule() {
         Rule::interface_dcl => {
             assert!(ctx.scope_stack.is_empty());
@@ -276,10 +278,10 @@ fn make_rust_method(method: &Method, file: &mut File) {
     }
 }
 
-fn make_rust_interface(itf: &Interface) {
+fn make_rust_interface(itf: &Interface, output_dir: &str) {
     use std::io::Write;
 
-    let path = format!("{}.rs", &(itf.name).to_lowercase());
+    let path = format!("{}/{}.rs", output_dir, &(itf.name).to_lowercase());
     let mut file = File::create(path).unwrap();
 
     write!(file, "pub trait {name} {{", name = itf.name).unwrap();
@@ -335,7 +337,7 @@ fn make_method_for_skeleton(method: &Method, itf_name: &str,
     write!(block, "{}\n", template.render(&args)).unwrap();
 }
 
-fn make_rust_skeleton(itf: &Interface, com_name: &str) {
+fn make_rust_skeleton(itf: &Interface, com_name: &str, output_dir: &str) {
     use std::io::Write;
 
     let mut methods_block = String::new();
@@ -356,7 +358,7 @@ fn make_rust_skeleton(itf: &Interface, com_name: &str) {
     args.insert("methods_block", &methods_block);
     let s = template.render(&args);
     /* make skeleton code for rust component */
-    let path = format!("{}_skeleton.rs", module);
+    let path = format!("{}/{}_skeleton.rs", output_dir, module);
     let mut file = File::create(path).unwrap();
 
     write!(file, "{}", s).unwrap();
@@ -417,7 +419,7 @@ fn make_method_for_stub(method: &Method, itf_name: &str,
     ).unwrap();
 }
 
-fn make_rust_stub(itf: &Interface) {
+fn make_rust_stub(itf: &Interface, output_dir: &str) {
     use std::io::Write;
 
     let mut methods_block = String::new();
@@ -440,7 +442,7 @@ fn make_rust_stub(itf: &Interface) {
     args.insert("extern_block", &extern_block);
     let s = template.render(&args);
     /* make skeleton code for rust component */
-    let path = format!("{}_stub.rs", module);
+    let path = format!("{}/{}_stub.rs", output_dir, module);
     let mut file = File::create(path).unwrap();
 
     write!(file, "{}", s).unwrap();
@@ -450,9 +452,10 @@ fn be_process(ctx: &Context) {
     for itf in &(ctx.interfaces) {
         println!("Interface '{}'", itf.name);
         match ctx.option.as_str() {
-            "-i" => make_rust_interface(itf),
-            "-c" => make_rust_stub(itf),
-            "-s" => make_rust_skeleton(itf, &(ctx.component)),
+            "-i" => make_rust_interface(itf, &(ctx.output_dir)),
+            "-c" => make_rust_stub(itf, &(ctx.output_dir)),
+            "-s" => make_rust_skeleton(itf, &(ctx.component),
+                                       &(ctx.output_dir)),
             _ => panic!("bad option"),
         }
     }
@@ -460,33 +463,36 @@ fn be_process(ctx: &Context) {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() < 3 {
-        panic!("Usage: idl -i interface
-                Usage: idl [-c|-s] component interfaces");
+    if args.len() < 5 {
+        panic!("Usage: idl -O output_dir -i interface
+                Usage: idl -O output_dir [-c|-s] component interfaces");
     }
 
     let itf;
     let com;
-    let option = &args[1];
+    assert!(&args[1] == "-O");
+    let output = &args[2];
+
+    let option = &args[3];
     match option.as_str() {
         "-i" | "-c" => {
-            assert!(args.len() == 3);
-            itf = &args[2];
+            assert!(args.len() == 5);
+            itf = &args[4];
             com = "";
         },
         "-s" => {
-            assert!(args.len() >= 4);
-            com = &args[2];
-            itf = &args[3];
-            assert!(args[3..].len() == 1);
+            assert!(args.len() > 5);
+            com = &args[4];
+            itf = &args[5];
+            assert!(args[5..].len() == 1);
         },
         _ => {
-            panic!("Usage: idl -i interface
-                    Usage: idl [-c|-s] component interfaces");
+            panic!("Usage: idl -O output_dir -i interface
+                    Usage: idl -O output_dir [-c|-s] component interfaces");
         },
     }
 
-    let filename = format!("./interfaces/{}.idl", itf.to_lowercase());
+    let filename = format!("./interfaces/{}.idl", itf);
     println!("interface idl: {}", filename);
     let mut file = File::open(filename).unwrap();
     let mut data = String::new();
@@ -497,6 +503,7 @@ fn main() {
             .unwrap_or_else(|e| panic!("{}", e));
 
     let mut ctx = Context::new();
+    ctx.output_dir = output.to_string();
     ctx.option = option.to_string();
     ctx.component = com.to_string();
 

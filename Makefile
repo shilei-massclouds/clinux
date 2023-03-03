@@ -52,6 +52,7 @@ $(modules): $(PREDIRS) prepare
 PHONY += prepare
 prepare: prepare0
 	@$(SHELL) ./scripts/rust_is_available.sh -v
+	@$(MAKE) -f ./scripts/Makefile.build obj=rust/kernel/interfaces
 	@$(MAKE) -f ./scripts/Makefile.build obj=rust
 
 PHONY += tools
@@ -63,9 +64,11 @@ $(CLEAN_DIRS):
 	@$(MAKE) -f ./scripts/Makefile.clean obj=$@
 
 clean: $(CLEAN_DIRS)
+	@printf "clean\n"
 	@rm -f ./prebuilt/*.h ./prebuilt/*.s ./scripts/mod/modpost ./top*.json
 	@$(MAKE) -C tools clean
 	@$(MAKE) -C rust clean
+	@$(MAKE) -C rust/kernel/interfaces clean
 	@find $(KMODULE_DIR)/* | grep -v README.md | xargs rm -f
 
 $(KMODULE_DIR)/bootrd.disk:
