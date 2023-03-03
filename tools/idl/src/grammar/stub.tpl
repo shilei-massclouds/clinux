@@ -8,7 +8,7 @@ impl ILib for Stub {
 {{methods_block}}
 }
 
-pub(crate) fn get_{{interface}}() -> impl {{interface}} {
+pub(crate) fn get_{{module}}() -> impl {{interface}} {
     Stub {}
 }
 

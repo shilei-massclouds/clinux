@@ -377,13 +377,16 @@ fn make_method_for_stub(method: &Method, itf_name: &str,
         let ptype = type_idl_to_rust(&(param.ptype));
         if param.is_sequence {
             write!(decl_args,
-                   ", {}: *const {}", param.name, ptype).unwrap();
+                   "{}: *const {}, ", param.name, ptype).unwrap();
             write!(decl_args,
-                   ", {}_size: core::ffi::c_uint", param.name).unwrap();
+                   "{}_size: core::ffi::c_uint, ", param.name).unwrap();
+
+            write!(call_args, "{}, ", param.name).unwrap();
+            write!(call_args, "{}_size, ", param.name).unwrap();
         } else {
-            write!(decl_args, ", {}: {}", param.name, ptype).unwrap();
+            write!(decl_args, "{}: {}, ", param.name, ptype).unwrap();
+            write!(call_args, "{}, ", param.name).unwrap();
         }
-        write!(call_args, "{}, ", param.name).unwrap();
     }
 
     let rtype;
@@ -394,7 +397,7 @@ fn make_method_for_stub(method: &Method, itf_name: &str,
     }
 
     let c_method = format!("{interface}_{method}",
-                           interface = itf_name,
+                           interface = itf_name.to_lowercase(),
                            method = method.name);
 
     let mut args = HashMap::<&str, &str>::new();
@@ -404,12 +407,10 @@ fn make_method_for_stub(method: &Method, itf_name: &str,
     args.insert("decl_args", &decl_args);
     args.insert("call_args", &call_args);
 
-    write!(methods, "{}\n", template.render(&args)).unwrap();
+    write!(methods, "{}", template.render(&args)).unwrap();
 
     write!(funcs,
-    "
-    pub(crate) fn {c_method}({decl_args}){rtype};
-    ",
+    "    pub(crate) fn {c_method}({decl_args}){rtype};",
     c_method = &c_method,
     decl_args = &decl_args,
     rtype = &rtype,
@@ -468,19 +469,20 @@ fn main() {
     let com;
     let option = &args[1];
     match option.as_str() {
-        "-i" => {
+        "-i" | "-c" => {
             assert!(args.len() == 3);
             itf = &args[2];
             com = "";
         },
-        "-c" | "-s" => {
+        "-s" => {
             assert!(args.len() >= 4);
             com = &args[2];
             itf = &args[3];
             assert!(args[3..].len() == 1);
         },
         _ => {
-            panic!("Usage: idl [-c|-s] component interfaces");
+            panic!("Usage: idl -i interface
+                    Usage: idl [-c|-s] component interfaces");
         },
     }
 
