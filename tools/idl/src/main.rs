@@ -73,7 +73,6 @@ impl Interface {
 struct Context {
     output_dir: String,
     option: String,
-    component: String,
     interfaces: Vec<Interface>,
     cur_itf: Option<Interface>,
     cur_method: Option<Method>,
@@ -86,7 +85,6 @@ impl Context {
         Context {
             output_dir: String::new(),
             option: String::new(),
-            component: String::new(),
             interfaces: Vec::<Interface>::new(),
             cur_itf: None,
             cur_method: None,
@@ -337,7 +335,7 @@ fn make_method_for_skeleton(method: &Method, itf_name: &str,
     write!(block, "{}\n", template.render(&args)).unwrap();
 }
 
-fn make_rust_skeleton(itf: &Interface, com_name: &str, output_dir: &str) {
+fn make_rust_skeleton(itf: &Interface, output_dir: &str) {
     use std::io::Write;
 
     let mut methods_block = String::new();
@@ -350,8 +348,7 @@ fn make_rust_skeleton(itf: &Interface, com_name: &str, output_dir: &str) {
     let tpl = include_str!("./grammar/skeleton.tpl");
     let template = Template::new(tpl);
 
-    let mut args = HashMap::new();
-    args.insert("component", com_name);
+    let mut args = HashMap::<&str, &str>::new();
     let module = &(itf.name).to_lowercase();
     args.insert("module", &module);
     args.insert("interface", &(itf.name));
@@ -450,12 +447,11 @@ fn make_rust_stub(itf: &Interface, output_dir: &str) {
 
 fn be_process(ctx: &Context) {
     for itf in &(ctx.interfaces) {
-        println!("Interface '{}'", itf.name);
+        //println!("Interface '{}'", itf.name);
         match ctx.option.as_str() {
             "-i" => make_rust_interface(itf, &(ctx.output_dir)),
             "-c" => make_rust_stub(itf, &(ctx.output_dir)),
-            "-s" => make_rust_skeleton(itf, &(ctx.component),
-                                       &(ctx.output_dir)),
+            "-s" => make_rust_skeleton(itf, &(ctx.output_dir)),
             _ => panic!("bad option"),
         }
     }
@@ -463,37 +459,20 @@ fn be_process(ctx: &Context) {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() < 5 {
-        panic!("Usage: idl -O output_dir -i interface
-                Usage: idl -O output_dir [-c|-s] component interfaces");
+    if args.len() != 5 {
+        panic!("Usage: idl -O output_dir [-i|-c|-s] interface");
     }
 
-    let itf;
-    let com;
     assert!(&args[1] == "-O");
     let output = &args[2];
 
     let option = &args[3];
-    match option.as_str() {
-        "-i" | "-c" => {
-            assert!(args.len() == 5);
-            itf = &args[4];
-            com = "";
-        },
-        "-s" => {
-            assert!(args.len() > 5);
-            com = &args[4];
-            itf = &args[5];
-            assert!(args[5..].len() == 1);
-        },
-        _ => {
-            panic!("Usage: idl -O output_dir -i interface
-                    Usage: idl -O output_dir [-c|-s] component interfaces");
-        },
-    }
+    assert!(matches!(option.as_str(), "-i" | "-c" | "-s"));
+
+    let itf = &args[4];
 
     let filename = format!("./interfaces/{}.idl", itf);
-    println!("interface idl: {}", filename);
+    //println!("interface idl: {}", filename);
     let mut file = File::open(filename).unwrap();
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
@@ -505,12 +484,11 @@ fn main() {
     let mut ctx = Context::new();
     ctx.output_dir = output.to_string();
     ctx.option = option.to_string();
-    ctx.component = com.to_string();
 
     for p in spec {
         fe_process(&p, &mut ctx);
     }
 
-    println!("\n\n#####################\n\n");
+    //println!("\n\n#####################\n\n");
     be_process(&ctx);
 }

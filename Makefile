@@ -64,7 +64,6 @@ $(CLEAN_DIRS):
 	@$(MAKE) -f ./scripts/Makefile.clean obj=$@
 
 clean: $(CLEAN_DIRS)
-	@printf "clean\n"
 	@rm -f ./prebuilt/*.h ./prebuilt/*.s ./scripts/mod/modpost ./top*.json
 	@$(MAKE) -C tools clean
 	@$(MAKE) -C rust clean

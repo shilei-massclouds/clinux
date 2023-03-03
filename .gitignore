@@ -66,3 +66,6 @@ scripts/mod/modpost
 output/*
 *.json
 *.rmeta
+
+*_stub.rs
+*_skeleton.rs

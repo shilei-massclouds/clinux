@@ -210,4 +210,4 @@ $(obj)/%_stub.rs: $(IDL_DIR)/%.idl
 
 $(obj)/%_skeleton.rs: $(IDL_DIR)/%.idl
 	@printf "IDL\t$@\n"
-	$(IDL) -O $(obj) -s $(obj) $(basename $(notdir $<))
+	$(IDL) -O $(obj) -s $(basename $(notdir $<))
