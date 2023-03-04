@@ -391,7 +391,7 @@ apply_relocate_add(const struct load_info *info, unsigned int relsec)
         }
         default:
             sbi_puts("bad type:\n");
-            early_puts(type);
+            sbi_put_u64(type);
             sbi_puts("\n");
             break;
         }
