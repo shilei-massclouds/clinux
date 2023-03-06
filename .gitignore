@@ -69,3 +69,4 @@ output/*
 
 *_stub.rs
 *_skeleton.rs
+*_generated.h

@@ -30,7 +30,7 @@ macro_rules! define_panicking_intrinsics(
             #[doc(hidden)]
             #[no_mangle]
             pub extern "C" fn $ident() {
-                panic!($reason);
+                loop {};
             }
         )*
     }
@@ -77,3 +77,11 @@ define_panicking_intrinsics!("`f64` should not be used", {
 define_panicking_intrinsics!("`u64` division/modulo should not be used", {
     __aeabi_uldivmod,
 });
+
+use core::panic::PanicInfo;
+
+/// This function is called on panic.
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    loop {}
+}

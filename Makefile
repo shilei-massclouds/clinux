@@ -12,6 +12,7 @@ export RUSTC_BOOTSTRAP := 1
 
 PREDIRS := prebuilt
 
+#rs_hello c_hello rs_ext2 top_hello_world
 modules := \
 	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
@@ -26,7 +27,8 @@ modules := \
 	ext2 ramfs rootfs procfs \
 	sys \
 	userboot \
-	top_linux top_hello_world rs_hello #c_hello #rs_ext2
+	rs_memory_addr rs_lib \
+	top_linux top_memory_addr
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 
@@ -47,7 +49,6 @@ $(modules): $(PREDIRS) prepare
 	@$(MAKE) -f ./scripts/Makefile.modpost obj=$@
 	@$(MAKE) -f ./scripts/Makefile.modfinal obj=$@
 	$(if $(filter-out startup, $@), @cp ./$@/*.ko $(KMODULE_DIR))
-	@cp ./rust/rust.ko $(KMODULE_DIR)
 
 PHONY += prepare
 prepare: prepare0
