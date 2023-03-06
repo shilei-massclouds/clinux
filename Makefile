@@ -27,7 +27,8 @@ modules := \
 	ext2 ramfs rootfs procfs \
 	sys \
 	userboot \
-	rs_memory_addr rs_lib \
+	rs_lib \
+	rs_memory_addr \
 	top_linux top_memory_addr
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))

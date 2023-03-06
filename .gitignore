@@ -43,7 +43,6 @@
 *.pdb
 
 # Kernel Module Compile Results
-*.mod*
 *.cmd
 .tmp_versions/
 modules.order
@@ -66,6 +65,7 @@ scripts/mod/modpost
 output/*
 *.json
 *.rmeta
+*.mod.c
 
 *_stub.rs
 *_skeleton.rs

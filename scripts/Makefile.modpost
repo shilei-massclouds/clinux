@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-2.0
+
+PHONY := _modpost
+
+include scripts/Makefile.include
+include $(obj)/Makefile
+
+idl_y := $(addprefix $(obj)/, $(idl_y))
+obj_y := $(addprefix $(obj)/, $(obj_y))
+
+MODPOST = scripts/mod/modpost
+
+obj_if_present := $(filter-out startup,$(obj))
+obj_if_present := $(if $(obj_if_present),$(obj)/$(obj).o, startup)
+output-symdump := Module.symvers
+
+_modpost: $(output-symdump)
+	@:
+
+$(output-symdump): $(idl_y) $(obj_y) $(MODPOST)
+	@$(MODPOST) -o $@ -O $(obj) $(obj_y)
+
+.PHONY: $(PHONY)
