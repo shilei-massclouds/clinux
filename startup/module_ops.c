@@ -308,6 +308,16 @@ apply_relocate_add(const struct load_info *info, unsigned int relsec)
             *(location + 1) = (*(location + 1) & 0xfffff) | (lo12 << 20);
             break;
         }
+        case R_RISCV_CALL_PLT: {
+            ptrdiff_t offset = (void *)v - (void *)location;
+            u32 hi20, lo12;
+
+            hi20 = (offset + 0x800) & 0xfffff000;
+            lo12 = (offset - hi20) & 0xfff;
+            *location = (*location & 0xfff) | hi20;
+            *(location + 1) = (*(location + 1) & 0xfffff) | (lo12 << 20);
+            break;
+        }
         case R_RISCV_BRANCH: {
             ptrdiff_t offset = (void *)v - (void *)location;
             u32 imm12 = (offset & 0x1000) << (31 - 12);

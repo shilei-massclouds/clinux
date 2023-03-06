@@ -67,6 +67,7 @@
 #define R_RISCV_BRANCH          16
 #define R_RISCV_JAL             17
 #define R_RISCV_CALL            18
+#define R_RISCV_CALL_PLT        19
 #define R_RISCV_GOT_HI20        20
 #define R_RISCV_TLS_GOT_HI20    21
 #define R_RISCV_TLS_GD_HI20     22
