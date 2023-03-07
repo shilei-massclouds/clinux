@@ -194,6 +194,7 @@ rust_common_cmd = \
 	-Zcrate-attr=no_std \
 	-Zcrate-attr='feature($(rust_allowed_features))' \
 	--extern alloc --extern kernel \
+	--emit=dep-info,obj,metadata \
 	--crate-type rlib --out-dir $(obj) -L ./rust/ \
 	--crate-name $(basename $(notdir $@))
 
