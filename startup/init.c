@@ -137,3 +137,36 @@ void unreachable(void)
 
     halt();
 }
+
+extern char _end[];
+EXPORT_SYMBOL(_end);
+
+extern char _text_start[];
+EXPORT_SYMBOL(_text_start);
+
+extern char _text_end[];
+EXPORT_SYMBOL(_text_end);
+
+extern char _rodata_start[];
+EXPORT_SYMBOL(_rodata_start);
+
+extern char _rodata_end[];
+EXPORT_SYMBOL(_rodata_end);
+
+extern char _data_start[];
+EXPORT_SYMBOL(_data_start);
+
+extern char _data_end[];
+EXPORT_SYMBOL(_data_end);
+
+extern char _bss_start[];
+EXPORT_SYMBOL(_bss_start);
+
+extern char _bss_stop[];
+EXPORT_SYMBOL(_bss_stop);
+
+extern char _init_stack[];
+EXPORT_SYMBOL(_init_stack);
+
+extern char _init_stack_top[];
+EXPORT_SYMBOL(_init_stack_top);

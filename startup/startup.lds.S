@@ -28,13 +28,17 @@ SECTIONS
         *(.init.data);
     }
 
+    _text_start = .;
     .text : AT(ADDR(.text) - LOAD_OFFSET) {
         *(.text);
     }
+    _text_end = .;
 
+    _rodata_start = .;
     .rodata : AT(ADDR(.rodata) - LOAD_OFFSET) {
         *(.rodata);
     }
+    _rodata_end = .;
 
     _ksymtab : AT(ADDR(_ksymtab) - LOAD_OFFSET) {
         _start_ksymtab = .;
@@ -49,15 +53,19 @@ SECTIONS
     }
 
     _data_start = .;
+    sdata = .;
     .data : AT(ADDR(.data) - LOAD_OFFSET) {
         . = ALIGN(PAGE_SIZE);
+        _init_stack = .;
         init_stack = .;
         . = init_stack + THREAD_SIZE;
+        _init_stack_top = .;
         init_stack_top = .;
         *(.data);
         *(.sdata);
         __global_pointer$ = . + 0x800;
     }
+    edata = .;
     _data_end = .;
 
     . = ALIGN(PAGE_SIZE);

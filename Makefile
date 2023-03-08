@@ -30,7 +30,7 @@ modules := \
 	rs_lib \
 	rs_memory_addr \
 	rs_log \
-	axlog \
+	axhal axlog \
 	top_linux top_memory_addr
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
