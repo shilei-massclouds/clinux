@@ -20,3 +20,13 @@ $(obj)/System.map: $(obj)/$(obj).elf
 $(obj)/test_$(obj).ko: $(test_y)
 	@printf "LD\t$@\n"
 	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(test_y)
+
+cmd_exports = \
+	$(NM) -p --defined-only $^ \
+		| grep -E ' (T|R|D) ' | cut -d ' ' -f 3 \
+		| xargs -Isymbol \
+		echo 'EXPORT_SYMBOL_RUST_GPL(symbol);' > $@
+
+$(obj)/exports_%_generated.h: $(extern_obj_y)
+	@$(cmd_exports)
+

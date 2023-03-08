@@ -8,7 +8,7 @@ include $(curdir)/Makefile
 
 files := \
 	$(extra_y) *.o *.ko *.elf *.bin *.map *.d *.mod.c Module.symvers \
-	*_stub.rs *_skeleton.rs *.rmeta
+	*_stub.rs *_skeleton.rs *.rmeta exports_*_generated.h
 
 _clean:
 	@rm -f $(addprefix $(curdir)/, $(files))

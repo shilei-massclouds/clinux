@@ -6,6 +6,7 @@ include scripts/Makefile.include
 include $(obj)/Makefile
 
 idl_y := $(addprefix $(obj)/, $(idl_y))
+always_y := $(addprefix $(obj)/, $(always_y))
 obj_y := $(addprefix $(obj)/, $(obj_y))
 
 MODPOST = scripts/mod/modpost
@@ -17,7 +18,9 @@ output-symdump := Module.symvers
 _modpost: $(output-symdump)
 	@:
 
-$(output-symdump): $(idl_y) $(obj_y) $(MODPOST)
+$(output-symdump): $(idl_y) $(always_y) $(obj_y) $(MODPOST)
 	@$(MODPOST) -o $@ -O $(obj) $(obj_y)
+
+include scripts/Makefile.library
 
 .PHONY: $(PHONY)

@@ -79,6 +79,7 @@ mod_lds := scripts/module.lds
 elf_lds := $(obj)/$(elf_lds)
 _target := $(if $(target_y), $(obj)/$(target_y), $(obj)/$(obj).ko)
 obj_y	:= $(addprefix $(obj)/, $(obj_y))
+always_y:= $(addprefix $(obj)/, $(always_y))
 _test	:= $(obj)/test_$(obj).ko
 extra_y := $(addprefix $(obj)/, $(extra_y))
 test_y	:= $(filter $(obj)/test%.o, \
@@ -201,7 +202,7 @@ rust_common_cmd = \
 
 $(obj)/%.o: $(obj)/%.rs
 	@printf "CC\t$<\n"
-	@$(rust_common_cmd) --emit=dep-info,obj $<
+	$(rust_common_cmd) --emit=dep-info,obj $<
 
 $(obj)/%_stub.rs: $(IDL_DIR)/%.idl
 	@printf "IDL\t$@\n"
