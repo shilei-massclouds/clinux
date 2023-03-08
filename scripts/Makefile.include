@@ -60,9 +60,9 @@ MAKE := @make --no-print-directory
 OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S
 
 INCLUDES := -I./include/
-AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64 -march=rv64imafdc \
+AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__
-CFLAGS := -nostdinc -fno-PIE -mabi=lp64 -march=rv64imafdc \
+CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug
 CC_FLAGS_CFI := -fsanitize=kcfi
@@ -159,7 +159,7 @@ export rust_common_flags := --edition=2021 \
                 -Wclippy::dbg_macro
 
 KBUILD_RUSTFLAGS := $(rust_common_flags) \
-            --target=./rust/target.json \
+			--target riscv64gc-unknown-none-elf \
             -Cpanic=abort -Cembed-bitcode=n -Clto=n \
             -Cforce-unwind-tables=n -Ccodegen-units=1 \
             -Csymbol-mangling-version=v0 \
@@ -175,6 +175,7 @@ KBUILD_RUSTFLAGS += -Cdebug-assertions=n
 KBUILD_RUSTFLAGS += -Coverflow-checks=y
 KBUILD_RUSTFLAGS += -Cforce-frame-pointers=y
 KBUILD_RUSTFLAGS += -Ctarget-cpu=generic-rv64
+KBUILD_RUSTFLAGS += -Csoft-float=n
 
 KBUILD_RUSTFLAGS_MODULE := --cfg MODULE
 RUSTFLAGS_MODULE =
@@ -193,7 +194,7 @@ rust_common_cmd = \
 	RUST_MODFILE=$(modfile) $(RUSTC) $(rust_flags) \
 	-Zcrate-attr=no_std \
 	-Zcrate-attr='feature($(rust_allowed_features))' \
-	--extern alloc --extern kernel \
+	--extern alloc --extern core \
 	--emit=dep-info,obj,metadata \
 	--crate-type rlib --out-dir $(obj) -L ./rust/ \
 	--crate-name $(basename $(notdir $@))

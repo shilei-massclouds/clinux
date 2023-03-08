@@ -13,6 +13,7 @@ export RUSTC_BOOTSTRAP := 1
 PREDIRS := prebuilt
 
 #rs_hello c_hello rs_ext2 top_hello_world
+#rs_lib
 modules := \
 	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
@@ -27,8 +28,9 @@ modules := \
 	ext2 ramfs rootfs procfs \
 	sys \
 	userboot \
-	rs_lib \
 	rs_memory_addr \
+	rs_log \
+	axlog \
 	top_linux top_memory_addr
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
@@ -55,7 +57,7 @@ PHONY += prepare
 prepare: prepare0
 	@$(SHELL) ./scripts/rust_is_available.sh -v
 	@$(MAKE) -f ./scripts/Makefile.build obj=rust/kernel/interfaces
-	@$(MAKE) -f ./scripts/Makefile.build obj=rust
+	#@$(MAKE) -f ./scripts/Makefile.build obj=rust
 
 PHONY += tools
 tools:
