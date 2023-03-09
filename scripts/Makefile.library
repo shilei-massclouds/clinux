@@ -23,7 +23,7 @@ $(obj)/test_$(obj).ko: $(test_y)
 
 cmd_exports = \
 	$(NM) -p --defined-only $^ \
-		| grep -E ' (T|R|D) ' | cut -d ' ' -f 3 \
+		| grep -E ' (T|R|D|B) ' | cut -d ' ' -f 3 \
 		| xargs -Isymbol \
 		echo 'EXPORT_SYMBOL_RUST_GPL(symbol);' > $@
 

@@ -141,6 +141,9 @@ void unreachable(void)
 extern char _end[];
 EXPORT_SYMBOL(_end);
 
+extern char ekernel[];
+EXPORT_SYMBOL(ekernel);
+
 extern char _text_start[];
 EXPORT_SYMBOL(_text_start);
 

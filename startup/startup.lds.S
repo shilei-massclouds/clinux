@@ -85,5 +85,6 @@ SECTIONS
     }
     _bss_stop = .;
 
+    ekernel = .;
     _end = .;
 }

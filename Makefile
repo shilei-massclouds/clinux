@@ -29,7 +29,7 @@ modules := \
 	userboot \
 	rs_lib \
 	rs_memory_addr \
-	rs_log \
+	rs_log rs_riscv \
 	axhal axlog \
 	top_linux top_memory_addr
 
