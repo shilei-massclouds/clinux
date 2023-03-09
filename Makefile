@@ -31,7 +31,7 @@ modules := \
 	rs_memory_addr \
 	rs_log rs_riscv \
 	axhal axlog axruntime libax \
-	top_linux top_memory_addr
+	top_linux top_memory_addr top_arceos_hello
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 

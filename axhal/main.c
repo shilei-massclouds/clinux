@@ -5,7 +5,7 @@
 int
 init_module(void)
 {
-    printk("module[axlog]: init begin ...\n");
-    printk("module[axlog]: init end!\n");
+    printk("module[axhal]: init begin ...\n");
+    printk("module[axhal]: init end!\n");
     return 0;
 }
