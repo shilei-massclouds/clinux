@@ -99,7 +99,7 @@ For experiment, this user-process init just prints [Hello, wolrd!] and exit.
 Patch and script are in directory `thirty_part/arceos/`.
 Copy both these files into the top directory of arceos first.
 1. Patch arceos
-At the top directory of arceos, execute `git apply prepare_export_obj.patch`
+    At the top directory of arceos, execute `git apply prepare_export_obj.patch`
 2. Export objs from arceos to clinux
-At the top directory of arceos, execute `./export_objs.sh`
-3. make && make run
+    At the top directory of arceos, execute `./export_objs.sh`
+3. Return to clinux, make && make run
