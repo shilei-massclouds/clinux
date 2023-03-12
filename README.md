@@ -42,23 +42,25 @@ Now there're three profiles
 $ make profiles
 Bootrd filename: ./output/bootrd.disk
 
-Bootrd profiles: total[3]:
-Bootrd profiles: offset(39f418) curr[39f418]:
-  -> [0]: arceos_hello[39f418]
-     [1]: memory_addr[39f478]
-     [2]: linux[39f4b8]
+Bootrd profiles: total[4]:
+Bootrd profiles: offset(3a11d0) curr[3a11d0]:
+  -> [0]: hello_world[3a11d0]
+     [1]: arceos_hello[3a1208]
+     [2]: memory_addr[3a1268]
+     [3]: linux[3a12a8]
 ```
 In default, this is a Unikernel-style OS (Components from ArceOS).
 We can change the profile
 ```sh
-$ tools/ch_bootrd/ch_bootrd ./output/bootrd.disk -s 2
+$ tools/ch_bootrd/ch_bootrd ./output/bootrd.disk -s 3
 Bootrd filename: ./output/bootrd.disk
 
-Bootrd profiles: total[3]:
-Bootrd profiles: offset(39f418) curr[39f418]:
-     [0]: arceos_hello[39f418]
-     [1]: memory_addr[39f478]
-  -> [2]: linux[39f4b8]
+Bootrd profiles: total[4]:
+Bootrd profiles: offset(3a11d0) curr[3a11d0]:
+     [0]: hello_world[3a11d0]
+     [1]: arceos_hello[3a1208]
+     [2]: memory_addr[3a1268]
+  -> [3]: linux[3a12a8]
 ```
 And then, run again
 ```sh
@@ -90,4 +92,14 @@ NOW user-space app exit! [0]
 cloud@server:~/gitStudy/clinux$
 ```
 Now this is a Linux-kernel-like OS from boot to first user-process(init).
-For experiemnt, this user-process init just prints [Hello, wolrd!] and exit.
+For experiment, this user-process init just prints [Hello, wolrd!] and exit.
+> Note: `Profile [1]: arceos_hello[3a1208]` can't be selected now.
+> We need to introduce ArceOS's objs first as below:
+### Import components from ArceOS and Test
+Patch and script are in directory `thirty_part/arceos/`.
+Copy both these files into the top directory of arceos first.
+1. Patch arceos
+At the top directory of arceos, execute `git apply prepare_export_obj.patch`
+2. Export objs from arceos to clinux
+At the top directory of arceos, execute `./export_objs.sh`
+3. make && make run

@@ -12,7 +12,7 @@ export RUSTC_BOOTSTRAP := 1
 
 PREDIRS := prebuilt
 
-#rs_hello c_hello rs_ext2 top_hello_world
+#rs_hello rs_ext2
 modules := \
 	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
@@ -31,6 +31,7 @@ modules := \
 	rs_memory_addr \
 	rs_log rs_riscv \
 	axhal axlog axruntime libax \
+	c_hello top_hello_world \
 	top_linux top_memory_addr top_arceos_hello
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))

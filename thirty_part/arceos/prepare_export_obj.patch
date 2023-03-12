@@ -1,0 +1,260 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 2e2eafd..4d428c1 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -142,8 +142,10 @@ dependencies = [
+  "aarch64-cpu",
+  "axalloc",
+  "axconfig",
++ "axlog",
+  "bitflags",
+  "cfg-if",
++ "crate_interface",
+  "lazy_init",
+  "log",
+  "memory_addr",
+@@ -194,7 +196,6 @@ dependencies = [
+  "axlog",
+  "axnet",
+  "axtask",
+- "crate_interface",
+ ]
+ 
+ [[package]]
+diff --git a/Makefile b/Makefile
+index 3392a92..4bf90c6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -24,6 +24,8 @@ export PLATFORM
+ export MODE
+ export LOG
+ 
++export CARGO_PROFILE_RELEASE_LTO=off
++
+ # Paths
+ app_package := arceos-$(APP)
+ kernel_elf := target/$(target)/$(MODE)/$(app_package)
+@@ -90,7 +92,7 @@ build: $(kernel_bin)
+ kernel_elf:
+ 	@echo Arch: $(ARCH), Platform: $(PLATFORM), Language: $(APP_LANG)
+ ifeq ($(APP_LANG), rust)
+-	cargo build $(build_args)
++	RUSTFLAGS=-Csymbol-mangling-version=v0 cargo build $(build_args)
+ else ifeq ($(APP_LANG), c)
+ 	@rm -f $(kernel_elf)
+ 	@make -C ulib/c_libax ARCH=$(ARCH) MODE=$(MODE) APP=$(APP) FEATURES="$(features)"
+diff --git a/apps/helloworld/src/lib.rs b/apps/helloworld/src/lib.rs
+new file mode 100644
+index 0000000..850e8a1
+--- /dev/null
++++ b/apps/helloworld/src/lib.rs
+@@ -0,0 +1,7 @@
++#![no_std]
++#![no_main]
++
++#[no_mangle]
++fn say_hello() {
++    libax::println!("Hello, world!");
++}
+diff --git a/modules/axhal/Cargo.toml b/modules/axhal/Cargo.toml
+index ec4ad42..a8712c7 100644
+--- a/modules/axhal/Cargo.toml
++++ b/modules/axhal/Cargo.toml
+@@ -22,6 +22,8 @@ cfg-if = "1.0"
+ bitflags = "1.3"
+ static_assertions = "1.1.0"
+ axconfig = { path = "../axconfig" }
++axlog = { path = "../axlog" }
++crate_interface = { path = "../../crates/crate_interface" }
+ axalloc = { path = "../axalloc", optional = true }
+ ratio = { path = "../../crates/ratio", optional = true }
+ lazy_init = { path = "../../crates/lazy_init", optional = true }
+diff --git a/modules/axhal/src/lib.rs b/modules/axhal/src/lib.rs
+index 45527ad..0545ade 100644
+--- a/modules/axhal/src/lib.rs
++++ b/modules/axhal/src/lib.rs
+@@ -8,6 +8,9 @@
+ #[macro_use]
+ extern crate log;
+ 
++#[macro_use]
++extern crate axlog;
++
+ mod platform;
+ 
+ pub mod arch;
+@@ -24,3 +27,26 @@ pub mod console {
+ pub mod misc {
+     pub use super::platform::misc::*;
+ }
++
++struct LogIfImpl;
++
++#[crate_interface::impl_interface]
++impl axlog::LogIf for LogIfImpl {
++    fn console_write_str(s: &str) {
++        use crate::console::putchar;
++        for c in s.chars() {
++            match c {
++                '\n' => {
++                    putchar(b'\r');
++                    putchar(b'\n');
++                }
++                _ => putchar(c as u8),
++            }
++        }
++    }
++
++    fn current_time() -> core::time::Duration {
++        crate::time::current_time()
++    }
++}
++
+diff --git a/modules/axhal/src/mem.rs b/modules/axhal/src/mem.rs
+index 34c57cf..ab6e502 100644
+--- a/modules/axhal/src/mem.rs
++++ b/modules/axhal/src/mem.rs
+@@ -62,32 +62,32 @@ pub(crate) fn common_memory_region_at(idx: usize) -> Option<MemRegion> {
+     let mmio_regions = axconfig::MMIO_REGIONS;
+     let r = match idx {
+         0 => MemRegion {
+-            paddr: virt_to_phys((stext as usize).into()),
+-            size: etext as usize - stext as usize,
++            paddr: virt_to_phys((_text_start as usize).into()),
++            size: _text_end as usize - _text_start as usize,
+             flags: MemRegionFlags::RESERVED | MemRegionFlags::READ | MemRegionFlags::EXECUTE,
+             name: ".text",
+         },
+         1 => MemRegion {
+-            paddr: virt_to_phys((srodata as usize).into()),
+-            size: erodata as usize - srodata as usize,
++            paddr: virt_to_phys((_rodata_start as usize).into()),
++            size: _rodata_end as usize - _rodata_start as usize,
+             flags: MemRegionFlags::RESERVED | MemRegionFlags::READ,
+             name: ".rodata",
+         },
+         2 => MemRegion {
+-            paddr: virt_to_phys((sdata as usize).into()),
+-            size: edata as usize - sdata as usize,
++            paddr: virt_to_phys((_data_start as usize).into()),
++            size: _data_end as usize - _data_start as usize,
+             flags: MemRegionFlags::RESERVED | MemRegionFlags::READ | MemRegionFlags::WRITE,
+             name: ".data",
+         },
+         3 => MemRegion {
+-            paddr: virt_to_phys((sbss as usize).into()),
+-            size: ebss as usize - sbss as usize,
++            paddr: virt_to_phys((_bss_start as usize).into()),
++            size: _bss_stop as usize - _bss_start as usize,
+             flags: MemRegionFlags::RESERVED | MemRegionFlags::READ | MemRegionFlags::WRITE,
+             name: ".bss",
+         },
+         4 => MemRegion {
+-            paddr: virt_to_phys((boot_stack as usize).into()),
+-            size: boot_stack_top as usize - boot_stack as usize,
++            paddr: virt_to_phys((_init_stack as usize).into()),
++            size: _init_stack_top as usize - _init_stack as usize,
+             flags: MemRegionFlags::RESERVED | MemRegionFlags::READ | MemRegionFlags::WRITE,
+             name: "boot stack",
+         },
+@@ -108,20 +108,20 @@ pub(crate) fn common_memory_region_at(idx: usize) -> Option<MemRegion> {
+ #[allow(dead_code)]
+ pub(crate) fn clear_bss() {
+     unsafe {
+-        core::slice::from_raw_parts_mut(sbss as usize as *mut u8, ebss as usize - sbss as usize)
++        core::slice::from_raw_parts_mut(_bss_start as usize as *mut u8, _bss_stop as usize - _bss_start as usize)
+             .fill(0);
+     }
+ }
+ 
+ extern "C" {
+-    fn stext();
+-    fn etext();
+-    fn srodata();
+-    fn erodata();
+-    fn sdata();
+-    fn edata();
+-    fn sbss();
+-    fn ebss();
+-    fn boot_stack();
+-    fn boot_stack_top();
++    fn _text_start();
++    fn _text_end();
++    fn _rodata_start();
++    fn _rodata_end();
++    fn _data_start();
++    fn _data_end();
++    fn _bss_start();
++    fn _bss_stop();
++    fn _init_stack();
++    fn _init_stack_top();
+ }
+diff --git a/modules/axhal/src/platform/qemu_virt_riscv/mod.rs b/modules/axhal/src/platform/qemu_virt_riscv/mod.rs
+index ec4400b..13177e3 100644
+--- a/modules/axhal/src/platform/qemu_virt_riscv/mod.rs
++++ b/modules/axhal/src/platform/qemu_virt_riscv/mod.rs
+@@ -1,5 +1,3 @@
+-mod boot;
+-
+ pub mod console;
+ pub mod mem;
+ pub mod misc;
+diff --git a/modules/axruntime/Cargo.toml b/modules/axruntime/Cargo.toml
+index 2eb3564..07af799 100644
+--- a/modules/axruntime/Cargo.toml
++++ b/modules/axruntime/Cargo.toml
+@@ -17,7 +17,6 @@ net = ["alloc", "paging", "axdriver/virtio-net", "dep:axnet"]
+ default = []
+ 
+ [dependencies]
+-crate_interface = { path = "../../crates/crate_interface" }
+ axalloc = { path = "../axalloc", optional = true }
+ axconfig = { path = "../axconfig" }
+ axdriver = { path = "../axdriver", optional = true }
+diff --git a/modules/axruntime/src/lib.rs b/modules/axruntime/src/lib.rs
+index 3fd1950..548f027 100644
+--- a/modules/axruntime/src/lib.rs
++++ b/modules/axruntime/src/lib.rs
+@@ -17,31 +17,11 @@ const LOGO: &str = r#"
+ d88P     888 888      "Y8888P  "Y8888   "Y88888P"   "Y8888P"
+ "#;
+ 
++/*
+ extern "Rust" {
+     fn main();
+ }
+-
+-struct LogIfImpl;
+-
+-#[crate_interface::impl_interface]
+-impl axlog::LogIf for LogIfImpl {
+-    fn console_write_str(s: &str) {
+-        use axhal::console::putchar;
+-        for c in s.chars() {
+-            match c {
+-                '\n' => {
+-                    putchar(b'\r');
+-                    putchar(b'\n');
+-                }
+-                _ => putchar(c as u8),
+-            }
+-        }
+-    }
+-
+-    fn current_time() -> core::time::Duration {
+-        axhal::time::current_time()
+-    }
+-}
++*/
+ 
+ #[cfg_attr(not(test), no_mangle)]
+ pub extern "C" fn rust_main() -> ! {
+@@ -104,7 +84,7 @@ pub extern "C" fn rust_main() -> ! {
+         axtask::init_scheduler();
+     }
+ 
+-    unsafe { main() };
++    //unsafe { main() };
+ 
+     axhal::misc::terminate()
+ }

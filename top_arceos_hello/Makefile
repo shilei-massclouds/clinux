@@ -2,4 +2,4 @@
 
 obj_y := top.o
 
-extern_obj_y = extern_rlib/helloworld/*.o
+extern_obj_y = extern_rlib/arceos_helloworld/*.o

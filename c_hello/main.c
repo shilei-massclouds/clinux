@@ -4,11 +4,18 @@
 #include <export.h>
 
 bool
-ready(void)
+IBase_ready(void)
 {
     return true;
 }
-EXPORT_SYMBOL(ready);
+EXPORT_SYMBOL(IBase_ready);
+
+const char *
+IBase_name(void)
+{
+    return "C_hello";
+}
+EXPORT_SYMBOL(IBase_name);
 
 int
 init_module(void)
