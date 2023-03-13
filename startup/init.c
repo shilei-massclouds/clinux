@@ -74,6 +74,12 @@ __aligned(L1_CACHE_BYTES) = {
     .sched_task_group = &root_task_group,
 };
 
+gfp_t GFP_KERNEL_C = GFP_KERNEL;
+EXPORT_SYMBOL(GFP_KERNEL_C);
+
+gfp_t __GFP_ZERO_C = __GFP_ZERO;
+EXPORT_SYMBOL(__GFP_ZERO_C);
+
 /*
  * Slab
  */
@@ -81,6 +87,9 @@ __aligned(L1_CACHE_BYTES) = {
 /* For common cache allocation based on size */
 kmalloc_t kmalloc;
 EXPORT_SYMBOL(kmalloc);
+
+krealloc_t krealloc;
+EXPORT_SYMBOL(krealloc);
 
 kfree_t kfree;
 EXPORT_SYMBOL(kfree);

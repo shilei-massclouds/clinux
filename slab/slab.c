@@ -1247,12 +1247,117 @@ _kmem_cache_free(struct kmem_cache *cachep, void *objp)
     __cache_free(cachep, objp, _RET_IP_);
 }
 
+/**
+ * __ksize -- Uninstrumented ksize.
+ * @objp: pointer to the object
+ *
+ * Unlike ksize(), __ksize() is uninstrumented, and does not provide the same
+ * safety checks as ksize() with KASAN instrumentation enabled.
+ *
+ * Return: size of the actual memory used by @objp in bytes
+ */
+size_t __ksize(const void *objp)
+{
+    struct kmem_cache *c;
+    size_t size;
+
+    BUG_ON(!objp);
+    if (unlikely(objp == ZERO_SIZE_PTR))
+        return 0;
+
+    c = virt_to_cache(objp);
+    size = c ? c->object_size : 0;
+
+    return size;
+}
+
+/**
+ * ksize - get the actual amount of memory allocated for a given object
+ * @objp: Pointer to the object
+ *
+ * kmalloc may internally round up allocations and return more memory
+ * than requested. ksize() can be used to determine the actual amount of
+ * memory allocated. The caller may use this additional memory, even though
+ * a smaller amount of memory was initially specified with the kmalloc call.
+ * The caller must guarantee that objp points to a valid object previously
+ * allocated with either kmalloc() or kmem_cache_alloc(). The object
+ * must not be freed during the duration of the call.
+ *
+ * Return: size of the actual memory used by @objp in bytes
+ */
+size_t ksize(const void *objp)
+{
+    size_t size;
+
+    /*
+     * We need to check that the pointed to object is valid, and only then
+     * unpoison the shadow memory below. We use __kasan_check_read(), to
+     * generate a more useful report at the time ksize() is called (rather
+     * than later where behaviour is undefined due to potential
+     * use-after-free or double-free).
+     *
+     * If the pointed to memory is invalid we return 0, to avoid users of
+     * ksize() writing to and potentially corrupting the memory region.
+     *
+     * We want to perform the check before __ksize(), to avoid potentially
+     * crashing in __ksize() due to accessing invalid metadata.
+     */
+    if (unlikely(ZERO_OR_NULL_PTR(objp)))
+        return 0;
+
+    return __ksize(objp);
+}
+
+static __always_inline void *
+__do_krealloc(const void *p, size_t new_size, gfp_t flags)
+{
+    void *ret;
+    size_t ks;
+
+    ks = ksize(p);
+
+    if (ks >= new_size) {
+        return (void *)p;
+    }
+
+    ret = __do_kmalloc(new_size, flags, _RET_IP_);
+    if (ret && p)
+        memcpy(ret, p, ks);
+
+    return ret;
+}
+
+/**
+ * krealloc - reallocate memory. The contents will remain unchanged.
+ * @p: object to reallocate memory for.
+ * @new_size: how many bytes of memory are required.
+ * @flags: the type of memory to allocate.
+ *
+ * The contents of the object pointed to are preserved up to the
+ * lesser of the new and old sizes.  If @p is %NULL, krealloc()
+ * behaves exactly like kmalloc().  If @new_size is 0 and @p is not a
+ * %NULL pointer, the object pointed to is freed.
+ *
+ * Return: pointer to the allocated memory or %NULL in case of error
+ */
+void *
+_krealloc(const void *p, size_t new_size, gfp_t flags)
+{
+    void *ret;
+    if (unlikely(!new_size)) {
+        _kfree(p);
+        return ZERO_SIZE_PTR;
+    }
+    return __do_krealloc(p, new_size, flags);
+}
+
 int
 init_module(void)
 {
     printk("module[slab]: init begin ...\n");
 
     kmalloc = _kmalloc;
+    krealloc = _krealloc;
     kfree = _kfree;
 
     kmemdup_nul = _kmemdup_nul;

@@ -145,6 +145,10 @@ typedef void *
 (*kmalloc_t)(size_t size, gfp_t flags);
 extern kmalloc_t kmalloc;
 
+typedef void *
+(*krealloc_t)(const void *p, size_t new_size, gfp_t flags);
+extern krealloc_t krealloc;
+
 typedef void
 (*kfree_t)(const void *objp);
 extern kfree_t kfree;

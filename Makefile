@@ -13,6 +13,7 @@ export RUSTC_BOOTSTRAP := 1
 PREDIRS := prebuilt
 
 #rs_hello rs_ext2
+#top_arceos_hello top_arceos_memtest
 modules := \
 	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
@@ -28,11 +29,14 @@ modules := \
 	sys \
 	userboot \
 	rs_lib \
-	rs_memory_addr \
+	rs_memory_addr rs_allocator \
+	rs_page_table_entry rs_page_table \
 	rs_log rs_riscv \
-	axhal axlog axruntime libax \
+	rs_buddy_system_allocator rs_bitmap_allocator \
+	axhal axlog axruntime axalloc libax \
 	c_hello top_hello_world \
-	top_linux top_memory_addr top_arceos_hello
+	top_linux top_memory_addr \
+	top_arceos_memtest
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 
@@ -58,7 +62,6 @@ PHONY += prepare
 prepare: prepare0
 	@$(SHELL) ./scripts/rust_is_available.sh -v
 	@$(MAKE) -f ./scripts/Makefile.build obj=rust/kernel/interfaces
-	#@$(MAKE) -f ./scripts/Makefile.build obj=rust
 
 PHONY += tools
 tools:

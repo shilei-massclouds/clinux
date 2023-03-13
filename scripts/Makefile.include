@@ -202,7 +202,7 @@ rust_common_cmd = \
 
 $(obj)/%.o: $(obj)/%.rs
 	@printf "CC\t$<\n"
-	$(rust_common_cmd) --emit=dep-info,obj $<
+	@$(rust_common_cmd) --emit=dep-info,obj $<
 
 $(obj)/%_stub.rs: $(IDL_DIR)/%.idl
 	@printf "IDL\t$@\n"
