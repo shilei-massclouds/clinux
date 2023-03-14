@@ -165,8 +165,10 @@ find_vma(struct mm_struct *mm, unsigned long addr)
     struct rb_node *rb_node;
     struct vm_area_struct *vma;
 
+    printk("--- --- %s: step0\n", __func__);
     rb_node = mm->mm_rb.rb_node;
 
+    printk("--- --- %s: step1\n", __func__);
     while (rb_node) {
         struct vm_area_struct *tmp;
 
@@ -180,6 +182,7 @@ find_vma(struct mm_struct *mm, unsigned long addr)
         } else
             rb_node = rb_node->rb_right;
     }
+    printk("--- --- %s: step2\n", __func__);
 
     return vma;
 }

@@ -306,18 +306,18 @@ __switch_to:
 .align 2
 .globl excp_vect_table
 excp_vect_table:
+    RISCV_PTR do_trap_insn_misaligned
+    RISCV_PTR do_trap_insn_fault
+    RISCV_PTR do_trap_insn_illegal
     RISCV_PTR do_trap_unknown
+    RISCV_PTR do_trap_load_misaligned
+    RISCV_PTR do_trap_load_fault
+    RISCV_PTR do_trap_store_misaligned
+    RISCV_PTR do_trap_store_fault
+    RISCV_PTR do_trap_ecall_u /* system call, gets intercepted */
+    RISCV_PTR do_trap_ecall_s
     RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown   /* system call, gets intercepted */
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
-    RISCV_PTR do_trap_unknown
+    RISCV_PTR do_trap_ecall_m
     RISCV_PTR do_page_fault     /* instruction page fault */
     RISCV_PTR do_page_fault     /* load page fault */
     RISCV_PTR do_trap_unknown

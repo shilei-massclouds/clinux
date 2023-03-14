@@ -800,9 +800,11 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
         if (strncmp(mod->name, "top_linux",
                     strlen("top_linux")) == 0)
             hdr->current_profile = ftell(fp);
+        else if (strncmp(mod->name, "top_hello_world",
+                         strlen("top_hello_world")) == 0)
+            hdr->current_profile = ftell(fp);
 #else
-        if (strncmp(mod->name, "top_hello_world",
-                    strlen("top_hello_world")) == 0)
+        if (strncmp(mod->name, "top_arceos", strlen("top_arceos")) == 0)
             hdr->current_profile = ftell(fp);
 #endif
 

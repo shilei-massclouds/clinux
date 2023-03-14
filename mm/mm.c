@@ -157,6 +157,7 @@ setup_vm_final(struct memblock_region *regions,
 
         for (pa = start; pa < end; pa += PMD_SIZE) {
             va = (uintptr_t)__va(pa);
+            //printk("%s: va(%p) pa(%p)\n", __func__, va, pa);
             create_pgd_mapping(swapper_pg_dir, va, pa,
                                PMD_SIZE, PAGE_KERNEL_EXEC);
         }
@@ -195,9 +196,12 @@ void _do_page_fault(struct pt_regs *regs)
         flags |= FAULT_FLAG_USER;
 
  retry:
+    printk("--- --- %s: step0 mm(%p)\n", __func__, mm);
+
     vma = find_vma(mm, addr);
     if (unlikely(!vma))
         panic("bad area!");
+    printk("--- --- %s: step2\n", __func__);
     if (likely(vma->vm_start <= addr))
         goto good_area;
     if (unlikely(!(vma->vm_flags & VM_GROWSDOWN)))

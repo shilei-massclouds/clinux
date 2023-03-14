@@ -520,6 +520,8 @@ init_module(void)
     early_init_dt_scan_nodes();
 
     BUG_ON(parse_args(boot_command_line, kernel_params, num_kernel_params));
+    printk("Memory Region (based on fdt): %lx - %lx\n",
+           dt_memory_base, dt_memory_base + dt_memory_size);
     printk("module[early_dt]: init end!\n");
     return 0;
 }

@@ -596,6 +596,13 @@ __next_mem_range(u64 *idx,
     *idx = ULLONG_MAX;
 }
 
+bool
+memblock_ready(void)
+{
+    return true;
+}
+EXPORT_SYMBOL(memblock_ready);
+
 int
 init_module(void)
 {
@@ -610,6 +617,14 @@ init_module(void)
                    memblock.memory.cnt,
                    memblock_phys_alloc);
 
+    /*
+    {
+        char *p = (char *) 0xffffffe0802c1000;
+        printk("module[memblock]: set 802c1000...\n");
+        *p = 1;
+        printk("module[memblock]: set 802c1000!\n");
+    }
+    */
     printk("module[memblock]: init end!\n");
     return 0;
 }
