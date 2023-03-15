@@ -74,16 +74,23 @@ fn __rust_alloc_zeroed(size: usize, _align: usize) -> *mut u8 {
 #[allow(non_camel_case_types)]
 pub type gfp_t = core::ffi::c_uint;
 
-extern "C" {
-    pub fn krealloc(
+#[allow(non_camel_case_types)]
+type krealloc_t =
+    extern fn (
         objp: *const core::ffi::c_void,
         new_size: usize,
         flags: gfp_t,
     ) -> *mut core::ffi::c_void;
-}
 
 extern "C" {
-    pub fn kfree(objp: *const core::ffi::c_void);
+    static krealloc: krealloc_t;
+}
+
+#[allow(non_camel_case_types)]
+type kfree_t = extern fn (objp: *const core::ffi::c_void);
+
+extern "C" {
+    static kfree: kfree_t;
 }
 
 #[no_mangle]

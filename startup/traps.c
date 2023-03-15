@@ -4,12 +4,25 @@
 #include <ptrace.h>
 #include <signal.h>
 
+static void show_regs(struct pt_regs *regs)
+{
+    sbi_puts("epc: ");
+    sbi_put_u64(regs->epc);
+    sbi_puts(" ra: ");
+    sbi_put_u64(regs->ra);
+    sbi_puts("\n");
+    sbi_puts("badaddr: ");
+    sbi_put_u64(regs->badaddr);
+    sbi_puts("\n");
+}
+
 static void
 do_trap_error(struct pt_regs *regs, int signo, int code,
               unsigned long addr, const char *str)
 {
     sbi_puts(str);
     sbi_puts("\n");
+    show_regs(regs);
     sbi_srst_power_off();
 }
 

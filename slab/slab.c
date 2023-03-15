@@ -1343,7 +1343,7 @@ __do_krealloc(const void *p, size_t new_size, gfp_t flags)
 void *
 _krealloc(const void *p, size_t new_size, gfp_t flags)
 {
-    void *ret;
+    //printk("%s: ...\n", __func__);
     if (unlikely(!new_size)) {
         _kfree(p);
         return ZERO_SIZE_PTR;
@@ -1359,6 +1359,7 @@ init_module(void)
     kmalloc = _kmalloc;
     krealloc = _krealloc;
     kfree = _kfree;
+    printk("%s: krealloc (%p)\n", __func__, krealloc);
 
     kmemdup_nul = _kmemdup_nul;
 
