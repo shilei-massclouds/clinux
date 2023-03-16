@@ -341,7 +341,7 @@ index 2eb3564..07af799 100644
  axconfig = { path = "../axconfig" }
  axdriver = { path = "../axdriver", optional = true }
 diff --git a/modules/axruntime/src/lib.rs b/modules/axruntime/src/lib.rs
-index 3fd1950..a96fbec 100644
+index 3fd1950..7fc8cc6 100644
 --- a/modules/axruntime/src/lib.rs
 +++ b/modules/axruntime/src/lib.rs
 @@ -17,34 +17,8 @@ const LOGO: &str = r#"
@@ -409,7 +409,8 @@ index 3fd1950..a96fbec 100644
 +    //println!("rust_main: step6\n");
      #[cfg(feature = "multitask")]
      {
-         info!("Initialize scheduling...");
+-        info!("Initialize scheduling...");
++        println!("Initialize scheduling...");
          axtask::init_scheduler();
      }
  
