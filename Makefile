@@ -33,10 +33,10 @@ modules := \
 	rs_page_table_entry rs_page_table \
 	rs_log rs_riscv \
 	rs_buddy_system_allocator rs_bitmap_allocator \
-	axhal axlog axruntime axalloc libax \
+	axhal axlog axruntime axalloc axtask libax \
 	c_hello top_hello_world \
 	top_linux top_memory_addr \
-	top_arceos_memtest
+	top_arceos_multitask
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 

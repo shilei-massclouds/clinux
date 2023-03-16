@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
+#include <slab.h>
 #include <export.h>
 #include <printk.h>
 
@@ -16,6 +17,7 @@ int
 init_module(void)
 {
     printk("module[axruntime]: init begin ...\n");
+    BUG_ON(!slab_is_available());
     rust_main();
     printk("module[axruntime]: init end!\n");
     return 0;
