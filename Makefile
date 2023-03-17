@@ -14,6 +14,7 @@ PREDIRS := prebuilt
 
 #rs_hello rs_ext2
 #top_arceos_hello top_arceos_memtest
+#top_arceos_multitask
 modules := \
 	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
@@ -28,15 +29,18 @@ modules := \
 	ext2 ramfs rootfs procfs \
 	sys \
 	userboot \
-	rs_lib \
+	rs_compiler_builtins rs_alloc rs_lib \
 	rs_memory_addr rs_allocator \
 	rs_page_table_entry rs_page_table \
-	rs_log rs_riscv \
+	rs_log rs_riscv rs_smoltcp rs_virtio_drivers \
 	rs_buddy_system_allocator rs_bitmap_allocator \
-	axhal axlog axruntime axalloc axtask libax \
+	rs_driver_virtio rs_driver_net rs_driver_common \
+	axhal axlog axruntime axalloc axtask \
+	axdriver axnet axerror \
+	libax \
 	c_hello top_hello_world \
 	top_linux top_memory_addr \
-	top_arceos_multitask
+	top_arceos_echoserver
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 

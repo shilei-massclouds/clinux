@@ -92,7 +92,7 @@ start_user(void)
     printk("start_user: init ...\n");
 
     if (kernel_size >= PMD_SIZE)
-        panic("kernel size (%lu) is over PME_SIZE!", kernel_size);
+        panic("kernel size (%lu) is over PMD_SIZE!", kernel_size);
 
     /* Do the rest non-__init'ed, we're now alive */
     arch_call_rest_init();

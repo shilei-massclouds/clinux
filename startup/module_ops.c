@@ -223,6 +223,10 @@ simplify_symbols(const struct load_info *info)
 
     for (i = 1; i < symsec->sh_size / sizeof(Elf64_Sym); i++) {
         const char *name = info->strtab + sym[i].st_name;
+#if 0
+        sbi_put_u64(sym[i].st_shndx);
+        sbi_puts("\n");
+#endif
 
         switch (sym[i].st_shndx) {
         case SHN_COMMON:
@@ -234,12 +238,20 @@ simplify_symbols(const struct load_info *info)
         case SHN_LIVEPATCH:
             break;
         case SHN_UNDEF:
+#if 0
+            sbi_puts("SHN_UNDEF\n");
+            sbi_put_u64((unsigned long)sym[i].st_name);
+            sbi_puts("\n[");
+            sbi_puts(name);
+            sbi_puts("]\n");
+#endif
             ksym = resolve_symbol(info, name);
             if (ksym && !IS_ERR(ksym)) {
                 sym[i].st_value = ksym->value;
                 break;
             }
 
+            sbi_puts("SHN_UNDEF: ");
             sbi_puts(name);
             sbi_puts(" can't be resolved\n");
             break;
@@ -486,13 +498,21 @@ do_init_module(struct module *mod)
  * We just use the back half of the second pmd for temporary
  * area. NOTE: check module size less than (PMD_SIZE / 2).
  */
-#define TEMP_MOD_AREA_VA    (PAGE_OFFSET + PMD_SIZE / 2)
+#define TEMP_MOD_AREA_VA    (PAGE_OFFSET + PMD_SIZE)
 
 static uintptr_t
 copy_mod_to_temp_area(uintptr_t src)
 {
     Elf64_Ehdr *hdr = (Elf64_Ehdr *) src;
     /* HACK! e_phoff holds size of this module */
+#if 1
+    if (hdr->e_phoff >= (PMD_SIZE * 3 / 4)) {
+        sbi_puts("mod is too large [");
+        sbi_put_u64(hdr->e_phoff);
+        sbi_puts("] over PMD_SIZE/2\n");
+        halt();
+    }
+#endif
     memcpy((void *)TEMP_MOD_AREA_VA, (void *)src, hdr->e_phoff);
     return TEMP_MOD_AREA_VA;
 }
@@ -526,12 +546,17 @@ init_other_modules(void)
 
         move_module(dst_addr, &info);
 
-#if 0
-    sbi_puts("1[\n");
+#if 1
+    sbi_puts("1[");
     sbi_put_u64(dst_addr);
-    sbi_puts("\n]\n");
+    sbi_puts("]\n");
 #endif
         simplify_symbols(&info);
+#if 1
+    sbi_puts("2[");
+    sbi_put_u64(dst_addr);
+    sbi_puts("]\n");
+#endif
 
         apply_relocations(&info);
 
@@ -548,9 +573,11 @@ void load_modules(void)
 {
     struct module *mod;
 
-    sbi_puts("startup: load_modules ...\n");
+    sbi_puts("startup: load_frame ...\n");
 
     init_kernel_module();
+
+    sbi_puts("startup: load_modules ...\n");
 
     init_other_modules();
 

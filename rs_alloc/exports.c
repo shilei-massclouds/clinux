@@ -15,4 +15,9 @@
 
 #define EXPORT_SYMBOL_RUST_GPL(sym) extern int sym; EXPORT_SYMBOL(sym)
 
-#include "exports_core_generated.h"
+#include "exports_alloc_generated.h"
+
+EXPORT_SYMBOL_RUST_GPL(__rust_alloc);
+EXPORT_SYMBOL_RUST_GPL(__rust_dealloc);
+EXPORT_SYMBOL_RUST_GPL(__rust_realloc);
+EXPORT_SYMBOL_RUST_GPL(__rust_alloc_zeroed);

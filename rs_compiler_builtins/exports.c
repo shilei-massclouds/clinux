@@ -15,4 +15,6 @@
 
 #define EXPORT_SYMBOL_RUST_GPL(sym) extern int sym; EXPORT_SYMBOL(sym)
 
-#include "exports_core_generated.h"
+#include "exports_compiler_builtins_generated.h"
+
+EXPORT_SYMBOL_RUST_GPL(rust_begin_unwind);

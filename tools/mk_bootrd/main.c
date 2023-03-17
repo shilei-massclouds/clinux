@@ -112,7 +112,7 @@ discover_modules(FILE *fp)
         if (check_module(namelist[n]->d_name)) {
             module *mod = calloc(1, sizeof(module));
             mod->name = strdup(namelist[n]->d_name);
-            printf("%s: \n", mod->name);
+            //printf("%s: \n", mod->name);
             INIT_LIST_HEAD(&(mod->undef_syms));
             INIT_LIST_HEAD(&(mod->dependencies));
             mod->num_dependencies = 0;
@@ -193,7 +193,7 @@ export_symbols(const char *start, const char *end,
         sym->mod = mod;
         list_add_tail(&(sym->list), sym_list);
 
-        printf("%s: export(%s)\n", __func__, start);
+        //printf("%s: export(%s)\n", __func__, start);
         start = strchr(start, '\0');
         start++;
     }
@@ -267,7 +267,7 @@ discover_undef_syms(module *mod,
             symbol *undef = calloc(1, sizeof(symbol));
             undef->name = strdup(strtab + sym[i].st_name);
             list_add_tail(&(undef->list), &(mod->undef_syms));
-            printf("%s: name(%s)\n", __func__, undef->name);
+            //printf("%s: name(%s)\n", __func__, undef->name);
         }
     }
 
@@ -291,7 +291,7 @@ static depend *
 on_match(module *mod, symbol *sym)
 {
     assert(sym->mod != NULL);
-    //printf("%s: mod '%s' sym '%s'\n", __func__, mod->name, sym->name);
+    printf("%s: mod '%s' sym '%s'\n", __func__, mod->name, sym->name);
 
     depend *d = find_dependency(mod, sym->mod);
     if (d == NULL) {
@@ -299,6 +299,9 @@ on_match(module *mod, symbol *sym)
         d->mod = sym->mod;
         list_add_tail(&(d->list), &(mod->dependencies));
         mod->num_dependencies++;
+        if (strcmp(mod->name, "rs_lib") == 0)
+        printf("++++++ %s: mod '%s' -> '%s' sym '%s'\n",
+               __func__, mod->name, sym->mod->name, sym->name);
     }
     return d;
 }
@@ -352,7 +355,7 @@ build_dependency(module *mod)
 {
     list_head *p, *n;
 
-    printf("%s: mod '%s'\n", __func__, mod->name);
+    //printf("%s: mod '%s'\n", __func__, mod->name);
     list_for_each_safe(p, n, &(mod->undef_syms)) {
         symbol *undef = list_entry(p, symbol, list);
         match_undef(undef->name, on_match, mod);
@@ -504,7 +507,7 @@ traverse_dependency(module *mod,
             printf("%s: item '%s'\n", __func__, d->mod->name);
         }
 
-        //printf("%s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
+        printf("###### %s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
 
         traverse_dependency(d->mod, json_top, verify,
                             num_profile_mods, profile_mods,
