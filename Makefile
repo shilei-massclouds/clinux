@@ -15,6 +15,7 @@ PREDIRS := prebuilt
 #rs_hello rs_ext2
 #top_arceos_hello top_arceos_memtest
 #top_arceos_multitask
+#top_arceos_echoserver
 modules := \
 	startup lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \

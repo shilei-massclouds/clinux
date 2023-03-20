@@ -1046,6 +1046,16 @@ alloc_pages_exact(size_t size, gfp_t gfp_mask)
 }
 EXPORT_SYMBOL(alloc_pages_exact);
 
+void *
+rust_alloc_pages_c(size_t size)
+{
+    printk("%s: \n", __func__);
+    void *ret= alloc_pages_exact(size, GFP_KERNEL|__GFP_NOWARN|__GFP_ZERO);
+    printk("%s: %p\n", __func__, ret);
+    return ret;
+}
+EXPORT_SYMBOL(rust_alloc_pages_c);
+
 /**
  * free_pages_exact - release memory allocated via alloc_pages_exact()
  * @virt: the value returned by alloc_pages_exact.
