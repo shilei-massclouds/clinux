@@ -41,7 +41,7 @@ modules := \
 	libax \
 	c_hello top_hello_world \
 	top_linux top_memory_addr \
-	top_arceos_echoserver
+	#top_arceos_hello
 
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 
@@ -65,8 +65,7 @@ $(modules): $(PREDIRS) prepare
 
 PHONY += prepare
 prepare: prepare0
-	@$(SHELL) ./scripts/rust_is_available.sh -v
-	@$(MAKE) -f ./scripts/Makefile.build obj=rust/kernel/interfaces
+	@:
 
 PHONY += tools
 tools:
@@ -79,8 +78,6 @@ $(CLEAN_DIRS):
 clean: $(CLEAN_DIRS)
 	@rm -f ./prebuilt/*.h ./prebuilt/*.s ./scripts/mod/modpost ./top*.json
 	@$(MAKE) -C tools clean
-	@$(MAKE) -C rust clean
-	@$(MAKE) -C rust/kernel/interfaces clean
 	@find $(KMODULE_DIR)/* | grep -v README.md | xargs rm -f
 
 $(KMODULE_DIR)/bootrd.disk:

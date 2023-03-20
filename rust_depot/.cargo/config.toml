@@ -1,0 +1,7 @@
+[profile.release]
+lto = true
+
+[target.riscv64gc-unknown-none-elf]
+rustflags = [
+    "-Clink-arg=-Tstartup/linker_riscv64.lds"
+]
