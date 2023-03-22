@@ -12,6 +12,7 @@ core::arch::global_asm!(
 
 fn handle_breakpoint(sepc: &mut usize) {
     //debug!("Exception(Breakpoint) @ {:#x} ", sepc);
+    crate::console::puts("exception!\n");
     *sepc += 2
 }
 
@@ -50,5 +51,6 @@ struct TrapHandlerImpl;
 #[crate_interface::impl_interface]
 impl TrapHandler for TrapHandlerImpl {
     fn handle_irq(_irq_num: usize) {
+        crate::console::puts("trap\n");
     }
 }

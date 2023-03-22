@@ -10,13 +10,12 @@ mod arch;
 mod misc;
 mod lang_items;
 
+pub mod mem;
 pub mod console;
 /*
 pub mod irq;
-pub mod misc;
 pub mod time;
 */
-pub mod mem;
 
 pub(crate) fn platform_init() {
     extern "C" {

@@ -123,7 +123,7 @@ extern "C" {
     fn sbss();
     fn ebss();
     fn boot_stack();
-    fn boot_stack_top();
+    pub fn boot_stack_top();
 }
 
 pub(crate) fn memory_regions_num() -> usize {

@@ -18,8 +18,7 @@ export LOG
 
 export CC = riscv64-linux-gnu-gcc
 export CFLAGS = -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
-	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__ \
-	-I./include/
+	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
 
 # Allows the usage of unstable features in stable compilers.
 export RUSTC_BOOTSTRAP := 1
@@ -66,11 +65,13 @@ qemu_args += \
 	-machine virt \
 	-bios default \
 	-kernel $(kernel_bin) \
+    -drive if=pflash,file=../output/bootrd.disk,format=raw,unit=1 \
 	-device virtio-blk-device,drive=disk0 \
 	-drive id=disk0,if=none,format=raw,file=/tmp/disk.img \
 	-device virtio-net-device,netdev=net0 \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
-	-nographic
+	-nographic \
+    -d in_asm -D /tmp/insturction.log
 
 build: $(kernel_bin)
 
