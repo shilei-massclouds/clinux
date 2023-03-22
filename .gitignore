@@ -50,7 +50,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 *.bin
-*.lds
 tags
 *.swp
 prebuilt/*.s
@@ -71,3 +70,4 @@ output/*
 *_skeleton.rs
 *_generated.h
 extern_rlib/*
+Cargo.lock

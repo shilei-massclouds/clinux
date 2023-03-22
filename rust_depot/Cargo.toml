@@ -2,6 +2,9 @@
 
 members = [
     "startup",
+    "crate_interface",
+    "axlog",
+    "axruntime",
 #    "apps/display",
 #    "apps/exception",
 #    "apps/helloworld",
@@ -15,7 +18,6 @@ members = [
 #
 #    "crates/allocator",
 #    "crates/arm_gic",
-#    "crates/crate_interface",
 #    "crates/driver_block",
 #    "crates/driver_common",
 #    "crates/driver_display",
@@ -39,9 +41,7 @@ members = [
 #    "modules/axdriver",
 #    "modules/axerror",
 #    "modules/axhal",
-#    "modules/axlog",
 #    "modules/axnet",
-#    "modules/axruntime",
 #    "modules/axsync",
 #    "modules/axtask",
 #

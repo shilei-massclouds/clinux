@@ -32,4 +32,3 @@ crate_interface = { path = "../crate_interface" }
 
 [build-dependencies]
 cc = "1.0"
-#axconfig = { path = "../axconfig" }
