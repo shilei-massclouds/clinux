@@ -58,11 +58,24 @@ unsafe extern "C" fn _start() -> ! {
         la      a1, {load_modules}
         mv      a0, s0                  // 5. call load_modules()
         jalr    a1
-        j       .",
+
+        tail    {unreachable}",
         boot_stack_top = sym crate::mem::boot_stack_top,
         init_mmu = sym init_mmu,
         platform_init = sym super::platform_init,
         load_modules = sym load_modules,
+        unreachable = sym unreachable,
         options(noreturn),
     )
+}
+
+fn unreachable()
+{
+    use crate::console::puts;
+
+    puts("\n##########################");
+    puts("\nImpossible to come here!\n");
+    puts("##########################\n");
+
+    sbi_rt::system_reset(sbi_rt::Shutdown, sbi_rt::NoReason);
 }

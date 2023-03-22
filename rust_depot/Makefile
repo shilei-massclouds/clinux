@@ -11,11 +11,15 @@ GRAPHIC ?= off
 PLATFORM ?= qemu-virt-riscv
 target := riscv64gc-unknown-none-elf
 
+# Default module output directory
+export KMODULE_DIR = ../output
+
 export ARCH
 export PLATFORM
 export MODE
 export LOG
 
+export NM = riscv64-linux-gnu-nm
 export CC = riscv64-linux-gnu-gcc
 export CFLAGS = -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
@@ -26,6 +30,7 @@ export RUSTC_BOOTSTRAP := 1
 # Paths
 kernel_elf := target/$(target)/$(MODE)/startup
 kernel_bin := $(kernel_elf).bin
+kernel_map := $(kernel_elf).map
 
 # Cargo features and build args
 
@@ -74,13 +79,19 @@ qemu_args += \
     -d in_asm -D /tmp/insturction.log
 
 build: $(kernel_bin)
+	@cp $(kernel_map) ../output/
+	@cp $(kernel_bin) ../output/
 
-kernel_elf:
+build_elf:
 	@echo Arch: $(ARCH), Platform: $(PLATFORM)
 	cargo build $(build_args)
 
-$(kernel_bin): kernel_elf
+$(kernel_bin): build_elf $(kernel_map)
 	@$(OBJCOPY) $(kernel_elf) --strip-all -O binary $@
+
+$(kernel_map): $(kernel_elf)
+	@$(NM) -n $< | \
+		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
 
 disasm:
 	$(OBJDUMP) $(kernel_elf) | less
@@ -110,4 +121,10 @@ test:
 test_no_fail_fast:
 	cargo test --workspace --exclude "arceos-*" --exclude "libax_bindings" --no-fail-fast -- --nocapture
 
-.PHONY: build kernel_elf disasm run justrun clean clippy fmt test test_no_fail_fast
+$(KMODULE_DIR)/bootrd.disk:
+	@ ../tools/mk_bootrd/mk_bootrd
+
+bootrd: $(KMODULE_DIR)/bootrd.disk
+	@:
+
+.PHONY: build build_elf kernel_map disasm run justrun clean clippy fmt test test_no_fail_fast bootrd

@@ -123,7 +123,7 @@ discover_modules(FILE *fp)
             write_mod_to_bootrd(mod, fp);
         } else if (!strcmp(namelist[n]->d_name, "startup.bin")) {
             has_startup = true;
-        } else if (!strcmp(namelist[n]->d_name, "System.map")) {
+        } else if (!strcmp(namelist[n]->d_name, "startup.map")) {
             has_system_map = true;
         }
 
@@ -137,7 +137,7 @@ discover_modules(FILE *fp)
     }
 
     if (!has_system_map) {
-        printf("%s: No System.map\n", __func__);
+        printf("%s: No startup.map\n", __func__);
         exit(-1);
     }
 }
@@ -151,10 +151,10 @@ detect_syms_range(void)
     uint64_t end = 0;
 
     char filename[256] = {0};
-    sprintf(filename, "%s/System.map", kmod_dir);
+    sprintf(filename, "%s/startup.map", kmod_dir);
     fp = fopen(filename, "r");
     if (fp == NULL) {
-        printf("No System.map\n");
+        printf("No startup.map\n");
         exit(-1);
     }
 
@@ -213,7 +213,7 @@ init_symtable(void)
     sprintf(filename, "%s/startup.bin", kmod_dir);
     fp = fopen(filename, "rb");
     if (fp == NULL) {
-        printf("No System.map\n");
+        printf("No startup.bin\n");
         exit(-1);
     }
 
