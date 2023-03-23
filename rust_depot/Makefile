@@ -88,7 +88,7 @@ build: $(kernel_bin) $(components)
 
 $(components): FORCE
 	@printf "com: $@\n"
-	@$(MAKE) -f ./$@/Makefile obj=$@
+	@$(MAKE) -f ./scripts/Makefile.build obj=$@
 
 build_elf:
 	@echo Arch: $(ARCH), Platform: $(PLATFORM)
