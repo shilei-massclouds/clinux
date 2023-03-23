@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
+#include "exports_axlog_generated.h"
+
 int
 init_module(void)
 {

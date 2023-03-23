@@ -24,6 +24,7 @@ export NM = riscv64-linux-gnu-nm
 export CC = riscv64-linux-gnu-gcc
 export CFLAGS = -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
+export MAKE := @make --no-print-directory
 
 # Allows the usage of unstable features in stable compilers.
 export RUSTC_BOOTSTRAP := 1
@@ -80,14 +81,13 @@ qemu_args += \
     -d in_asm -D /tmp/insturction.log
 
 # All components subdir
-components := axlog axruntime
+components := log axlog axruntime
 
 build: $(kernel_bin) $(components)
 	@cp $(kernel_map) ../output/
 	@cp $(kernel_bin) ../output/
 
 $(components): FORCE
-	@printf "com: $@\n"
 	@$(MAKE) -f ./scripts/Makefile.build obj=$@
 
 build_elf:

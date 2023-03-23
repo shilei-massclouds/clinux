@@ -42,4 +42,6 @@ struct kernel_symbol {
 extern struct module __this_module;
 #define THIS_MODULE (&__this_module)
 
+#define EXPORT_SYMBOL_RUST_GPL(sym) extern int sym; EXPORT_SYMBOL(sym)
+
 #endif /* _LINUX_EXPORT_H */
