@@ -10,6 +10,7 @@ GRAPHIC ?= off
 # Platform
 PLATFORM ?= qemu-virt-riscv
 target := riscv64gc-unknown-none-elf
+export target
 
 # Default module output directory
 export KMODULE_DIR = ../output
@@ -78,13 +79,20 @@ qemu_args += \
 	-nographic \
     -d in_asm -D /tmp/insturction.log
 
-build: $(kernel_bin)
+# All components subdir
+components := axruntime
+
+build: $(kernel_bin) $(components)
 	@cp $(kernel_map) ../output/
 	@cp $(kernel_bin) ../output/
 
+$(components): FORCE
+	@printf "com: $@\n"
+	@$(MAKE) -f ./$@/Makefile obj=$@
+
 build_elf:
 	@echo Arch: $(ARCH), Platform: $(PLATFORM)
-	cargo build $(build_args)
+	@cargo build $(build_args)
 
 $(kernel_bin): build_elf $(kernel_map)
 	@$(OBJCOPY) $(kernel_elf) --strip-all -O binary $@
@@ -127,4 +135,5 @@ $(KMODULE_DIR)/bootrd.disk:
 bootrd: $(KMODULE_DIR)/bootrd.disk
 	@:
 
-.PHONY: build build_elf kernel_map disasm run justrun clean clippy fmt test test_no_fail_fast bootrd
+.PHONY: build build_elf kernel_map disasm run justrun clean \
+	clippy fmt test test_no_fail_fast bootrd components FORCE
