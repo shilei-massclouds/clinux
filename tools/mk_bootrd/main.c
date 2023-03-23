@@ -420,10 +420,8 @@ analysis_module(module *mod)
             const char *name = secstrings + shdr->sh_name;
             if (strcmp(name, "_ksymtab_strings") == 0) {
                 char *ksym_str = get_strtab(shdr, fp);
-#if 1
                 export_symbols(ksym_str, ksym_str + shdr->sh_size,
                                &symbols, mod);
-#endif
             }
         }
     }

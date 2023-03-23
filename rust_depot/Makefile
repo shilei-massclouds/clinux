@@ -81,13 +81,14 @@ qemu_args += \
     -d in_asm -D /tmp/insturction.log
 
 # All components subdir
-components := log axlog axruntime
+components := core log axlog axruntime
 
 build: $(kernel_bin) $(components)
 	@cp $(kernel_map) ../output/
 	@cp $(kernel_bin) ../output/
 
 $(components): FORCE
+	@mkdir -p ./target/$(target)/$(MODE)/deps/$@
 	@$(MAKE) -f ./scripts/Makefile.build obj=$@
 
 build_elf:

@@ -8,13 +8,13 @@ LD  := $(CROSS_)ld
 NM  := $(CROSS_)nm
 MAKE := @make --no-print-directory
 
-TARGET_DIR = target/$(target)/$(MODE)/deps
+TARGET_DIR = target/$(target)/$(MODE)/deps/$(obj)
 
 INCLUDES := -I../include/ -I$(TARGET_DIR)
 CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
 
-rust_rlib = $(TARGET_DIR)/lib$(obj)-*.rlib
+rust_rlib = $(TARGET_DIR)/../lib$(obj)-*.rlib
 rust_obj_y = $(TARGET_DIR)/$(obj)-*.o
 exports_gen_h = $(TARGET_DIR)/exports_$(obj)_generated.h
 mod_lds := scripts/module.lds
@@ -42,7 +42,9 @@ $(TARGET_DIR)/%.o: $(obj)/src/%.c
 $(exports_gen_h): $(rust_obj_y)
 	@echo '#include <export.h>' > $@
 	@$(NM) -p --defined-only $^ \
-		| grep -E ' (T|R|D|B) ' | cut -d ' ' -f 3 \
+		| grep -E ' (T|R|D|B) ' \
+		| cut -d ' ' -f 3 \
+		| grep -v '\.' \
 		| xargs -Isymbol \
 		echo 'EXPORT_SYMBOL_RUST_GPL(symbol);' >> $@
 
