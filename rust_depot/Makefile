@@ -80,7 +80,7 @@ qemu_args += \
     -d in_asm -D /tmp/insturction.log
 
 # All components subdir
-components := axruntime
+components := axlog axruntime
 
 build: $(kernel_bin) $(components)
 	@cp $(kernel_map) ../output/
