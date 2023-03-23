@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-$(obj)/$(obj).bin: $(obj)/$(obj).elf $(obj)/System.map
+$(obj)/$(obj).bin: $(obj)/$(obj).elf $(obj)/startup.map
 	@printf "COPY\t$@\n"
 	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
 
@@ -13,7 +13,7 @@ $(obj)/$(obj).ko: $(obj_y) $(mod_lds) $(wildcard $(obj)/*.rs)
 	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(obj_y)
 	@$(READELF) -p _ksymtab_strings $@ > $(obj)/$(obj).map 2> /dev/null
 
-$(obj)/System.map: $(obj)/$(obj).elf
+$(obj)/startup.map: $(obj)/$(obj).elf
 	@$(NM) -n $< | \
 		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
 

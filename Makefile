@@ -46,7 +46,7 @@ modules := \
 CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
 
 all: tools $(modules) startup/startup.bin
-	@cp ./startup/System.map $(KMODULE_DIR)
+	@cp ./startup/startup.map $(KMODULE_DIR)
 	@cp ./startup/startup.bin $(KMODULE_DIR)
 
 PHONY += prepare0
