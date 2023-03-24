@@ -81,7 +81,9 @@ qemu_args += \
     -d in_asm -D /tmp/insturction.log
 
 # All components subdir
-components = startup compiler_builtins core log axhal axlog axruntime
+components = \
+	startup compiler_builtins core log memory_addr \
+	axhal axlog axruntime
 
 build: cargo_build $(components)
 	@cp $(kernel_map) $(KMODULE_DIR)
@@ -130,5 +132,8 @@ $(KMODULE_DIR)/bootrd.disk:
 bootrd: $(KMODULE_DIR)/bootrd.disk
 	@:
 
+profiles: bootrd
+	@ ../tools/ch_bootrd/ch_bootrd $(KMODULE_DIR)/bootrd.disk
+
 .PHONY: build cargo_build kernel_map disasm run justrun clean \
-	clippy fmt test test_no_fail_fast bootrd components FORCE
+	clippy fmt test test_no_fail_fast bootrd profiles components FORCE
