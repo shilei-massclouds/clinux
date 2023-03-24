@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <sbi.h>
-#include "exports_compiler_builtins_generated.h"
 
 int
 init_module(void)

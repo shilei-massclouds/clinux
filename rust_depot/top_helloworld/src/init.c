@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
+#include <sbi.h>
+
 extern void say_hello();
 
 int
 init_module(void)
 {
-    //printk("module[helloworld]: init begin ...\n");
+    sbi_puts("module[helloworld]: init begin ...\n");
     say_hello();
-    //printk("module[helloworld]: init end!\n");
+    sbi_puts("module[helloworld]: init end!\n");
     return 0;
 }

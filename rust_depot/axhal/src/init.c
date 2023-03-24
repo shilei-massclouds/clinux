@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
-#include "exports_axhal_generated.h"
+#include <sbi.h>
 
 int
 init_module(void)
 {
-    //printk("module[axhal]: init begin ...\n");
-    //printk("module[axhal]: init end!\n");
+    sbi_puts("module[axhal]: init begin ...\n");
+    sbi_puts("module[axhal]: init end!\n");
     return 0;
 }

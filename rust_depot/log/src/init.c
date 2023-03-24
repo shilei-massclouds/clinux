@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
-#include "exports_log_generated.h"
+#include <sbi.h>
 
 int
 init_module(void)
 {
-    //printk("module[log]: init begin ...\n");
-    //printk("module[log]: init end!\n");
+    sbi_puts("module[log]: init begin ...\n");
+    sbi_puts("module[log]: init end!\n");
     return 0;
 }
