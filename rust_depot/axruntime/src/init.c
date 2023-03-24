@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <sbi.h>
-//#include "exports_axruntime_generated.h"
 
 extern void rust_main();
 

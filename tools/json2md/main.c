@@ -92,6 +92,9 @@ int main(int argc, char *argv[])
     }
 
     json_object_object_foreach(depend, key, val) {
+        if (json_object_get_type(val) != json_type_array)
+            continue;
+
         int num = json_object_array_length(val);
         if (num == 0)
             continue;
