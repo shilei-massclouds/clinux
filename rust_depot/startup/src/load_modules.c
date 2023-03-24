@@ -6,6 +6,7 @@
 #include <module.h>
 #include <kernel.h>
 #include <bootrd.h>
+#include <string.h>
 
 /* n must be power of 2 */
 #define ROUND_UP(x, n) (((x) + (n) - 1UL) & ~((n) - 1UL))
@@ -26,10 +27,6 @@
 
 extern char skernel[];
 extern char ekernel[];
-
-extern int memcmp(const void *, const void *, size_t);
-extern void *memcpy(void *, const void *, size_t);
-extern void *memset(void *s, int c, size_t count);
 
 extern const struct kernel_symbol _start_ksymtab[];
 extern const struct kernel_symbol _end_ksymtab[];
@@ -66,82 +63,6 @@ struct load_info {
 };
 
 /*
- * SBI-Print: for debug
- */
-
-static void dputc(int ch)
-{
-    register u64 a0 asm ("a0") = (u64)ch;
-    register u64 a7 asm ("a7") = (u64)SBI_EXT_0_1_CONSOLE_PUTCHAR;
-    asm volatile ("ecall"
-                  : "+r" (a0)
-                  : "r" (a7)
-                  : "memory");
-}
-
-static void dputs(const char *s)
-{
-    for (; *s; s++) {
-        if (*s == '\n')
-            dputc('\r');
-        dputc(*s);
-    }
-}
-
-static int ul_to_str(unsigned long n, char *str, size_t len)
-{
-    /* include '\0' */
-    if (len != 17)
-        return -1;
-
-    for (int i = 1; i <= 16; i++) {
-        char c = (n >> ((16 - i)*4)) & 0xF;
-        if (c >= 10) {
-            c -= 10;
-            c += 'A';
-        } else {
-            c += '0';
-        }
-        str[i-1] = c;
-    }
-    str[16] = '\0';
-
-    return 0;
-}
-
-static void dput_u64(unsigned long n)
-{
-    char buf[UL_STR_SIZE];
-    ul_to_str(n, buf, sizeof(buf));
-    dputs(buf);
-}
-
-/*
- * SBI-PowerOff
- */
-
-static void power_off(void)
-{
-    register uintptr_t a0 asm ("a0") = (uintptr_t)0;
-    register uintptr_t a1 asm ("a1") = (uintptr_t)0;
-    register uintptr_t a6 asm ("a6") = (uintptr_t)0;
-    register uintptr_t a7 asm ("a7") = (uintptr_t)(SBI_EXT_SRST);
-    asm volatile ("ecall"
-                  : "+r" (a0), "+r" (a1)
-                  : "r" (a6), "r" (a7)
-                  : "memory");
-}
-
-void unreachable(void)
-{
-    dputs("\n##########################");
-    dputs("\nImpossible to come here!\n");
-    dputs("##########################\n");
-
-    power_off();
-}
-
-/*
  * Component-related operations
  */
 
@@ -161,10 +82,10 @@ copy_mod_to_temp_area(uintptr_t src)
     Elf64_Ehdr *hdr = (Elf64_Ehdr *) src;
     /* HACK! e_phoff holds size of this module */
     if (hdr->e_phoff >= PMD_SIZE) {
-        dputs("mod is too large [");
-        dput_u64(hdr->e_phoff);
-        dputs("] over PMD_SIZE\n");
-        power_off();
+        sbi_puts("mod is too large [");
+        sbi_put_u64(hdr->e_phoff);
+        sbi_puts("] over PMD_SIZE\n");
+        sbi_srst_power_off();
     }
     memcpy((void *)base, (void *)src, hdr->e_phoff);
     return base;
@@ -196,12 +117,12 @@ mod_indexes_in_flash(uint32_t *pnum)
 
     struct bootrd_header *bh = (struct bootrd_header *) FLASH_VA;
     if (memcmp(&bh->magic, &BOOTRD_MAGIC, sizeof(bh->magic))) {
-        dputs("bootrd: bad magic\n");
-        power_off();
+        sbi_puts("bootrd: bad magic\n");
+        sbi_srst_power_off();
     }
     if (bh->version != 1) {
-        dputs("bootrd: bad version\n");
-        power_off();
+        sbi_puts("bootrd: bad version\n");
+        sbi_srst_power_off();
     }
 
     if (bh->profile_num == 0)
@@ -210,12 +131,12 @@ mod_indexes_in_flash(uint32_t *pnum)
     struct profile_header *ph =
         (struct profile_header *) (FLASH_VA + bh->current_profile);
     if (memcmp(&ph->magic, &PROFILE_MAGIC, sizeof(ph->magic))) {
-        dputs("profile: bad magic\n");
-        power_off();
+        sbi_puts("profile: bad magic\n");
+        sbi_srst_power_off();
     }
     if (ph->version != 1) {
-        dputs("profile: bad version\n");
-        power_off();
+        sbi_puts("profile: bad version\n");
+        sbi_srst_power_off();
     }
     *pnum = ph->mod_num;
 
@@ -319,19 +240,6 @@ move_module(uintptr_t addr, struct load_info *info)
     }
 }
 
-/**
- * strlen - Find the length of a string
- * @s: The string to be sized
- */
-static size_t strlen(const char *s)
-{
-    const char *sc;
-
-    for (sc = s; *sc != '\0'; ++sc)
-        /* nothing */;
-    return sc - s;
-}
-
 static int
 match_str(const char *s0, const char *s1)
 {
@@ -371,26 +279,26 @@ simplify_symbols(const struct load_info *info)
     for (i = 1; i < symsec->sh_size / sizeof(Elf64_Sym); i++) {
         const char *name = info->strtab + sym[i].st_name;
 #if 1
-        dput_u64(sym[i].st_shndx);
-        dputs("\n");
+        sbi_put_u64(sym[i].st_shndx);
+        sbi_puts("\n");
 #endif
 
         switch (sym[i].st_shndx) {
         case SHN_COMMON:
-            dputs("'SHN_COMMON' isn't supported for ");
-            dputs(name);
-            dputs("\n");
+            sbi_puts("'SHN_COMMON' isn't supported for ");
+            sbi_puts(name);
+            sbi_puts("\n");
             break;
         case SHN_ABS:
         case SHN_LIVEPATCH:
             break;
         case SHN_UNDEF:
 #if 1
-            dputs("SHN_UNDEF\n");
-            dput_u64((unsigned long)sym[i].st_name);
-            dputs("\n[");
-            dputs(name);
-            dputs("]\n");
+            sbi_puts("SHN_UNDEF\n");
+            sbi_put_u64((unsigned long)sym[i].st_name);
+            sbi_puts("\n[");
+            sbi_puts(name);
+            sbi_puts("]\n");
 #endif
             ksym = resolve_symbol(info, name);
             if (ksym && !IS_ERR(ksym)) {
@@ -398,9 +306,9 @@ simplify_symbols(const struct load_info *info)
                 break;
             }
 
-            dputs("SHN_UNDEF: ");
-            dputs(name);
-            dputs(" can't be resolved\n");
+            sbi_puts("SHN_UNDEF: ");
+            sbi_puts(name);
+            sbi_puts(" can't be resolved\n");
             break;
         default:
             sym[i].st_value += info->sechdrs[sym[i].st_shndx].sh_addr;
@@ -559,9 +467,9 @@ apply_relocate_add(const struct load_info *info, unsigned int relsec)
             break;
         }
         default:
-            dputs("bad type: [\n");
-            dput_u64(type);
-            dputs("]\n");
+            sbi_puts("bad type: [\n");
+            sbi_put_u64(type);
+            sbi_puts("]\n");
             break;
         }
     }
@@ -665,23 +573,23 @@ init_other_modules(void)
 
         mod = finalize_module(dst_addr, &info);
 
-        dputs("[");
-        dput_u64(dst_addr);
-        dputs("]\n");
-        dputs("[");
-        dput_u64(src_addr);
-        dputs("]\n");
-        power_off();
+        sbi_puts("[");
+        sbi_put_u64(dst_addr);
+        sbi_puts("]\n");
+        sbi_puts("[");
+        sbi_put_u64(src_addr);
+        sbi_puts("]\n");
+        sbi_srst_power_off();
 
         /* next */
         dst_addr += ROUND_UP(info.layout.size, 8);
 
         if (dst_addr >= ((uintptr_t)skernel + PMD_SIZE)) {
-            dputs("Out of memory: ");
-            dputs("Space for all components must less than PMD_SIZE; Now [");
-            dput_u64(dst_addr - (uintptr_t)skernel);
-            dputs("]\n");
-            power_off();
+            sbi_puts("Out of memory: ");
+            sbi_puts("Space for all components must less than PMD_SIZE; Now [");
+            sbi_put_u64(dst_addr - (uintptr_t)skernel);
+            sbi_puts("]\n");
+            sbi_srst_power_off();
         }
     }
 
@@ -690,13 +598,13 @@ init_other_modules(void)
 
 void load_modules(void)
 {
-    dputs("startup: init framework ...\n");
+    sbi_puts("startup: init framework ...\n");
 
     init_kernel_module();
 
-    dputs("startup: load all components ...\n");
+    sbi_puts("startup: load all components ...\n");
 
     init_other_modules();
 
-    dputs("startup: load all components ok!\n");
+    sbi_puts("startup: load all components ok!\n");
 }

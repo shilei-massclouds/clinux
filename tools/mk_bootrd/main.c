@@ -147,6 +147,7 @@ detect_syms_range(void)
 {
     FILE *fp;
     char line[256];
+    uint64_t base = 0;
     uint64_t start = 0;
     uint64_t end = 0;
 
@@ -159,10 +160,13 @@ detect_syms_range(void)
     }
 
     while (fgets(line, sizeof(line), fp) != NULL) {
-        if (strstr(line, "_start_ksymtab_strings")) {
+        if (strstr(line, " _start\n")) {
+            char *tail = strchr(line, ' ');
+            base = strtoul(line, &tail, 16);
+        } else if (strstr(line, " _start_ksymtab_strings\n")) {
             char *tail = strchr(line, ' ');
             start = strtoul(line, &tail, 16);
-        } else if (strstr(line, "_end_ksymtab_strings")) {
+        } else if (strstr(line, " _end_ksymtab_strings\n")) {
             char *tail = strchr(line, ' ');
             end = strtoul(line, &tail, 16);
         }
@@ -174,7 +178,8 @@ detect_syms_range(void)
     fclose(fp);
 
     /* Address to offset within the module */
-    ksym_ptr = (uint32_t)(start - CONFIG_PAGE_OFFSET);
+    //printf("%s: %lx, %lx\n", __func__, start, base);
+    ksym_ptr = (uint32_t)(start - base);
     ksym_num = (uint32_t)(end - start);
 }
 
@@ -207,7 +212,7 @@ init_symtable(void)
     char *cur;
 
     detect_syms_range();
-    printf("range(0x%x, 0x%x)\n", ksym_ptr, ksym_num);
+    //printf("range(0x%x, 0x%x)\n", ksym_ptr, ksym_num);
 
     char filename[256] = {0};
     sprintf(filename, "%s/startup.bin", kmod_dir);
@@ -234,7 +239,6 @@ get_strtab(Elf64_Shdr *shdr, FILE *fp)
     char *str;
 
     str = (char *) calloc(shdr->sh_size, 1);
-    printf("%s: offset(%lx)\n", __func__, shdr->sh_offset);
 
     fseek(fp, (long)shdr->sh_offset, SEEK_SET);
     if (fread(str, 1, shdr->sh_size, fp) != shdr->sh_size) {
@@ -291,7 +295,7 @@ static depend *
 on_match(module *mod, symbol *sym)
 {
     assert(sym->mod != NULL);
-    printf("%s: mod '%s' sym '%s'\n", __func__, mod->name, sym->name);
+    //printf("%s: mod '%s' sym '%s'\n", __func__, mod->name, sym->name);
 
     depend *d = find_dependency(mod, sym->mod);
     if (d == NULL) {
@@ -299,9 +303,6 @@ on_match(module *mod, symbol *sym)
         d->mod = sym->mod;
         list_add_tail(&(d->list), &(mod->dependencies));
         mod->num_dependencies++;
-        if (strcmp(mod->name, "rs_lib") == 0)
-        printf("++++++ %s: mod '%s' -> '%s' sym '%s'\n",
-               __func__, mod->name, sym->mod->name, sym->name);
     }
     return d;
 }
@@ -340,7 +341,6 @@ match_undef(const char *name, match_callback cb, module *mod)
      * manual intervention. */
     depend *p = head;
     while (p) {
-        printf("%s: mod '%s'\n", __func__, p->mod->name);
         p->flags |= DEPEND_FLAGS_CANDIDATE;
         p = p->next;
     }
@@ -379,7 +379,6 @@ analysis_module(module *mod)
     Elf64_Ehdr hdr = {0};
     char filename[256] = {0};
 
-    printf("%s: %s\n", __func__, mod->name);
     sprintf(filename, "%s/%s", kmod_dir, mod->name);
     fp = fopen(filename, "rb");
     if (fp == NULL) {
@@ -409,9 +408,6 @@ analysis_module(module *mod)
         if (shdr->sh_type == SHT_SYMTAB) {
             char *strtab;
             strtab = get_strtab(&sechdrs[shdr->sh_link], fp);
-
-            printf("[%d]: SHT_SYMTAB (%lx, %lx)\n",
-                   i, shdr->sh_offset, shdr->sh_size);
 
             /* Discover all undef syms for this mod */
             discover_undef_syms(mod, shdr, strtab, fp);
@@ -501,11 +497,7 @@ traverse_dependency(module *mod,
 
             if (!in_list(d->mod->name, whitelist))
                 need_handle_candidates = true;
-
-            printf("%s: item '%s'\n", __func__, d->mod->name);
         }
-
-        printf("###### %s: '%s' -> '%s'\n", __func__, mod->name, d->mod->name);
 
         traverse_dependency(d->mod, json_top, verify,
                             num_profile_mods, profile_mods,
@@ -645,9 +637,6 @@ append_fixups_to_profile(json_object *json_top)
             if (obj == NULL)
                 break;
 
-            printf("############### Candidates: %s: mod '%s'\n",
-                   __func__, p->mod->name);
-
             if (candidates == NULL)
                 candidates = json_object_new_array();
 
@@ -685,7 +674,6 @@ setup_white_black_list(json_object *fixups,
         const char *str_select = json_object_get_string(select);
         if (str_select == NULL || strlen(str_select) == 0)
             goto err;
-        printf("%s: select '%s'\n", __func__, str_select);
         wb_item *item = calloc(1, sizeof(wb_item));
         item->mod_name = strdup(str_select);
         list_add_tail(&(item->list), whitelist);
@@ -698,7 +686,6 @@ setup_white_black_list(json_object *fixups,
         for (int i = 0; i < json_object_array_length(candidates); i++) {
             json_object *candidate = json_object_array_get_idx(candidates, i);
             const char *n = json_object_get_string(candidate);
-            printf("%s: candidate '%s'\n", __func__, n);
             if (strncmp(str_select, n, strlen(str_select)) != 0) {
                 wb_item *item = calloc(1, sizeof(wb_item));
                 item->mod_name = strdup(n);
@@ -766,7 +753,6 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
             json_object *json_fixups;
             json_object_object_get_ex(json_top, "fixups", &json_fixups);
             if (json_fixups != NULL) {
-                printf("################################## fixups\n");
                 setup_white_black_list(json_fixups, &whitelist, &blacklist);
             }
         } else {
@@ -936,7 +922,7 @@ complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 
     hdr->total_size = ftell(fp);
 
-#if 1
+#if 0
     printf("%s: magic %x\n", __func__, hdr->magic);
     printf("%s: version %x\n", __func__, hdr->version);
     printf("%s: total_size %x\n", __func__, hdr->total_size);
@@ -984,7 +970,7 @@ main(int argc, char *argv[])
         }
         kmod_dir = argv[1];
     }
-    printf("KMODULE_DIR: %s\n", kmod_dir);
+    //printf("KMODULE_DIR: %s\n", kmod_dir);
 
     struct bootrd_header hdr;
     memset(&hdr, 0, sizeof(hdr));

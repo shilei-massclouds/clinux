@@ -7,6 +7,7 @@ AR  := $(CROSS_)ar
 LD  := $(CROSS_)ld
 NM  := $(CROSS_)nm
 MAKE := @make --no-print-directory
+OBJCOPY := $(CROSS_)objcopy
 
 TARGET_DIR = target/$(target)/$(MODE)/deps/$(obj)
 
@@ -16,6 +17,7 @@ CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug
+OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S
 
 rust_rlib = $(TARGET_DIR)/../lib$(obj)-*.rlib
 rust_obj_y = $(TARGET_DIR)/$(obj)-*.o
@@ -40,7 +42,7 @@ $(TARGET_DIR)/$(obj).ko: $(exports_gen_h) $(rust_obj_y) $(obj_y) $(mod_lds)
 	@cp $@ $(KMODULE_DIR)
 
 $(TARGET_DIR)/$(obj).bin: $(TARGET_DIR)/$(obj).elf $(TARGET_DIR)/$(obj).map
-	@$(OBJCOPY) $< --strip-all -O binary $@
+	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
 
 $(TARGET_DIR)/$(obj).map: $(TARGET_DIR)/$(obj).elf
 	@$(NM) -n $< | \

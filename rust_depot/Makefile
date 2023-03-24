@@ -109,6 +109,7 @@ debug: build
 	$(GDB) $(kernel_elf) -ex 'target remote localhost:1234'
 
 clean:
+	@rm -f $(KMODULE_DIR)/*.ko $(KMODULE_DIR)/startup.*
 	@cargo clean
 
 clippy:
