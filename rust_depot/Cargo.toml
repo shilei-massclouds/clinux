@@ -5,9 +5,10 @@ members = [
     "crate_interface",
     "axlog",
     "axruntime",
+
+    "top_helloworld",
 #    "apps/display",
 #    "apps/exception",
-#    "apps/helloworld",
 #    "apps/memtest",
 #    "apps/net/echoserver",
 #    "apps/net/httpclient",

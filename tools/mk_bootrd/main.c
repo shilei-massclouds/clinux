@@ -911,6 +911,9 @@ create_bootrd(struct bootrd_header *hdr)
 void
 complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
+    if (hdr->profile_num == 0)
+        printf("Warning: No top components FOUND! Please check!\n");
+
     if (need_handle_candidates) {
         fclose(fp);
         clean_bootrd();
@@ -970,7 +973,6 @@ main(int argc, char *argv[])
         }
         kmod_dir = argv[1];
     }
-    //printf("KMODULE_DIR: %s\n", kmod_dir);
 
     struct bootrd_header hdr;
     memset(&hdr, 0, sizeof(hdr));
@@ -981,5 +983,6 @@ main(int argc, char *argv[])
     clear_symbols();
     clear_modules();
 
+    printf("[OK]: Make BOOTRD at '%s'.\n", kmod_dir);
     return 0;
 }

@@ -41,3 +41,9 @@ void unreachable(void)
 
     sbi_srst_power_off();
 }
+
+void
+rust_begin_unwind(void)
+{
+}
+EXPORT_SYMBOL(rust_begin_unwind);

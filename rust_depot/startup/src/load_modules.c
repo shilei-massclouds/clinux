@@ -278,10 +278,6 @@ simplify_symbols(const struct load_info *info)
 
     for (i = 1; i < symsec->sh_size / sizeof(Elf64_Sym); i++) {
         const char *name = info->strtab + sym[i].st_name;
-#if 1
-        sbi_put_u64(sym[i].st_shndx);
-        sbi_puts("\n");
-#endif
 
         switch (sym[i].st_shndx) {
         case SHN_COMMON:
@@ -293,13 +289,6 @@ simplify_symbols(const struct load_info *info)
         case SHN_LIVEPATCH:
             break;
         case SHN_UNDEF:
-#if 1
-            sbi_puts("SHN_UNDEF\n");
-            sbi_put_u64((unsigned long)sym[i].st_name);
-            sbi_puts("\n[");
-            sbi_puts(name);
-            sbi_puts("]\n");
-#endif
             ksym = resolve_symbol(info, name);
             if (ksym && !IS_ERR(ksym)) {
                 sym[i].st_value = ksym->value;
@@ -573,14 +562,6 @@ init_other_modules(void)
 
         mod = finalize_module(dst_addr, &info);
 
-        sbi_puts("[");
-        sbi_put_u64(dst_addr);
-        sbi_puts("]\n");
-        sbi_puts("[");
-        sbi_put_u64(src_addr);
-        sbi_puts("]\n");
-        sbi_srst_power_off();
-
         /* next */
         dst_addr += ROUND_UP(info.layout.size, 8);
 
@@ -596,8 +577,17 @@ init_other_modules(void)
     kernel_size = dst_addr - (uintptr_t)skernel;
 }
 
+static void
+do_init_module(struct module *mod)
+{
+    if (mod->init)
+        mod->init();
+}
+
 void load_modules(void)
 {
+    struct module *mod;
+
     sbi_puts("startup: init framework ...\n");
 
     init_kernel_module();
@@ -606,5 +596,11 @@ void load_modules(void)
 
     init_other_modules();
 
-    sbi_puts("startup: load all components ok!\n");
+    sbi_puts("startup: prepare init components ...\n");
+
+    list_for_each_entry(mod, &modules, list) {
+        do_init_module(mod);
+    }
+
+    sbi_puts("startup: init components ok!\n");
 }
