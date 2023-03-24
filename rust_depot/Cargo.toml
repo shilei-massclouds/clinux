@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "startup",
+    "axhal",
     "crate_interface",
     "axlog",
     "axruntime",
@@ -40,7 +40,6 @@ members = [
 #    "modules/axdisplay",
 #    "modules/axdriver",
 #    "modules/axerror",
-#    "modules/axhal",
 #    "modules/axnet",
 #    "modules/axsync",
 #    "modules/axtask",

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 #[macro_use]
 mod macros;
 
@@ -44,7 +42,7 @@ pub fn read_page_table_root() -> PhysAddr {
 /// This function is unsafe as it changes the virtual memory address space.
 pub unsafe fn write_page_table_root(root_paddr: PhysAddr) {
     let old_root = read_page_table_root();
-    //trace!("set page table root: {:#x} => {:#x}", old_root, root_paddr);
+    trace!("set page table root: {:#x} => {:#x}", old_root, root_paddr);
     if old_root != root_paddr {
         satp::set(satp::Mode::Sv39, 0, root_paddr.as_usize() >> 12);
         asm::sfence_vma_all();

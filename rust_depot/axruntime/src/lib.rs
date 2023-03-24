@@ -16,39 +16,8 @@ d88P     888 888      "Y8888P  "Y8888   "Y88888P"   "Y8888P"
 
 
 /*
-struct LogIfImpl;
 struct GuardIfImpl;
 
-#[crate_interface::impl_interface]
-impl axlog::LogIf for LogIfImpl {
-    fn console_write_str(s: &str) {
-        use axhal::console::putchar;
-        for c in s.chars() {
-            match c {
-                '\n' => {
-                    putchar(b'\r');
-                    putchar(b'\n');
-                }
-                _ => putchar(c as u8),
-            }
-        }
-    }
-
-    fn current_time() -> core::time::Duration {
-        axhal::time::current_time()
-    }
-
-    fn current_task_id() -> Option<u64> {
-        #[cfg(feature = "multitask")]
-        {
-            axtask::current_may_uninit().map(|curr| curr.id().as_u64())
-        }
-        #[cfg(not(feature = "multitask"))]
-        {
-            None
-        }
-    }
-}
 
 #[crate_interface::impl_interface]
 impl spinlock::GuardIf for GuardIfImpl {

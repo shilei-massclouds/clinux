@@ -13,23 +13,42 @@ TARGET_DIR = target/$(target)/$(MODE)/deps/$(obj)
 INCLUDES := -I../include/ -I$(TARGET_DIR)
 CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
+AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
+	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__
+LDFLAGS := -melf64lriscv --build-id=none --strip-debug
 
 rust_rlib = $(TARGET_DIR)/../lib$(obj)-*.rlib
 rust_obj_y = $(TARGET_DIR)/$(obj)-*.o
 exports_gen_h = $(TARGET_DIR)/exports_$(obj)_generated.h
 mod_lds := scripts/module.lds
+elf_lds := scripts/startup.lds
 
 include $(obj)/Makefile
 
+target_y := $(if $(target_y), \
+			$(TARGET_DIR)/$(target_y), \
+			$(TARGET_DIR)/$(obj).ko)
+
 obj_y := $(addprefix $(TARGET_DIR)/, $(obj_y))
 
-_mod: $(TARGET_DIR)/$(obj).ko
+_build: $(target_y)
 	@:
 
 $(TARGET_DIR)/$(obj).ko: $(exports_gen_h) $(rust_obj_y) $(obj_y) $(mod_lds)
 	@printf "LD\t$@\n"
 	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(rust_obj_y) $(obj_y)
 	@cp $@ $(KMODULE_DIR)
+
+$(TARGET_DIR)/$(obj).bin: $(TARGET_DIR)/$(obj).elf $(TARGET_DIR)/$(obj).map
+	@$(OBJCOPY) $< --strip-all -O binary $@
+
+$(TARGET_DIR)/$(obj).map: $(TARGET_DIR)/$(obj).elf
+	@$(NM) -n $< | \
+		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
+
+$(TARGET_DIR)/$(obj).elf: $(obj_y) $(elf_lds)
+	@printf "LD\t$@\n"
+	@$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
 
 $(rust_obj_y): $(rust_rlib)
 	@printf "AR\t$@\n"
@@ -38,6 +57,10 @@ $(rust_obj_y): $(rust_rlib)
 $(TARGET_DIR)/%.o: $(obj)/src/%.c
 	@printf "CC\t$<\n"
 	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
+
+$(TARGET_DIR)/%.o: $(obj)/src/%.S
+	@printf "AS\t$<\n"
+	@$(CC) $(AS_FLAGS) $(INCLUDES) -c -o $@ $<
 
 $(exports_gen_h): $(rust_obj_y)
 	@echo '#include <export.h>' > $@
@@ -48,4 +71,4 @@ $(exports_gen_h): $(rust_obj_y)
 		| xargs -Isymbol \
 		echo 'EXPORT_SYMBOL_RUST_GPL(symbol);' >> $@
 
-.PHONY: _mod rust_obj_y
+.PHONY: _build rust_obj_y

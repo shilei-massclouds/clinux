@@ -132,6 +132,15 @@ static void power_off(void)
                   : "memory");
 }
 
+void unreachable(void)
+{
+    dputs("\n##########################");
+    dputs("\nImpossible to come here!\n");
+    dputs("##########################\n");
+
+    power_off();
+}
+
 /*
  * Component-related operations
  */
@@ -681,7 +690,7 @@ init_other_modules(void)
 
 void load_modules(void)
 {
-    dputs("startup: load framework ...\n");
+    dputs("startup: init framework ...\n");
 
     init_kernel_module();
 

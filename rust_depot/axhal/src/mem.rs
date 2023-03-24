@@ -27,7 +27,7 @@ impl Iterator for MemRegionIter {
     type Item = MemRegion;
 
     fn next(&mut self) -> Option<Self::Item> {
-        //use crate::platform::mem::{memory_region_at, memory_regions_num};
+        use crate::platform::mem::{memory_region_at, memory_regions_num};
         let ret = if self.idx < memory_regions_num() {
             memory_region_at(self.idx)
         } else {
@@ -123,31 +123,5 @@ extern "C" {
     fn sbss();
     fn ebss();
     fn boot_stack();
-    pub fn boot_stack_top();
-}
-
-pub(crate) fn memory_regions_num() -> usize {
-    common_memory_regions_num() + 1
-}
-
-pub(crate) fn memory_region_at(idx: usize) -> Option<MemRegion> {
-    use core::cmp::Ordering;
-    match idx.cmp(&common_memory_regions_num()) {
-        Ordering::Less => common_memory_region_at(idx),
-        Ordering::Equal => {
-            // free memory
-            extern "C" {
-                fn ekernel();
-            }
-            let start = virt_to_phys((ekernel as usize).into()).align_up_4k();
-            let end = PhysAddr::from(axconfig::PHYS_MEMORY_END).align_down_4k();
-            Some(MemRegion {
-                paddr: start,
-                size: end.as_usize() - start.as_usize(),
-                flags: MemRegionFlags::FREE | MemRegionFlags::READ | MemRegionFlags::WRITE,
-                name: "free memory",
-            })
-        }
-        Ordering::Greater => None,
-    }
+    fn boot_stack_top();
 }

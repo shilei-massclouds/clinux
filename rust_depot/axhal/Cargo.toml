@@ -1,5 +1,5 @@
 [package]
-name = "startup"
+name = "axhal"
 version = "0.1.0"
 edition = "2021"
 authors = ["Yuekai Jia <equation618@gmail.com>"]
@@ -7,19 +7,17 @@ authors = ["Yuekai Jia <equation618@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-#platform-qemu-virt-riscv = ["axconfig/platform-qemu-virt-riscv"]
+platform-qemu-virt-riscv = ["axconfig/platform-qemu-virt-riscv"]
 #paging = ["axalloc", "page_table"]
-#default = []
+default = []
 
 [dependencies]
-riscv = "0.10"
-sbi-rt = { version = "0.0.2", features = ["legacy"] }
-#
-#log = "0.4"
-#cfg-if = "1.0"
+log = "0.4"
+cfg-if = "1.0"
 bitflags = "1.3"
 #static_assertions = "1.1.0"
 axconfig = { path = "../axconfig" }
+axlog = { path = "../axlog" }
 #axalloc = { path = "../axalloc", optional = true }
 #spinlock = { path = "../../crates/spinlock" }
 #ratio = { path = "../../crates/ratio", optional = true }
@@ -30,5 +28,8 @@ memory_addr = { path = "../memory_addr" }
 #handler_table = { path = "../../crates/handler_table" }
 crate_interface = { path = "../crate_interface" }
 
+riscv = "0.10"
+sbi-rt = { version = "0.0.2", features = ["legacy"] }
+
 [build-dependencies]
-cc = "1.0"
+axconfig = { path = "../axconfig" }
