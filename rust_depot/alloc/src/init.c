@@ -2,6 +2,10 @@
 
 #include <export.h>
 #include <sbi.h>
+#include <rust_alloc.h>
+
+rg_alloc_t rg_alloc;
+EXPORT_SYMBOL(rg_alloc);
 
 int
 init_module(void)
@@ -14,9 +18,8 @@ init_module(void)
 char *
 __rust_alloc(uintptr_t size, uintptr_t align)
 {
-    sbi_puts("###### ###### module[alloc] call __rust_alloc!\n");
-    sbi_srst_power_off();
-    //return __rg_alloc(size, align);
+    SBI_ASSERT_MSG(rg_alloc != NULL, "rg_alloc is NULL!");
+    return rg_alloc(size, align);
 }
 EXPORT_SYMBOL(__rust_alloc);
 

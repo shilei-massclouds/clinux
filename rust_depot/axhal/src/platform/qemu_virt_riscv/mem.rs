@@ -11,9 +11,11 @@ pub(crate) fn memory_region_at(idx: usize) -> Option<MemRegion> {
         Ordering::Equal => {
             // free memory
             extern "C" {
-                fn ekernel();
+                fn skernel();
+                static kernel_size: usize;
             }
-            let start = virt_to_phys((ekernel as usize).into()).align_up_4k();
+            let start = skernel as usize + unsafe {kernel_size};
+            let start = virt_to_phys(start.into()).align_up_4k();
             let end = PhysAddr::from(axconfig::PHYS_MEMORY_END).align_down_4k();
             Some(MemRegion {
                 paddr: start,

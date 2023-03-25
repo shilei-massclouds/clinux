@@ -6,6 +6,8 @@ members = [
     "crate_interface",
     "axlog",
     "axruntime",
+    "page_table",
+    "page_table_entry",
 
     "top_helloworld",
     "top_memtest",
@@ -30,8 +32,6 @@ members = [
 #    "crates/lazy_init",
 #    "crates/linked_list",
 #    "crates/memory_addr",
-#    "crates/page_table",
-#    "crates/page_table_entry",
 #    "crates/ratio",
 #    "crates/scheduler",
 #    "crates/spinlock",

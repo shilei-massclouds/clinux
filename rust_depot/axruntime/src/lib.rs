@@ -35,10 +35,9 @@ fn rust_main() {
     axlog::set_max_level(option_env!("LOG").unwrap_or("")); // no effect if set `log-level-*` features
     info!("Logging is enabled.");
 
-/*
     info!("Found physcial memory regions:");
     for r in axhal::mem::memory_regions() {
-        info!(
+        println!(
             "  [{:x?}, {:x?}) {} ({:?})",
             r.paddr,
             r.paddr + r.size,
@@ -47,18 +46,26 @@ fn rust_main() {
         );
     }
 
-    #[cfg(feature = "alloc")]
-    {
-        info!("Initialize global memory allocator...");
-        init_allocator();
-    }
+    info!("Initialize global memory allocator...");
+    init_allocator();
 
-    #[cfg(feature = "paging")]
-    {
-        info!("Initialize kernel page table...");
-        remap_kernel_memory().expect("remap kernel memoy failed");
+    println!("step1");
+    unsafe {
+        extern crate alloc;
+        use core::alloc::Layout;
+        use alloc::alloc::alloc;
+        let layout = Layout::new::<u16>();
+        let ptr = alloc(layout);
+        println!("ptr: {:?}", ptr);
     }
+    println!("step2");
 
+    info!("Initialize kernel page table...");
+    println!("step3");
+    remap_kernel_memory().expect("remap kernel memoy failed");
+    println!("step4");
+
+/*
     #[cfg(feature = "multitask")]
     axtask::init_scheduler();
 
@@ -82,8 +89,6 @@ fn rust_main() {
 */
 }
 
-/*
-#[cfg(feature = "alloc")]
 fn init_allocator() {
     use axhal::mem::{memory_regions, phys_to_virt, MemRegionFlags};
 
@@ -109,7 +114,6 @@ fn init_allocator() {
     }
 }
 
-#[cfg(feature = "paging")]
 fn remap_kernel_memory() -> Result<(), axhal::paging::PagingError> {
     use axhal::mem::{memory_regions, phys_to_virt};
     use axhal::paging::PageTable;
@@ -130,6 +134,7 @@ fn remap_kernel_memory() -> Result<(), axhal::paging::PagingError> {
     Ok(())
 }
 
+/*
 fn init_interrupt() {
     use axhal::time::TIMER_IRQ_NUM;
     use core::sync::atomic::{AtomicU64, Ordering};

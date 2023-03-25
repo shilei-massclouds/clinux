@@ -38,3 +38,13 @@ pub type SpinRaw<T> = BaseSpinLock<NoOp, T>;
 
 /// A guard that provides mutable data access for [`SpinLockRaw`].
 pub type SpinRawGuard<'a, T> = BaseSpinLockGuard<'a, NoOp, T>;
+
+struct GuardIfImpl;
+
+#[crate_interface::impl_interface]
+impl GuardIf for GuardIfImpl {
+    fn set_preemptible(_enabled: bool) {
+        #[cfg(feature = "multitask")]
+        axtask::set_preemptiable(_enabled);
+    }
+}

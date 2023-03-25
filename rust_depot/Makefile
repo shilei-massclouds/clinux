@@ -83,7 +83,7 @@ qemu_args += \
 # All components subdir
 components = \
 	startup compiler_builtins core alloc \
-	log memory_addr \
+	riscv log memory_addr page_table page_table_entry \
 	spinlock \
 	bitmap_allocator buddy_system_allocator allocator \
 	axhal axalloc axlog axruntime \
@@ -132,7 +132,7 @@ test_no_fail_fast:
 	cargo test --workspace --exclude "arceos-*" --exclude "libax_bindings" --no-fail-fast -- --nocapture
 
 bootrd: FORCE
-	@rm -f $<
+	@rm -f $< top_*.json
 	@ ../tools/mk_bootrd/mk_bootrd
 
 profiles:

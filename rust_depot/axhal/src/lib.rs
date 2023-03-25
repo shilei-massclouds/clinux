@@ -4,15 +4,19 @@
 #![feature(const_trait_impl)]
 #![feature(const_maybe_uninit_zeroed)]
 
+#[allow(unused_imports)]
+#[macro_use]
+extern crate log;
+
 mod platform;
 
-//pub mod arch;
-//pub mod irq;
+pub mod arch;
+pub mod irq;
 pub mod mem;
 pub mod time;
-//pub mod trap;
+pub mod trap;
 
-//pub mod paging;
+pub mod paging;
 
 pub mod console {
     pub use super::platform::console::*;
@@ -54,15 +58,5 @@ impl axlog::LogIf for LogIfImpl {
         {
             None
         }
-    }
-}
-
-struct GuardIfImpl;
-
-#[crate_interface::impl_interface]
-impl spinlock::GuardIf for GuardIfImpl {
-    fn set_preemptible(_enabled: bool) {
-        #[cfg(feature = "multitask")]
-        axtask::set_preemptiable(_enabled);
     }
 }
