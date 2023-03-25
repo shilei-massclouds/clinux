@@ -2,11 +2,13 @@
 
 members = [
     "axhal",
+    "axalloc",
     "crate_interface",
     "axlog",
     "axruntime",
 
     "top_helloworld",
+    "top_memtest",
 #    "apps/display",
 #    "apps/exception",
 #    "apps/memtest",
@@ -36,7 +38,6 @@ members = [
 #    "crates/timer_list",
 #    "crates/tuple_for_each",
 #
-#    "modules/axalloc",
 #    "modules/axconfig",
 #    "modules/axdisplay",
 #    "modules/axdriver",

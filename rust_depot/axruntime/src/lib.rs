@@ -15,19 +15,6 @@ d88P     888 888      "Y8888P  "Y8888   "Y88888P"   "Y8888P"
 "#;
 
 
-/*
-struct GuardIfImpl;
-
-
-#[crate_interface::impl_interface]
-impl spinlock::GuardIf for GuardIfImpl {
-    fn set_preemptible(_enabled: bool) {
-        #[cfg(feature = "multitask")]
-        axtask::set_preemptiable(_enabled);
-    }
-}
-*/
-
 #[cfg_attr(not(test), no_mangle)]
 fn rust_main() {
     println!("{}", LOGO);

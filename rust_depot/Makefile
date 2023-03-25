@@ -82,9 +82,13 @@ qemu_args += \
 
 # All components subdir
 components = \
-	startup compiler_builtins core log memory_addr \
-	axhal axlog axruntime \
-	top_helloworld
+	startup compiler_builtins core alloc \
+	log memory_addr \
+	spinlock \
+	bitmap_allocator buddy_system_allocator allocator \
+	axhal axalloc axlog axruntime \
+	libax \
+	top_helloworld top_memtest
 
 build: cargo_build $(components)
 	@cp $(kernel_map) $(KMODULE_DIR)
@@ -127,7 +131,7 @@ test:
 test_no_fail_fast:
 	cargo test --workspace --exclude "arceos-*" --exclude "libax_bindings" --no-fail-fast -- --nocapture
 
-bootrd: $(KMODULE_DIR)/bootrd.disk FORCE
+bootrd: FORCE
 	@rm -f $<
 	@ ../tools/mk_bootrd/mk_bootrd
 

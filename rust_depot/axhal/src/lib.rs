@@ -56,3 +56,13 @@ impl axlog::LogIf for LogIfImpl {
         }
     }
 }
+
+struct GuardIfImpl;
+
+#[crate_interface::impl_interface]
+impl spinlock::GuardIf for GuardIfImpl {
+    fn set_preemptible(_enabled: bool) {
+        #[cfg(feature = "multitask")]
+        axtask::set_preemptiable(_enabled);
+    }
+}

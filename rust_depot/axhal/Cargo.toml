@@ -19,7 +19,7 @@ bitflags = "1.3"
 axconfig = { path = "../axconfig" }
 axlog = { path = "../axlog" }
 #axalloc = { path = "../axalloc", optional = true }
-#spinlock = { path = "../../crates/spinlock" }
+spinlock = { path = "../spinlock" }
 #ratio = { path = "../../crates/ratio", optional = true }
 #lazy_init = { path = "../../crates/lazy_init" }
 #page_table = { path = "../../crates/page_table", optional = true }
