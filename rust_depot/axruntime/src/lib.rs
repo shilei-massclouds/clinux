@@ -49,19 +49,23 @@ fn rust_main() {
     info!("Initialize global memory allocator...");
     init_allocator();
 
-    println!("step1");
     unsafe {
         extern crate alloc;
         use core::alloc::Layout;
         use alloc::alloc::alloc;
+        println!("step0");
         let layout = Layout::new::<u16>();
+        println!("step1");
         let ptr = alloc(layout);
+        println!("step2");
         println!("ptr: {:?}", ptr);
     }
-    println!("step2");
 
     info!("Initialize kernel page table...");
-    println!("step3");
+    extern "C" {
+        static kernel_end: usize;
+    }
+    println!("step3 {:x}", unsafe {kernel_end});
     remap_kernel_memory().expect("remap kernel memoy failed");
     println!("step4");
 
@@ -120,6 +124,7 @@ fn remap_kernel_memory() -> Result<(), axhal::paging::PagingError> {
 
     let mut kernel_page_table = PageTable::try_new()?;
     for r in memory_regions() {
+        println!("remap {:x} {:x}", phys_to_virt(r.paddr), r.paddr);
         kernel_page_table.map_region(
             phys_to_virt(r.paddr),
             r.paddr,
@@ -129,7 +134,9 @@ fn remap_kernel_memory() -> Result<(), axhal::paging::PagingError> {
         )?;
     }
 
+    println!("step5");
     unsafe { axhal::arch::write_page_table_root(kernel_page_table.root_paddr()) };
+    println!("step6");
     core::mem::forget(kernel_page_table);
     Ok(())
 }

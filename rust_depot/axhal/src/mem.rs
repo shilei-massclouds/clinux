@@ -54,7 +54,7 @@ pub fn memory_regions() -> impl Iterator<Item = MemRegion> {
 
 #[allow(dead_code)]
 pub(crate) const fn common_memory_regions_num() -> usize {
-    5 + axconfig::MMIO_REGIONS.len()
+    6 + axconfig::MMIO_REGIONS.len()
 }
 
 #[allow(dead_code)]
@@ -91,9 +91,16 @@ pub(crate) fn common_memory_region_at(idx: usize) -> Option<MemRegion> {
             flags: MemRegionFlags::RESERVED | MemRegionFlags::READ | MemRegionFlags::WRITE,
             name: "boot stack",
         },
-        i if i < 5 + mmio_regions.len() => MemRegion {
-            paddr: mmio_regions[i - 5].0.into(),
-            size: mmio_regions[i - 5].1,
+        5 => MemRegion {
+            paddr: virt_to_phys((ekernel as usize).into()),
+            size: unsafe { kernel_end } - ekernel as usize,
+            flags: MemRegionFlags::RESERVED | MemRegionFlags::READ |
+                MemRegionFlags::WRITE | MemRegionFlags::EXECUTE,
+            name: "component",
+        },
+        i if i < 6 + mmio_regions.len() => MemRegion {
+            paddr: mmio_regions[i - 6].0.into(),
+            size: mmio_regions[i - 6].1,
             flags: MemRegionFlags::RESERVED
                 | MemRegionFlags::DEVICE
                 | MemRegionFlags::READ
@@ -124,4 +131,6 @@ extern "C" {
     fn ebss();
     fn boot_stack();
     fn boot_stack_top();
+    fn ekernel();
+    static kernel_end: usize;
 }

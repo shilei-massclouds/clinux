@@ -7,6 +7,12 @@
 rg_alloc_t rg_alloc;
 EXPORT_SYMBOL(rg_alloc);
 
+rg_dealloc_t rg_dealloc;
+EXPORT_SYMBOL(rg_dealloc);
+
+rg_realloc_t rg_realloc;
+EXPORT_SYMBOL(rg_realloc);
+
 int
 init_module(void)
 {
@@ -35,18 +41,17 @@ EXPORT_SYMBOL(__rust_alloc_zeroed);
 void
 __rust_dealloc(char *ptr, uintptr_t size, uintptr_t align)
 {
-    sbi_puts("###### ###### module[alloc] call __rust_dealloc!\n");
-    sbi_srst_power_off();
-    //return __rg_dealloc(ptr, size, align);
+    SBI_ASSERT_MSG(rg_dealloc != NULL, "rg_dealloc is NULL!");
+    rg_dealloc(ptr, size, align);
 }
 EXPORT_SYMBOL(__rust_dealloc);
 
 char *
-__rust_realloc(char *ptr, uintptr_t old_size, uintptr_t _align)
+__rust_realloc(char *ptr, uintptr_t old_size,
+               uintptr_t align, uintptr_t new_size)
 {
-    sbi_puts("###### ###### module[alloc] call __rust_realloc!\n");
-    sbi_srst_power_off();
-    //return __rg_realloc(ptr, size, align);
+    SBI_ASSERT_MSG(rg_realloc != NULL, "rg_realloc is NULL!");
+    return rg_realloc(ptr, old_size, align, new_size);
 }
 EXPORT_SYMBOL(__rust_realloc);
 

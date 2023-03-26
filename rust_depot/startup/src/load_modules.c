@@ -35,8 +35,8 @@ extern const struct kernel_symbol _end_ksymtab[];
 LIST_HEAD(modules);
 EXPORT_SYMBOL(modules);
 
-uintptr_t kernel_size = 0;
-EXPORT_SYMBOL(kernel_size);
+uintptr_t kernel_end = 0;
+EXPORT_SYMBOL(kernel_end);
 
 struct module kernel_module;
 
@@ -574,7 +574,7 @@ init_other_modules(void)
         }
     }
 
-    kernel_size = dst_addr - (uintptr_t)skernel;
+    kernel_end = PAGE_ALIGN(dst_addr);
 }
 
 static void
