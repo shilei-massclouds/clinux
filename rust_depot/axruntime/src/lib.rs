@@ -52,8 +52,6 @@ fn rust_main() {
     info!("Initialize kernel page table...");
     remap_kernel_memory().expect("remap kernel memoy failed");
 
-/*
-    #[cfg(feature = "multitask")]
     axtask::init_scheduler();
 
     #[cfg(any(feature = "fs", feature = "net", feature = "display"))]
@@ -69,11 +67,6 @@ fn rust_main() {
     }
 
     init_interrupt();
-
-    unsafe { main() };
-
-    axtask::exit(0)
-*/
 }
 
 fn init_allocator() {
@@ -121,7 +114,6 @@ fn remap_kernel_memory() -> Result<(), axhal::paging::PagingError> {
     Ok(())
 }
 
-/*
 fn init_interrupt() {
     use axhal::time::TIMER_IRQ_NUM;
     use core::sync::atomic::{AtomicU64, Ordering};
@@ -143,11 +135,9 @@ fn init_interrupt() {
 
     axhal::irq::register_handler(TIMER_IRQ_NUM, || {
         update_timer();
-        #[cfg(feature = "multitask")]
         axtask::on_timer_tick();
     });
 
     // Enable IRQs before starting app
     axhal::arch::enable_irqs();
 }
-*/

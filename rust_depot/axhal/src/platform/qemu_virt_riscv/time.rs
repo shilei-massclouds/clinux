@@ -1,9 +1,8 @@
-//use riscv::register::{sie, time};
-use riscv::register::time;
+use riscv::register::{sie, time};
 
 const NANOS_PER_TICK: u64 = crate::time::NANOS_PER_SEC / axconfig::TIMER_FREQUENCY as u64;
 
-//pub const TIMER_IRQ_NUM: usize = super::irq::S_TIMER;
+pub const TIMER_IRQ_NUM: usize = super::irq::S_TIMER;
 
 #[inline]
 pub fn current_ticks() -> u64 {
@@ -24,7 +23,6 @@ pub fn set_oneshot_timer(deadline_ns: u64) {
     sbi_rt::set_timer(nanos_to_ticks(deadline_ns));
 }
 
-/*
 pub fn init() {
     unsafe {
         sie::set_ssoft();
@@ -33,4 +31,3 @@ pub fn init() {
     }
     sbi_rt::set_timer(0);
 }
-*/

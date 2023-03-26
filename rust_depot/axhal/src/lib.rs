@@ -48,13 +48,7 @@ impl axlog::LogIf for LogIfImpl {
     }
 
     fn current_task_id() -> Option<u64> {
-        #[cfg(feature = "multitask")]
-        {
-            axtask::current_may_uninit().map(|curr| curr.id().as_u64())
-        }
-        #[cfg(not(feature = "multitask"))]
-        {
-            None
-        }
+        //axtask::current_may_uninit().map(|curr| curr.id().as_u64())
+        None
     }
 }

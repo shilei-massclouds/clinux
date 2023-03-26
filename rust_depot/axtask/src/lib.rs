@@ -66,11 +66,14 @@ pub fn init_scheduler() {
 
     self::timers::init();
 
+    /* Todo: select schedule policy based on ENV */
+    /*
     if cfg!(feature = "sched_fifo") {
         info!("  use FIFO scheduler.");
     } else if cfg!(feature = "sched_rr") {
         info!("  use Round-robin scheduler.");
     }
+    */
 }
 
 /// Handle periodic timer ticks for task manager, e.g. advance scheduler, update timer.

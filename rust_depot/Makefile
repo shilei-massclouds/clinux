@@ -78,7 +78,7 @@ qemu_args += \
 	-device virtio-net-device,netdev=net0 \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
 	-nographic \
-    -d in_asm -D /tmp/insturction.log
+    #-d in_asm -D /tmp/insturction.log
 
 # All components subdir
 components = \
