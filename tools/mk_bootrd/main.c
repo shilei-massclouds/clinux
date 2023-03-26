@@ -791,7 +791,7 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
                          strlen("top_hello_world")) == 0)
             hdr->current_profile = ftell(fp);
 #else
-        if (strncmp(mod->name, "top_memtest", strlen("top_memtest")) == 0)
+        if (strncmp(mod->name, "top_parallel", strlen("top_parallel")) == 0)
             hdr->current_profile = ftell(fp);
 #endif
 

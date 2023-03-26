@@ -11,7 +11,6 @@ pub(crate) fn memory_region_at(idx: usize) -> Option<MemRegion> {
         Ordering::Equal => {
             // free memory
             extern "C" {
-                fn skernel();
                 static kernel_end: usize;
             }
             let start = virt_to_phys(unsafe {kernel_end.into()}).align_up_4k();

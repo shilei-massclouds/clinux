@@ -22,11 +22,9 @@ pub mod console {
     pub use super::platform::console::*;
 }
 
-/*
 pub mod misc {
     pub use super::platform::misc::*;
 }
-*/
 
 struct LogIfImpl;
 

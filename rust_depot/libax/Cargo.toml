@@ -46,5 +46,5 @@ axhal = { path = "../axhal" }
 axlog = { path = "../axlog" }
 #axnet = { path = "../../modules/axnet", optional = true }
 axruntime = { path = "../axruntime" }
-#axsync = { path = "../../modules/axsync", default-features = false, optional = true }
-#axtask = { path = "../../modules/axtask", default-features = false, optional = true }
+axsync = { path = "../axsync" }
+axtask = { path = "../axtask" }

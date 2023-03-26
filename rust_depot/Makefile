@@ -86,9 +86,9 @@ components = \
 	riscv log memory_addr page_table page_table_entry \
 	spinlock \
 	bitmap_allocator buddy_system_allocator allocator \
-	axhal axalloc axlog axruntime \
+	axhal axalloc axlog axtask axruntime \
 	libax \
-	top_helloworld top_memtest
+	top_helloworld top_memtest top_parallel
 
 build: cargo_build $(components)
 	@cp $(kernel_map) $(KMODULE_DIR)
