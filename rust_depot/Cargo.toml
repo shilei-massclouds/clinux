@@ -13,12 +13,12 @@ members = [
     "top_helloworld",
     "top_memtest",
     "top_parallel",
+    "top_sleep",
 #    "apps/display",
 #    "apps/exception",
 #    "apps/net/echoserver",
 #    "apps/net/httpclient",
 #    "apps/net/httpserver",
-#    "apps/task/sleep",
 #    "apps/task/yield",
 #
 #    "crates/allocator",

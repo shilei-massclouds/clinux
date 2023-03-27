@@ -88,7 +88,8 @@ components = \
 	bitmap_allocator buddy_system_allocator allocator \
 	axhal axalloc axlog axtask axruntime \
 	libax \
-	top_helloworld top_memtest top_parallel
+	top_helloworld top_memtest \
+	top_parallel top_sleep
 
 build: cargo_build $(components)
 	@cp $(kernel_map) $(KMODULE_DIR)
@@ -105,10 +106,10 @@ $(components): FORCE
 disasm:
 	$(OBJDUMP) $(kernel_elf) | less
 
-run: build justrun
+run: build bootrd justrun
 
 justrun:
-	$(qemu) $(qemu_args)
+	@ $(qemu) $(qemu_args)
 
 debug: build
 	$(qemu) $(qemu_args) -s -S &
