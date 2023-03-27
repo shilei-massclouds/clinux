@@ -17,9 +17,9 @@ members = [
     "top_yield",
     "top_exception",
     "top_echoserver",
+    "top_httpserver",
 #    "apps/display",
 #    "apps/net/httpclient",
-#    "apps/net/httpserver",
 #
 #    "crates/allocator",
 #    "crates/arm_gic",
