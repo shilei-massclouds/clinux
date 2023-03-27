@@ -91,7 +91,7 @@ components = \
 	axdriver axnet \
 	libax \
 	top_helloworld top_memtest top_exception \
-	top_echoserver top_httpserver \
+	top_echoserver top_httpclient top_httpserver \
 	top_parallel top_sleep top_yield
 
 build: cargo_build $(components)
