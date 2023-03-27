@@ -42,10 +42,10 @@ kernel_map := $(kernel_elf).map
 # Cargo features and build args
 
 features := axhal/platform-qemu-virt-riscv
-features += #axdriver?/bus-mmio
+#features += axdriver?/bus-mmio
 
 ifneq ($(filter $(LOG),off error warn info debug trace),)
-  features += #libax/log-level-$(LOG)
+  #features += libax/log-level-$(LOG)
 else
   $(error "LOG" must be one of "off", "error", "warn", "info", "debug", "trace")
 endif
@@ -84,11 +84,14 @@ qemu_args += \
 components = \
 	startup compiler_builtins core alloc \
 	riscv log memory_addr page_table page_table_entry \
-	spinlock \
+	spinlock smoltcp\
 	bitmap_allocator buddy_system_allocator allocator \
-	axhal axalloc axlog axtask axruntime \
+	virtio_drivers driver_common driver_virtio \
+	axhal axalloc axerror axlog axtask axruntime \
+	axdriver axnet \
 	libax \
 	top_helloworld top_memtest top_exception \
+	top_echoserver \
 	top_parallel top_sleep top_yield
 
 build: cargo_build $(components)

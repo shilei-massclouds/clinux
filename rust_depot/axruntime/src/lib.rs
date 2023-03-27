@@ -54,14 +54,11 @@ fn rust_main() {
 
     axtask::init_scheduler();
 
-    #[cfg(any(feature = "fs", feature = "net", feature = "display"))]
+    let all_devices = axdriver::init_drivers();
+    axnet::init_network(all_devices.net);
+
+    #[cfg(any(feature = "fs", feature = "display"))]
     {
-        #[allow(unused_variables)]
-        let all_devices = axdriver::init_drivers();
-
-        #[cfg(feature = "net")]
-        axnet::init_network(all_devices.net);
-
         #[cfg(feature = "display")]
         axdisplay::init_display(all_devices.display);
     }

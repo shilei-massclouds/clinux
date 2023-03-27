@@ -7,6 +7,9 @@
 rg_alloc_t rg_alloc;
 EXPORT_SYMBOL(rg_alloc);
 
+rg_alloc_t rg_alloc_zeroed;
+EXPORT_SYMBOL(rg_alloc_zeroed);
+
 rg_dealloc_t rg_dealloc;
 EXPORT_SYMBOL(rg_dealloc);
 
@@ -32,9 +35,8 @@ EXPORT_SYMBOL(__rust_alloc);
 char *
 __rust_alloc_zeroed(uintptr_t size, uintptr_t align)
 {
-    sbi_puts("###### ###### module[alloc] call __rust_alloc_zeroed!\n");
-    sbi_srst_power_off();
-    //return __rg_alloc_zeroed(size, align);
+    SBI_ASSERT_MSG(rg_alloc_zeroed != NULL, "rg_alloc_zeroed is NULL!");
+    return rg_alloc_zeroed(size, align);
 }
 EXPORT_SYMBOL(__rust_alloc_zeroed);
 

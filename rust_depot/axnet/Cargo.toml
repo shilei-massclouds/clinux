@@ -1,0 +1,33 @@
+[package]
+name = "axnet"
+version = "0.1.0"
+edition = "2021"
+authors = ["Yuekai Jia <equation618@gmail.com>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+#smoltcp = []
+#default = ["axdriver/virtio-net", "smoltcp"]
+
+[dependencies]
+log = "0.4"
+cfg-if = "1.0"
+driver_common = { path = "../driver_common" }
+driver_net = { path = "../driver_net" }
+lazy_init = { path = "../lazy_init" }
+axhal = { path = "../axhal" }
+axsync = { path = "../axsync" }
+axtask = { path = "../axtask" }
+axdriver = { path = "../axdriver" }
+axerror = { path = "../axerror" }
+
+[dependencies.smoltcp]
+version = "0.9.1"
+default-features = false
+features = [
+    "alloc", "log",   # no std
+    "medium-ethernet",
+    "proto-ipv4",
+    "socket-raw", "socket-icmp", "socket-udp", "socket-tcp",
+]

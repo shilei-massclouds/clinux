@@ -22,9 +22,9 @@ spinlock = { path = "../spinlock" }
 crate_interface = { path = "../crate_interface" }
 axalloc = { path = "../axalloc" }
 axconfig = { path = "../axconfig" }
-#axdriver = { path = "../axdriver", optional = true }
+axdriver = { path = "../axdriver" }
 axhal = { path = "../axhal" }
 axlog = { path = "../axlog" }
-#axnet = { path = "../axnet", optional = true }
+axnet = { path = "../axnet" }
 #axdisplay = { path = "../axdisplay", optional = true }
 axtask = { path = "../axtask" }

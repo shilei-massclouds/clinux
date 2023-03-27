@@ -4,11 +4,13 @@
 
 #include <types.h>
 
-//fn __rust_alloc_zeroed(size: usize, align: usize) -> *mut u8;
-
 typedef char *
 (*rg_alloc_t)(uintptr_t size, uintptr_t align);
 extern rg_alloc_t rg_alloc;
+
+typedef char *
+(*rg_alloc_zeroed_t)(uintptr_t size, uintptr_t align);
+extern rg_alloc_zeroed_t rg_alloc_zeroed;
 
 typedef void
 (*rg_dealloc_t)(char *ptr, uintptr_t size, uintptr_t align);

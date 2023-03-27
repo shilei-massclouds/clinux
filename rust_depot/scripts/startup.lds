@@ -1,6 +1,7 @@
 OUTPUT_ARCH(riscv)
 
 BASE_ADDRESS = 0xffffffc080200000;
+TASK_STACK_SIZE = 0x40000;
 
 ENTRY(_start)
 SECTIONS
@@ -49,8 +50,7 @@ SECTIONS
 
     .bss : ALIGN(4K) {
         boot_stack = .;
-        *(.bss.stack)
-        . = ALIGN(4K);
+        . = boot_stack + TASK_STACK_SIZE;
         boot_stack_top = .;
 
         sbss = .;
