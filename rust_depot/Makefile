@@ -88,7 +88,7 @@ components = \
 	bitmap_allocator buddy_system_allocator allocator \
 	axhal axalloc axlog axtask axruntime \
 	libax \
-	top_helloworld top_memtest \
+	top_helloworld top_memtest top_exception \
 	top_parallel top_sleep top_yield
 
 build: cargo_build $(components)
