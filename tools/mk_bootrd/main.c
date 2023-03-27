@@ -747,7 +747,7 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
         /* If profile exists, we just verify dependencies based on it;
          * Or we will create a profile and fill in all dependencies. */
         bool verify = true;
-        sprintf(filename, "./%s.json", mod->name);
+        sprintf(filename, "./%s/%s.json", kmod_dir, mod->name);
         json_object *json_top = json_object_from_file(filename);
         if (json_top != NULL) {
             json_object *json_fixups;
@@ -791,7 +791,7 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
                          strlen("top_hello_world")) == 0)
             hdr->current_profile = ftell(fp);
 #else
-        if (strncmp(mod->name, "top_sleep", strlen("top_sleep")) == 0)
+        if (strncmp(mod->name, "top_yield", strlen("top_yield")) == 0)
             hdr->current_profile = ftell(fp);
 #endif
 

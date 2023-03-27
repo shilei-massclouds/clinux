@@ -89,7 +89,7 @@ components = \
 	axhal axalloc axlog axtask axruntime \
 	libax \
 	top_helloworld top_memtest \
-	top_parallel top_sleep
+	top_parallel top_sleep top_yield
 
 build: cargo_build $(components)
 	@cp $(kernel_map) $(KMODULE_DIR)
@@ -117,7 +117,7 @@ debug: build
 	$(GDB) $(kernel_elf) -ex 'target remote localhost:1234'
 
 clean:
-	@rm -f $(KMODULE_DIR)/*.ko $(KMODULE_DIR)/startup.*
+	@rm -f `find $(KMODULE_DIR) ! -name README.md -type f`
 	@cargo clean
 
 clippy:
@@ -133,7 +133,7 @@ test_no_fail_fast:
 	cargo test --workspace --exclude "arceos-*" --exclude "libax_bindings" --no-fail-fast -- --nocapture
 
 bootrd: FORCE
-	@rm -f $< top_*.json
+	@rm -f $(KMODULE_DIR)/bootrd.disk $(KMODULE_DIR)/top_*.json
 	@ ../tools/mk_bootrd/mk_bootrd
 
 profiles:
