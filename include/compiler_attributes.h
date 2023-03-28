@@ -11,6 +11,13 @@
 
 #define __force
 
+/*
+ *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-format-function-attribute
+ * clang: https://clang.llvm.org/docs/AttributeReference.html#format
+ */
+#define __printf(a, b)  __attribute__((__format__(printf, a, b)))
+#define __scanf(a, b)   __attribute__((__format__(scanf, a, b)))
+
 #define likely(x)   (x)
 #define unlikely(x) (x)
 

@@ -9,7 +9,7 @@
 
 void do_exit(long code)
 {
-    panic("NOW user-space app exit! [%d]", code);
+    panic("NOW user-space app exit! [%ld]", code);
 }
 
 /*
@@ -21,7 +21,7 @@ _do_group_exit(int exit_code)
 {
     struct signal_struct *sig = current->signal;
 
-    printk("%s: ...\n", __func__);
+    pr_warn("%s: ...\n", __func__);
 
 #if 0
     if (sig->flags & SIGNAL_GROUP_EXIT)

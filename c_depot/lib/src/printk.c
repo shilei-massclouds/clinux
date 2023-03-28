@@ -26,20 +26,52 @@ EXPORT_SYMBOL(preferred_console);
 struct console *console_drivers;
 EXPORT_SYMBOL(console_drivers);
 
+/* Default Log level for console */
+int console_loglevel = 7;
+
+static void
+pre_print(int level)
+{
+    if (level >= 0 && level <= 3) {
+        sbi_puts(_CP_RESET);
+        sbi_puts(_CP_RED);
+    } else if (level == 4) {
+        sbi_puts(_CP_RESET);
+        sbi_puts(_CP_DARKRED);
+    } else if (level == 5 || level == 6) {
+        sbi_puts(_CP_RESET);
+        sbi_puts(_CP_BLUE);
+    }
+}
+
+static void
+post_print(int level)
+{
+    if (level >= 0 && level <= 6) {
+        sbi_puts(_CP_RESET);
+    }
+}
+
 static void
 vprintk_func(const char *fmt, va_list args)
 {
+    int kern_level;
     int offset = 0;
     static char textbuf[LOG_LINE_MAX];
 
     vsnprintf(textbuf, sizeof(textbuf), fmt, args);
 
-    if (printk_get_level(textbuf) != 0) {
+    if ((kern_level = printk_get_level(textbuf)) >= 0) {
+        if (kern_level >= console_loglevel)
+            return;
+
         /* skip log level tag (2 bytes) */
         offset = 2;
     }
 
+    pre_print(kern_level);
     sbi_puts(textbuf + offset);
+    post_print(kern_level);
 }
 
 void printk(const char *fmt, ...)
