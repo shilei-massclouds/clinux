@@ -11,8 +11,9 @@
 #define _CP_RESET   "\033[0m"
 #define _CP_RED     "\033[31;1m"
 #define _CP_GREEN   "\033[32;1m"
-#define _CP_DARKRED "\033[31;2m"
+#define _CP_YELLOW  "\033[33;1m"
 #define _CP_BLUE    "\033[34;1m"
+#define _CP_PURPLE  "\033[35;1m"
 
 #define _COLORED(text, color) _CP_RESET color text _CP_RESET
 

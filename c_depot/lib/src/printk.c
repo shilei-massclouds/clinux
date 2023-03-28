@@ -37,7 +37,7 @@ pre_print(int level)
         sbi_puts(_CP_RED);
     } else if (level == 4) {
         sbi_puts(_CP_RESET);
-        sbi_puts(_CP_DARKRED);
+        sbi_puts(_CP_PURPLE);
     } else if (level == 5 || level == 6) {
         sbi_puts(_CP_RESET);
         sbi_puts(_CP_BLUE);
