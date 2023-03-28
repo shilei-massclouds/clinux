@@ -71,3 +71,4 @@ output/*
 *_generated.h
 extern_rlib/*
 Cargo.lock
+c_depot/target/

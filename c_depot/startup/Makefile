@@ -15,6 +15,6 @@ obj_y += uaccess.o
 obj_y += sys_ni.o
 obj_y += syscalls.o
 obj_y += syscall_table.o
-obj_y += module_ops.o
 obj_y += setup.o
+obj_y += load_modules.o
 obj_y += init.o
