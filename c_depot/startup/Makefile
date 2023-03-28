@@ -18,6 +18,3 @@ obj_y += syscall_table.o
 obj_y += module_ops.o
 obj_y += setup.o
 obj_y += init.o
-
-extra_y := startup.lds
-elf_lds := startup.lds
