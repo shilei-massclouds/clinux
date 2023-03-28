@@ -26,7 +26,22 @@ predirs := prebuilt
 # All component subdir
 components := \
 	startup lib \
-	top_helloworld
+	rbtree radix_tree bitmap xarray hashtable \
+	early_dt of of_irq platform \
+	mm memblock buddy slab \
+	kalloc pgalloc gup readahead \
+	sched fork workqueue \
+	kobject irq softirq devres \
+	of_serial \
+	block genhd backing_dev \
+	bio iov_iter scatterlist mempool \
+	vma filemap ioremap \
+	intc plic \
+	virtio virtio_mmio virtio_blk \
+	dcache \
+	fs rootfs ramfs ext2 procfs \
+	sys userboot \
+	top_helloworld top_linux
 
 build: $(components)
 	@:
