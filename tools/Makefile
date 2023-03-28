@@ -2,7 +2,7 @@
 
 PHONY := all clean
 
-SUBDIRS := mk_rootfs mk_bootrd ch_bootrd json2md idl
+SUBDIRS := mk_rootfs mk_bootrd ch_bootrd json2md
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS))
 
