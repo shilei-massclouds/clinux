@@ -1,5 +1,0 @@
-interface ILib
-{
-    unsigned long find_next_bit(in sequence<unsigned long long> bitmap,
-                                in unsigned long offset);
-};

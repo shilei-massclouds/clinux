@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 
-PHONY := all clean run
+PHONY := all clean
 
 CC := gcc
 
@@ -19,8 +19,5 @@ $(TARGET): main.c
 
 clean:
 	@rm -rf *.o *.json $(TARGET)
-
-run: $(TARGET)
-	@:
 
 .PHONY: $(PHONY)

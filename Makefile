@@ -1,99 +1,24 @@
 # SPDX-License-Identifier: GPL-2.0
 
-include scripts/Makefile.include
+.PHONY: all tools clean dump run bootrd FORCE
 
-PHONY := all clean dump run profiles bootrd
+MAKE := @make --no-print-directory
 
-# Default module output directory
-export KMODULE_DIR := ./output
+all: tools
+	@$(MAKE) -C c_depot
 
-# Allows the usage of unstable features in stable compilers.
-export RUSTC_BOOTSTRAP := 1
-
-PREDIRS := prebuilt
-
-#rs_hello rs_ext2
-#top_arceos_hello top_arceos_memtest
-#top_arceos_multitask
-#top_arceos_echoserver
-modules := \
-	lib rbtree radix_tree hashtable bitmap \
-	workqueue scatterlist xarray mempool \
-	early_dt of of_serial of_irq platform \
-	intc plic irq softirq \
-	mm memblock pgalloc buddy slab kalloc \
-	vma ioremap gup devres \
-	fs dcache filemap readahead \
-	kobject bio iov_iter block genhd backing-dev \
-	fork sched \
-	virtio virtio_mmio virtio_blk \
-	ext2 ramfs rootfs procfs \
-	sys \
-	userboot \
-	rs_compiler_builtins rs_alloc rs_lib \
-	rs_memory_addr rs_allocator \
-	rs_page_table_entry rs_page_table \
-	rs_log rs_riscv rs_smoltcp rs_virtio_drivers \
-	rs_buddy_system_allocator rs_bitmap_allocator \
-	rs_driver_virtio rs_driver_net rs_driver_common \
-	axhal axlog axruntime axalloc axtask \
-	axdriver axnet axerror \
-	libax \
-	c_hello top_hello_world \
-	top_linux top_memory_addr \
-	#top_arceos_hello
-
-CLEAN_DIRS := $(addprefix _clean_, $(modules) $(PREDIRS))
-
-all: tools $(modules) startup/startup.bin
-	@cp ./startup/startup.map $(KMODULE_DIR)
-	@cp ./startup/startup.bin $(KMODULE_DIR)
-
-PHONY += prepare0
-prepare0:
-	@$(MAKE) -f ./scripts/Makefile.build obj=scripts/mod
-
-PHONY += $(PREDIRS)
-$(PREDIRS):
-	@$(MAKE) -f ./scripts/Makefile.build obj=$@
-
-PHONY += $(modules)
-$(modules): $(PREDIRS) prepare
-	@$(MAKE) -f ./scripts/Makefile.modpost obj=$@
-	@$(MAKE) -f ./scripts/Makefile.modfinal obj=$@
-	$(if $(filter-out startup, $@), @cp ./$@/*.ko $(KMODULE_DIR))
-
-PHONY += prepare
-prepare: prepare0
-	@:
-
-PHONY += tools
-tools:
+tools: FORCE
 	@$(MAKE) -C tools
 
-PHONY += $(CLEAN_DIRS)
-$(CLEAN_DIRS):
-	@$(MAKE) -f ./scripts/Makefile.clean obj=$@
+run: tools
+	@$(MAKE) -C c_depot run
 
-clean: $(CLEAN_DIRS)
-	@rm -f ./prebuilt/*.h ./prebuilt/*.s ./scripts/mod/modpost ./top*.json
+bootrd: tools
+	@$(MAKE) -C c_depot bootrd
+
+clean:
 	@$(MAKE) -C tools clean
-	@find $(KMODULE_DIR)/* | grep -v README.md | xargs rm -f
-
-$(KMODULE_DIR)/bootrd.disk:
-	@ ./tools/mk_bootrd/mk_bootrd
-
-bootrd: $(KMODULE_DIR)/bootrd.disk
-	@:
-
-run: all bootrd
-	@$(MAKE) -C tools run
-	@ ./scripts/qemu.sh
-
-profiles: bootrd
-	@ ./tools/ch_bootrd/ch_bootrd $(KMODULE_DIR)/bootrd.disk
+	@$(MAKE) -C c_depot clean
 
 dump:
 	$(OBJDUMP) -D -m riscv:rv64 -EL -b binary ./startup/startup.bin
-
-.PHONY: $(PHONY)

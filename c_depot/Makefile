@@ -11,6 +11,7 @@ qemu := qemu-system-$(ARCH)
 qemu_args := -m 512M
 qemu_args += \
 	-machine virt \
+    -cpu rv64 \
 	-bios default \
 	-kernel $(KMODULE_DIR)/startup.bin \
     -drive if=pflash,file=$(KMODULE_DIR)/bootrd.disk,format=raw,unit=1 \
