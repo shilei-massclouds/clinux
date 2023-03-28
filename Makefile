@@ -17,7 +17,7 @@ PREDIRS := prebuilt
 #top_arceos_multitask
 #top_arceos_echoserver
 modules := \
-	startup lib rbtree radix_tree hashtable bitmap \
+	lib rbtree radix_tree hashtable bitmap \
 	workqueue scatterlist xarray mempool \
 	early_dt of of_serial of_irq platform \
 	intc plic irq softirq \

@@ -16,4 +16,4 @@ sudo cp ./init ./fs/sbin/
 #sudo cp /usr/riscv64-linux-gnu/lib/libc.so.6 ./fs/lib
 sudo umount ./fs
 mkdir ~/gitStudy/qemu/image/ 2>/dev/null
-cp ./rootfs.ext2 ~/gitStudy/qemu/image/test.raw
+cp ./rootfs.ext2 /tmp/disk.img

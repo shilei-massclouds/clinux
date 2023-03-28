@@ -19,6 +19,7 @@ qemu_args += \
 	-device virtio-net-device,netdev=net0 \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
 	-nographic \
+    -append "earlycon=sbi root=/dev/vda rw console=ttyS0" \
     #-d in_asm -D /tmp/insturction.log
 
 predirs := prebuilt
