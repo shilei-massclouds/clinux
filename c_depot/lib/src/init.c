@@ -5,7 +5,7 @@
 int
 init_module(void)
 {
-    //printk("module[lib]: init begin ...\n");
-    //printk("module[lib]: init end!\n");
+    printk("module[lib]: init begin ...\n");
+    printk("module[lib]: init end!\n");
     return 0;
 }

@@ -505,7 +505,7 @@ copy_mod_to_temp_area(uintptr_t src)
 {
     Elf64_Ehdr *hdr = (Elf64_Ehdr *) src;
     /* HACK! e_phoff holds size of this module */
-#if 1
+#if 0
     if (hdr->e_phoff >= (PMD_SIZE * 3 / 4)) {
         sbi_puts("mod is too large [");
         sbi_put_u64(hdr->e_phoff);
@@ -546,13 +546,13 @@ init_other_modules(void)
 
         move_module(dst_addr, &info);
 
-#if 1
+#if 0
     sbi_puts("1[");
     sbi_put_u64(dst_addr);
     sbi_puts("]\n");
 #endif
         simplify_symbols(&info);
-#if 1
+#if 0
     sbi_puts("2[");
     sbi_put_u64(dst_addr);
     sbi_puts("]\n");
@@ -573,18 +573,19 @@ void load_modules(void)
 {
     struct module *mod;
 
-    sbi_puts("startup: load_frame ...\n");
+    sbi_puts("startup: init framework ...\n");
 
     init_kernel_module();
 
-    sbi_puts("startup: load_modules ...\n");
+    sbi_puts("startup: load all components ...\n");
 
     init_other_modules();
 
-    sbi_puts("startup: init_modules ...\n");
+    sbi_puts("startup: prepare init components ...\n");
+
     list_for_each_entry(mod, &modules, list) {
         do_init_module(mod);
     }
 
-    sbi_puts("startup: load_modules ok!\n");
+    sbi_puts("startup: init components ok!\n");
 }
