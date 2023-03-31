@@ -155,7 +155,7 @@ long _do_fork(struct kernel_clone_args *args)
 
     p = copy_process(NULL, args);
     if (IS_ERR(p))
-        panic("copy process error(%d)", PTR_ERR(p));
+        panic("copy process error(%ld)", PTR_ERR(p));
 
     wake_up_new_task(p);
     return 0;

@@ -21,12 +21,7 @@
  * Dummy printk for disabled debugging statements to use whilst maintaining
  * gcc's format checking.
  */
-#define no_printk(fmt, ...)				\
-({							\
-	if (0)						\
-		printk(fmt, ##__VA_ARGS__);		\
-	0;						\
-})
+#define no_printk(fmt, ...)
 
 /**
  * pr_fmt - used by the pr_*() macros to generate the printk format string

@@ -199,11 +199,11 @@ __of_translate_address(struct device_node *dev,
         pbus = of_match_bus(parent);
         pbus->count_cells(dev, &pna, &pns);
         if (!OF_CHECK_COUNTS(pna, pns)) {
-            panic("Bad cell count for %lxOF", dev);
+            panic("Bad cell count for %p", dev);
             break;
         }
 
-        pr_debug("parent bus is %s (na=%d, ns=%d) on %lxOF\n",
+        pr_debug("parent bus is %s (na=%d, ns=%d) on %p\n",
                  pbus->name, pna, pns, parent);
 
         /* Apply bus translation */

@@ -165,7 +165,7 @@ __get_user_pages(struct mm_struct *mm,
              */
             goto next_page;
         } else if (IS_ERR(page)) {
-            panic("follow page error: %d", PTR_ERR(page));
+            panic("follow page error: %ld", PTR_ERR(page));
         }
 
         if (pages) {
@@ -183,7 +183,7 @@ __get_user_pages(struct mm_struct *mm,
         nr_pages -= page_increm;
     } while (nr_pages);
 
-    printk("%s: !(%d) nr_pages(%u)\n", __func__, i, nr_pages);
+    printk("%s: !(%ld) nr_pages(%lu)\n", __func__, i, nr_pages);
     return i ? i : ret;
 }
 

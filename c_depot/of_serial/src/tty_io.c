@@ -36,7 +36,7 @@ tty_lookup_driver(dev_t device, struct file *filp, int *index)
         panic("no driver!");
         break;
     }
-    printk("%s: ! %lx\n", __func__, driver);
+    printk("%s: ! %p\n", __func__, driver);
     return driver;
 }
 
@@ -134,7 +134,7 @@ tty_open_by_driver(dev_t device, struct file *filp)
         tty = tty_init_dev(driver, index);
     }
 
-    printk("%s: device(%lx) tty(%lx)!\n", __func__, device, tty);
+    printk("%s: device(%d) tty(%p)!\n", __func__, device, tty);
     return tty;
 }
 
@@ -179,7 +179,7 @@ static int tty_open(struct inode *inode, struct file *filp)
     if (IS_ERR_OR_NULL(tty))
         panic("open by driver error!");
 
-    printk("%s: 1 ops(%lx)\n", __func__, tty->ops);
+    printk("%s: 1 ops(%p)\n", __func__, tty->ops);
     tty_add_file(tty, filp);
 
     if (tty->ops->open)
@@ -193,7 +193,7 @@ static int tty_open(struct inode *inode, struct file *filp)
         panic("open tty error!");
 
     clear_bit(TTY_HUPPED, &tty->flags);
-    printk("%s: device(%lx)!\n", __func__, device);
+    printk("%s: device(%x)!\n", __func__, device);
     return 0;
 }
 
@@ -386,7 +386,7 @@ tty_register_device_attr(struct tty_driver *driver,
     dev_set_name(dev, "%s", name);
     dev_set_drvdata(dev, drvdata);
 
-    printk("%s: devt(%lx) (%lx,%lx)\n",
+    printk("%s: devt(%x) (%x,%x)\n",
            __func__, devt, driver->major, driver->minor_start);
 
     if (!(driver->flags & TTY_DRIVER_DYNAMIC_ALLOC)) {

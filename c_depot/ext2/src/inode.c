@@ -35,7 +35,7 @@ ext2_get_inode(struct super_block *sb, ino_t ino, struct buffer_head **p)
     if (!(bh = sb_bread_unmovable(sb, block)))
         panic("bad io!");
 
-    printk("%s: ino(%u) bg_inode_table(%lu) offset(%lu) block(%lu)\n",
+    printk("%s: ino(%lu) bg_inode_table(%u) offset(%lu) block(%lu)\n",
            __func__, ino, gdp->bg_inode_table, offset, block);
 
     *p = bh;

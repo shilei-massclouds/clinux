@@ -260,7 +260,7 @@ virtblk_update_capacity(struct virtio_blk *vblk, bool resize)
     struct virtio_device *vdev = vblk->vdev;
     struct request_queue *q = vblk->disk->queue;
     char cap_str_2[10], cap_str_10[10];
-    unsigned long long nblocks;
+    unsigned long nblocks;
     u64 capacity;
 
     /* Host must always specify the capacity. */
@@ -269,7 +269,7 @@ virtblk_update_capacity(struct virtio_blk *vblk, bool resize)
     /* If capacity is too big, truncate with warning. */
     if ((sector_t)capacity != capacity) {
         panic("Capacity %lu too large: truncating\n",
-              (unsigned long long)capacity);
+              (unsigned long)capacity);
         capacity = (sector_t)-1;
     }
 

@@ -186,7 +186,7 @@ void _do_page_fault(struct pt_regs *regs)
     cause = regs->cause;
     addr = regs->badaddr;
 
-    printk("--- --- %s: cause(%x) addr(%p)\n",
+    printk("--- --- %s: cause(%lx) addr(%ld)\n",
            __func__, cause, addr);
 
     tsk = current;

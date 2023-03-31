@@ -105,7 +105,6 @@ sb_bread(struct super_block *sb, sector_t block)
 static inline struct buffer_head *
 sb_bread_unmovable(struct super_block *sb, sector_t block)
 {
-    printk("### %s: (%u)\n", __func__, block);
     return __bread_gfp(sb->s_bdev, block, sb->s_blocksize, 0);
 }
 

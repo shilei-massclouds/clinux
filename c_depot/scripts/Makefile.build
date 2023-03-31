@@ -85,7 +85,7 @@ $(TARGET_DIR)/$(obj).elf: $(obj_y) $(elf_lds)
 
 $(TARGET_DIR)/%.o: $(obj)/src/%.c
 	@printf "CC\t$<\n"
-	$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
+	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
 
 $(elf_lds): $(obj)/src/$(obj).lds.S
 	@printf "AS\t$<\n"

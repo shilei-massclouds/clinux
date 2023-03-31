@@ -51,7 +51,7 @@ ondemand_readahead(struct address_space *mapping,
     ra->size = get_init_ra_size(req_size, max_pages);
     ra->async_size = ra->size > req_size ? ra->size - req_size : ra->size;
 
-    printk("%s: ra_pages(%lu) max_pages(%lu) io_pages(%lu) req_size(%lu) (%lu, %lu)\n",
+    printk("%s: ra_pages(%u) max_pages(%lu) io_pages(%lu) req_size(%lu) (%u, %u)\n",
            __func__, ra->ra_pages, max_pages, bdi->io_pages, req_size,
            ra->size, ra->async_size);
 

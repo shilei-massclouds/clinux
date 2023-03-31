@@ -134,7 +134,7 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
         if (port->cons && !(port->cons->flags & CON_ENABLED)) {
             register_console(port->cons);
         }
-        printk("%s: 1 cons(%lx)\n", __func__, port->cons);
+        printk("%s: 1 cons(%p)\n", __func__, port->cons);
     }
 }
 
@@ -240,7 +240,7 @@ int serial8250_register_8250_port(struct uart_8250_port *up)
         } else {
             printk("skipping CIR port at 0x%lx / 0x%lx, IRQ %d\n",
                    uart->port.iobase,
-                   (unsigned long long)uart->port.mapbase,
+                   (unsigned long)uart->port.mapbase,
                    uart->port.irq);
 
             ret = 0;

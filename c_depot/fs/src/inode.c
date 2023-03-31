@@ -66,7 +66,7 @@ inode_init_always(struct super_block *sb, struct inode *inode)
 
     mapping->a_ops = &empty_aops;
     mapping->host = inode;
-    printk("%s: host(%lx)\n", __func__, inode);
+    printk("%s: host(%p)\n", __func__, inode);
     return 0;
 }
 

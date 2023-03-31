@@ -112,7 +112,7 @@ vfs_write(struct file *file, const char *buf, size_t count, loff_t *pos)
         panic("no write_iter!");
     else
         ret = -EINVAL;
-    printk("%s: ret(%d)\n", __func__, ret);
+    printk("%s: ret(%ld)\n", __func__, ret);
     return ret;
 }
 EXPORT_SYMBOL(vfs_write);

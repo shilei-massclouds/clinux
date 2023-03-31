@@ -460,7 +460,7 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
 {
     pte_t entry;
 
-    printk("--- %s: vmf: addr(%x) flags(%x) pgoff(%x)\n",
+    printk("--- %s: vmf: addr(%lx) flags(%x) pgoff(%lx)\n",
            __func__, vmf->address, vmf->flags, vmf->pgoff);
     if (unlikely(pmd_none(*vmf->pmd))) {
         /*
@@ -650,7 +650,7 @@ vm_fault_t alloc_set_pte(struct vm_fault *vmf, struct page *page)
     } else {
         page_add_file_rmap(page, false);
     }
-    printk("%s: addr(%x) entry(%x)\n", __func__, vmf->address, entry);
+    printk("%s: addr(%lx) entry(%lx)\n", __func__, vmf->address, entry.pte);
     set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);
     /* no need to invalidate: a not-present page won't be cached */
     update_mmu_cache(vma, vmf->address, vmf->pte);
@@ -705,7 +705,7 @@ long _do_sys_brk(unsigned long brk)
     /* Check against existing mmap mappings. */
     next = find_vma(mm, oldbrk);
 
-    printk("%s 2: brk(%lx) min_brk(%lx) next(%lx) newbrk(%lx)\n",
+    printk("%s 2: brk(%lx) min_brk(%lx) next(%p) newbrk(%lx)\n",
            __func__, brk, min_brk, next, newbrk);
 
     if (next && newbrk + PAGE_SIZE > vm_start_gap(next))

@@ -115,8 +115,8 @@ ext2_find_entry(struct inode *dir, const struct qstr *child,
         /* next page is past the blocks we've got */
         if (unlikely(n > (dir->i_blocks >> (PAGE_SHIFT - 9))))
             panic("dir %lu size %ld exceeds block count %lu",
-                  dir->i_ino, dir->i_size,
-                  (unsigned long long)dir->i_blocks);
+                  dir->i_ino, (long)dir->i_size,
+                  (unsigned long)dir->i_blocks);
 
     } while(n != start);
 

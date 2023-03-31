@@ -451,8 +451,8 @@ early_init_dt_scan_memory(unsigned long node,
             continue;
 
         printk(" - %lx ,  %lx\n",
-               (unsigned long long)base,
-               (unsigned long long)size);
+               (unsigned long)base,
+               (unsigned long)size);
 
         early_init_dt_add_memory_arch(base, size);
     }

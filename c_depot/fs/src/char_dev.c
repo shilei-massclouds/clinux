@@ -41,7 +41,7 @@ int cdev_add(struct cdev *p, dev_t dev, unsigned count)
 {
     int error;
 
-    printk("%s: dev(%lx) count(%u)\n", __func__, dev, count);
+    printk("%s: dev(%x) count(%u)\n", __func__, dev, count);
 
     p->dev = dev;
     p->count = count;
@@ -78,7 +78,7 @@ static int chrdev_open(struct inode *inode, struct file *filp)
         struct kobject *kobj;
         kobj = kobj_lookup(cdev_map, inode->i_rdev, &idx);
         if (!kobj) {
-            panic("no i_rdev(%lx)", inode->i_rdev);
+            panic("no i_rdev(%x)", inode->i_rdev);
             return -ENXIO;
         }
         new = container_of(kobj, struct cdev, kobj);
@@ -92,7 +92,7 @@ static int chrdev_open(struct inode *inode, struct file *filp)
         } else if (!cdev_get(p))
             ret = -ENXIO;
 
-        printk("%s: i_cdev(%lx)\n", __func__, inode->i_cdev);
+        printk("%s: i_cdev(%p)\n", __func__, inode->i_cdev);
     } else if (!cdev_get(p))
         ret = -ENXIO;
 

@@ -374,13 +374,13 @@ __devm_ioremap_resource(struct device *dev,
         return IOMEM_ERR_PTR(-ENOMEM);
 
     if (!devm_request_mem_region(dev, res->start, size, pretty_name)) {
-        panic("can't request region for resource %lxR\n", res);
+        panic("can't request region for resource %p\n", res);
         return IOMEM_ERR_PTR(-EBUSY);
     }
 
     dest_ptr = __devm_ioremap(dev, res->start, size, type);
     if (!dest_ptr) {
-        panic("ioremap failed for resource %lxR\n", res);
+        panic("ioremap failed for resource %p\n", res);
         devm_release_mem_region(dev, res->start, size);
         dest_ptr = IOMEM_ERR_PTR(-ENOMEM);
     }

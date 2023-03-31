@@ -100,7 +100,7 @@ irq_domain_translate(struct irq_domain *d,
                      struct irq_fwspec *fwspec,
                      irq_hw_number_t *hwirq, unsigned int *type)
 {
-    printk("%s: 1 ops(%lx) translate\n", __func__, d->ops);
+    printk("%s: 1 ops(%p) translate\n", __func__, d->ops);
     if (d->ops->translate)
         return d->ops->translate(d, fwspec, hwirq, type);
     if (d->ops->xlate) {
@@ -223,7 +223,7 @@ __irq_domain_add(struct fwnode_handle *fwnode, int size,
     domain->revmap_size = size;
     irq_domain_check_hierarchy(domain);
 
-    printk("%s: ops(%lx)\n", __func__, ops);
+    printk("%s: ops(%p)\n", __func__, ops);
     list_add(&domain->link, &irq_domain_list);
     return domain;
 }
@@ -431,7 +431,7 @@ irq_find_mapping(struct irq_domain *domain, irq_hw_number_t hwirq)
 
     BUG_ON(domain == NULL);
 
-    printk("%s: %u, %u\n",
+    printk("%s: %lu, %u\n",
            __func__, hwirq, domain->revmap_size);
 
     /* Check if the hwirq is in the linear revmap. */

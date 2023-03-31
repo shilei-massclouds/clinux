@@ -192,7 +192,7 @@ vm_setup_vq(struct virtio_device *vdev, unsigned index,
 
     if (vm_dev->version != 1)
         panic("version is NOT 1!");
-    printk("### virtio mmio version (%u)\n", vm_dev->version);
+    printk("### virtio mmio version (%lu)\n", vm_dev->version);
 
     /* Queue shouldn't already be set up. */
     if (readl(vm_dev->base + VIRTIO_MMIO_QUEUE_PFN)) {
@@ -237,8 +237,8 @@ vm_setup_vq(struct virtio_device *vdev, unsigned index,
      * pretending to be successful.
      */
     if (q_pfn >> 32) {
-        panic("platform bug: legacy virtio-mmio must not be used with RAM above 0x%lxGB",
-              0x1ULL << (32 + PAGE_SHIFT - 30));
+        panic("platform bug: legacy virtio-mmio must not be used with RAM above 0x%lx",
+              0x1UL << (32 + PAGE_SHIFT - 30));
     }
 
     writel(PAGE_SIZE, vm_dev->base + VIRTIO_MMIO_QUEUE_ALIGN);

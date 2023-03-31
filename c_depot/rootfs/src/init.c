@@ -101,7 +101,7 @@ name_to_dev_t(const char *name)
     name += 5;
 
     if (strlen(name) > 31)
-        panic("bad name(%s)!");
+        panic("bad name(%s)!", name);
 
     strcpy(s, name);
     for (p = s; *p; p++) {

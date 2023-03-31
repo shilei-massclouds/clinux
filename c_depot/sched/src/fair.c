@@ -185,7 +185,7 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
             break;
 
         cfs_rq = cfs_rq_of(se);
-        printk("%s: cfs_rq(%lx)\n", __func__, cfs_rq);
+        printk("%s: cfs_rq(%p)\n", __func__, cfs_rq);
         enqueue_entity(cfs_rq, se, flags);
 
         flags = ENQUEUE_WAKEUP;

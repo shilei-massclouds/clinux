@@ -475,7 +475,7 @@ __unflatten_device_tree(const void *blob,
 	int size;
 	void *mem;
 
-    printk(" -> unflatten_device_tree() blob(%lx)\n", blob);
+    printk(" -> unflatten_device_tree() blob(%p)\n", blob);
 
     if (!blob) {
         printk("No device tree pointer\n");
@@ -508,7 +508,7 @@ __unflatten_device_tree(const void *blob,
 
 	*(u32 *)(mem + size) = cpu_to_be32(0xdeadbeef);
 
-	printk("  unflattening %lx...\n", mem);
+	printk("  unflattening %p...\n", mem);
 
 	/* Second pass, do actual unflattening */
 	unflatten_dt_nodes(blob, mem, dad, mynodes);

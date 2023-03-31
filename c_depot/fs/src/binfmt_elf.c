@@ -237,7 +237,7 @@ create_elf_tables(struct linux_binprm *bprm, const struct elfhdr *exec,
             panic("put argv to userspace error!");
         len = strnlen_user((void *)p, MAX_ARG_STRLEN);
         if (!len || len > MAX_ARG_STRLEN)
-            panic("bad len(%u)!", len);
+            panic("bad len(%lu)!", len);
         p += len;
     }
     if (put_user(0, sp++))

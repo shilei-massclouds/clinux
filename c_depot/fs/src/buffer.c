@@ -81,7 +81,7 @@ __find_get_block_slow(struct block_device *bdev, sector_t block)
     bh = head;
     do {
         if (!buffer_mapped(bh)) {
-            panic("%s: all_mapped");
+            panic("%s: all_mapped", __func__);
         } else if (bh->b_blocknr == block) {
             return bh;
         }

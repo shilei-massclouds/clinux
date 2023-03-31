@@ -117,7 +117,7 @@ radix_tree_extend(struct radix_tree_root *root,
     if (!entry)
         return maxshift + RADIX_TREE_MAP_SHIFT;
 
-    panic("%s: (%u, %u, %u)!", __func__, index, shift);
+    panic("%s: (%lu, %u)!", __func__, index, shift);
 }
 
 static struct radix_tree_node *

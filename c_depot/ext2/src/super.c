@@ -70,10 +70,10 @@ ext2_fill_super(struct super_block *sb, void *data, int silent)
     if (blocksize != BLOCK_SIZE) {
         logic_sb_block = (sb_block*BLOCK_SIZE) / blocksize;
         offset = (sb_block*BLOCK_SIZE) % blocksize;
-        printk("%s: 1 logic_sb_block(%lu, %lu)\n", __func__, logic_sb_block, BLOCK_SIZE);
+        printk("%s: 1 logic_sb_block(%lu, %u)\n", __func__, logic_sb_block, BLOCK_SIZE);
     } else {
         logic_sb_block = sb_block;
-        printk("%s: 2 logic_sb_block(%lu, %lu)\n", __func__, logic_sb_block, BLOCK_SIZE);
+        printk("%s: 2 logic_sb_block(%lu, %u)\n", __func__, logic_sb_block, BLOCK_SIZE);
     }
 
     if (!(bh = sb_bread_unmovable(sb, logic_sb_block)))
@@ -89,7 +89,7 @@ ext2_fill_super(struct super_block *sb, void *data, int silent)
             panic("bad blocksize %d", blocksize);
 
         logic_sb_block = (sb_block * BLOCK_SIZE) / blocksize;
-        printk("%s: logic_sb_block(%lu) blocksize(%lu) sb_block(%lu)\n",
+        printk("%s: logic_sb_block(%lu) blocksize(%u) sb_block(%lu)\n",
                __func__, logic_sb_block, blocksize, sb_block);
         offset = (sb_block*BLOCK_SIZE) % blocksize;
         bh = sb_bread_unmovable(sb, logic_sb_block);
@@ -147,10 +147,10 @@ ext2_fill_super(struct super_block *sb, void *data, int silent)
 
     root = ext2_iget(sb, EXT2_ROOT_INO);
     if (IS_ERR(root))
-        panic("can not get root inode! (%d)!", PTR_ERR(root));
+        panic("can not get root inode! (%ld)!", PTR_ERR(root));
 
     printk("%s: isdir(%d) i_blocks(%lu) i_size(%lu)\n",
-           __func__, S_ISDIR(root->i_mode), root->i_blocks, root->i_size);
+           __func__, S_ISDIR(root->i_mode), root->i_blocks, (unsigned long)root->i_size);
 
     if (!S_ISDIR(root->i_mode) || !root->i_blocks || !root->i_size)
         panic("error: corrupt root inode, run e2fsck");

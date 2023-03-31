@@ -512,7 +512,7 @@ int setup_arg_pages(struct linux_binprm *bprm,
     vm_flags |= VM_STACK_INCOMPLETE_SETUP;
 
     if (unlikely(vm_flags & VM_EXEC)) {
-        panic("process '%lx' started with executable stack", bprm->file);
+        panic("process '%p' started with executable stack", bprm->file);
     }
 
     /* mprotect_fixup is overkill to remove the temporary stack flags */

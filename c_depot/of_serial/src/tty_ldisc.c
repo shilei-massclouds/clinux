@@ -82,7 +82,7 @@ int tty_register_ldisc(int disc, struct tty_ldisc_ops *new_ldisc)
     if (disc < N_TTY || disc >= NR_LDISCS)
         return -EINVAL;
 
-    printk("%s: disc(%d) ldisc(%lx)\n", __func__, disc, new_ldisc);
+    printk("%s: disc(%d) ldisc(%p)\n", __func__, disc, new_ldisc);
     tty_ldiscs[disc] = new_ldisc;
     new_ldisc->num = disc;
     return ret;

@@ -248,7 +248,7 @@ handle_mounts(struct nameidata *nd, struct dentry *dentry,
 
     path->mnt = nd->path.mnt;
     path->dentry = dentry;
-    printk("%s: 1 dir(%s) flags(%lx)\n",
+    printk("%s: 1 dir(%s) flags(%u)\n",
            __func__, path->dentry->d_name.name, nd->flags);
     if (nd->flags & LOOKUP_RCU) {
         if (unlikely(!*inode))
@@ -286,7 +286,7 @@ step_into(struct nameidata *nd, struct dentry *dentry, struct inode *inode)
     if (err < 0)
         return ERR_PTR(err);
 
-    printk("%s: dentry(%s) inode(%lx)\n",
+    printk("%s: dentry(%s) inode(%p)\n",
            __func__, dentry->d_name.name, inode);
 
     nd->path = path;
@@ -320,7 +320,7 @@ __lookup_slow(const struct qstr *name, struct dentry *dir,
     if (unlikely(!d_in_lookup(dentry))) {
         panic("not in lookup!");
     } else {
-        printk("%s: 1 dir(%s) inode(%lx)\n",
+        printk("%s: 1 dir(%s) inode(%p)\n",
                __func__, dir->d_name.name, inode);
         old = inode->i_op->lookup(inode, dentry, flags);
         printk("%s: 2\n", __func__);
@@ -361,7 +361,7 @@ walk_component(struct nameidata *nd)
         return ERR_CAST(dentry);
     if (unlikely(!dentry)) {
         dentry = lookup_slow(&nd->last, nd->path.dentry, nd->flags);
-        printk("%s: 1 dentry(%lx)\n", __func__, dentry);
+        printk("%s: 1 dentry(%p)\n", __func__, dentry);
         if (IS_ERR(dentry))
             return ERR_CAST(dentry);
     }
@@ -587,15 +587,9 @@ path_lookupat(struct nameidata *nd, unsigned flags, struct path *path)
     int err;
     const char *s = path_init(nd, flags);
 
-    printk(">>>>>>>>>>>>>>>>>> %s 1: name(%s) dir(%s) flags(%lx)\n",
-           __func__, s, nd->path.dentry->d_name.name, nd->flags);
-
     while (!(err = link_path_walk(s, nd)) &&
            (s = lookup_last(nd)) != NULL)
         ;
-
-    printk(">>>>>>>>>>>>>>>>>> %s 2: name(%s) dir(%s) err(%d)\n",
-           __func__, s, nd->path.dentry->d_name.name, err);
 
     if (!err) {
         *path = nd->path;
@@ -639,7 +633,7 @@ lookup_open(struct nameidata *nd, struct file *file,
     struct dentry *dir = nd->path.dentry;
     struct inode *dir_inode = dir->d_inode;
 
-    printk("### %s: (%lx)\n", __func__, nd->path.dentry->d_inode);
+    printk("### %s: (%p)\n", __func__, nd->path.dentry->d_inode);
 
     file->f_mode &= ~FMODE_CREATED;
     dentry = d_lookup(dir, &nd->last);
@@ -702,7 +696,7 @@ open_last_lookups(struct nameidata *nd,
         if (likely(dentry))
             goto finish_lookup;
     } else {
-        panic("create things! open_flag(%lx) (%s)",
+        panic("create things! open_flag(%d) (%s)",
               open_flag, nd->last.name);
     }
 

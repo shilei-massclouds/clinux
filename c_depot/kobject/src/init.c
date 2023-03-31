@@ -171,7 +171,7 @@ kobject_add_internal(struct kobject *kobj)
     if (kobj->kset)
         kobj_kset_join(kobj);
 
-    printk("kobject: '%s' (%lx): %s: set: '%s'\n",
+    printk("kobject: '%s' (%p): %s: set: '%s'\n",
            kobject_name(kobj), kobj, __func__,
            kobj->kset ? kobject_name(&kobj->kset->kobj) : "<NULL>");
 

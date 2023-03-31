@@ -42,7 +42,7 @@ static void riscv_intc_irq_mask(struct irq_data *d)
 
 static void riscv_intc_irq_unmask(struct irq_data *d)
 {
-    printk("### %s ###: hwirq(0x%x) irq(0x%x) chip(%s) domain(%s)\n",
+    printk("### %s ###: hwirq(0x%lx) irq(0x%x) chip(%s) domain(%s)\n",
            __func__, d->hwirq, d->irq, d->chip->name, d->domain->name);
 
     csr_set(CSR_IE, BIT(d->hwirq));

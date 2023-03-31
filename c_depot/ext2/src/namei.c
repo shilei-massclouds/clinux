@@ -14,9 +14,7 @@ ext2_lookup(struct inode *dir, struct dentry *dentry, unsigned int flags)
     if (dentry->d_name.len > EXT2_NAME_LEN)
         return ERR_PTR(-ENAMETOOLONG);
 
-    printk("%s: ===================== 1\n", __func__);
     res = ext2_inode_by_name(dir, &dentry->d_name, &ino);
-    printk("%s: ===================== 2\n", __func__);
     if (res) {
         if (res != -ENOENT)
             return ERR_PTR(res);
@@ -26,7 +24,6 @@ ext2_lookup(struct inode *dir, struct dentry *dentry, unsigned int flags)
         if (inode == ERR_PTR(-ESTALE))
             panic("deleted inode referenced: %lu", (unsigned long) ino);
     }
-    printk("%s: ===================== 3 inode(%lx)\n", __func__, inode);
     return d_splice_alias(inode, dentry);
 }
 

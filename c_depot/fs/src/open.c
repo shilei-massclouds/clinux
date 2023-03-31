@@ -234,7 +234,7 @@ do_sys_openat2(int dfd, const char *filename, struct open_how *how)
         }
     }
 
-    printk("%s: fd(%d) filename(%s) flags(%x) mode(%x)!\n",
+    printk("%s: fd(%d) filename(%s) flags(%lx) mode(%lx)!\n",
           __func__, fd, filename, how->flags, how->mode);
     return fd;
 }
