@@ -61,7 +61,9 @@ tools/mk_bootrd/mk_bootrd
 tools/ch_bootrd/ch_bootrd
 tools/json2md/json2md
 scripts/mod/modpost
-output/*
+output/*.ko
+output/*.disk
+output/apps/*.ko
 *.json
 *.rmeta
 *.mod.c

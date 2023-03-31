@@ -65,9 +65,9 @@ endef
 _build: $(target_y)
 	@:
 
-$(TARGET_DIR)/$(obj).ko: $(obj_y) $(mod_lds)
+$(TARGET_DIR)/$(obj).ko: $(obj_y) $(top)/$(mod_lds)
 	@printf "LD\t$@\n"
-	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(obj_y)
+	@$(LD) -r $(LDFLAGS) -T $(top)/$(mod_lds) -o $@ $(obj_y)
 	@cp $@ $(KMODULE_DIR)
 
 $(TARGET_DIR)/$(obj).bin: $(TARGET_DIR)/$(obj).elf $(TARGET_DIR)/$(obj).map
@@ -85,7 +85,7 @@ $(TARGET_DIR)/$(obj).elf: $(obj_y) $(elf_lds)
 
 $(TARGET_DIR)/%.o: $(obj)/src/%.c
 	@printf "CC\t$<\n"
-	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_$(@F)) $(INCLUDES) -c -o $@ $<
 
 $(elf_lds): $(obj)/src/$(obj).lds.S
 	@printf "AS\t$<\n"

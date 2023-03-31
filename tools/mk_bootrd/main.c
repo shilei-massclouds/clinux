@@ -69,7 +69,7 @@ check_module(const char *name)
         return false;
 
     p = strrchr(name, '.');
-    return !strcmp(p, ".ko");
+    return p && !strcmp(p, ".ko");
 }
 
 static void

@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0
 ARCH ?= riscv64
 
+export top = .
 export MAKE := @make --no-print-directory
 
 # Default module output directory
-export KMODULE_DIR = ../output
+export KMODULE_DIR = $(top)/../output
 
 # QEMU
 qemu := qemu-system-$(ARCH)
@@ -45,8 +46,11 @@ components := \
 	sys userboot \
 	top_helloworld top_linux
 
-build: $(components)
+build: apps
 	@:
+
+apps: $(components) FORCE
+	@$(MAKE) -C apps
 
 $(components): $(predirs) FORCE
 	@mkdir -p ./target/$@
@@ -64,6 +68,7 @@ justrun:
 clean:
 	@rm -f `find $(KMODULE_DIR) ! -name README.md -type f`
 	@rm -rf ./target
+	@$(MAKE) -C apps clean
 
 bootrd: FORCE
 	@rm -f $(KMODULE_DIR)/bootrd.disk $(KMODULE_DIR)/top_*.json
@@ -74,4 +79,4 @@ profiles:
 
 FORCE:
 
-.PHONY: build components predirs clean FORCE
+.PHONY: build components apps predirs clean FORCE
