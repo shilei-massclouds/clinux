@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-2.0
-ARCH ?= riscv64
 
 export top = .
 export MAKE := @make --no-print-directory
@@ -8,7 +7,7 @@ export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(top)/../output
 
 # QEMU
-qemu := qemu-system-$(ARCH)
+qemu := qemu-system-riscv64
 qemu_args := -m 512M
 qemu_args += \
 	-machine virt \
