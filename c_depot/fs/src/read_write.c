@@ -112,7 +112,7 @@ vfs_write(struct file *file, const char *buf, size_t count, loff_t *pos)
         panic("no write_iter!");
     else
         ret = -EINVAL;
-    printk("%s: ret(%ld)\n", __func__, ret);
+    pr_debug("%s: ret(%ld)\n", __func__, ret);
     return ret;
 }
 EXPORT_SYMBOL(vfs_write);
@@ -123,9 +123,7 @@ _ksys_write(unsigned int fd, const char *buf, size_t count)
     ssize_t ret = -EBADF;
     struct fd f = fdget_pos(fd);
 
-    printk("%s: 1 fd(%u)\n", __func__, fd);
     if (f.file) {
-        printk("%s: 2\n", __func__);
         loff_t pos, *ppos = file_ppos(f.file);
         if (ppos) {
             pos = *ppos;

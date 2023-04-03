@@ -110,7 +110,6 @@ ext2_get_branch(struct inode *inode, int depth, int *offsets,
     *err = 0;
     /* i_data is not going away, no lock needed */
     add_chain(chain, NULL, EXT2_I(inode)->i_data + *offsets);
-    printk("%s 1: key(%x) %x\n", __func__, p->key, *(EXT2_I(inode)->i_data));
     if (!p->key)
         panic("no block!");
     while (--depth) {
@@ -262,8 +261,6 @@ struct inode *ext2_iget(struct super_block *sb, unsigned long ino)
     raw_inode = ext2_get_inode(inode->i_sb, ino, &bh);
     if (IS_ERR(raw_inode))
         panic("bad inode!");
-
-    printk("%s: i_block0(%x)\n", __func__, raw_inode->i_block[0]);
 
     inode->i_mode = raw_inode->i_mode;
     inode->i_size = raw_inode->i_size;

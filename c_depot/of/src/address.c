@@ -49,8 +49,8 @@ of_bus_default_map(u32 *addr, const u32 *range,
     da = of_read_number(addr, na);
 
     pr_debug("default map, cp=%lx, s=%lx, da=%lx\n",
-             (unsigned long long)cp, (unsigned long long)s,
-             (unsigned long long)da);
+             (unsigned long)cp, (unsigned long)s,
+             (unsigned long)da);
 
     if (da < cp || da >= (cp + s))
         return OF_BAD_ADDR;
@@ -116,7 +116,7 @@ of_translate_one(struct device_node *parent, struct of_bus *bus,
     memcpy(addr, ranges + na, 4 * pna);
 
  finish:
-    pr_debug("with offset: %lx\n", (unsigned long long)offset);
+    pr_debug("with offset: %lx\n", (unsigned long)offset);
 
     /* Translate it into parent bus space */
     return pbus->translate(addr, offset, pna);
@@ -174,7 +174,7 @@ __of_translate_address(struct device_node *dev,
     /* Count address cells & copy address locally */
     bus->count_cells(dev, &na, &ns);
     if (!OF_CHECK_COUNTS(na, ns)) {
-        pr_debug("Bad cell count for %lxOF\n", dev);
+        pr_debug("Bad cell count for %p\n", dev);
         goto bail;
     }
     memcpy(addr, in_addr, na * 4);
@@ -215,7 +215,7 @@ __of_translate_address(struct device_node *dev,
         ns = pns;
         bus = pbus;
 
-        pr_debug("one level translation: (%lx, %x)\n", addr, na);
+        pr_debug("one level translation: (%p, %x)\n", addr, na);
     }
 
  bail:

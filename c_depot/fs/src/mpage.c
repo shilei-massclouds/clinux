@@ -131,7 +131,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
         bdev = map_bh->b_bdev;
     }
 
-    printk("%s: step1 first_hole(%u)\n", __func__, first_hole);
+    pr_debug("%s: step1 first_hole(%u)\n", __func__, first_hole);
 
     /*
      * Then do more get_blocks calls until we are done with this page.
@@ -148,9 +148,6 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
             args->first_logical_block = block_in_file;
         }
 
-    printk("%s: step2 first_hole(%u) page_block(%u)\n",
-           __func__, first_hole, page_block);
-
         if (!buffer_mapped(map_bh)) {
             fully_mapped = 0;
             if (first_hole == blocks_per_page)
@@ -159,9 +156,6 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
             block_in_file++;
             continue;
         }
-
-    printk("%s: step3 first_hole(%u) page_block(%u)\n",
-           __func__, first_hole, page_block);
 
         /* some filesystems will copy data into the page during
          * the get_block call, in which case we don't want to

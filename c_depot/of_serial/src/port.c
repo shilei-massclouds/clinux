@@ -196,7 +196,6 @@ void serial8250_tx_chars(struct uart_8250_port *up)
         return;
 
     count = up->tx_loadsz;
-    printk("%s: send count(%d) ...\n", __func__, count);
     do {
         serial_out(up, UART_TX, xmit->buf[xmit->tail]);
         xmit->tail = (xmit->tail + 1) & (UART_XMIT_SIZE - 1);

@@ -177,8 +177,8 @@ static vm_fault_t do_read_fault(struct vm_fault *vmf)
     vm_fault_t ret = 0;
     struct vm_area_struct *vma = vmf->vma;
 
-    printk("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
-           __func__, vmf->address, vmf->pgoff, vmf->flags);
+    pr_debug("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
+             __func__, vmf->address, vmf->pgoff, vmf->flags);
 
     /*
      * Let's call ->map_pages() first and use ->fault() as fallback
@@ -204,8 +204,8 @@ static vm_fault_t do_cow_fault(struct vm_fault *vmf)
     vm_fault_t ret;
     struct vm_area_struct *vma = vmf->vma;
 
-    printk("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
-           __func__, vmf->address, vmf->pgoff, vmf->flags);
+    pr_debug("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
+             __func__, vmf->address, vmf->pgoff, vmf->flags);
 
     vmf->cow_page = alloc_page_vma(GFP_HIGHUSER_MOVABLE, vma, vmf->address);
     if (!vmf->cow_page)
@@ -224,7 +224,7 @@ static vm_fault_t do_cow_fault(struct vm_fault *vmf)
     if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY)))
         panic("uncharge out!");
 
-    printk("%s: step2\n", __func__);
+    pr_debug("%s: end!\n", __func__);
     return ret;
 }
 
@@ -460,8 +460,8 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
 {
     pte_t entry;
 
-    printk("--- %s: vmf: addr(%lx) flags(%x) pgoff(%lx)\n",
-           __func__, vmf->address, vmf->flags, vmf->pgoff);
+    pr_debug("--- %s: vmf: addr(%lx) flags(%x) pgoff(%lx)\n",
+             __func__, vmf->address, vmf->flags, vmf->pgoff);
     if (unlikely(pmd_none(*vmf->pmd))) {
         /*
          * Leave __pte_alloc() until later: because vm_ops->fault may
@@ -598,9 +598,16 @@ static vm_fault_t pte_alloc_one_map(struct vm_fault *vmf)
 
 void page_add_file_rmap(struct page *page, bool compound)
 {
-    /* Todo */
-    printk("%s: NOT implemented!\n", __func__);
-    //panic("%s: !", __func__);
+    int nr = 1;
+
+    BUG_ON(compound);
+    /*
+    if (!atomic_inc_and_test(&page->_mapcount))
+        return 0;
+
+    __mod_lruvec_page_state(page, NR_FILE_MAPPED, nr);
+    */
+    pr_warn("%s: NOT implemented!\n", __func__);
 }
 
 /**
@@ -650,7 +657,7 @@ vm_fault_t alloc_set_pte(struct vm_fault *vmf, struct page *page)
     } else {
         page_add_file_rmap(page, false);
     }
-    printk("%s: addr(%lx) entry(%lx)\n", __func__, vmf->address, entry.pte);
+    pr_debug("%s: addr(%lx) entry(%lx)\n", __func__, vmf->address, entry.pte);
     set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);
     /* no need to invalidate: a not-present page won't be cached */
     update_mmu_cache(vma, vmf->address, vmf->pte);

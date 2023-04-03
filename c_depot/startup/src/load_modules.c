@@ -495,8 +495,8 @@ do_init_module(struct module *mod)
  * Qemu pflash(cfi-flash) cannot be write directly,
  * so copy module to a temporary area for writing.
  * From PAGE_OFFSET, the first pmd holds startup code.
- * We just use the back half of the second pmd for temporary
- * area. NOTE: check module size less than (PMD_SIZE / 2).
+ * We just use the follow pmd for temporary area.
+ * NOTE: check module size less than PMD_SIZE.
  */
 #define TEMP_MOD_AREA_VA    (PAGE_OFFSET + PMD_SIZE)
 
@@ -505,14 +505,12 @@ copy_mod_to_temp_area(uintptr_t src)
 {
     Elf64_Ehdr *hdr = (Elf64_Ehdr *) src;
     /* HACK! e_phoff holds size of this module */
-#if 0
-    if (hdr->e_phoff >= (PMD_SIZE * 3 / 4)) {
+    if (hdr->e_phoff >= PMD_SIZE) {
         sbi_puts("mod is too large [");
         sbi_put_u64(hdr->e_phoff);
-        sbi_puts("] over PMD_SIZE/2\n");
+        sbi_puts("] over PMD_SIZE\n");
         halt();
     }
-#endif
     memcpy((void *)TEMP_MOD_AREA_VA, (void *)src, hdr->e_phoff);
     return TEMP_MOD_AREA_VA;
 }

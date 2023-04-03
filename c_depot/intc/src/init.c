@@ -28,9 +28,7 @@ riscv_intc_irq(struct pt_regs *regs)
         panic("no irq soft!");
         break;
     default:
-        printk("%s: 1\n", __func__);
         handle_domain_irq(intc_domain, cause, regs);
-        printk("%s: 2\n", __func__);
         break;
     }
 }

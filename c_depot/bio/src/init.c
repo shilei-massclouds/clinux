@@ -121,7 +121,7 @@ bio_alloc_bioset(gfp_t gfp_mask,
     struct bio_vec *bvl = NULL;
     gfp_t saved_gfp = gfp_mask;
 
-    printk("%s: bs(0x%p) nr_iovecs(%u)\n", __func__, bs, nr_iovecs);
+    pr_debug("%s: bs(0x%p) nr_iovecs(%u)\n", __func__, bs, nr_iovecs);
 
     if (!bs) {
         panic("bs is NULL!");

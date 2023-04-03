@@ -198,8 +198,7 @@ of_platform_bus_create(struct device_node *bus,
     }
 
     if (of_node_check_flag(bus, OF_POPULATED_BUS)) {
-        pr_debug("%s() - skipping %lxOF, already populated",
-                 __func__, bus);
+        pr_debug("%s() - skipping %p, already populated", __func__, bus);
         return 0;
     }
 

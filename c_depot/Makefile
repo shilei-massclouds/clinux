@@ -49,7 +49,7 @@ build: apps
 	@:
 
 apps: $(components) FORCE
-	@$(MAKE) -C apps
+	#@$(MAKE) -C apps
 
 $(components): $(predirs) FORCE
 	@mkdir -p ./target/$@

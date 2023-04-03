@@ -431,8 +431,8 @@ irq_find_mapping(struct irq_domain *domain, irq_hw_number_t hwirq)
 
     BUG_ON(domain == NULL);
 
-    printk("%s: %lu, %u\n",
-           __func__, hwirq, domain->revmap_size);
+    pr_debug("%s: %lu, %u\n",
+             __func__, hwirq, domain->revmap_size);
 
     /* Check if the hwirq is in the linear revmap. */
     if (hwirq < domain->revmap_size)

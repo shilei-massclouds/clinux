@@ -186,8 +186,7 @@ void _do_page_fault(struct pt_regs *regs)
     cause = regs->cause;
     addr = regs->badaddr;
 
-    printk("--- --- %s: cause(%lx) addr(%ld)\n",
-           __func__, cause, addr);
+    pr_debug("%s: cause(%lx) addr(%ld)\n", __func__, cause, addr);
 
     tsk = current;
     mm = tsk->mm;
@@ -196,12 +195,9 @@ void _do_page_fault(struct pt_regs *regs)
         flags |= FAULT_FLAG_USER;
 
  retry:
-    printk("--- --- %s: step0 mm(%p)\n", __func__, mm);
-
     vma = find_vma(mm, addr);
     if (unlikely(!vma))
         panic("bad area!");
-    printk("--- --- %s: step2\n", __func__);
     if (likely(vma->vm_start <= addr))
         goto good_area;
     if (unlikely(!(vma->vm_flags & VM_GROWSDOWN)))
