@@ -1,11 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0
-
 #ifndef _ASM_GENERIC_ATOMIC_LONG_H
 #define _ASM_GENERIC_ATOMIC_LONG_H
 
 #include <bug.h>
+#include <fence.h>
 #include <types.h>
 #include <compiler_attributes.h>
+
+#define __atomic_acquire_fence()                    \
+    __asm__ __volatile__(RISCV_ACQUIRE_BARRIER "" ::: "memory")
+
+#define __atomic_release_fence()                    \
+    __asm__ __volatile__(RISCV_RELEASE_BARRIER "" ::: "memory");
 
 /*
  * Use __READ_ONCE() instead of READ_ONCE() if you do not require any
@@ -158,6 +164,33 @@ ATOMIC_OPS(sub, add, +, -i)
 
 #undef ATOMIC_OPS
 
+#define ATOMIC_OPS(op, asm_op, I)                   \
+        ATOMIC_FETCH_OP(op, asm_op, I, w, int,   )          \
+        ATOMIC_FETCH_OP(op, asm_op, I, d, s64, 64)
+
+ATOMIC_OPS(and, and, i)
+ATOMIC_OPS( or,  or, i)
+ATOMIC_OPS(xor, xor, i)
+
+#define atomic_fetch_and_relaxed    atomic_fetch_and_relaxed
+#define atomic_fetch_or_relaxed     atomic_fetch_or_relaxed
+#define atomic_fetch_xor_relaxed    atomic_fetch_xor_relaxed
+#define atomic_fetch_and        atomic_fetch_and
+#define atomic_fetch_or         atomic_fetch_or
+#define atomic_fetch_xor        atomic_fetch_xor
+
+#define atomic64_fetch_and_relaxed  atomic64_fetch_and_relaxed
+#define atomic64_fetch_or_relaxed   atomic64_fetch_or_relaxed
+#define atomic64_fetch_xor_relaxed  atomic64_fetch_xor_relaxed
+#define atomic64_fetch_and      atomic64_fetch_and
+#define atomic64_fetch_or       atomic64_fetch_or
+#define atomic64_fetch_xor      atomic64_fetch_xor
+
+#undef ATOMIC_OPS
+
+#undef ATOMIC_FETCH_OP
+#undef ATOMIC_OP_RETURN
+
 static __always_inline void
 atomic_long_set(atomic_long_t *v, long i)
 {
@@ -175,6 +208,28 @@ atomic_dec_return(atomic_t *v)
 {
     return atomic_sub_return(1, v);
 }
+
+#define arch_atomic_inc atomic_inc
+
+#ifndef atomic_inc
+static __always_inline void
+atomic_inc(atomic_t *v)
+{
+    atomic_add(1, v);
+}
+#define atomic_inc atomic_inc
+#endif
+
+#define arch_atomic_dec atomic_dec
+
+#ifndef atomic_dec
+static __always_inline void
+atomic_dec(atomic_t *v)
+{
+    atomic_sub(1, v);
+}
+#define atomic_dec atomic_dec
+#endif
 
 /**
  * atomic_dec_and_test - decrement and test
@@ -194,6 +249,31 @@ static __always_inline long
 atomic_long_read(const atomic_long_t *v)
 {
     return atomic64_read(v);
+}
+
+#ifndef atomic64_fetch_and_release
+static __always_inline s64
+atomic64_fetch_and_release(s64 i, atomic64_t *v)
+{
+    __atomic_release_fence();
+    return atomic64_fetch_and_relaxed(i, v);
+}
+#define atomic64_fetch_and_release atomic64_fetch_and_release
+#endif
+
+#ifndef atomic64_fetch_andnot_release
+static __always_inline s64
+atomic64_fetch_andnot_release(s64 i, atomic64_t *v)
+{
+    return atomic64_fetch_and_release(~i, v);
+}
+#define atomic64_fetch_andnot_release atomic64_fetch_andnot_release
+#endif
+
+static __always_inline long
+atomic_long_fetch_andnot_release(long i, atomic_long_t *v)
+{
+    return atomic64_fetch_andnot_release(i, v);
 }
 
 #endif /* _ASM_GENERIC_ATOMIC_LONG_H */

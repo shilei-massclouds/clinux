@@ -12,6 +12,8 @@
 #include <memblock.h>
 #include <resource.h>
 #include <page-flags.h>
+#include <rbtree.h>
+#include <rmap.h>
 
 #define untagged_addr(addr) (addr)
 
@@ -122,6 +124,16 @@ struct alloc_context {
      * usable for this allocation request.
      */
     enum zone_type highest_zoneidx;
+};
+
+struct vm_unmapped_area_info {
+#define VM_UNMAPPED_AREA_TOPDOWN 1
+    unsigned long flags;
+    unsigned long length;
+    unsigned long low_limit;
+    unsigned long high_limit;
+    unsigned long align_mask;
+    unsigned long align_offset;
 };
 
 extern unsigned long max_mapnr;
@@ -333,5 +345,65 @@ vma_adjust(struct vm_area_struct *vma,
 {
     return __vma_adjust(vma, start, end, pgoff, insert, NULL);
 }
+
+/* interval_tree.c */
+void vma_interval_tree_insert(struct vm_area_struct *node,
+                  struct rb_root_cached *root);
+void vma_interval_tree_insert_after(struct vm_area_struct *node,
+                    struct vm_area_struct *prev,
+                    struct rb_root_cached *root);
+void vma_interval_tree_remove(struct vm_area_struct *node,
+                  struct rb_root_cached *root);
+struct vm_area_struct *vma_interval_tree_iter_first(struct rb_root_cached *root,
+                unsigned long start, unsigned long last);
+struct vm_area_struct *vma_interval_tree_iter_next(struct vm_area_struct *node,
+                unsigned long start, unsigned long last);
+
+#define vma_interval_tree_foreach(vma, root, start, last)       \
+    for (vma = vma_interval_tree_iter_first(root, start, last); \
+         vma; vma = vma_interval_tree_iter_next(vma, start, last))
+
+void anon_vma_interval_tree_insert(struct anon_vma_chain *node,
+                   struct rb_root_cached *root);
+void anon_vma_interval_tree_remove(struct anon_vma_chain *node,
+                   struct rb_root_cached *root);
+struct anon_vma_chain *
+anon_vma_interval_tree_iter_first(struct rb_root_cached *root,
+                  unsigned long start, unsigned long last);
+struct anon_vma_chain *anon_vma_interval_tree_iter_next(
+    struct anon_vma_chain *node, unsigned long start, unsigned long last);
+#ifdef CONFIG_DEBUG_VM_RB
+void anon_vma_interval_tree_verify(struct anon_vma_chain *node);
+#endif
+
+#define anon_vma_interval_tree_foreach(avc, root, start, last)       \
+    for (avc = anon_vma_interval_tree_iter_first(root, start, last); \
+         avc; avc = anon_vma_interval_tree_iter_next(avc, start, last))
+
+/*
+static inline void update_hiwater_vm(struct mm_struct *mm)
+{
+    if (mm->hiwater_vm < mm->total_vm)
+        mm->hiwater_vm = mm->total_vm;
+}
+*/
+
+extern unsigned long vm_unmapped_area(struct vm_unmapped_area_info *info);
+
+struct file;
+
+extern unsigned long
+arch_get_unmapped_area(struct file *, unsigned long, unsigned long,
+                       unsigned long, unsigned long);
+
+extern unsigned long
+arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
+                               unsigned long len, unsigned long pgoff,
+                               unsigned long flags);
+
+int __do_munmap(struct mm_struct *mm, unsigned long start, size_t len,
+                struct list_head *uf, bool downgrade);
+
+void mark_page_accessed(struct page *page);
 
 #endif /* _RISCV_MM_H_ */

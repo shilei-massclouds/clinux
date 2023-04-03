@@ -2,7 +2,7 @@
 
 #include <export.h>
 #include <printk.h>
-#include <rbtree.h>
+#include <rbtree_augmented.h>
 
 static inline struct rb_node *
 rb_red_parent(struct rb_node *red)
@@ -372,113 +372,6 @@ ____rb_erase_color(struct rb_node *parent,
     }
 }
 
-struct rb_node *
-__rb_erase_augmented(struct rb_node *node,
-                     struct rb_root *root,
-                     const struct rb_augment_callbacks *augment)
-{
-    unsigned long pc;
-    struct rb_node *parent;
-    struct rb_node *rebalance;
-    struct rb_node *child = node->rb_right;
-    struct rb_node *tmp = node->rb_left;
-
-    if (!tmp) {
-        /*
-         * Case 1: node to erase has no more than 1 child (easy!)
-         *
-         * Note that if there is one child it must be red due to 5)
-         * and node must be black due to 4). We adjust colors locally
-         * so as to bypass __rb_erase_color() later on.
-         */
-        pc = node->__rb_parent_color;
-        parent = __rb_parent(pc);
-        __rb_change_child(node, child, parent, root);
-        if (child) {
-            child->__rb_parent_color = pc;
-            rebalance = NULL;
-        } else {
-            rebalance = __rb_is_black(pc) ? parent : NULL;
-        }
-        tmp = parent;
-    } else if (!child) {
-        /* Still case 1, but this time the child is node->rb_left */
-        tmp->__rb_parent_color = pc = node->__rb_parent_color;
-        parent = __rb_parent(pc);
-        __rb_change_child(node, tmp, parent, root);
-        rebalance = NULL;
-        tmp = parent;
-    } else {
-        struct rb_node *child2;
-        struct rb_node *successor = child;
-
-        tmp = child->rb_left;
-        if (!tmp) {
-            /*
-             * Case 2: node's successor is its right child
-             *
-             *    (n)          (s)
-             *    / \          / \
-             *  (x) (s)  ->  (x) (c)
-             *        \
-             *        (c)
-             */
-            parent = successor;
-            child2 = successor->rb_right;
-
-            augment->copy(node, successor);
-        } else {
-            /*
-             * Case 3: node's successor is leftmost under
-             * node's right child subtree
-             *
-             *    (n)          (s)
-             *    / \          / \
-             *  (x) (y)  ->  (x) (y)
-             *      /            /
-             *    (p)          (p)
-             *    /            /
-             *  (s)          (c)
-             *    \
-             *    (c)
-             */
-            do {
-                parent = successor;
-                successor = tmp;
-                tmp = tmp->rb_left;
-            } while (tmp);
-            child2 = successor->rb_right;
-            WRITE_ONCE(parent->rb_left, child2);
-            WRITE_ONCE(successor->rb_right, child);
-            rb_set_parent(child, successor);
-
-            augment->copy(node, successor);
-            augment->propagate(parent, successor);
-        }
-
-        tmp = node->rb_left;
-        WRITE_ONCE(successor->rb_left, tmp);
-        rb_set_parent(tmp, successor);
-
-        pc = node->__rb_parent_color;
-        tmp = __rb_parent(pc);
-        __rb_change_child(node, successor, tmp, root);
-
-        if (child2) {
-            rb_set_parent_color(child2, parent, RB_BLACK);
-            rebalance = NULL;
-        } else {
-            rebalance = rb_is_black(successor) ? parent : NULL;
-        }
-        successor->__rb_parent_color = pc;
-        tmp = successor;
-    }
-
-    augment->propagate(tmp, NULL);
-    return rebalance;
-}
-EXPORT_SYMBOL(__rb_erase_augmented);
-
 void
 rb_erase(struct rb_node *node, struct rb_root *root)
 {
@@ -524,6 +417,19 @@ struct rb_node *rb_first(const struct rb_root *root)
     return n;
 }
 EXPORT_SYMBOL(rb_first);
+
+struct rb_node *rb_last(const struct rb_root *root)
+{
+    struct rb_node  *n;
+
+    n = root->rb_node;
+    if (!n)
+        return NULL;
+    while (n->rb_right)
+        n = n->rb_right;
+    return n;
+}
+EXPORT_SYMBOL(rb_last);
 
 struct rb_node *rb_next(const struct rb_node *node)
 {

@@ -145,4 +145,7 @@ static inline void local_flush_tlb_all(void)
     typeof(y) __y = (y);        \
     __x == 0 ? __y : ((__y == 0) ? __x : min(__x, __y)); })
 
+#define might_resched() do { } while (0)
+#define might_sleep() do { might_resched(); } while (0)
+
 #endif /* _UAPI_LINUX_KERNEL_H */

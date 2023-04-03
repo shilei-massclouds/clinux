@@ -18,6 +18,7 @@
 #define ___GFP_ATOMIC           0x200u
 #define ___GFP_DIRECT_RECLAIM   0x400u
 #define ___GFP_KSWAPD_RECLAIM   0x800u
+#define ___GFP_WRITE            0x1000u
 #define ___GFP_NOWARN           0x2000u
 #define ___GFP_RETRY_MAYFAIL    0x4000u
 #define ___GFP_NOFAIL           0x8000u
@@ -57,6 +58,7 @@
 #define __GFP_NORETRY       ((gfp_t)___GFP_NORETRY)
 
 #define __GFP_RECLAIMABLE   ((gfp_t)___GFP_RECLAIMABLE)
+#define __GFP_WRITE         ((__force gfp_t)___GFP_WRITE)
 #define __GFP_HARDWALL      ((gfp_t)___GFP_HARDWALL)
 #define __GFP_ACCOUNT       ((gfp_t)___GFP_ACCOUNT)
 

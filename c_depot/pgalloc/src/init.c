@@ -12,6 +12,8 @@
 #include <pgtable.h>
 #include <syscalls.h>
 #include <linkage.h>
+#include <compiler.h>
+#include <barrier.h>
 
 unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)]
     __page_aligned_bss;
@@ -139,13 +141,24 @@ static vm_fault_t __do_fault(struct vm_fault *vmf)
         vmf->prealloc_pte = pte_alloc_one(vmf->vma->vm_mm);
         if (!vmf->prealloc_pte)
             return VM_FAULT_OOM;
+        smp_wmb(); /* See comment in __pte_alloc() */
     }
 
     ret = vma->vm_ops->fault(vmf);
-    if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY |
-                        VM_FAULT_DONE_COW)))
+    if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE |
+                        VM_FAULT_RETRY | VM_FAULT_DONE_COW))) {
+        panic("%s: error[%x]\n", __func__, ret);
         return ret;
+    }
 
+    /*
+    if (unlikely(!(ret & VM_FAULT_LOCKED)))
+        lock_page(vmf->page);
+    else
+        BUG_ON(!PageLocked(vmf->page));
+        */
+
+    pr_info("%s: step3!\n", __func__);
     return ret;
 }
 
@@ -177,8 +190,8 @@ static vm_fault_t do_read_fault(struct vm_fault *vmf)
     vm_fault_t ret = 0;
     struct vm_area_struct *vma = vmf->vma;
 
-    pr_debug("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
-             __func__, vmf->address, vmf->pgoff, vmf->flags);
+    pr_info("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
+            __func__, vmf->address, vmf->pgoff, vmf->flags);
 
     /*
      * Let's call ->map_pages() first and use ->fault() as fallback
@@ -190,10 +203,13 @@ static vm_fault_t do_read_fault(struct vm_fault *vmf)
         if (ret)
             return ret;
     }
+    pr_info("%s: step1!\n", __func__);
 
     ret = __do_fault(vmf);
-    if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY)))
+    if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY))) {
+        panic("%s: error[%x]\n", __func__, ret);
         return ret;
+    }
 
     ret |= finish_fault(vmf);
     return ret;
@@ -204,8 +220,8 @@ static vm_fault_t do_cow_fault(struct vm_fault *vmf)
     vm_fault_t ret;
     struct vm_area_struct *vma = vmf->vma;
 
-    pr_debug("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
-             __func__, vmf->address, vmf->pgoff, vmf->flags);
+    pr_info("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
+            __func__, vmf->address, vmf->pgoff, vmf->flags);
 
     vmf->cow_page = alloc_page_vma(GFP_HIGHUSER_MOVABLE, vma, vmf->address);
     if (!vmf->cow_page)
@@ -224,7 +240,7 @@ static vm_fault_t do_cow_fault(struct vm_fault *vmf)
     if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY)))
         panic("uncharge out!");
 
-    pr_debug("%s: end!\n", __func__);
+    pr_info("%s: end!\n", __func__);
     return ret;
 }
 
@@ -247,6 +263,7 @@ static vm_fault_t do_fault(struct vm_fault *vmf)
     if (vmf->prealloc_pte) {
         vmf->prealloc_pte = NULL;
     }
+    pr_info("%s: step3 ret(%x)\n", __func__, ret);
     return ret;
 }
 
@@ -419,6 +436,7 @@ static vm_fault_t do_wp_page(struct vm_fault *vmf)
 {
     struct vm_area_struct *vma = vmf->vma;
 
+    pr_info("%s: ...\n", __func__);
     vmf->page = vm_normal_page(vma, vmf->address, vmf->orig_pte);
     if (!vmf->page) {
 #if 0
@@ -460,8 +478,8 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
 {
     pte_t entry;
 
-    pr_debug("--- %s: vmf: addr(%lx) flags(%x) pgoff(%lx)\n",
-             __func__, vmf->address, vmf->flags, vmf->pgoff);
+    pr_info("--- %s: vmf: addr(%lx) flags(%x) pgoff(%lx)\n",
+            __func__, vmf->address, vmf->flags, vmf->pgoff);
     if (unlikely(pmd_none(*vmf->pmd))) {
         /*
          * Leave __pte_alloc() until later: because vm_ops->fault may
@@ -488,16 +506,21 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
          * for the ifs and we later double check anyway with the
          * ptl lock held. So here a barrier will do.
          */
+        barrier();
         if (pte_none(vmf->orig_pte))
             vmf->pte = NULL;
     }
 
+    pr_info("%s: step1\n", __func__);
+
     if (!vmf->pte) {
-        if (vma_is_anonymous(vmf->vma))
+        if (vma_is_anonymous(vmf->vma)) {
             return do_anonymous_page(vmf);
-        else
+        } else {
             return do_fault(vmf);
+        }
     }
+    pr_info("%s: step2\n", __func__);
 
     if (!pte_present(vmf->orig_pte)) {
         panic("do_swap_page");

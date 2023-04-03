@@ -101,6 +101,9 @@ EXPORT_SYMBOL(kmemdup_nul);
 vm_area_alloc_t vm_area_alloc;
 EXPORT_SYMBOL(vm_area_alloc);
 
+vm_area_free_t vm_area_free;
+EXPORT_SYMBOL(vm_area_free);
+
 vm_area_dup_t vm_area_dup;
 EXPORT_SYMBOL(vm_area_dup);
 

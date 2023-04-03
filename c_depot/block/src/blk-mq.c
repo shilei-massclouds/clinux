@@ -300,6 +300,7 @@ blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
     rq->mq_hctx = data->hctx;
     rq->rq_flags = 0;
     rq->cmd_flags = data->cmd_flags;
+    rq->nr_phys_segments = 0;
     INIT_LIST_HEAD(&rq->queuelist);
     return rq;
 }

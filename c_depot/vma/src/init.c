@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <export.h>
 #include <limits.h>
-#include <rbtree.h>
+#include <rbtree_augmented.h>
 #include <pgtable.h>
 
 /*

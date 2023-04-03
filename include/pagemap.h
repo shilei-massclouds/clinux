@@ -11,6 +11,9 @@
 #define FGP_ACCESSED    0x00000001
 #define FGP_LOCK        0x00000002
 #define FGP_CREAT       0x00000004
+#define FGP_WRITE       0x00000008
+#define FGP_NOFS        0x00000010
+#define FGP_NOWAIT      0x00000020
 #define FGP_FOR_MMAP    0x00000040
 
 #define VM_READAHEAD_PAGES  (SZ_128K / PAGE_SIZE)
@@ -153,5 +156,47 @@ void page_cache_async_readahead(struct address_space *,
                                 struct page *,
                                 pgoff_t index,
                                 unsigned long req_count);
+
+extern void __lock_page(struct page *page);
+extern void unlock_page(struct page *page);
+
+/*
+ * Return true if the page was successfully locked
+ */
+static inline int trylock_page(struct page *page)
+{
+    page = compound_head(page);
+    return (likely(!test_and_set_bit_lock(PG_locked, &page->flags)));
+}
+
+/*
+ * lock_page may only be called if we have the page's inode pinned.
+ */
+static inline void lock_page(struct page *page)
+{
+    might_sleep();
+    if (!trylock_page(page))
+        __lock_page(page);
+}
+
+/*
+ * This is exported only for wait_on_page_locked/wait_on_page_writeback, etc.,
+ * and should not be used directly.
+ */
+extern void wait_on_page_bit(struct page *page, int bit_nr);
+extern int wait_on_page_bit_killable(struct page *page, int bit_nr);
+
+/*
+ * Wait for a page to be unlocked.
+ *
+ * This must be called with the caller "holding" the page,
+ * ie with increased "page->count" so that the page won't
+ * go away during the wait..
+ */
+static inline void wait_on_page_locked(struct page *page)
+{
+    if (PageLocked(page))
+        wait_on_page_bit(compound_head(page), PG_locked);
+}
 
 #endif /* _LINUX_PAGEMAP_H */

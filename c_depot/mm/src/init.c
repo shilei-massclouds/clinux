@@ -224,7 +224,7 @@ void _do_page_fault(struct pt_regs *regs)
         break;
     case EXC_STORE_PAGE_FAULT:
         if (!(vma->vm_flags & VM_WRITE))
-            panic("bad vm_flags!");
+            pr_warn("%s: bad vm_flags!\n", __func__);
         flags |= FAULT_FLAG_WRITE;
         break;
     default:

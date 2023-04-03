@@ -9,6 +9,68 @@
 #include <pgalloc.h>
 #include <mm_types.h>
 #include <readahead.h>
+#include <bitops.h>
+#include <sched.h>
+#include <wait.h>
+#include <hash.h>
+#include <page_idle.h>
+#include <gfp.h>
+
+/*
+ * In order to wait for pages to become available there must be
+ * waitqueues associated with pages. By using a hash table of
+ * waitqueues where the bucket discipline is to maintain all
+ * waiters on the same queue and wake all when any of the pages
+ * become available, and for the woken contexts to check to be
+ * sure the appropriate page became available, this saves space
+ * at a cost of "thundering herd" phenomena during rare hash
+ * collisions.
+ */
+#define PAGE_WAIT_TABLE_BITS 8
+#define PAGE_WAIT_TABLE_SIZE (1 << PAGE_WAIT_TABLE_BITS)
+static wait_queue_head_t page_wait_table[PAGE_WAIT_TABLE_SIZE];
+
+static wait_queue_head_t *page_waitqueue(struct page *page)
+{
+    return &page_wait_table[hash_ptr(page, PAGE_WAIT_TABLE_BITS)];
+}
+
+static void wake_up_page_bit(struct page *page, int bit_nr)
+{
+    panic("%s: todo!\n", __func__);
+}
+
+static void wake_up_page(struct page *page, int bit)
+{
+    if (!PageWaiters(page))
+        return;
+    wake_up_page_bit(page, bit);
+}
+
+/*
+ * A choice of three behaviors for wait_on_page_bit_common():
+ */
+enum behavior {
+    EXCLUSIVE,  /* Hold ref to page and take the bit when woken, like
+             * __lock_page() waiting on then setting PG_locked.
+             */
+    SHARED,     /* Hold ref to page and check the bit when woken, like
+             * wait_on_page_writeback() waiting on PG_writeback.
+             */
+    DROP,       /* Drop ref to page before wait, no check when woken,
+             * like put_and_wait_on_page_locked() on PG_locked.
+             */
+};
+
+static inline int
+wait_on_page_bit_common(wait_queue_head_t *q,
+                        struct page *page,
+                        int bit_nr,
+                        int state,
+                        enum behavior behavior)
+{
+    panic("%s: todo!\n", __func__);
+}
 
 static int
 __add_to_page_cache_locked(struct page *page,
@@ -65,18 +127,68 @@ pagecache_get_page(struct address_space *mapping, pgoff_t index,
     int err;
     struct page *page;
 
+ repeat:
     page = find_get_entry(mapping, index);
-    if (page)
-        return page;
+    if (xa_is_value(page))
+        page = NULL;
+    if (!page)
+        goto no_page;
 
+    if (fgp_flags & FGP_LOCK) {
+        if (fgp_flags & FGP_NOWAIT) {
+            if (!trylock_page(page)) {
+                //put_page(page);
+                return NULL;
+            }
+        } else {
+            lock_page(page);
+        }
+
+        /* Has the page been truncated? */
+        if (unlikely(compound_head(page)->mapping != mapping)) {
+            unlock_page(page);
+            //put_page(page);
+            goto repeat;
+        }
+        BUG_ON(page->index != index);
+    }
+
+    if (fgp_flags & FGP_ACCESSED)
+        mark_page_accessed(page);
+    else if (fgp_flags & FGP_WRITE) {
+        /* Clear idle flag for buffer write */
+        if (page_is_idle(page))
+            clear_page_idle(page);
+    }
+
+ no_page:
     if (!page && (fgp_flags & FGP_CREAT)) {
+        if ((fgp_flags & FGP_WRITE))
+            gfp_mask |= __GFP_WRITE;
+        if (fgp_flags & FGP_NOFS)
+            gfp_mask &= ~__GFP_FS;
+
         page = __page_cache_alloc(gfp_mask);
         if (!page)
             return NULL;
 
+        if (!(fgp_flags & (FGP_LOCK | FGP_FOR_MMAP)))
+            fgp_flags |= FGP_LOCK;
+
+        /* Init accessed so avoid atomic mark_page_accessed later */
+        if (fgp_flags & FGP_ACCESSED)
+            __SetPageReferenced(page);
+
         err = add_to_page_cache_lru(page, mapping, index, gfp_mask);
         if (unlikely(err))
             panic("add page to cache lru error!");
+
+        /*
+         * add_to_page_cache_lru locks the page, and for mmap we expect
+         * an unlocked page.
+         */
+        if (page && (fgp_flags & FGP_FOR_MMAP))
+            unlock_page(page);
     }
 
     return page;
@@ -345,8 +457,30 @@ do_async_mmap_readahead(struct vm_fault *vmf, struct page *page)
     */
 }
 
+/*
+ * lock_page_maybe_drop_mmap - lock the page, possibly dropping the mmap_lock
+ * @vmf - the vm_fault for this fault.
+ * @page - the page to lock.
+ * @fpin - the pointer to the file we may pin (or is already pinned).
+ *
+ * This works similar to lock_page_or_retry in that it can drop the mmap_lock.
+ * It differs in that it actually returns the page locked if it returns 1 and 0
+ * if it couldn't lock the page.  If we did have to drop the mmap_lock then fpin
+ * will point to the pinned file and needs to be fput()'ed at a later point.
+ */
+static int lock_page_maybe_drop_mmap(struct vm_fault *vmf,
+                                     struct page *page,
+                                     struct file **fpin)
+{
+    if (trylock_page(page))
+        return 1;
+
+    panic("%s: todo!\n", __func__);
+}
+
 vm_fault_t filemap_fault(struct vm_fault *vmf)
 {
+    int error;
     pgoff_t max_off;
     struct page *page;
     vm_fault_t ret = 0;
@@ -370,6 +504,8 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
     } else if (!page) {
         ret = VM_FAULT_MAJOR;
         fpin = do_sync_mmap_readahead(vmf);
+
+ retry_find:
         page = pagecache_get_page(mapping, offset,
                                   FGP_CREAT|FGP_FOR_MMAP, GFP_KERNEL);
         if (!page) {
@@ -380,6 +516,14 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
         }
     }
 
+    if (!lock_page_maybe_drop_mmap(vmf, page, &fpin))
+        goto out_retry;
+
+    /* Did it get truncated? */
+    if (unlikely(compound_head(page)->mapping != mapping)) {
+        unlock_page(page);
+        goto retry_find;
+    }
     BUG_ON(page_to_pgoff(page) != offset);
 
     /*
@@ -387,16 +531,20 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
      * that it's up-to-date. If not, it is going to be due to an error.
      */
     if (unlikely(!PageUptodate(page)))
-        while (!PageUptodate(page));
+        goto page_not_uptodate;
 
+    pr_info("%s: step1\n", __func__);
     /*
      * We've made it this far and we had to drop our mmap_lock, now is the
      * time to return to the upper layer and have it re-find the vma and
      * redo the fault.
      */
-    if (fpin)
+    if (fpin) {
+        unlock_page(page);
         goto out_retry;
+    }
 
+    pr_info("%s: step2\n", __func__);
     /*
      * Found the page and have a reference on it.
      * We must recheck i_size under page lock.
@@ -407,6 +555,31 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
 
     vmf->page = page;
     return ret | VM_FAULT_LOCKED;
+
+ page_not_uptodate:
+    /*
+     * Umm, take care of errors if the page isn't up-to-date.
+     * Try to re-read it _once_. We do this synchronously,
+     * because there really aren't any performance issues here
+     * and we need to check for errors.
+     */
+    ClearPageError(page);
+    fpin = maybe_unlock_mmap_for_io(vmf, fpin);
+    error = mapping->a_ops->readpage(file, page);
+    if (!error) {
+        wait_on_page_locked(page);
+        if (!PageUptodate(page))
+            error = -EIO;
+    }
+    if (fpin)
+        goto out_retry;
+    //put_page(page);
+
+    if (!error || error == AOP_TRUNCATED_PAGE)
+        goto retry_find;
+
+    //shrink_readahead_size_eio(ra);
+    return VM_FAULT_SIGBUS;
 
  out_retry:
     /*
@@ -466,6 +639,51 @@ int generic_file_mmap(struct file *file, struct vm_area_struct *vma)
     return 0;
 }
 EXPORT_SYMBOL(generic_file_mmap);
+
+/**
+ * __lock_page - get a lock on the page, assuming we need to sleep to get it
+ * @__page: the page to lock
+ */
+void __lock_page(struct page *__page)
+{
+    struct page *page = compound_head(__page);
+    wait_queue_head_t *q = page_waitqueue(page);
+    wait_on_page_bit_common(q, page, PG_locked, TASK_UNINTERRUPTIBLE,
+                            EXCLUSIVE);
+}
+EXPORT_SYMBOL(__lock_page);
+
+/**
+ * unlock_page - unlock a locked page
+ * @page: the page
+ *
+ * Unlocks the page and wakes up sleepers in ___wait_on_page_locked().
+ * Also wakes sleepers in wait_on_page_writeback() because the wakeup
+ * mechanism between PageLocked pages and PageWriteback pages is shared.
+ * But that's OK - sleepers in wait_on_page_writeback() just go back to sleep.
+ *
+ * Note that this depends on PG_waiters being the sign bit in the byte
+ * that contains PG_locked - thus the BUILD_BUG_ON(). That allows us to
+ * clear the PG_locked bit and test PG_waiters at the same time fairly
+ * portably (architectures that do LL/SC can test any bit, while x86 can
+ * test the sign bit).
+ */
+void unlock_page(struct page *page)
+{
+    BUG_ON(PG_waiters != 7);
+    page = compound_head(page);
+    BUG_ON(!PageLocked(page));
+    if (clear_bit_unlock_is_negative_byte(PG_locked, &page->flags))
+        wake_up_page_bit(page, PG_locked);
+}
+EXPORT_SYMBOL(unlock_page);
+
+void wait_on_page_bit(struct page *page, int bit_nr)
+{
+    wait_queue_head_t *q = page_waitqueue(page);
+    wait_on_page_bit_common(q, page, bit_nr, TASK_UNINTERRUPTIBLE, SHARED);
+}
+EXPORT_SYMBOL(wait_on_page_bit);
 
 int
 init_module(void)

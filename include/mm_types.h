@@ -142,6 +142,15 @@ struct vm_area_struct {
 
     /* Function pointers to deal with this struct. */
     const struct vm_operations_struct *vm_ops;
+
+    /*
+     * For areas with an address space and backing store,
+     * linkage into the address_space->i_mmap interval tree.
+     */
+    struct {
+        struct rb_node rb;
+        unsigned long rb_subtree_last;
+    } shared;
 };
 
 static inline void

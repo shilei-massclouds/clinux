@@ -140,6 +140,7 @@ struct address_space {
     struct xarray   i_pages;
     unsigned long   nrpages;
     gfp_t           gfp_mask;
+    atomic_t        i_mmap_writable;
 
     struct rb_root_cached   i_mmap;
 
@@ -245,6 +246,8 @@ struct inode {
         struct block_device *i_bdev;
         struct cdev         *i_cdev;
     };
+
+    atomic_t i_writecount;
 };
 
 struct pseudo_fs_context {
@@ -550,5 +553,10 @@ vfs_write(struct file *file, const char *buf, size_t count, loff_t *pos);
 int nonseekable_open(struct inode *inode, struct file *filp);
 
 extern struct file * open_exec(const char *);
+
+enum positive_aop_returns {
+    AOP_WRITEPAGE_ACTIVATE  = 0x80000,
+    AOP_TRUNCATED_PAGE  = 0x80001,
+};
 
 #endif /* _LINUX_FS_H */

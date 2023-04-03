@@ -317,6 +317,7 @@ static int exec_binprm(struct linux_binprm *bprm)
             return -ELOOP;
 
         ret = search_binary_handler(bprm);
+        pr_debug("%s: step1\n", __func__);
         if (ret < 0)
             panic("can not find handler!");
         if (!bprm->interpreter)

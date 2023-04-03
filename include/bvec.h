@@ -25,6 +25,28 @@
     .bv_offset  = mp_bvec_iter_offset((bvec), (iter)),  \
 })
 
+#define mp_bvec_iter_page_idx(bvec, iter)           \
+    (mp_bvec_iter_offset((bvec), (iter)) / PAGE_SIZE)
+
+/* For building single-page bvec in flight */
+#define bvec_iter_offset(bvec, iter)               \
+    (mp_bvec_iter_offset((bvec), (iter)) % PAGE_SIZE)
+
+#define bvec_iter_len(bvec, iter)               \
+    min_t(unsigned, mp_bvec_iter_len((bvec), (iter)),       \
+          PAGE_SIZE - bvec_iter_offset((bvec), (iter)))
+
+#define bvec_iter_page(bvec, iter)          \
+    (mp_bvec_iter_page((bvec), (iter)) +    \
+     mp_bvec_iter_page_idx((bvec), (iter)))
+
+#define bvec_iter_bvec(bvec, iter)              \
+((struct bio_vec) {                     \
+    .bv_page    = bvec_iter_page((bvec), (iter)),   \
+    .bv_len     = bvec_iter_len((bvec), (iter)),    \
+    .bv_offset  = bvec_iter_offset((bvec), (iter)), \
+})
+
 struct bio_vec {
     struct page     *bv_page;
     unsigned int    bv_len;

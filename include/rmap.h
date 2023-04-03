@@ -52,6 +52,27 @@ struct anon_vma {
     struct rb_root_cached rb_root;
 };
 
+/*
+ * The copy-on-write semantics of fork mean that an anon_vma
+ * can become associated with multiple processes. Furthermore,
+ * each child process will have its own anon_vma, where new
+ * pages for that process are instantiated.
+ *
+ * This structure allows us to find the anon_vmas associated
+ * with a VMA, or the VMAs associated with an anon_vma.
+ * The "same_vma" list contains the anon_vma_chains linking
+ * all the anon_vmas associated with this VMA.
+ * The "rb" field indexes on an interval tree the anon_vma_chains
+ * which link all the VMAs associated with this anon_vma.
+ */
+struct anon_vma_chain {
+    struct vm_area_struct *vma;
+    struct anon_vma *anon_vma;
+    struct list_head same_vma;   /* locked by mmap_lock & page_table_lock */
+    struct rb_node rb;          /* locked by anon_vma->rwsem */
+    unsigned long rb_subtree_last;
+};
+
 static inline int anon_vma_prepare(struct vm_area_struct *vma)
 {
     /*

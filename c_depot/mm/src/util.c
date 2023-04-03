@@ -106,33 +106,6 @@ find_vma_prev(struct mm_struct *mm, unsigned long addr,
 }
 */
 
-unsigned long
-arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
-                               unsigned long len, unsigned long pgoff,
-                               unsigned long flags)
-{
-    struct vm_area_struct *vma;
-    struct mm_struct *mm = current->mm;
-    const unsigned long mmap_end = arch_get_mmap_end(addr);
-
-    if (flags & MAP_FIXED)
-        return addr;
-
-    /* requesting a specific address */
-    if (addr) {
-        addr = PAGE_ALIGN(addr);
-        /*
-        vma = find_vma_prev(mm, addr, &prev);
-        if (mmap_end - len >= addr && addr >= mmap_min_addr &&
-                (!vma || addr + len <= vm_start_gap(vma)) &&
-                (!prev || addr >= vm_end_gap(prev)))
-            return addr;
-            */
-    }
-
-    panic("%s: !", __func__);
-}
-
 void
 arch_pick_mmap_layout(struct mm_struct *mm, struct rlimit *rlim_stack)
 {

@@ -68,6 +68,11 @@ struct vm_area_struct *_vm_area_alloc(struct mm_struct *mm)
     return vma;
 }
 
+void _vm_area_free(struct vm_area_struct *vma)
+{
+    kmem_cache_free(vm_area_cachep, vma);
+}
+
 void set_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file)
 {
     mm->exe_file = new_exe_file;
@@ -268,6 +273,7 @@ init_module(void)
     proc_caches_init();
 
     vm_area_alloc = _vm_area_alloc;
+    vm_area_free = _vm_area_free;
     vm_area_dup = _vm_area_dup;
     do_set_tid_address = _do_set_tid_address;
 

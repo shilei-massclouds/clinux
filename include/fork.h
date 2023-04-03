@@ -11,6 +11,10 @@ typedef struct vm_area_struct *
 (*vm_area_alloc_t)(struct mm_struct *mm);
 extern vm_area_alloc_t vm_area_alloc;
 
+typedef void
+(*vm_area_free_t)(struct vm_area_struct *vma);
+extern vm_area_free_t vm_area_free;
+
 typedef struct vm_area_struct *
 (*vm_area_dup_t)(struct vm_area_struct *orig);
 extern vm_area_dup_t vm_area_dup;

@@ -265,4 +265,16 @@ static inline void xa_init_flags(struct xarray *xa, gfp_t flags)
     xa->xa_head = NULL;
 }
 
+/**
+ * xa_is_value() - Determine if an entry is a value.
+ * @entry: XArray entry.
+ *
+ * Context: Any context.
+ * Return: True if the entry is a value, false if it is a pointer.
+ */
+static inline bool xa_is_value(const void *entry)
+{
+    return (unsigned long)entry & 1;
+}
+
 #endif /* _LINUX_XARRAY_H */

@@ -14,6 +14,11 @@
 
 #define bio_prio(bio)   (bio)->bi_ioprio
 
+#define bio_iter_iovec(bio, iter) \
+    bvec_iter_bvec((bio)->bi_io_vec, (iter))
+
+#define bio_iovec(bio)      bio_iter_iovec((bio), (bio)->bi_iter)
+
 struct biovec_slab {
     int nr_vecs;
     char *name;

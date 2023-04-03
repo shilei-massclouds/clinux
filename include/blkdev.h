@@ -98,6 +98,53 @@ enum mq_rq_state {
  */
 typedef u32 req_flags_t;
 
+/* elevator knows about this request */
+#define RQF_SORTED      ((__force req_flags_t)(1 << 0))
+/* drive already may have started this one */
+#define RQF_STARTED     ((__force req_flags_t)(1 << 1))
+/* may not be passed by ioscheduler */
+#define RQF_SOFTBARRIER     ((__force req_flags_t)(1 << 3))
+/* request for flush sequence */
+#define RQF_FLUSH_SEQ       ((__force req_flags_t)(1 << 4))
+/* merge of different types, fail separately */
+#define RQF_MIXED_MERGE     ((__force req_flags_t)(1 << 5))
+/* track inflight for MQ */
+#define RQF_MQ_INFLIGHT     ((__force req_flags_t)(1 << 6))
+/* don't call prep for this one */
+#define RQF_DONTPREP        ((__force req_flags_t)(1 << 7))
+/* set for "ide_preempt" requests and also for requests for which the SCSI
+   "quiesce" state must be ignored. */
+#define RQF_PREEMPT     ((__force req_flags_t)(1 << 8))
+/* vaguely specified driver internal error.  Ignored by the block layer */
+#define RQF_FAILED      ((__force req_flags_t)(1 << 10))
+/* don't warn about errors */
+#define RQF_QUIET       ((__force req_flags_t)(1 << 11))
+/* elevator private data attached */
+#define RQF_ELVPRIV     ((__force req_flags_t)(1 << 12))
+/* account into disk and partition IO statistics */
+#define RQF_IO_STAT     ((__force req_flags_t)(1 << 13))
+/* request came from our alloc pool */
+#define RQF_ALLOCED     ((__force req_flags_t)(1 << 14))
+/* runtime pm request */
+#define RQF_PM          ((__force req_flags_t)(1 << 15))
+/* on IO scheduler merge hash */
+#define RQF_HASHED      ((__force req_flags_t)(1 << 16))
+/* track IO completion time */
+#define RQF_STATS       ((__force req_flags_t)(1 << 17))
+/* Look at ->special_vec for the actual data payload instead of the
+   bio chain. */
+#define RQF_SPECIAL_PAYLOAD ((__force req_flags_t)(1 << 18))
+/* The per-zone write lock is held for this request */
+#define RQF_ZONE_WRITE_LOCKED   ((__force req_flags_t)(1 << 19))
+/* already slept for hybrid poll */
+#define RQF_MQ_POLL_SLEPT   ((__force req_flags_t)(1 << 20))
+/* ->timeout has been called, don't expire again */
+#define RQF_TIMED_OUT       ((__force req_flags_t)(1 << 21))
+
+/* flags that prevent us from merging requests: */
+#define RQF_NOMERGE_FLAGS \
+    (RQF_STARTED | RQF_SOFTBARRIER | RQF_FLUSH_SEQ | RQF_SPECIAL_PAYLOAD)
+
 struct request {
     struct request_queue *q;
     struct blk_mq_ctx *mq_ctx;
@@ -120,6 +167,24 @@ struct request {
     struct list_head queuelist;
 
     struct gendisk *rq_disk;
+
+    /*
+     * The rb_node is only used inside the io scheduler, requests
+     * are pruned when moved to the dispatch queue. So let the
+     * completion_data share space with the rb_node.
+     */
+    union {
+        struct rb_node rb_node; /* sort/lookup */
+        struct bio_vec special_vec;
+        void *completion_data;
+        int error_count; /* for legacy drivers, don't use */
+    };
+
+    /*
+     * Number of scatter-gather DMA addr+len pairs after
+     * physical address coalescing is performed.
+     */
+    unsigned short nr_phys_segments;
 };
 
 void
@@ -209,6 +274,22 @@ static inline unsigned int blk_rq_bytes(const struct request *rq)
 static inline sector_t get_start_sect(struct block_device *bdev)
 {
     return bdev->bd_part->start_sect;
+}
+
+/*
+ * Number of physical segments as sent to the device.
+ *
+ * Normally this is the number of discontiguous data segments sent by the
+ * submitter.  But for data-less command like discard we might have no
+ * actual data segments submitted, but the driver might have to add it's
+ * own special payload.  In that case we still return 1 here so that this
+ * special payload will be mapped.
+ */
+static inline unsigned short blk_rq_nr_phys_segments(struct request *rq)
+{
+    if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+        return 1;
+    return rq->nr_phys_segments;
 }
 
 #endif /* _LINUX_BLKDEV_H */
