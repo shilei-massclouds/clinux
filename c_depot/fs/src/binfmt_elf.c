@@ -833,6 +833,11 @@ static int load_elf_binary(struct linux_binprm *bprm)
 
     printk("###### %s: switch unikernel entry(%lx) sp(%lx) ######\n",
            __func__, elf_entry, bprm->p);
+    {
+        printk("%s: 1 current (%p)\n", __func__, current);
+        save_current();
+        printk("%s: 2 current (%p)\n", __func__, get_saved_current());
+    }
     switch_to_unikernel(elf_entry, bprm->p);
 
     panic("###### %s: Stop here! ######\n", __func__);

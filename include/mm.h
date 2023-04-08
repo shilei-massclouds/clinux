@@ -412,4 +412,11 @@ void create_pgd_mapping(pgd_t *pgdp,
 
 void reset_phys_alloc_fn(phys_alloc_t alloc);
 
+typedef long
+(*sys_mmap_t)(unsigned long addr, unsigned long len,
+              unsigned long prot, unsigned long flags,
+              unsigned long fd, off_t offset,
+              unsigned long page_shift_offset);
+extern sys_mmap_t riscv_sys_mmap;
+
 #endif /* _RISCV_MM_H_ */

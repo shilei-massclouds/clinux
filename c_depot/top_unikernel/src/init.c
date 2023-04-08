@@ -27,6 +27,7 @@ init_module(void)
     printk("module[top_unikernel]: init begin ...\n");
     BUG_ON(!slab_is_available());
     BUG_ON(!sys_ready);
+    BUG_ON(!rootfs_initialized);
 
     run_uniprocess(UNI_PROCESS);
 

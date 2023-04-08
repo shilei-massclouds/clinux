@@ -60,6 +60,11 @@ EXPORT_SYMBOL(ksys_write);
 
 SYSCALL_DEFINE3(write, unsigned int, fd, const char *, buf, size_t, count)
 {
+    sbi_puts("ksys_write ...\n");
+    if (ksys_write == NULL) {
+        sbi_puts("NOT register ksys_write yet!\n");
+        sbi_srst_power_off();
+    }
     return ksys_write(fd, buf, count);
 }
 
@@ -81,7 +86,6 @@ EXPORT_SYMBOL(do_group_exit);
  */
 SYSCALL_DEFINE1(exit_group, int, error_code)
 {
-    sbi_puts("exit_group ...\n");
     if (do_group_exit == NULL) {
         sbi_puts("NOT register do_exit_group yet!\n");
         sbi_srst_power_off();
@@ -146,4 +150,15 @@ SYSCALL_DEFINE2(clock_gettime, const clockid_t, which_clock,
                 struct __kernel_timespec *, tp)
 {
     return 0;
+}
+
+SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
+                unsigned long, prot, unsigned long, flags,
+                unsigned long, fd, off_t, offset)
+{
+    if (riscv_sys_mmap == NULL) {
+        sbi_puts("NOT register riscv_sys_mmap yet!\n");
+        sbi_srst_power_off();
+    }
+    return riscv_sys_mmap(addr, len, prot, flags, fd, offset, 0);
 }

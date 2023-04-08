@@ -40,6 +40,9 @@ __SYSCALL(__NR_uname, sys_newuname)
 #define __NR_brk 214
 __SYSCALL(__NR_brk, sys_brk)
 
+#define __NR_mmap 222
+__SYSCALL(__NR_mmap, sys_mmap)
+
 /* mm/, CONFIG_MMU only */
 #define __NR_mprotect 226
 __SYSCALL(__NR_mprotect, sys_mprotect)

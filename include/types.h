@@ -153,6 +153,7 @@ typedef long                __kernel_long_t;
 typedef unsigned long       __kernel_ulong_t;
 typedef __kernel_ulong_t    __kernel_size_t;
 typedef __kernel_long_t     __kernel_ssize_t;
+typedef __kernel_long_t     __kernel_off_t;
 
 typedef long long __kernel_time64_t;
 
@@ -170,6 +171,8 @@ typedef __kernel_pid_t  pid_t;
 #define _SIZE_T
 typedef __kernel_size_t     size_t;
 #endif
+
+typedef __kernel_off_t      off_t;
 
 #ifndef _SSIZE_T
 #define _SSIZE_T

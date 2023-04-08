@@ -97,6 +97,10 @@ EXPORT_SYMBOL(kfree);
 kmemdup_nul_t kmemdup_nul;
 EXPORT_SYMBOL(kmemdup_nul);
 
+/* For mmap */
+sys_mmap_t riscv_sys_mmap;
+EXPORT_SYMBOL(riscv_sys_mmap);
+
 /* For fork */
 vm_area_alloc_t vm_area_alloc;
 EXPORT_SYMBOL(vm_area_alloc);
@@ -185,3 +189,6 @@ EXPORT_SYMBOL(_init_stack);
 
 extern char _init_stack_top[];
 EXPORT_SYMBOL(_init_stack_top);
+
+struct task_struct *saved_riscv_tp = NULL;
+EXPORT_SYMBOL(saved_riscv_tp);

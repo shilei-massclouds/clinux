@@ -13,6 +13,7 @@
 #include <mm_types.h>
 
 void init_mprotect(void);
+void init_mmap(void);
 
 static phys_alloc_t phys_alloc_fn;
 
@@ -328,6 +329,7 @@ init_module(void)
     printk("module[mm]: init begin ...\n");
 
     init_mprotect();
+    init_mmap();
 
     do_page_fault_func = _do_page_fault;
 

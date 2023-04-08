@@ -69,7 +69,8 @@ clean:
 bootrd: FORCE
 	@rm -f $(KMODULE_DIR)/bootrd.disk $(KMODULE_DIR)/top_*.json
 	mkdir -p $(KMODULE_DIR)/payloads/
-	cp /home/cloud/test/hello/test $(KMODULE_DIR)/payloads/test
+	#cp /home/cloud/test/hello/test $(KMODULE_DIR)/payloads/test
+	cp /home/cloud/test/sqlite-amalgamation-3410200/test_sqlite $(KMODULE_DIR)/payloads/test
 	#cp /home/cloud/test/musl-1.2.3/output/lib/libc.so $(KMODULE_DIR)/payloads/
 	@ ../tools/mk_bootrd/mk_bootrd
 

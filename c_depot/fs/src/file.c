@@ -137,6 +137,7 @@ __fget_files(struct files_struct *files, unsigned int fd, fmode_t mask,
 {
     struct file *file;
 
+    pr_info("%s: 0 files(%p)\n", __func__, files);
     file = fcheck_files(files, fd);
     if (file) {
         /* File object ref couldn't be taken.

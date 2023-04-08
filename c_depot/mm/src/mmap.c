@@ -417,7 +417,7 @@ mmap_region(struct file *file, unsigned long addr,
     } else if (vm_flags & VM_SHARED) {
         panic("vm shared!");
     } else {
-        panic("bad arg!");
+        vma_set_anonymous(vma);
     }
 
     vma_link(mm, vma, prev, rb_link, rb_parent);
@@ -495,19 +495,38 @@ do_mmap(struct file *file, unsigned long addr,
                 panic("bad flags!");
         }
     } else {
-        panic("no file!");
+        switch (flags & MAP_TYPE) {
+        case MAP_SHARED:
+            if (vm_flags & (VM_GROWSDOWN|VM_GROWSUP))
+                return -EINVAL;
+            /*
+             * Ignore pgoff.
+             */
+            pgoff = 0;
+            vm_flags |= VM_SHARED | VM_MAYSHARE;
+            break;
+        case MAP_PRIVATE:
+            /*
+             * Set pgoff according to addr for anon_vma.
+             */
+            pgoff = addr >> PAGE_SHIFT;
+            break;
+        default:
+            return -EINVAL;
+        }
     }
 
     if (flags & MAP_NORESERVE)
         panic("MAP_NORESERVE!");
 
+    pr_info("%s: ...\n", __func__);
     addr = mmap_region(file, addr, len, vm_flags, pgoff, uf);
     if (!IS_ERR_VALUE(addr) &&
         ((vm_flags & VM_LOCKED) ||
          (flags & (MAP_POPULATE | MAP_NONBLOCK)) == MAP_POPULATE))
         panic("set poplate!");
 
-    pr_debug("%s: addr(%lx) end!\n", __func__, addr);
+    pr_info("%s: addr(%lx) end!\n", __func__, addr);
     return addr;
 }
 EXPORT_SYMBOL(do_mmap);
@@ -1239,4 +1258,53 @@ arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
     }
 
     return addr;
+}
+
+unsigned long
+ksys_mmap_pgoff(unsigned long addr, unsigned long len,
+                unsigned long prot, unsigned long flags,
+                unsigned long fd, unsigned long pgoff)
+{
+    struct file *file = NULL;
+    unsigned long retval;
+
+    if (!(flags & MAP_ANONYMOUS)) {
+        panic("%s: MAP_ANONYMOUS\n", __func__);
+    } else if (flags & MAP_HUGETLB) {
+        panic("%s: MAP_HUGETLB\n", __func__);
+    }
+
+    flags &= ~(MAP_EXECUTABLE | MAP_DENYWRITE);
+
+    retval = vm_mmap_pgoff(file, addr, len, prot, flags, pgoff);
+
+ out_fput:
+#if 0
+    if (file)
+        fput(file);
+#endif
+    return retval;
+}
+
+long _riscv_sys_mmap(unsigned long addr, unsigned long len,
+                     unsigned long prot, unsigned long flags,
+                     unsigned long fd, off_t offset,
+                     unsigned long page_shift_offset)
+{
+    printk("%s: step1\n", __func__);
+    if (unlikely(offset & (~PAGE_MASK >> page_shift_offset)))
+        return -EINVAL;
+
+    if ((prot & PROT_WRITE) && (prot & PROT_EXEC))
+        if (unlikely(!(prot & PROT_READ)))
+            return -EINVAL;
+
+    return ksys_mmap_pgoff(addr, len, prot, flags, fd,
+                           offset >> (PAGE_SHIFT - page_shift_offset));
+}
+
+void
+init_mmap(void)
+{
+    riscv_sys_mmap = _riscv_sys_mmap;
 }

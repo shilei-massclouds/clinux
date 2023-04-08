@@ -130,4 +130,8 @@ long sys_getrandom(char *buf, size_t count, unsigned int flags);
 long sys_clock_gettime(clockid_t which_clock,
                        struct __kernel_timespec *tp);
 
+long sys_mmap(unsigned long addr, unsigned long len,
+              unsigned long prot, unsigned long flags,
+              unsigned long fd, off_t offset);
+
 #endif /* _LINUX_SYSCALLS_H */
