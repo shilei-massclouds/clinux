@@ -470,7 +470,7 @@ do_mmap(struct file *file, unsigned long addr,
         unsigned long flags_mask;
         struct inode *inode = file_inode(file);
 
-        if (!file_mmap_ok(file, inode, pgoff, len))
+        if (inode && !file_mmap_ok(file, inode, pgoff, len))
             panic("overflow!");
 
         //flags_mask = LEGACY_MAP_MASK | file->f_op->mmap_supported_flags;
@@ -675,7 +675,7 @@ int __vma_adjust(struct vm_area_struct *vma,
         panic("%s: step1!", __func__);
     }
 
-    if (file) {
+    if (file && file->f_mapping) {
         mapping = file->f_mapping;
         root = &mapping->i_mmap;
 

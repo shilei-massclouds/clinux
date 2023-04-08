@@ -783,11 +783,11 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
             hdr->profile_offset = ftell(fp);
             hdr->current_profile = hdr->profile_offset;
         }
-#if 1
+#if 0
         if (strncmp(mod->name, "top_linux", strlen("top_linux")) == 0)
             hdr->current_profile = ftell(fp);
 #else
-        if (strncmp(mod->name, "top_echoserver", strlen("top_echoserver")) == 0)
+        if (strncmp(mod->name, "top_unikernel", strlen("top_unikernel")) == 0)
             hdr->current_profile = ftell(fp);
 #endif
 
@@ -843,7 +843,7 @@ elf64_hdr_set_length(void *ptr, uint64_t length)
 }
 
 static uint8_t *
-read_module(const char *filename, long *psize)
+read_file(const char *filename, long *psize)
 {
     struct stat info;
     FILE *fp = fopen(filename, "rb");
@@ -852,7 +852,7 @@ read_module(const char *filename, long *psize)
         exit(-1);
     }
 
-    *psize = ROUND_UP((size_t) info.st_size, 8);
+    *psize = (size_t) info.st_size;
 
     uint8_t *data = calloc(*psize, 1);
     if (data == NULL) {
@@ -864,10 +864,19 @@ read_module(const char *filename, long *psize)
         exit(-1);
     }
 
-    /* HACK!!! */
-    elf64_hdr_set_length(data, (uint64_t)info.st_size);
     fclose(fp);
+    return data;
+}
 
+static uint8_t *
+read_module(const char *filename, long *psize)
+{
+    long size = 0;
+    uint8_t *data = read_file(filename, &size);
+
+    /* HACK!!! */
+    elf64_hdr_set_length(data, (uint64_t)size);
+    *psize = ROUND_UP((size_t)size, 8);
     return data;
 }
 
@@ -957,6 +966,83 @@ complete_bootrd(struct bootrd_header *hdr, FILE *fp)
     fclose(fp);
 }
 
+static void
+append_payloads(struct bootrd_header *hdr, FILE *fp)
+{
+    int n;
+    struct dirent **namelist;
+    char dir[256] = {0};
+    sprintf(dir, "%s/payloads/", kmod_dir);
+
+    hdr->payload_offset = ftell(fp);
+
+    n = scandir(dir, &namelist, NULL, NULL);
+    if (n == -1) {
+        printf("%s: error when scandir!\n", __func__);
+        exit(-1);
+    }
+
+    while (n--) {
+        if (strcmp(namelist[n]->d_name, ".") == 0 ||
+            strcmp(namelist[n]->d_name, "..") == 0)
+            continue;
+
+        long size = 0;
+        u32 name_len = strlen(namelist[n]->d_name) + 1;
+        char filename[512] = {0};
+        sprintf(filename, "%s/%s", dir, namelist[n]->d_name);
+
+        printf("payload: '%s'\n", filename);
+        uint8_t *data = read_file(filename, &size);
+        if (data == NULL || size == 0) {
+            printf("cannont read payload '%s'!\n", filename);
+            terminate();
+        }
+        u32 total_size = sizeof(struct payload_header) + size;
+        u32 name_offset = total_size;
+        total_size += name_len;
+
+        struct payload_header header;
+        memset(&header, 0, sizeof(header));
+        memcpy(&header.magic, &PAYLOAD_MAGIC, sizeof(header.magic));
+        header.version = 1;
+        header.flags = PAYLOAD_PAGE_ALIGN;
+        header.total_size = total_size;
+        header.name_offset = name_offset;
+
+        if (fwrite(&header, sizeof(header), 1, fp) != 1) {
+            printf("%s: cannot write payload header to bootrd file!\n",
+                   __func__);
+            exit(-1);
+        }
+
+        if (fwrite(data, 1, size, fp) != size) {
+            printf("%s: cannot write payload!\n", __func__);
+            terminate();
+        }
+        free(data);
+        data = NULL;
+
+        if (fwrite(namelist[n]->d_name, 1, name_len, fp) != name_len) {
+            printf("%s: cannot write name for payload!\n", __func__);
+            terminate();
+        }
+
+        long pos = ftell(fp);
+        if (pos % 8) {
+            pos = ROUND_UP((size_t)pos, 8);
+            printf("1: %lx\n", ftell(fp));
+            fseek(fp, pos, SEEK_SET);
+            printf("2: %lx\n", ftell(fp));
+        }
+
+        free(namelist[n]);
+
+        hdr->payload_num++;
+    }
+    free(namelist);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -975,6 +1061,7 @@ main(int argc, char *argv[])
 
     FILE* fp = create_bootrd(&hdr);
     sort_modules(&hdr, sort_func, fp);
+    append_payloads(&hdr, fp);
     complete_bootrd(&hdr, fp);
     clear_symbols();
     clear_modules();

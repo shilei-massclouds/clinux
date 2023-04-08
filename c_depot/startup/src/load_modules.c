@@ -11,6 +11,7 @@
 #include <pgtable.h>
 #include <mm.h>
 #include <bootrd.h>
+#include <payload.h>
 
 /* n must be power of 2 */
 #define ROUND_UP(x, n) (((x) + (n) - 1UL) & ~((n) - 1UL))
@@ -28,6 +29,9 @@ EXPORT_SYMBOL(modules);
 
 uintptr_t kernel_size = 0;
 EXPORT_SYMBOL(kernel_size);
+
+LIST_HEAD(payloads);
+EXPORT_SYMBOL(payloads);
 
 struct module kernel_module;
 
@@ -145,8 +149,8 @@ setup_load_info(uintptr_t base, struct load_info *info)
     }
 }
 
-static uint64_t *
-mod_indexes_in_flash(uint32_t *pnum)
+static struct bootrd_header *
+open_bootrd(void)
 {
     struct bootrd_header *bh = (struct bootrd_header *) FLASH_VA;
     if (memcmp(&bh->magic, &BOOTRD_MAGIC, sizeof(bh->magic))) {
@@ -157,6 +161,14 @@ mod_indexes_in_flash(uint32_t *pnum)
         sbi_puts("bootrd: bad version\n");
         halt();
     }
+
+    return bh;
+}
+
+static uint64_t *
+mod_indexes_in_flash(uint32_t *pnum)
+{
+    struct bootrd_header *bh = open_bootrd();
 
     struct profile_header *ph =
         (struct profile_header *) (FLASH_VA + bh->current_profile);
@@ -170,6 +182,121 @@ mod_indexes_in_flash(uint32_t *pnum)
     }
     *pnum = ph->mod_num;
     return (uint64_t *) ((uintptr_t) ph + sizeof(*ph));
+}
+
+static void
+fixup_syscall_table_ptr(struct payload *payload)
+{
+    extern void *sys_call_table[];
+    void **sys_call_table_ptr = (void **)0xFFFFFFE00000C000;
+    sbi_puts("sys_call_table[");
+    sbi_put_u64((u64)__pa(sys_call_table_ptr));
+    sbi_puts("]\n");
+    /*
+#define SYSCALL_TABLE_PTR "sys_call_table_ptr"
+
+    if (memcmp(payload->ptr, ELFMAG, SELFMAG)) {
+        sbi_puts("bad payload: it is not ELF\n");
+        halt();
+    }
+
+    sbi_puts("[");
+    sbi_puts(SYSCALL_TABLE_PTR);
+    sbi_puts("]\n");
+
+    Elf64_Ehdr *hdr = (Elf64_Ehdr *) payload->ptr;
+    Elf64_Shdr *sechdrs = payload->ptr + hdr->e_shoff;
+
+    int i;
+    Elf64_Shdr *symsec = NULL;
+    char *strtab = NULL;
+    Elf64_Sym *sym = NULL;
+    for (i = 1; i < hdr->e_shnum; i++) {
+        if (sechdrs[i].sh_type == SHT_SYMTAB) {
+            symsec = &sechdrs[i];
+            int index_str = sechdrs[i].sh_link;
+            strtab = (char *)hdr + sechdrs[index_str].sh_offset;
+            sym = (void *)symsec->sh_addr;
+            break;
+        }
+    }
+
+    if (strtab == NULL) {
+        sbi_puts("no str table!\n");
+        halt();
+    }
+    if (sym == NULL) {
+        sbi_puts("no sym table!\n");
+        halt();
+    }
+
+    for (i = 1; i < symsec->sh_size / sizeof(Elf64_Sym); i++) {
+        const char *name = strtab + sym[i].st_name;
+        if (strcmp(name, "sys_call_table_ptr") == 0) {
+            sbi_puts("[");
+            sbi_puts(name);
+            sbi_puts("]\n");
+            sbi_puts("[");
+            sbi_put_u64(sym[i].st_value);
+            sbi_puts("]\n");
+        }
+    }
+    */
+}
+
+static uintptr_t
+load_payloads(uintptr_t dst_addr)
+{
+    struct bootrd_header *bh = open_bootrd();
+    if (bh->payload_num == 0) {
+        sbi_puts("no payloads!\n");
+        return dst_addr;
+    }
+
+    uintptr_t src_addr = FLASH_VA + bh->payload_offset;
+
+    int i;
+    for (i = 0; i < bh->payload_num; i++) {
+        struct payload_header *ph = (struct payload_header *) src_addr;
+        if (memcmp(&ph->magic, &PAYLOAD_MAGIC, sizeof(ph->magic))) {
+            sbi_puts("payload: bad magic\n");
+            halt();
+        }
+        if (ph->version != 1) {
+            sbi_puts("payload: bad version\n");
+            halt();
+        }
+        if ((ph->flags & PAYLOAD_PAGE_ALIGN) == 0) {
+            sbi_puts("payload: NOW it must be page-aligned\n");
+            halt();
+        }
+        dst_addr = ROUND_UP(dst_addr, PAGE_SIZE);
+
+        void *data_ptr = (void *) dst_addr;
+        int total_len = ph->total_size - sizeof(struct payload_header);
+        memcpy((void*)dst_addr,
+               (void*)(src_addr + sizeof(struct payload_header)),
+               total_len);
+
+        int data_len = ph->name_offset - sizeof(struct payload_header);
+        const char *name = (const char *) (dst_addr + data_len);
+
+        dst_addr += total_len;
+        struct payload *payload = (struct payload *)dst_addr;
+        payload->name = name;
+        payload->ptr = data_ptr;
+        payload->size = data_len;
+        list_add_tail(&payload->lh, &payloads);
+
+        src_addr += ph->total_size;
+        dst_addr += sizeof(struct payload);
+
+        if (strcmp(name, "libc.so") == 0) {
+            fixup_syscall_table_ptr(payload);
+        }
+    }
+
+    return dst_addr;
 }
 
 static void
@@ -563,6 +690,8 @@ init_other_modules(void)
         /* next */
         dst_addr += ROUND_UP(info.layout.size, 8);
     }
+
+    dst_addr = load_payloads(dst_addr);
 
     kernel_size = __pa(dst_addr) - kernel_start;
 }

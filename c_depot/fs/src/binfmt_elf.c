@@ -16,6 +16,7 @@
 #include <mman-common.h>
 #include <limits.h>
 #include <switch_to.h>
+#include <payload.h>
 
 #define ELF_MIN_ALIGN       PAGE_SIZE
 #define ELF_PAGESTART(_v)   ((_v) & ~(unsigned long)(ELF_MIN_ALIGN-1))
@@ -294,6 +295,7 @@ static int padzero(unsigned long elf_bss)
     nbyte = ELF_PAGEOFFSET(elf_bss);
     if (nbyte) {
         nbyte = ELF_MIN_ALIGN - nbyte;
+        printk("%s: %lx %lx\n", __func__, elf_bss, nbyte);
         if (clear_user((void *) elf_bss, nbyte))
             return -EFAULT;
     }
@@ -452,6 +454,17 @@ out:
     return error;
 }
 
+static void
+switch_to_unikernel(unsigned long entry, unsigned long sp)
+{
+    asm volatile (
+        "mv sp, %1\n"
+        "jr %0\n"
+        :: "r" (entry), "r" (sp)
+        : "memory"
+    );
+}
+
 static int load_elf_binary(struct linux_binprm *bprm)
 {
     int i;
@@ -530,17 +543,48 @@ static int load_elf_binary(struct linux_binprm *bprm)
 
         printk("%s: interp[%s]\n", __func__, elf_interpreter);
 
+        /* Todo: implement a MAP in bootrd */
+        if (strcmp(kbasename(elf_interpreter),
+                   "ld-musl-riscv64.so.1") == 0) {
+            strcpy(elf_interpreter, "payload://libc.so");
+        }
+
         interpreter = open_exec(elf_interpreter);
-        kfree(elf_interpreter);
         retval = PTR_ERR(interpreter);
         if (IS_ERR(interpreter))
             panic("out_free_ph");
+
+        /* Todo: wrap a common function */
+        {
+            #define PAYLOAD_PROTOCOL "payload://"
+            extern const struct file_operations payload_file_operations;
+            extern struct list_head payloads;
+
+            struct payload *payload;
+            list_for_each_entry(payload, &payloads, lh) {
+                int prefix_size = strlen(PAYLOAD_PROTOCOL);
+                printk("++++++ %s: payload '%s'\n", __func__, payload->name);
+                if (strcmp(elf_interpreter + prefix_size, payload->name) == 0) {
+                    interpreter->private_data = (void *)payload->ptr;
+                    break;
+                }
+            }
+            if (interpreter->private_data == NULL) {
+                panic("%s: no payload named '%s'\n",
+                      __func__, elf_interpreter);
+            }
+            interpreter->f_mode |= FMODE_READ;
+            interpreter->f_mode |= FMODE_CAN_READ;
+            interpreter->f_op = &payload_file_operations;
+        }
+        kfree(elf_interpreter);
 
         interp_elf_ex = kmalloc(sizeof(*interp_elf_ex), GFP_KERNEL);
         if (!interp_elf_ex) {
             retval = -ENOMEM;
             panic("out_free_ph");
         }
+
 
         /* Get the exec headers */
         retval = elf_read(interpreter, interp_elf_ex,
@@ -596,7 +640,6 @@ static int load_elf_binary(struct linux_binprm *bprm)
         }
     }
 
-    printk("%s: p(%lx)!\n", __func__, bprm->p);
     retval = begin_new_exec(bprm);
     if (retval)
         panic("begin new exec error!");
@@ -669,7 +712,9 @@ static int load_elf_binary(struct linux_binprm *bprm)
             }
         }
 
-        error = elf_map(bprm->file, vaddr, elf_ppnt,
+        printk("--- vaddr: %lx, elf_prot: %x, elf_flags: %x, total_size: %lx\n",
+               vaddr, elf_prot, elf_flags, total_size);
+        error = elf_map(bprm->file, load_bias + vaddr, elf_ppnt,
                         elf_prot, elf_flags, total_size);
         if (BAD_ADDR(error))
             panic("elf map error!");
@@ -715,10 +760,17 @@ static int load_elf_binary(struct linux_binprm *bprm)
         }
     }
 
-    printk("--- --- %s: code(%lx, %lx) data(%lx, %lx) bss(%lx) brk(%lx)\n",
-           __func__, start_code, end_code, start_data, end_data, elf_bss, elf_brk);
+    e_entry = elf_ex->e_entry + load_bias;
+    elf_bss += load_bias;
+    elf_brk += load_bias;
+    start_code += load_bias;
+    end_code += load_bias;
+    start_data += load_bias;
+    end_data += load_bias;
 
-    e_entry = elf_ex->e_entry;
+    printk("--- %s: code(%lx, %lx) data(%lx, %lx) bss(%lx) brk(%lx) entry(%lx)\n",
+           __func__, start_code, end_code, start_data, end_data,
+           elf_bss, elf_brk, e_entry);
 
     /* Calling set_brk effectively mmaps the pages that we need
      * for the bss and break sections.  We must do this before
@@ -778,6 +830,12 @@ static int load_elf_binary(struct linux_binprm *bprm)
     mm->start_data = start_data;
     mm->end_data = end_data;
     mm->start_stack = bprm->p;
+
+    printk("###### %s: switch unikernel entry(%lx) sp(%lx) ######\n",
+           __func__, elf_entry, bprm->p);
+    switch_to_unikernel(elf_entry, bprm->p);
+
+    panic("###### %s: Stop here! ######\n", __func__);
 
     regs = current_pt_regs();
 

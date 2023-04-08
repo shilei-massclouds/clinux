@@ -19,6 +19,9 @@
 #include <resource.h>
 #include <processor.h>
 #include <mmu_context.h>
+#include <payload.h>
+
+extern struct list_head payloads;
 
 static LIST_HEAD(formats);
 
@@ -104,7 +107,7 @@ static struct linux_binprm *alloc_bprm(int fd, struct filename *filename)
     }
     bprm->interp = bprm->filename;
 
-    printk("%s: (%s)!\n", __func__, filename->name);
+    pr_debug("%s: (%s)!\n", __func__, filename->name);
 
     retval = bprm_mm_init(bprm);
     if (retval)
@@ -238,10 +241,12 @@ int copy_string_kernel(const char *arg, struct linux_binprm *bprm)
         arg -= bytes_to_copy;
         len -= bytes_to_copy;
 
+    printk("+++ step1 pos(%lx) p(%lx)\n", pos, bprm->p);
         page = get_arg_page(bprm, pos, 1);
         if (!page)
             panic("out of memory!");
         kaddr = kmap_atomic(page);
+    printk("+++ step2 kaddr(%p) (%lx)\n", kaddr, __pa(kaddr));
         memcpy(kaddr + offset_in_page(pos), arg, bytes_to_copy);
     }
 
@@ -317,7 +322,6 @@ static int exec_binprm(struct linux_binprm *bprm)
             return -ELOOP;
 
         ret = search_binary_handler(bprm);
-        pr_debug("%s: step1\n", __func__);
         if (ret < 0)
             panic("can not find handler!");
         if (!bprm->interpreter)
@@ -329,6 +333,59 @@ static int exec_binprm(struct linux_binprm *bprm)
     return 0;
 }
 
+static ssize_t
+payload_read(struct file *file, char *buf, size_t count, loff_t *pos)
+{
+    memcpy((char *)buf, file->private_data + *pos, count);
+    *pos += count;
+    return count;
+}
+
+static int
+payload_file_mmap(struct file *file, struct vm_area_struct *vma)
+{
+    printk("%s: (%lx, %lx) (%lx)(%lx) private(%p)\n",
+           __func__,
+           vma->vm_start, vma->vm_end,
+           vma->vm_pgoff,
+           vma->vm_page_prot.pgprot,
+           file->private_data);
+
+    BUG_ON(!PAGE_ALIGNED(vma->vm_start));
+    BUG_ON(!PAGE_ALIGNED(vma->vm_end));
+    BUG_ON(!PAGE_ALIGNED(file->private_data));
+    /*
+    int i;
+    for (i = 0; i < 16; i++) {
+        u64 *data = file->private_data;
+        printk("%lx ", data[i]);
+    }
+    printk("\n");
+    */
+    uintptr_t va = vma->vm_start;
+    unsigned long pa =
+        __pa((uintptr_t)file->private_data + (vma->vm_pgoff << PAGE_SHIFT));
+
+    pgd_t *pgd = current->mm->pgd;
+    while (va < vma->vm_end) {
+        /*
+        printk("va: %lx pa: %lx, %p, %lx\n",
+               va, pa, __va(pa), vma->vm_page_prot.pgprot);
+               */
+        create_pgd_mapping(pgd, va, pa, PAGE_SIZE,
+                           PAGE_KERNEL_EXEC);
+        va += PAGE_SIZE;
+        pa += PAGE_SIZE;
+    }
+
+    return 0;
+}
+
+const struct file_operations payload_file_operations = {
+    .read = payload_read,
+    .mmap = payload_file_mmap,
+};
+
 /*
  * sys_execve() executes a new program.
  */
@@ -337,11 +394,31 @@ static int bprm_execve(struct linux_binprm *bprm,
 {
     int retval;
     struct file *file;
+    struct payload *payload;
 
     file = do_open_execat(fd, filename, flags);
     retval = PTR_ERR(file);
     if (IS_ERR(file))
         panic("bad file!");
+
+    /* payload file */
+    /* Todo: implement payload as a filesystem. */
+    #define PAYLOAD_PROTOCOL "payload://"
+    list_for_each_entry(payload, &payloads, lh) {
+        int prefix_size = strlen(PAYLOAD_PROTOCOL);
+        printk("++++++ %s: payload '%s'\n", __func__, payload->name);
+        if (strcmp(filename->name + prefix_size, payload->name) == 0) {
+            file->private_data = (void *)payload->ptr;
+            break;
+        }
+    }
+    if (file->private_data == NULL) {
+        panic("%s: no payload named '%s'\n", __func__, filename->name);
+    }
+
+    file->f_mode |= FMODE_READ;
+    file->f_mode |= FMODE_CAN_READ;
+    file->f_op = &payload_file_operations;
 
     bprm->file = file;
 
@@ -383,11 +460,13 @@ int kernel_execve(const char *kernel_filename,
     if (retval < 0)
         panic("out of limits!");
 
+    printk("+++ step1 (%lx)\n", bprm->p);
     retval = copy_string_kernel(bprm->filename, bprm);
     if (retval < 0)
         panic("out of memory!");
     bprm->exec = bprm->p;
 
+    printk("+++ step2\n");
     retval = copy_strings_kernel(bprm->envc, envp, bprm);
     if (retval < 0)
         panic("out of memory!");

@@ -110,6 +110,7 @@ static int faultin_page(struct vm_area_struct *vma,
         fault_flags |= FAULT_FLAG_TRIED;
     }
 
+    printk("%s: address(%lx) fault_flags(%x)\n", __func__, address, fault_flags);
     ret = handle_mm_fault(vma, address, fault_flags, NULL);
     if (ret & VM_FAULT_ERROR)
         panic("handle mm fault error!");

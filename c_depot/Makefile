@@ -21,7 +21,7 @@ qemu_args += \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
 	-nographic \
     -append "earlycon=sbi root=/dev/vda rw console=ttyS0" \
-    #-d in_asm -D /tmp/insturction.log
+    -d in_asm -D /tmp/insturction.log
 
 predirs := prebuilt
 
@@ -43,7 +43,8 @@ components := \
 	dcache \
 	fs rootfs ramfs ext2 procfs \
 	sys userboot \
-	top_helloworld top_linux
+	top_helloworld top_linux \
+	top_unikernel
 
 build: apps
 	@:
@@ -71,6 +72,9 @@ clean:
 
 bootrd: FORCE
 	@rm -f $(KMODULE_DIR)/bootrd.disk $(KMODULE_DIR)/top_*.json
+	mkdir -p $(KMODULE_DIR)/payloads/
+	cp /home/cloud/test/hello/test $(KMODULE_DIR)/payloads/test
+	#cp /home/cloud/test/musl-1.2.3/output/lib/libc.so $(KMODULE_DIR)/payloads/
 	@ ../tools/mk_bootrd/mk_bootrd
 
 profiles:

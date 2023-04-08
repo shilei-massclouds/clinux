@@ -18,7 +18,7 @@ long sys_ni_syscall(void)
     register uintptr_t a7 asm ("a7");
 
     ul_to_str(a7, buf, sizeof(buf));
-    sbi_puts("\nSyscall[0x");
+    sbi_puts("\nNOTE: Syscall[0x");
     sbi_puts(buf);
     sbi_puts("] NOT-Implemented yet!\n");
     halt();

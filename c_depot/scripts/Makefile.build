@@ -12,8 +12,7 @@ OBJCOPY := $(CROSS_)objcopy
 
 INCLUDES := -I../include/ -I./target/
 CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
-	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__ \
-	-DDEBUG
+	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__
 AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug

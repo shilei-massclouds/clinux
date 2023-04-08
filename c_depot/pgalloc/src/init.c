@@ -73,7 +73,13 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
 
     __SetPageUptodate(page);
 
+    /* Todo: Control vmf->vma, allow it to be for kernel NOT for user */
+    printk("%s: prot(%lx)\n", __func__, vma->vm_page_prot.pgprot);
+#if 0
     entry = mk_pte(page, vma->vm_page_prot);
+#else
+    entry = mk_pte(page, PAGE_KERNEL_EXEC);
+#endif
     entry = pte_sw_mkyoung(entry);
 
     vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd, vmf->address);
@@ -81,6 +87,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
         panic("bad pte!");
 
     set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);
+    printk("%s: entry(%lx)\n", __func__, entry.pte);
     return 0;
 }
 

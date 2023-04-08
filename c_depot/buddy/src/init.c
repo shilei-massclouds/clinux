@@ -1082,6 +1082,14 @@ unsigned long get_zeroed_page(gfp_t gfp_mask)
 }
 EXPORT_SYMBOL(get_zeroed_page);
 
+static phys_addr_t
+buddy_phys_alloc(phys_addr_t size, phys_addr_t align)
+{
+    BUG_ON(size != PAGE_SIZE);
+    BUG_ON(align != PAGE_SIZE);
+    return __pa(get_zeroed_page(GFP_KERNEL));
+}
+
 int
 init_module(void)
 {
@@ -1098,6 +1106,8 @@ init_module(void)
 
     reserve_first_chunk_for_cpu_cache();
     memblock_free_all();
+
+    reset_phys_alloc_fn(buddy_phys_alloc);
 
     printk("module[buddy]: init end!\n");
     return 0;

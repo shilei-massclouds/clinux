@@ -19,6 +19,7 @@ void do_exit(long code)
 void
 _do_group_exit(int exit_code)
 {
+    sbi_puts("_do_group_exit\n");
     struct signal_struct *sig = current->signal;
 
     pr_warn("%s: ...\n", __func__);

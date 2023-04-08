@@ -257,6 +257,7 @@ void fork_init(void)
 
 static long _do_set_tid_address(int *tidptr)
 {
+    sbi_puts("_do_set_tid_address ...\n");
     return 0;
     //current->clear_child_tid = tidptr;
 

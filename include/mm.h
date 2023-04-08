@@ -406,4 +406,10 @@ int __do_munmap(struct mm_struct *mm, unsigned long start, size_t len,
 
 void mark_page_accessed(struct page *page);
 
+void create_pgd_mapping(pgd_t *pgdp,
+                        uintptr_t va, phys_addr_t pa,
+                        phys_addr_t sz, pgprot_t prot);
+
+void reset_phys_alloc_fn(phys_alloc_t alloc);
+
 #endif /* _RISCV_MM_H_ */

@@ -81,6 +81,11 @@ EXPORT_SYMBOL(do_group_exit);
  */
 SYSCALL_DEFINE1(exit_group, int, error_code)
 {
+    sbi_puts("exit_group ...\n");
+    if (do_group_exit == NULL) {
+        sbi_puts("NOT register do_exit_group yet!\n");
+        sbi_srst_power_off();
+    }
     do_group_exit((error_code & 0xff) << 8);
     /* NOTREACHED */
     return 0;
@@ -92,6 +97,10 @@ EXPORT_SYMBOL(do_set_tid_address);
 /* fork/fork.c */
 SYSCALL_DEFINE1(set_tid_address, int *, tidptr)
 {
+    if (do_set_tid_address == NULL) {
+        sbi_puts("NOT register do_set_tid_address yet!\n");
+        sbi_srst_power_off();
+    }
     return do_set_tid_address(tidptr);
 }
 

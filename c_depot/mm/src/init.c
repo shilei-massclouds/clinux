@@ -24,6 +24,8 @@ EXPORT_SYMBOL(dtb_early_va);
 handle_mm_fault_t handle_mm_fault;
 EXPORT_SYMBOL(handle_mm_fault);
 
+static bool mmu_enabled;
+
 struct mm_struct init_mm = {
     .pgd    = swapper_pg_dir,
 };
@@ -84,10 +86,42 @@ get_pmd_virt(phys_addr_t pa)
 static phys_addr_t
 alloc_pmd(uintptr_t va)
 {
-	uintptr_t pmd_num;
-
+    BUG_ON(!mmu_enabled);
     BUG_ON(!phys_alloc_fn);
     return phys_alloc_fn(PAGE_SIZE, PAGE_SIZE);
+}
+
+static pte_t *
+get_pte_virt(phys_addr_t pa)
+{
+    BUG_ON(!mmu_enabled);
+    clear_fixmap(FIX_PTE);
+    return (pte_t *)set_fixmap_offset(FIX_PTE, pa);
+}
+
+static phys_addr_t
+alloc_pte(uintptr_t va)
+{
+    /*
+     * We only create PMD or PGD early mappings so we
+     * should never reach here with MMU disabled.
+     */
+    BUG_ON(!mmu_enabled);
+    BUG_ON(!phys_alloc_fn);
+    return phys_alloc_fn(PAGE_SIZE, PAGE_SIZE);
+}
+
+static void
+create_pte_mapping(pte_t *ptep,
+                   uintptr_t va, phys_addr_t pa,
+                   phys_addr_t sz, pgprot_t prot)
+{
+    uintptr_t pte_idx = pte_index(va);
+
+    BUG_ON(sz != PAGE_SIZE);
+
+    if (pte_none(ptep[pte_idx]))
+        ptep[pte_idx] = pfn_pte(PFN_DOWN(pa), prot);
 }
 
 static void
@@ -95,15 +129,30 @@ create_pmd_mapping(pmd_t *pmdp,
                    uintptr_t va, phys_addr_t pa,
                    phys_addr_t sz, pgprot_t prot)
 {
-	uintptr_t pmd_idx = pmd_index(va);
+    pte_t *ptep;
+    phys_addr_t pte_phys;
+    uintptr_t pmd_idx = pmd_index(va);
 
-    BUG_ON(sz != PMD_SIZE);
+    if (sz == PMD_SIZE) {
+        if (pmd_none(pmdp[pmd_idx]))
+            pmdp[pmd_idx] = pfn_pmd(PFN_DOWN(pa), prot);
+        return;
+    }
 
-    if (pmd_none(pmdp[pmd_idx]))
-        pmdp[pmd_idx] = pfn_pmd(PFN_DOWN(pa), prot);
+    if (pmd_none(pmdp[pmd_idx])) {
+        pte_phys = alloc_pte(va);
+        pmdp[pmd_idx] = pfn_pmd(PFN_DOWN(pte_phys), PAGE_TABLE);
+        ptep = get_pte_virt(pte_phys);
+        memset(ptep, 0, PAGE_SIZE);
+    } else {
+        pte_phys = PFN_PHYS(pmd_pfn(pmdp[pmd_idx]));
+        ptep = get_pte_virt(pte_phys);
+    }
+
+    create_pte_mapping(ptep, va, pa, sz, prot);
 }
 
-static void
+void
 create_pgd_mapping(pgd_t *pgdp,
                    uintptr_t va, phys_addr_t pa,
                    phys_addr_t sz, pgprot_t prot)
@@ -130,6 +179,7 @@ create_pgd_mapping(pgd_t *pgdp,
 
 	create_pmd_mapping(nextp, va, pa, sz, prot);
 }
+EXPORT_SYMBOL(create_pgd_mapping);
 
 void
 setup_vm_final(struct memblock_region *regions,
@@ -139,6 +189,9 @@ setup_vm_final(struct memblock_region *regions,
 	uintptr_t va;
 	phys_addr_t pa, start, end;
 	struct memblock_region *reg;
+
+    /* Set mmu_enabled flag */
+    mmu_enabled = true;
 
     phys_alloc_fn = alloc;
 
@@ -157,7 +210,6 @@ setup_vm_final(struct memblock_region *regions,
 
         for (pa = start; pa < end; pa += PMD_SIZE) {
             va = (uintptr_t)__va(pa);
-            //printk("%s: va(%p) pa(%p)\n", __func__, va, pa);
             create_pgd_mapping(swapper_pg_dir, va, pa,
                                PMD_SIZE, PAGE_KERNEL_EXEC);
         }
@@ -172,6 +224,12 @@ setup_vm_final(struct memblock_region *regions,
     local_flush_tlb_all();
 }
 EXPORT_SYMBOL(setup_vm_final);
+
+void reset_phys_alloc_fn(phys_alloc_t alloc)
+{
+    phys_alloc_fn = alloc;
+}
+EXPORT_SYMBOL(reset_phys_alloc_fn);
 
 void _do_page_fault(struct pt_regs *regs)
 {

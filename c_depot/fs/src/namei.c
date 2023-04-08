@@ -729,7 +729,11 @@ path_openat(struct nameidata *nd,
     if (IS_ERR(file))
         return file;
 
-    if (unlikely(file->f_flags & __O_TMPFILE)) {
+    /* Todo: implement payload as a filesystem. */
+    if (strncmp(nd->name->name, "payload://", strlen("payload://")) == 0) {
+        error = 0;
+        file->f_mode |= FMODE_OPENED;
+    } else if (unlikely(file->f_flags & __O_TMPFILE)) {
         panic("__O_TMPFILE");
     } else if (unlikely(file->f_flags & O_PATH)) {
         panic("O_PATH");
@@ -763,9 +767,7 @@ struct file *do_filp_open(int dfd, struct filename *pathname,
     int flags = op->lookup_flags;
 
     set_nameidata(&nd, dfd, pathname);
-    printk("####### %s: 1 filename(%s)\n", __func__, pathname->name);
     filp = path_openat(&nd, op, flags | LOOKUP_RCU);
-    printk("####### %s: 2 filename(%s)\n", __func__, pathname->name);
     return filp;
 }
 EXPORT_SYMBOL(do_filp_open);

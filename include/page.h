@@ -191,6 +191,11 @@ struct page {
     atomic_t _refcount;
 };
 
+static inline unsigned long pmd_pfn(pmd_t pmd)
+{
+    return pmd_val(pmd) >> _PAGE_PFN_SHIFT;
+}
+
 #include <log2.h>
 #define STRUCT_PAGE_MAX_SHIFT   (order_base_2(sizeof(struct page)))
 
