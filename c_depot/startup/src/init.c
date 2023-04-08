@@ -101,6 +101,9 @@ EXPORT_SYMBOL(kmemdup_nul);
 sys_mmap_t riscv_sys_mmap;
 EXPORT_SYMBOL(riscv_sys_mmap);
 
+do_vm_munmap_t do_vm_munmap;
+EXPORT_SYMBOL(do_vm_munmap);
+
 /* For fork */
 vm_area_alloc_t vm_area_alloc;
 EXPORT_SYMBOL(vm_area_alloc);

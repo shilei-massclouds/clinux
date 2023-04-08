@@ -29,4 +29,21 @@ static inline struct fd fdget_pos(int fd)
     return __to_fd(__fdget_pos(fd));
 }
 
+static inline void fdput(struct fd fd)
+{
+#if 0
+    if (fd.flags & FDPUT_FPUT)
+        fput(fd.file);
+#endif
+}
+
+static inline void fdput_pos(struct fd f)
+{
+#if 0
+    if (f.flags & FDPUT_POS_UNLOCK)
+        __f_unlock_pos(f.file);
+    fdput(f);
+#endif
+}
+
 #endif /* __LINUX_FILE_H */

@@ -419,4 +419,8 @@ typedef long
               unsigned long page_shift_offset);
 extern sys_mmap_t riscv_sys_mmap;
 
+typedef int
+(*do_vm_munmap_t)(unsigned long start, size_t len, bool downgrade);
+extern do_vm_munmap_t do_vm_munmap;
+
 #endif /* _RISCV_MM_H_ */

@@ -13,6 +13,9 @@
 #include <xarray.h>
 #include <mm_types.h>
 
+typedef int __kernel_rwf_t;
+typedef __kernel_rwf_t rwf_t;
+
 #define INR_OPEN_CUR 1024   /* Initial setting for nfile rlimits */
 #define INR_OPEN_MAX 4096   /* Hard limit for nfile rlimits */
 

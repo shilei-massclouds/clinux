@@ -15,6 +15,9 @@ __SYSCALL(__NR_openat, sys_openat)
 #define __NR_write 64
 __SYSCALL(__NR_write, sys_write)
 
+#define __NR_writev 66
+__SYSCALL(__NR_writev, sys_writev)
+
 /* fs/stat.c */
 #define __NR_readlinkat 78
 __SYSCALL(__NR_readlinkat, sys_readlinkat)
@@ -39,6 +42,9 @@ __SYSCALL(__NR_uname, sys_newuname)
 /* mm/nommu.c, also with MMU */
 #define __NR_brk 214
 __SYSCALL(__NR_brk, sys_brk)
+
+#define __NR_munmap 215
+__SYSCALL(__NR_munmap, sys_munmap)
 
 #define __NR_mmap 222
 __SYSCALL(__NR_mmap, sys_mmap)

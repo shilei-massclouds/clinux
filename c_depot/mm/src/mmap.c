@@ -1307,4 +1307,5 @@ void
 init_mmap(void)
 {
     riscv_sys_mmap = _riscv_sys_mmap;
+    do_vm_munmap = __vm_munmap;
 }

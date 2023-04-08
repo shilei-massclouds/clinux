@@ -109,6 +109,17 @@ extern ksys_write_t ksys_write;
 
 long sys_write(unsigned int fd, const char *buf, size_t count);
 
+typedef ssize_t
+(*do_writev_t)(unsigned long fd,
+               const struct iovec *vec,
+               unsigned long vlen,
+               rwf_t flags);
+
+extern do_writev_t do_writev;
+
+long sys_writev(unsigned long fd, const struct iovec *vec,
+                unsigned long vlen);
+
 typedef void (*do_group_exit_t)(int exit_code);
 extern do_group_exit_t do_group_exit;
 
@@ -133,5 +144,7 @@ long sys_clock_gettime(clockid_t which_clock,
 long sys_mmap(unsigned long addr, unsigned long len,
               unsigned long prot, unsigned long flags,
               unsigned long fd, off_t offset);
+
+long sys_munmap(unsigned long addr, size_t len);
 
 #endif /* _LINUX_SYSCALLS_H */

@@ -136,8 +136,53 @@ _ksys_write(unsigned int fd, const char *buf, size_t count)
     return ret;
 }
 
+static ssize_t
+vfs_writev(struct file *file, const struct iovec *vec,
+           unsigned long vlen, loff_t *pos, rwf_t flags)
+{
+    panic("%s: vfs_writev\n", __func__);
+#if 0
+    struct iovec iovstack[UIO_FASTIOV];
+    struct iovec *iov = iovstack;
+    struct iov_iter iter;
+    ssize_t ret;
+
+    ret = import_iovec(WRITE, vec, vlen, ARRAY_SIZE(iovstack), &iov, &iter);
+    if (ret >= 0) {
+        file_start_write(file);
+        ret = do_iter_write(file, &iter, pos, flags);
+        file_end_write(file);
+        kfree(iov);
+    }
+    return ret;
+#endif
+}
+
+static ssize_t
+_do_writev(unsigned long fd, const struct iovec *vec,
+           unsigned long vlen, rwf_t flags)
+{
+    struct fd f = fdget_pos(fd);
+    ssize_t ret = -EBADF;
+
+    if (f.file) {
+        loff_t pos, *ppos = file_ppos(f.file);
+        if (ppos) {
+            pos = *ppos;
+            ppos = &pos;
+        }
+        ret = vfs_writev(f.file, vec, vlen, ppos, flags);
+        if (ret >= 0 && ppos)
+            f.file->f_pos = pos;
+        fdput_pos(f);
+    }
+
+    return ret;
+}
+
 void init_read_write(void)
 {
     do_sys_readlinkat = _do_sys_readlinkat;
     ksys_write = _ksys_write;
+    do_writev = _do_writev;
 }

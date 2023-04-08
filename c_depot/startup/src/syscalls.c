@@ -68,6 +68,20 @@ SYSCALL_DEFINE3(write, unsigned int, fd, const char *, buf, size_t, count)
     return ksys_write(fd, buf, count);
 }
 
+do_writev_t do_writev;
+EXPORT_SYMBOL(do_writev);
+
+SYSCALL_DEFINE3(writev, unsigned long, fd,
+                const struct iovec *, vec,
+                unsigned long, vlen)
+{
+    if (do_writev == NULL) {
+        sbi_puts("NOT register do_writev yet!\n");
+        sbi_srst_power_off();
+    }
+    return do_writev(fd, vec, vlen, 0);
+}
+
 do_faccessat_t do_faccessat;
 EXPORT_SYMBOL(do_faccessat);
 
@@ -161,4 +175,15 @@ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
         sbi_srst_power_off();
     }
     return riscv_sys_mmap(addr, len, prot, flags, fd, offset, 0);
+}
+
+SYSCALL_DEFINE2(munmap, unsigned long, addr, size_t, len)
+{
+    if (do_vm_munmap == NULL) {
+        sbi_puts("NOT register do_vm_munmap yet!\n");
+        sbi_srst_power_off();
+    }
+
+    addr = untagged_addr(addr);
+    return do_vm_munmap(addr, len, true);
 }
