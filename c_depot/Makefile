@@ -46,11 +46,8 @@ components := \
 	top_helloworld top_linux \
 	top_unikernel
 
-build: apps
+build: $(components) FORCE
 	@:
-
-apps: $(components) FORCE
-	#@$(MAKE) -C apps
 
 $(components): $(predirs) FORCE
 	@mkdir -p ./target/$@
@@ -68,7 +65,6 @@ justrun:
 clean:
 	@rm -f `find $(KMODULE_DIR) ! -name README.md -type f`
 	@rm -rf ./target
-	@$(MAKE) -C apps clean
 
 bootrd: FORCE
 	@rm -f $(KMODULE_DIR)/bootrd.disk $(KMODULE_DIR)/top_*.json
@@ -82,4 +78,4 @@ profiles:
 
 FORCE:
 
-.PHONY: build components apps predirs clean FORCE
+.PHONY: build components predirs clean FORCE
