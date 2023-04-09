@@ -13,6 +13,9 @@
 #include <xarray.h>
 #include <mm_types.h>
 
+/* high priority request, poll if possible */
+#define RWF_HIPRI   ((__force __kernel_rwf_t)0x00000001)
+
 typedef int __kernel_rwf_t;
 typedef __kernel_rwf_t rwf_t;
 
@@ -561,5 +564,11 @@ enum positive_aop_returns {
     AOP_WRITEPAGE_ACTIVATE  = 0x80000,
     AOP_TRUNCATED_PAGE  = 0x80001,
 };
+
+ssize_t
+rw_copy_check_uvector(int type, const struct iovec *uvector,
+                      unsigned long nr_segs, unsigned long fast_segs,
+                      struct iovec *fast_pointer,
+                      struct iovec **ret_pointer);
 
 #endif /* _LINUX_FS_H */

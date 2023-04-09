@@ -96,4 +96,32 @@ static inline bool iov_iter_is_pipe(const struct iov_iter *i)
     return iov_iter_type(i) == ITER_PIPE;
 }
 
+ssize_t
+import_iovec(int type, const struct iovec *uvector,
+             unsigned nr_segs, unsigned fast_segs,
+             struct iovec **iov, struct iov_iter *i);
+
+/*
+ *  UIO_MAXIOV shall be at least 16 1003.1g (5.4.1.1)
+ */
+
+#define UIO_FASTIOV 8
+#define UIO_MAXIOV  1024
+
+static inline bool iov_iter_is_discard(const struct iov_iter *i)
+{
+    return iov_iter_type(i) == ITER_DISCARD;
+}
+
+static inline struct iovec iov_iter_iovec(const struct iov_iter *iter)
+{
+    return (struct iovec) {
+        .iov_base = iter->iov->iov_base + iter->iov_offset,
+        .iov_len = min(iter->count,
+                       iter->iov->iov_len - iter->iov_offset),
+    };
+}
+
+void iov_iter_advance(struct iov_iter *i, size_t bytes);
+
 #endif /* __LINUX_UIO_H */

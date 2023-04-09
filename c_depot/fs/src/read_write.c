@@ -2,6 +2,7 @@
 
 #include <fs.h>
 #include <file.h>
+#include <slab.h>
 #include <errno.h>
 #include <namei.h>
 #include <export.h>
@@ -136,12 +137,78 @@ _ksys_write(unsigned int fd, const char *buf, size_t count)
     return ret;
 }
 
+/* Do it by hand, with file-ops */
+static ssize_t
+do_loop_readv_writev(struct file *filp, struct iov_iter *iter,
+                     loff_t *ppos, int type, rwf_t flags)
+{
+    ssize_t ret = 0;
+
+    if (flags & ~RWF_HIPRI)
+        return -EOPNOTSUPP;
+
+    while (iov_iter_count(iter)) {
+        struct iovec iovec = iov_iter_iovec(iter);
+        ssize_t nr;
+
+        if (type == READ) {
+            nr = filp->f_op->read(filp, iovec.iov_base,
+                          iovec.iov_len, ppos);
+        } else {
+            nr = filp->f_op->write(filp, iovec.iov_base,
+                           iovec.iov_len, ppos);
+        }
+
+        if (nr < 0) {
+            if (!ret)
+                ret = nr;
+            break;
+        }
+        ret += nr;
+        if (nr != iovec.iov_len)
+            break;
+        iov_iter_advance(iter, nr);
+    }
+
+    return ret;
+}
+
+static ssize_t
+do_iter_write(struct file *file, struct iov_iter *iter,
+              loff_t *pos, rwf_t flags)
+{
+    size_t tot_len;
+    ssize_t ret = 0;
+
+    if (!(file->f_mode & FMODE_WRITE))
+        return -EBADF;
+    if (!(file->f_mode & FMODE_CAN_WRITE))
+        return -EINVAL;
+
+    tot_len = iov_iter_count(iter);
+    if (!tot_len)
+        return 0;
+    ret = rw_verify_area(WRITE, file, pos, tot_len);
+    if (ret < 0)
+        return ret;
+
+    if (file->f_op->write_iter) {
+        //ret = do_iter_readv_writev(file, iter, pos, WRITE, flags);
+        panic("%s: with write_iter\n", __func__);
+    } else {
+        ret = do_loop_readv_writev(file, iter, pos, WRITE, flags);
+    }
+#if 0
+    if (ret > 0)
+        fsnotify_modify(file);
+#endif
+    return ret;
+}
+
 static ssize_t
 vfs_writev(struct file *file, const struct iovec *vec,
            unsigned long vlen, loff_t *pos, rwf_t flags)
 {
-    panic("%s: vfs_writev\n", __func__);
-#if 0
     struct iovec iovstack[UIO_FASTIOV];
     struct iovec *iov = iovstack;
     struct iov_iter iter;
@@ -149,13 +216,12 @@ vfs_writev(struct file *file, const struct iovec *vec,
 
     ret = import_iovec(WRITE, vec, vlen, ARRAY_SIZE(iovstack), &iov, &iter);
     if (ret >= 0) {
-        file_start_write(file);
+        //file_start_write(file);
         ret = do_iter_write(file, &iter, pos, flags);
-        file_end_write(file);
+        //file_end_write(file);
         kfree(iov);
     }
     return ret;
-#endif
 }
 
 static ssize_t
