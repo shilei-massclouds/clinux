@@ -147,4 +147,14 @@ long sys_mmap(unsigned long addr, unsigned long len,
 
 long sys_munmap(unsigned long addr, size_t len);
 
+/* fs/ioctl.c */
+long sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
+
+typedef long
+(*ksys_do_vfs_ioctl_t)(unsigned int fd,
+                       unsigned int cmd,
+                       unsigned long arg);
+
+extern ksys_do_vfs_ioctl_t ksys_do_vfs_ioctl;
+
 #endif /* _LINUX_SYSCALLS_H */

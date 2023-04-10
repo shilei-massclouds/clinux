@@ -1,5 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 
+/* fs/ioctl.c */
+#define __NR_ioctl 29
+__SYSCALL(__NR_ioctl, sys_ioctl)
+
 /* fs/namespace.c */
 #define __NR_mount 40
 __SYSCALL(__NR_mount, sys_mount)

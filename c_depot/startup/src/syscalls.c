@@ -187,3 +187,16 @@ SYSCALL_DEFINE2(munmap, unsigned long, addr, size_t, len)
     addr = untagged_addr(addr);
     return do_vm_munmap(addr, len, true);
 }
+
+ksys_do_vfs_ioctl_t ksys_do_vfs_ioctl;
+EXPORT_SYMBOL(ksys_do_vfs_ioctl);
+
+SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
+{
+    if (ksys_do_vfs_ioctl == NULL) {
+        sbi_puts("NOT register ksys_do_vfs_ioctl yet!\n");
+        sbi_srst_power_off();
+    }
+
+    return ksys_do_vfs_ioctl(fd, cmd, arg);
+}

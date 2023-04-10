@@ -272,6 +272,7 @@ struct file_operations {
     ssize_t (*write)(struct file *, const char *, size_t, loff_t *);
     ssize_t (*read_iter)(struct kiocb *, struct iov_iter *);
     ssize_t (*write_iter)(struct kiocb *, struct iov_iter *);
+    long (*unlocked_ioctl) (struct file *, unsigned int, unsigned long);
     int (*mmap)(struct file *, struct vm_area_struct *);
 };
 
@@ -570,5 +571,142 @@ rw_copy_check_uvector(int type, const struct iovec *uvector,
                       unsigned long nr_segs, unsigned long fast_segs,
                       struct iovec *fast_pointer,
                       struct iovec **ret_pointer);
+
+struct file_clone_range {
+    __s64 src_fd;
+    __u64 src_offset;
+    __u64 src_length;
+    __u64 dest_offset;
+};
+
+struct fstrim_range {
+    __u64 start;
+    __u64 len;
+    __u64 minlen;
+};
+
+/* from struct btrfs_ioctl_file_extent_same_info */
+struct file_dedupe_range_info {
+    __s64 dest_fd;      /* in - destination file */
+    __u64 dest_offset;  /* in - start of extent in destination */
+    __u64 bytes_deduped;    /* out - total # of bytes we were able
+                 * to dedupe from this file. */
+    /* status of this dedupe operation:
+     * < 0 for error
+     * == FILE_DEDUPE_RANGE_SAME if dedupe succeeds
+     * == FILE_DEDUPE_RANGE_DIFFERS if data differs
+     */
+    __s32 status;       /* out - see above description */
+    __u32 reserved;     /* must be zero */
+};
+
+/* from struct btrfs_ioctl_file_extent_same_args */
+struct file_dedupe_range {
+    __u64 src_offset;   /* in - start of extent in source */
+    __u64 src_length;   /* in - length of extent */
+    __u16 dest_count;   /* in - total elements in info array */
+    __u16 reserved1;    /* must be zero */
+    __u32 reserved2;    /* must be zero */
+    struct file_dedupe_range_info info[0];
+};
+
+/*
+ * The following is for compatibility across the various Linux
+ * platforms.  The generic ioctl numbering scheme doesn't really enforce
+ * a type field.  De facto, however, the top 8 bits of the lower 16
+ * bits are indeed used as a type field, so we might just as well make
+ * this explicit here.  Please be sure to use the decoding macros
+ * below from now on.
+ */
+#define _IOC_NRBITS 8
+#define _IOC_TYPEBITS   8
+
+/*
+ * Let any architecture override either of the following before
+ * including this file.
+ */
+
+#ifndef _IOC_SIZEBITS
+# define _IOC_SIZEBITS  14
+#endif
+
+#ifndef _IOC_DIRBITS
+# define _IOC_DIRBITS   2
+#endif
+
+#define _IOC_NRMASK ((1 << _IOC_NRBITS)-1)
+#define _IOC_TYPEMASK   ((1 << _IOC_TYPEBITS)-1)
+#define _IOC_SIZEMASK   ((1 << _IOC_SIZEBITS)-1)
+#define _IOC_DIRMASK    ((1 << _IOC_DIRBITS)-1)
+
+#define _IOC_NRSHIFT    0
+#define _IOC_TYPESHIFT  (_IOC_NRSHIFT+_IOC_NRBITS)
+#define _IOC_SIZESHIFT  (_IOC_TYPESHIFT+_IOC_TYPEBITS)
+#define _IOC_DIRSHIFT   (_IOC_SIZESHIFT+_IOC_SIZEBITS)
+
+/*
+ * Direction bits, which any architecture can choose to override
+ * before including this file.
+ *
+ * NOTE: _IOC_WRITE means userland is writing and kernel is
+ * reading. _IOC_READ means userland is reading and kernel is writing.
+ */
+
+#ifndef _IOC_NONE
+# define _IOC_NONE  0U
+#endif
+
+#ifndef _IOC_WRITE
+# define _IOC_WRITE 1U
+#endif
+
+#ifndef _IOC_READ
+# define _IOC_READ  2U
+#endif
+
+#define _IOC(dir,type,nr,size) \
+    (((dir)  << _IOC_DIRSHIFT) | \
+     ((type) << _IOC_TYPESHIFT) | \
+     ((nr)   << _IOC_NRSHIFT) | \
+     ((size) << _IOC_SIZESHIFT))
+
+#define _IOC_TYPECHECK(t) (sizeof(t))
+
+/*
+ * Used to create numbers.
+ *
+ * NOTE: _IOW means userland is writing and kernel is reading. _IOR
+ * means userland is reading and kernel is writing.
+ */
+#define _IO(type,nr)        _IOC(_IOC_NONE,(type),(nr),0)
+#define _IOR(type,nr,size)  _IOC(_IOC_READ,(type),(nr),(_IOC_TYPECHECK(size)))
+#define _IOW(type,nr,size)  _IOC(_IOC_WRITE,(type),(nr),(_IOC_TYPECHECK(size)))
+#define _IOWR(type,nr,size) _IOC(_IOC_READ|_IOC_WRITE,(type),(nr),(_IOC_TYPECHECK(size)))
+#define _IOR_BAD(type,nr,size)  _IOC(_IOC_READ,(type),(nr),sizeof(size))
+#define _IOW_BAD(type,nr,size)  _IOC(_IOC_WRITE,(type),(nr),sizeof(size))
+#define _IOWR_BAD(type,nr,size) _IOC(_IOC_READ|_IOC_WRITE,(type),(nr),sizeof(size))
+
+#define FIBMAP      _IO(0x00,1)  /* bmap access */
+#define FIGETBSZ    _IO(0x00,2)  /* get the block size used for bmap */
+#define FIFREEZE    _IOWR('X', 119, int)    /* Freeze */
+#define FITHAW      _IOWR('X', 120, int)    /* Thaw */
+#define FITRIM      _IOWR('X', 121, struct fstrim_range)    /* Trim */
+#define FICLONE     _IOW(0x94, 9, int)
+#define FICLONERANGE    _IOW(0x94, 13, struct file_clone_range)
+#define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
+
+#define FS_IOC_GETFLAGS         _IOR('f', 1, long)
+#define FS_IOC_SETFLAGS         _IOW('f', 2, long)
+#define FS_IOC_GETVERSION       _IOR('v', 1, long)
+#define FS_IOC_SETVERSION       _IOW('v', 2, long)
+#define FS_IOC_FIEMAP           _IOWR('f', 11, struct fiemap)
+#define FS_IOC32_GETFLAGS       _IOR('f', 1, int)
+#define FS_IOC32_SETFLAGS       _IOW('f', 2, int)
+#define FS_IOC32_GETVERSION     _IOR('v', 1, int)
+#define FS_IOC32_SETVERSION     _IOW('v', 2, int)
+#define FS_IOC_FSGETXATTR       _IOR('X', 31, struct fsxattr)
+#define FS_IOC_FSSETXATTR       _IOW('X', 32, struct fsxattr)
+#define FS_IOC_GETFSLABEL       _IOR(0x94, 49, char[FSLABEL_MAX])
+#define FS_IOC_SETFSLABEL       _IOW(0x94, 50, char[FSLABEL_MAX])
 
 #endif /* _LINUX_FS_H */

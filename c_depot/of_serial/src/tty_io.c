@@ -8,6 +8,7 @@
 #include <kdev_t.h>
 #include <uaccess.h>
 #include <tty_ldisc.h>
+#include <ioctls.h>
 
 static struct cdev console_cdev;
 static struct file *redirect;
@@ -303,14 +304,254 @@ redirected_tty_write(struct file *file,
     return tty_write(file, buf, count, ppos);
 }
 
+/*
+ * if pty, return the slave side (real_tty)
+ * otherwise, return self
+ */
+static struct tty_struct *tty_pair_get_tty(struct tty_struct *tty)
+{
+    BUG_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY);
+#if 0
+    if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+        tty->driver->subtype == PTY_TYPE_MASTER)
+        tty = tty->link;
+#endif
+    return tty;
+}
+
+/*
+ * Called from tty_ioctl(). If tty is a pty then real_tty is the slave side,
+ * if not then tty == real_tty.
+ */
+long tty_jobctrl_ioctl(struct tty_struct *tty, struct tty_struct *real_tty,
+                       struct file *file, unsigned int cmd, unsigned long arg)
+{
+    void *p = (void *)arg;
+
+    switch (cmd) {
+    case TIOCNOTTY:
+#if 0
+        if (current->signal->tty != tty)
+            return -ENOTTY;
+        no_tty();
+#endif
+        panic("%s: cmd (%u)\n", __func__, cmd);
+        return 0;
+    case TIOCSCTTY:
+        panic("%s: cmd (%u)\n", __func__, cmd);
+        //return tiocsctty(real_tty, file, arg);
+    case TIOCGPGRP:
+        panic("%s: cmd (%u)\n", __func__, cmd);
+        //return tiocgpgrp(tty, real_tty, p);
+    case TIOCSPGRP:
+        panic("%s: cmd (%u)\n", __func__, cmd);
+        //return tiocspgrp(tty, real_tty, p);
+    case TIOCGSID:
+        panic("%s: cmd (%u)\n", __func__, cmd);
+        //return tiocgsid(tty, real_tty, p);
+    }
+    return -ENOIOCTLCMD;
+}
+
+/**
+ *  tiocgwinsz      -   implement window query ioctl
+ *  @tty; tty
+ *  @arg: user buffer for result
+ *
+ *  Copies the kernel idea of the window size into the user buffer.
+ *
+ *  Locking: tty->winsize_mutex is taken to ensure the winsize data
+ *      is consistent.
+ */
+
+static int tiocgwinsz(struct tty_struct *tty, struct winsize *arg)
+{
+    int err;
+
+    printk("%s: arg (%p) winsize(%u,%u,%u,%u)\n",
+           __func__, arg,
+           tty->winsize.ws_row,
+           tty->winsize.ws_col,
+           tty->winsize.ws_xpixel,
+           tty->winsize.ws_ypixel);
+    //mutex_lock(&tty->winsize_mutex);
+    err = copy_to_user(arg, &tty->winsize, sizeof(*arg));
+    //mutex_unlock(&tty->winsize_mutex);
+
+    return err ? -EFAULT: 0;
+}
+
+/*
+ * Split this up, as gcc can choke on it otherwise..
+ */
+long tty_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+{
+    struct tty_struct *tty = file_tty(file);
+    struct tty_struct *real_tty;
+    void *p = (void *)arg;
+    int retval;
+    struct tty_ldisc *ld;
+
+    real_tty = tty_pair_get_tty(tty);
+
+    /*
+     * Factor out some common prep work
+     */
+    switch (cmd) {
+    case TIOCSETD:
+    case TIOCSBRK:
+    case TIOCCBRK:
+    case TCSBRK:
+    case TCSBRKP:
+#if 0
+        retval = tty_check_change(tty);
+        if (retval)
+            return retval;
+        if (cmd != TIOCCBRK) {
+            tty_wait_until_sent(tty, 0);
+            if (signal_pending(current))
+                return -EINTR;
+        }
+#endif
+        panic("%s: Factor out some common prep work\n", __func__);
+        break;
+    }
+
+    /*
+     *  Now do the stuff.
+     */
+    switch (cmd) {
+    case TIOCSTI:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tiocsti(tty, p);
+    case TIOCGWINSZ:
+        return tiocgwinsz(real_tty, p);
+    case TIOCSWINSZ:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tiocswinsz(real_tty, p);
+    case TIOCCONS:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return real_tty != tty ? -EINVAL : tioccons(file);
+    case TIOCEXCL:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //set_bit(TTY_EXCLUSIVE, &tty->flags);
+        return 0;
+    case TIOCNXCL:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //clear_bit(TTY_EXCLUSIVE, &tty->flags);
+        return 0;
+    case TIOCGEXCL:
+    {
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+#if 0
+        int excl = test_bit(TTY_EXCLUSIVE, &tty->flags);
+        return put_user(excl, (int *)p);
+#endif
+    }
+    case TIOCGETD:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tiocgetd(tty, p);
+    case TIOCSETD:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tiocsetd(tty, p);
+    case TIOCVHANGUP:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+#if 0
+        if (!capable(CAP_SYS_ADMIN))
+            return -EPERM;
+        tty_vhangup(tty);
+        return 0;
+#endif
+    case TIOCGDEV:
+    {
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+#if 0
+        unsigned int ret = new_encode_dev(tty_devnum(real_tty));
+        return put_user(ret, (unsigned int *)p);
+#endif
+    }
+    /*
+     * Break handling
+     */
+    case TIOCSBRK:  /* Turn break on, unconditionally */
+#if 0
+        if (tty->ops->break_ctl)
+            return tty->ops->break_ctl(tty, -1);
+#endif
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        return 0;
+    case TIOCCBRK:  /* Turn break off, unconditionally */
+#if 0
+        if (tty->ops->break_ctl)
+            return tty->ops->break_ctl(tty, 0);
+#endif
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        return 0;
+    case TCSBRK:   /* SVID version: non-zero arg --> no break */
+        /* non-zero arg means wait for all output data
+         * to be sent (performed above) but don't send break.
+         * This is used by the tcdrain() termios function.
+         */
+#if 0
+        if (!arg)
+            return send_break(tty, 250);
+#endif
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        return 0;
+    case TCSBRKP:   /* support for POSIX tcsendbreak() */
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return send_break(tty, arg ? arg*100 : 250);
+
+    case TIOCMGET:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tty_tiocmget(tty, p);
+    case TIOCMSET:
+    case TIOCMBIC:
+    case TIOCMBIS:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tty_tiocmset(tty, cmd, p);
+    case TIOCGICOUNT:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tty_tiocgicount(tty, p);
+    case TCFLSH:
+#if 0
+        switch (arg) {
+        case TCIFLUSH:
+        case TCIOFLUSH:
+        /* flush tty buffer and allow ldisc to process ioctl */
+            tty_buffer_flush(tty, NULL);
+            break;
+        }
+#endif
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        break;
+    case TIOCSSERIAL:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tty_tiocsserial(tty, p);
+    case TIOCGSERIAL:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        //return tty_tiocgserial(tty, p);
+    case TIOCGPTPEER:
+        panic("%s: Now do the stuff cmd(%u)!\n", __func__, cmd);
+        /* Special because the struct file is needed */
+        //return ptm_open_peer(file, tty, (int)arg);
+    default:
+        retval = tty_jobctrl_ioctl(tty, real_tty, file, cmd, arg);
+        if (retval != -ENOIOCTLCMD)
+            return retval;
+    }
+
+    panic("%s: todo!\n", __func__);
+}
+
 static const struct file_operations console_fops = {
     .open       = tty_open,
     .write      = redirected_tty_write,
+    .unlocked_ioctl = tty_ioctl,
     /*
     .llseek     = no_llseek,
     .read       = tty_read,
     .poll       = tty_poll,
-    .unlocked_ioctl = tty_ioctl,
     .compat_ioctl   = tty_compat_ioctl,
     .release    = tty_release,
     .fasync     = tty_fasync,

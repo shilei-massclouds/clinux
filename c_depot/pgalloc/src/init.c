@@ -61,7 +61,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
     struct page *page;
     struct vm_area_struct *vma = vmf->vma;
 
-    printk("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
+    pr_debug("%s: addr(%lx) pgoff(%lx) flags(%x)\n",
            __func__, vmf->address, vmf->pgoff, vmf->flags);
 
     if (pte_alloc(vma->vm_mm, vmf->pmd))
@@ -74,7 +74,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
     __SetPageUptodate(page);
 
     /* Todo: Control vmf->vma, allow it to be for kernel NOT for user */
-    printk("%s: prot(%lx)\n", __func__, vma->vm_page_prot.pgprot);
+    pr_debug("%s: prot(%lx)\n", __func__, vma->vm_page_prot.pgprot);
 #if 0
     entry = mk_pte(page, vma->vm_page_prot);
 #else
@@ -87,7 +87,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
         panic("bad pte!");
 
     set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);
-    printk("%s: entry(%lx)\n", __func__, entry.pte);
+    pr_debug("%s: entry(%lx)\n", __func__, entry.pte);
     return 0;
 }
 
@@ -210,7 +210,6 @@ static vm_fault_t do_read_fault(struct vm_fault *vmf)
         if (ret)
             return ret;
     }
-    pr_info("%s: step1!\n", __func__);
 
     ret = __do_fault(vmf);
     if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY))) {
@@ -324,7 +323,6 @@ static vm_fault_t wp_page_copy(struct vm_fault *vmf)
         if (!new_page)
             goto oom;
     } else {
-        printk("--- %s: 1.2\n", __func__);
         new_page = alloc_page_vma(GFP_HIGHUSER_MOVABLE, vma, vmf->address);
         if (!new_page)
             goto oom;
@@ -414,7 +412,6 @@ static vm_fault_t wp_page_copy(struct vm_fault *vmf)
         }
     }
 
-    printk("--- %s: 3\n", __func__);
     return page_copied ? VM_FAULT_WRITE : 0;
 
  oom:
@@ -485,7 +482,7 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
 {
     pte_t entry;
 
-    pr_info("--- %s: vmf: addr(%lx) flags(%x) pgoff(%lx)\n",
+    pr_debug("--- %s: vmf: addr(%lx) flags(%x) pgoff(%lx)\n",
             __func__, vmf->address, vmf->flags, vmf->pgoff);
     if (unlikely(pmd_none(*vmf->pmd))) {
         /*
@@ -518,8 +515,6 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
             vmf->pte = NULL;
     }
 
-    pr_info("%s: step1\n", __func__);
-
     if (!vmf->pte) {
         if (vma_is_anonymous(vmf->vma)) {
             return do_anonymous_page(vmf);
@@ -527,7 +522,6 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
             return do_fault(vmf);
         }
     }
-    pr_info("%s: step2\n", __func__);
 
     if (!pte_present(vmf->orig_pte)) {
         panic("do_swap_page");
@@ -709,7 +703,7 @@ long _do_sys_brk(unsigned long brk)
 
     min_brk = mm->end_data;
 
-    printk("%s 1: brk(%lx) min_brk(%lx) origbrk(%lx)\n",
+    pr_debug("%s 1: brk(%lx) min_brk(%lx) origbrk(%lx)\n",
            __func__, brk, min_brk, origbrk);
 
     if (brk < min_brk)
@@ -742,7 +736,7 @@ long _do_sys_brk(unsigned long brk)
     /* Check against existing mmap mappings. */
     next = find_vma(mm, oldbrk);
 
-    printk("%s 2: brk(%lx) min_brk(%lx) next(%p) newbrk(%lx)\n",
+    pr_debug("%s 2: brk(%lx) min_brk(%lx) next(%p) newbrk(%lx)\n",
            __func__, brk, min_brk, next, newbrk);
 
     if (next && newbrk + PAGE_SIZE > vm_start_gap(next))

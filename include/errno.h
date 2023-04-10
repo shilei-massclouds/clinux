@@ -80,8 +80,9 @@
 #define ESTALE      116 /* Stale file handle */
 #define EREMOTEIO   121 /* Remote I/O error */
 
+#define ENOIOCTLCMD     515 /* No ioctl command */
 #define EPROBE_DEFER    517 /* Driver requests probe retry */
-#define EIOCBQUEUED 529 /* iocb queued, will get completion event */
+#define EIOCBQUEUED     529 /* iocb queued, will get completion event */
 
 
 static inline void *

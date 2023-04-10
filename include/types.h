@@ -147,6 +147,9 @@ typedef u16 __u16;
 typedef u32 __u32;
 typedef u64 __u64;
 
+typedef s32 __s32;
+typedef s64 __s64;
+
 typedef u64 phys_addr_t;
 
 typedef long                __kernel_long_t;

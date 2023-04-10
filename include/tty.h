@@ -5,6 +5,7 @@
 #include <file.h>
 #include <sysfs.h>
 #include <kernel.h>
+#include <termios.h>
 
 #define NR_LDISCS   30
 
@@ -39,6 +40,7 @@ struct tty_struct {
     void *driver_data;
     unsigned char *write_buf;
     int write_cnt;
+    struct winsize winsize;
     struct list_head tty_files;
 };
 
