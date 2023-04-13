@@ -17,6 +17,8 @@
 #include <user_namespace.h>
 #include <syscalls.h>
 
+void init_pid(void);
+
 #define allocate_mm()   (kmem_cache_alloc(mm_cachep, GFP_KERNEL))
 
 /* SLAB cache for vm_area_struct structures */
@@ -272,6 +274,8 @@ init_module(void)
     fork_init();
 
     proc_caches_init();
+
+    init_pid();
 
     vm_area_alloc = _vm_area_alloc;
     vm_area_free = _vm_area_free;

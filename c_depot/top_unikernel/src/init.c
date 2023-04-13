@@ -29,6 +29,17 @@ init_module(void)
     BUG_ON(!sys_ready);
     BUG_ON(!rootfs_initialized);
 
+    /*
+    {
+        extern void *sys_call_table[];
+        printk("%s: sys_call_table %p\n", __func__, sys_call_table[0]);
+
+        typedef long (*sys_io_setup_t)(unsigned long, unsigned long);
+        sys_io_setup_t func = (sys_io_setup_t) sys_call_table[0];
+        func(0, 0);
+    }
+    */
+
     run_uniprocess(UNI_PROCESS);
 
     printk("module[top_unikernel]: init end!\n");

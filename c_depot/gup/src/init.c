@@ -22,7 +22,7 @@ follow_page_pte(struct vm_area_struct *vma,
     pte_t *ptep, pte;
 
  retry:
-    printk("%s: 1 pmd(%lx) address(%lx) (%lx, %lx)\n",
+    pr_debug("%s: 1 pmd(%lx) address(%lx) (%lx, %lx)\n",
            __func__, pmd->pmd, address, vma->vm_end, vma->vm_start);
 
     ptep = pte_offset_map_lock(mm, pmd, address);
@@ -124,7 +124,7 @@ static int faultin_page(struct vm_area_struct *vma,
         fault_flags |= FAULT_FLAG_TRIED;
     }
 
-    printk("%s: address(%lx) fault_flags(%x)\n", __func__, address, fault_flags);
+    pr_debug("%s: address(%lx) fault_flags(%x)\n", __func__, address, fault_flags);
     ret = handle_mm_fault(vma, address, fault_flags, NULL);
     if (ret & VM_FAULT_ERROR)
         panic("handle mm fault error!");
@@ -221,7 +221,7 @@ __get_user_pages(struct mm_struct *mm,
         }
 
  retry:
-        printk("%s: start(%lx) vma(%lx, %lx)\n",
+        pr_debug("%s: start(%lx) vma(%lx, %lx)\n",
                __func__, start, vma->vm_start, vma->vm_end);
 
         page = follow_page_mask(vma, start, foll_flags);
@@ -258,7 +258,7 @@ __get_user_pages(struct mm_struct *mm,
         nr_pages -= page_increm;
     } while (nr_pages);
 
-    printk("%s: !(%ld) nr_pages(%lu)\n", __func__, i, nr_pages);
+    pr_debug("%s: !(%ld) nr_pages(%lu)\n", __func__, i, nr_pages);
     return i ? i : ret;
 }
 EXPORT_SYMBOL(__get_user_pages);

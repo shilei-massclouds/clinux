@@ -7,6 +7,7 @@
 #include <utsname.h>
 #include <futex.h>
 #include <time_types.h>
+#include <aio_abi.h>
 
 /* Are two types/vars the same type (ignoring qualifiers)? */
 #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
@@ -45,6 +46,10 @@
         return ret;                     \
     }                               \
     static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
+
+#define SYSCALL_DEFINE0(sname)  \
+    long sys_##sname(void);     \
+    long sys_##sname(void)
 
 #define SYSCALL_DEFINE1(name, ...) SYSCALL_DEFINEx(1, _##name, __VA_ARGS__)
 #define SYSCALL_DEFINE2(name, ...) SYSCALL_DEFINEx(2, _##name, __VA_ARGS__)
@@ -156,5 +161,17 @@ typedef long
                        unsigned long arg);
 
 extern ksys_do_vfs_ioctl_t ksys_do_vfs_ioctl;
+
+long sys_io_setup(unsigned nr_reqs, aio_context_t *ctx);
+
+typedef long
+(*do_io_setup_t)(unsigned nr_reqs, aio_context_t *ctx);
+extern do_io_setup_t do_io_setup;
+
+/* kernel/timer.c */
+long sys_getpid(void);
+
+typedef long (*do_getpid_t)(void);
+extern do_getpid_t do_getpid;
 
 #endif /* _LINUX_SYSCALLS_H */

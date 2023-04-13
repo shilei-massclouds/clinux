@@ -60,7 +60,6 @@ EXPORT_SYMBOL(ksys_write);
 
 SYSCALL_DEFINE3(write, unsigned int, fd, const char *, buf, size_t, count)
 {
-    sbi_puts("ksys_write ...\n");
     if (ksys_write == NULL) {
         sbi_puts("NOT register ksys_write yet!\n");
         sbi_srst_power_off();
@@ -193,11 +192,58 @@ EXPORT_SYMBOL(ksys_do_vfs_ioctl);
 
 SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
 {
-    long ret;
     if (ksys_do_vfs_ioctl == NULL) {
         sbi_puts("NOT register ksys_do_vfs_ioctl yet!\n");
         sbi_srst_power_off();
     }
 
     return ksys_do_vfs_ioctl(fd, cmd, arg);
+}
+
+do_io_setup_t do_io_setup;
+EXPORT_SYMBOL(do_io_setup);
+
+/* sys_io_setup:
+ *  Create an aio_context capable of receiving at least nr_events.
+ *  ctxp must not point to an aio_context that already exists, and
+ *  must be initialized to 0 prior to the call.  On successful
+ *  creation of the aio_context, *ctxp is filled in with the resulting
+ *  handle.  May fail with -EINVAL if *ctxp is not initialized,
+ *  if the specified nr_events exceeds internal limits.  May fail
+ *  with -EAGAIN if the specified nr_events exceeds the user's limit
+ *  of available events.  May fail with -ENOMEM if insufficient kernel
+ *  resources are available.  May fail with -EFAULT if an invalid
+ *  pointer is passed for ctxp.  Will fail with -ENOSYS if not
+ *  implemented.
+ */
+SYSCALL_DEFINE2(io_setup, unsigned, nr_events, aio_context_t *, ctxp)
+{
+    if (do_io_setup == NULL) {
+        sbi_puts("NOT register do_io_setup yet!\n");
+        sbi_srst_power_off();
+    }
+
+    return do_io_setup(nr_events, ctxp);
+}
+
+do_getpid_t do_getpid;
+EXPORT_SYMBOL(do_getpid);
+
+/**
+ * sys_getpid - return the thread group id of the current process
+ *
+ * Note, despite the name, this returns the tgid not the pid.  The tgid and
+ * the pid are identical unless CLONE_THREAD was specified on clone() in
+ * which case the tgid is the same in all threads of the same group.
+ *
+ * This is SMP safe as current->tgid does not change.
+ */
+SYSCALL_DEFINE0(getpid)
+{
+    if (do_getpid == NULL) {
+        sbi_puts("NOT register do_getpid yet!\n");
+        sbi_srst_power_off();
+    }
+
+    return do_getpid();
 }

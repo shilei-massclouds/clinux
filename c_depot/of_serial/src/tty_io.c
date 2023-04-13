@@ -250,7 +250,7 @@ do_tty_write(ssize_t (*write)(struct tty_struct *, struct file *,
             break;
 
         ret = write(tty, file, tty->write_buf, size);
-        printk("############ %s: 1 ret(%ld)\n", __func__, ret);
+        pr_debug("############ %s: 1 ret(%ld)\n", __func__, ret);
         if (ret <= 0)
             break;
         written += ret;

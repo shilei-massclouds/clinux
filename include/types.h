@@ -44,7 +44,10 @@ static inline int isdigit(int c)
 #define SIZE_MAX        (~(size_t)0)
 #define PHYS_ADDR_MAX   (~(phys_addr_t)0)
 #define INT_MAX         ((int)(~0U >> 1))
+#define INT_MIN         (-INT_MAX - 1)
 #define ULLONG_MAX      (~0ULL)
+
+#define ATOMIC_INIT(i) { (i) }
 
 #define min(a, b)   ((a < b) ? a : b)
 #define max(a, b)   ((a > b) ? a : b)

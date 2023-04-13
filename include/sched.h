@@ -4,6 +4,8 @@
 
 #include <fs.h>
 #include <thread_info.h>
+#include <pid.h>
+#include <pid_namespace.h>
 
 #define MAX_NICE    19
 #define MIN_NICE    -20
@@ -155,6 +157,9 @@ struct task_struct {
     int on_rq;
     int on_cpu;
 
+    /* PID/PID hash table linkage. */
+    struct pid *thread_pid;
+
     struct task_group *sched_task_group;
 };
 
@@ -211,5 +216,30 @@ pick_next_task_fair(struct rq *rq, struct task_struct *prev);
 
 /* An entity is a task if it doesn't "own" a runqueue */
 #define entity_is_task(se)  (!se->my_q)
+
+/*
+ * the helpers to get the task's different pids as they are seen
+ * from various namespaces
+ *
+ * task_xid_nr()     : global id, i.e. the id seen from the init namespace;
+ * task_xid_vnr()    : virtual id, i.e. the id seen from the pid namespace of
+ *                     current.
+ * task_xid_nr_ns()  : id seen from the ns specified;
+ *
+ * see also pid_nr() etc in include/linux/pid.h
+ */
+pid_t __task_pid_nr_ns(struct task_struct *task,
+                       enum pid_type type,
+                       struct pid_namespace *ns);
+
+static inline pid_t task_tgid_vnr(struct task_struct *tsk)
+{
+    return __task_pid_nr_ns(tsk, PIDTYPE_TGID, NULL);
+}
+
+static inline struct pid *task_pid(struct task_struct *task)
+{
+    return task->thread_pid;
+}
 
 #endif /* _LINUX_SCHED_H */

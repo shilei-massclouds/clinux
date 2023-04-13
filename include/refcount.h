@@ -4,6 +4,10 @@
 
 #include <atomic.h>
 
+#define REFCOUNT_INIT(n)    { .refs = ATOMIC_INIT(n), }
+#define REFCOUNT_MAX        INT_MAX
+#define REFCOUNT_SATURATED  (INT_MIN / 2)
+
 typedef struct refcount_struct {
     atomic_t refs;
 } refcount_t;

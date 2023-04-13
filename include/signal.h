@@ -81,7 +81,12 @@
 #define SEGV_MAPERR 1   /* address not mapped to object */
 #define SEGV_ACCERR 2   /* invalid permissions for mapped object */
 
+struct task_struct;
+
 struct signal_struct {
+    /* PID/PID hash table linkage. */
+    struct pid *pids[PIDTYPE_MAX];
+
     struct rlimit rlim[RLIM_NLIMITS];
 };
 

@@ -2,3 +2,4 @@
 
 obj_y := init.o
 obj_y += process.o
+obj_y += pid.o

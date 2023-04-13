@@ -299,7 +299,7 @@ get_unmapped_area(struct file *file, unsigned long addr, unsigned long len,
     if (IS_ERR_VALUE(addr))
         panic("bad addr!");
 
-    printk("%s: addr(%lx) len(%lx)\n", __func__, addr, len);
+    pr_debug("%s: addr(%lx) len(%lx)\n", __func__, addr, len);
     if (addr > TASK_SIZE - len)
         panic("out of memory!");
     if (offset_in_page(addr))
@@ -519,14 +519,14 @@ do_mmap(struct file *file, unsigned long addr,
     if (flags & MAP_NORESERVE)
         panic("MAP_NORESERVE!");
 
-    pr_info("%s: ...\n", __func__);
+    pr_debug("%s: ...\n", __func__);
     addr = mmap_region(file, addr, len, vm_flags, pgoff, uf);
     if (!IS_ERR_VALUE(addr) &&
         ((vm_flags & VM_LOCKED) ||
          (flags & (MAP_POPULATE | MAP_NONBLOCK)) == MAP_POPULATE))
         *populate = len;
 
-    pr_info("%s: addr(%lx) end!\n", __func__, addr);
+    pr_debug("%s: addr(%lx) end!\n", __func__, addr);
     return addr;
 }
 EXPORT_SYMBOL(do_mmap);
@@ -541,7 +541,7 @@ int do_brk_flags(unsigned long addr, unsigned long len,
     pgoff_t pgoff = addr >> PAGE_SHIFT;
     struct mm_struct *mm = current->mm;
 
-    printk("### %s: 1 (%lx, %lx)\n", __func__, addr, len);
+    pr_debug("### %s: 1 (%lx, %lx)\n", __func__, addr, len);
     /* Until we need other flags, refuse anything except VM_EXEC. */
     if ((flags & (~VM_EXEC)) != 0)
         return -EINVAL;
@@ -1292,7 +1292,7 @@ long _riscv_sys_mmap(unsigned long addr, unsigned long len,
                      unsigned long fd, off_t offset,
                      unsigned long page_shift_offset)
 {
-    printk("%s: step1\n", __func__);
+    pr_debug("%s: step1\n", __func__);
     if (unlikely(offset & (~PAGE_MASK >> page_shift_offset)))
         return -EINVAL;
 

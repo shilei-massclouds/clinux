@@ -1,5 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 
+#define __NR_io_setup 0
+__SYSCALL(__NR_io_setup, sys_io_setup)
+
 /* fs/ioctl.c */
 #define __NR_ioctl 29
 __SYSCALL(__NR_ioctl, sys_ioctl)
@@ -42,6 +45,10 @@ __SYSCALL(__NR_clock_gettime, sys_clock_gettime)
 /* sys/sys.c */
 #define __NR_uname 160
 __SYSCALL(__NR_uname, sys_newuname)
+
+/* kernel/timer.c */
+#define __NR_getpid 172
+__SYSCALL(__NR_getpid, sys_getpid)
 
 /* mm/nommu.c, also with MMU */
 #define __NR_brk 214

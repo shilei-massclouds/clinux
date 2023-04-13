@@ -22,8 +22,30 @@ EXPORT_SYMBOL(handle_arch_irq);
 struct fs_struct init_fs = {
 };
 
+struct pid init_struct_pid = {
+    .count      = REFCOUNT_INIT(1),
+#if 0
+    .tasks      = {
+        { .first = NULL },
+        { .first = NULL },
+        { .first = NULL },
+    },
+#endif
+    .level      = 0,
+    .numbers    = { {
+        .nr     = 0,
+        .ns     = &init_pid_ns,
+    }, }
+};
+
 static struct signal_struct init_signals = {
     .rlim   = INIT_RLIMITS,
+    .pids   = {
+        [PIDTYPE_PID]   = &init_struct_pid,
+        [PIDTYPE_TGID]  = &init_struct_pid,
+        [PIDTYPE_PGID]  = &init_struct_pid,
+        [PIDTYPE_SID]   = &init_struct_pid,
+    },
 };
 
 /*
@@ -59,6 +81,27 @@ struct files_struct init_files = {
     },
 };
 
+/*
+ * PID-map pages start out as NULL, they get allocated upon
+ * first use and are never deallocated. This way a low pid_max
+ * value does not cause lots of bitmaps to be allocated, but
+ * the scheme scales to up to 4 million PIDs, runtime.
+ */
+struct pid_namespace init_pid_ns = {
+#if 0
+    .kref = KREF_INIT(2),
+    .idr = IDR_INIT(init_pid_ns.idr),
+    .pid_allocated = PIDNS_ADDING,
+#endif
+    .level = 0,
+#if 0
+    .child_reaper = &init_task,
+    .user_ns = &init_user_ns,
+    .ns.inum = PROC_PID_INIT_INO,
+#endif
+};
+EXPORT_SYMBOL(init_pid_ns);
+
 struct task_struct init_task
 __aligned(L1_CACHE_BYTES) = {
     .thread_info = INIT_THREAD_INFO(init_task),
@@ -69,6 +112,7 @@ __aligned(L1_CACHE_BYTES) = {
     .files  = &init_files,
     .signal = &init_signals,
     .nsproxy = &init_nsproxy,
+    .thread_pid = &init_struct_pid,
 
     .normal_prio = MAX_PRIO - 20,
     .sched_task_group = &root_task_group,
