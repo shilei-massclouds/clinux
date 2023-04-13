@@ -15,10 +15,10 @@ n_tty_write(struct tty_struct *tty, struct file *file,
             c = tty->ops->write(tty, b, nr);
             if (c < 0)
                 panic("write error!");
-            
+
             if (!c)
                 break;
-            
+
             b += c;
             nr -= c;
         }

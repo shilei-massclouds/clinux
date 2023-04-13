@@ -245,7 +245,7 @@ void _do_page_fault(struct pt_regs *regs)
     cause = regs->cause;
     addr = regs->badaddr;
 
-    pr_debug("%s: cause(%lx) addr(%ld)\n", __func__, cause, addr);
+    pr_warn("%s: cause(%lx) addr(%lx)\n", __func__, cause, addr);
 
     tsk = current;
     mm = tsk->mm;

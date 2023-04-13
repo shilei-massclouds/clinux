@@ -124,6 +124,7 @@ _ksys_write(unsigned int fd, const char *buf, size_t count)
     ssize_t ret = -EBADF;
     struct fd f = fdget_pos(fd);
 
+    printk("############ %s: 0 fd(%x)\n", __func__, fd);
     if (f.file) {
         loff_t pos, *ppos = file_ppos(f.file);
         if (ppos) {
@@ -214,6 +215,7 @@ vfs_writev(struct file *file, const struct iovec *vec,
     struct iov_iter iter;
     ssize_t ret;
 
+        printk("############ %s: 0\n", __func__);
     ret = import_iovec(WRITE, vec, vlen, ARRAY_SIZE(iovstack), &iov, &iter);
     if (ret >= 0) {
         //file_start_write(file);
@@ -231,6 +233,8 @@ _do_writev(unsigned long fd, const struct iovec *vec,
     struct fd f = fdget_pos(fd);
     ssize_t ret = -EBADF;
 
+    printk("############ %s: 0 fd(%lx)\n", __func__, fd);
+
     if (f.file) {
         loff_t pos, *ppos = file_ppos(f.file);
         if (ppos) {
@@ -242,6 +246,7 @@ _do_writev(unsigned long fd, const struct iovec *vec,
             f.file->f_pos = pos;
         fdput_pos(f);
     }
+    printk("############ %s: 2 ret(%ld)\n", __func__, ret);
 
     return ret;
 }

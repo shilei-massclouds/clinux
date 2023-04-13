@@ -1082,13 +1082,14 @@ unsigned long get_zeroed_page(gfp_t gfp_mask)
 }
 EXPORT_SYMBOL(get_zeroed_page);
 
-static phys_addr_t
+phys_addr_t
 buddy_phys_alloc(phys_addr_t size, phys_addr_t align)
 {
     BUG_ON(size != PAGE_SIZE);
     BUG_ON(align != PAGE_SIZE);
     return __pa(get_zeroed_page(GFP_KERNEL));
 }
+EXPORT_SYMBOL(buddy_phys_alloc);
 
 int
 init_module(void)

@@ -150,10 +150,11 @@ long vfs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
     if (!filp->f_op->unlocked_ioctl)
         goto out;
 
-    printk("%s: ...\n", __func__);
+    printk("%s: ... arg(%lx)\n", __func__, arg);
     error = filp->f_op->unlocked_ioctl(filp, cmd, arg);
     if (error == -ENOIOCTLCMD)
         error = -ENOTTY;
+    printk("%s: ... p errno(%p)\n", __func__, &error);
  out:
     return error;
 }

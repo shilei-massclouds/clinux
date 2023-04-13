@@ -248,7 +248,9 @@ do_tty_write(ssize_t (*write)(struct tty_struct *, struct file *,
         ret = -EFAULT;
         if (copy_from_user(tty->write_buf, buf, size))
             break;
+
         ret = write(tty, file, tty->write_buf, size);
+        printk("############ %s: 1 ret(%ld)\n", __func__, ret);
         if (ret <= 0)
             break;
         written += ret;
@@ -368,15 +370,11 @@ static int tiocgwinsz(struct tty_struct *tty, struct winsize *arg)
 {
     int err;
 
-    printk("%s: arg (%p) winsize(%u,%u,%u,%u)\n",
-           __func__, arg,
-           tty->winsize.ws_row,
-           tty->winsize.ws_col,
-           tty->winsize.ws_xpixel,
-           tty->winsize.ws_ypixel);
+    printk("%s: arg (%p) winsize(%p)\n", __func__, arg, &(tty->winsize));
     //mutex_lock(&tty->winsize_mutex);
     err = copy_to_user(arg, &tty->winsize, sizeof(*arg));
     //mutex_unlock(&tty->winsize_mutex);
+    printk("%s: ok! err(%d)\n", __func__, err);
 
     return err ? -EFAULT: 0;
 }
@@ -393,6 +391,9 @@ long tty_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
     struct tty_ldisc *ld;
 
     real_tty = tty_pair_get_tty(tty);
+
+    printk("############### %s: 1 cmd(%x) tty(%p)\n",
+           __func__, cmd, tty);
 
     /*
      * Factor out some common prep work

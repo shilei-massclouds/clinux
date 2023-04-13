@@ -6,6 +6,7 @@
 #include <export.h>
 #include <pgtable.h>
 #include <mm_types.h>
+#include <current.h>
 
 static struct page *
 no_page_table(struct vm_area_struct *vma, unsigned int flags)
@@ -20,13 +21,26 @@ follow_page_pte(struct vm_area_struct *vma,
     struct page *page;
     pte_t *ptep, pte;
 
-    printk("%s: 1 pmd(%lx) address(%lx)\n",
-           __func__, pmd->pmd, address);
+ retry:
+    printk("%s: 1 pmd(%lx) address(%lx) (%lx, %lx)\n",
+           __func__, pmd->pmd, address, vma->vm_end, vma->vm_start);
 
     ptep = pte_offset_map_lock(mm, pmd, address);
     pte = *ptep;
-    if (!pte_present(pte))
-        panic("pte NOT present!");
+    if (!pte_present(pte)) {
+        /* For unikernel, populate it! */
+        if (1) {
+            pgd_t *pgd = current->mm->pgd;
+            unsigned long start;
+            for (start = vma->vm_start; start < vma->vm_end; start += PAGE_SIZE) {
+                unsigned long pa = buddy_phys_alloc(PAGE_SIZE, PAGE_SIZE);
+                create_pgd_mapping(pgd, start, pa, PAGE_SIZE, PAGE_KERNEL_EXEC);
+            }
+            goto retry;
+        } else {
+            panic("pte NOT present! (%lx)\n", pte.pte);
+        }
+    }
 
     page = vm_normal_page(vma, address, pte);
     if (!page)
@@ -118,7 +132,67 @@ static int faultin_page(struct vm_area_struct *vma,
     return 0;
 }
 
-static long
+/**
+ * __get_user_pages() - pin user pages in memory
+ * @mm:     mm_struct of target mm
+ * @start:  starting user address
+ * @nr_pages:   number of pages from start to pin
+ * @gup_flags:  flags modifying pin behaviour
+ * @pages:  array that receives pointers to the pages pinned.
+ *      Should be at least nr_pages long. Or NULL, if caller
+ *      only intends to ensure the pages are faulted in.
+ * @vmas:   array of pointers to vmas corresponding to each page.
+ *      Or NULL if the caller does not require them.
+ * @locked:     whether we're still with the mmap_lock held
+ *
+ * Returns either number of pages pinned (which may be less than the
+ * number requested), or an error. Details about the return value:
+ *
+ * -- If nr_pages is 0, returns 0.
+ * -- If nr_pages is >0, but no pages were pinned, returns -errno.
+ * -- If nr_pages is >0, and some pages were pinned, returns the number of
+ *    pages pinned. Again, this may be less than nr_pages.
+ * -- 0 return value is possible when the fault would need to be retried.
+ *
+ * The caller is responsible for releasing returned @pages, via put_page().
+ *
+ * @vmas are valid only as long as mmap_lock is held.
+ *
+ * Must be called with mmap_lock held.  It may be released.  See below.
+ *
+ * __get_user_pages walks a process's page tables and takes a reference to
+ * each struct page that each user address corresponds to at a given
+ * instant. That is, it takes the page that would be accessed if a user
+ * thread accesses the given user virtual address at that instant.
+ *
+ * This does not guarantee that the page exists in the user mappings when
+ * __get_user_pages returns, and there may even be a completely different
+ * page there in some cases (eg. if mmapped pagecache has been invalidated
+ * and subsequently re faulted). However it does guarantee that the page
+ * won't be freed completely. And mostly callers simply care that the page
+ * contains data that was valid *at some point in time*. Typically, an IO
+ * or similar operation cannot guarantee anything stronger anyway because
+ * locks can't be held over the syscall boundary.
+ *
+ * If @gup_flags & FOLL_WRITE == 0, the page must not be written to. If
+ * the page is written to, set_page_dirty (or set_page_dirty_lock, as
+ * appropriate) must be called after the page is finished with, and
+ * before put_page is called.
+ *
+ * If @locked != NULL, *@locked will be set to 0 when mmap_lock is
+ * released by an up_read().  That can happen if @gup_flags does not
+ * have FOLL_NOWAIT.
+ *
+ * A caller using such a combination of @locked and @gup_flags
+ * must therefore hold the mmap_lock for reading only, and recognize
+ * when it's been released.  Otherwise, it must be held for either
+ * reading or writing and will not be released.
+ *
+ * In most cases, get_user_pages or get_user_pages_fast should be used
+ * instead of __get_user_pages. __get_user_pages should be used only if
+ * you need some special @gup_flags.
+ */
+long
 __get_user_pages(struct mm_struct *mm,
                  unsigned long start, unsigned long nr_pages,
                  unsigned int gup_flags, struct page **pages,
@@ -187,6 +261,7 @@ __get_user_pages(struct mm_struct *mm,
     printk("%s: !(%ld) nr_pages(%lu)\n", __func__, i, nr_pages);
     return i ? i : ret;
 }
+EXPORT_SYMBOL(__get_user_pages);
 
 static inline long
 __get_user_pages_locked(struct mm_struct *mm,
@@ -275,6 +350,7 @@ int
 init_module(void)
 {
     printk("module[gup]: init begin ...\n");
+    __get_user_pages_cb = __get_user_pages;
     printk("module[gup]: init end!\n");
 
     return 0;

@@ -524,7 +524,7 @@ do_mmap(struct file *file, unsigned long addr,
     if (!IS_ERR_VALUE(addr) &&
         ((vm_flags & VM_LOCKED) ||
          (flags & (MAP_POPULATE | MAP_NONBLOCK)) == MAP_POPULATE))
-        panic("set poplate!");
+        *populate = len;
 
     pr_info("%s: addr(%lx) end!\n", __func__, addr);
     return addr;
@@ -595,8 +595,9 @@ int vm_brk_flags(unsigned long addr, unsigned long request,
 
     ret = do_brk_flags(addr, len, flags, &uf);
     populate = ((mm->def_flags & VM_LOCKED) != 0);
+    /* Todo: for unikernel, set VM_LOCKED */
     if (populate && !ret)
-        panic("can not populate!");
+        mm_populate(addr, len);
     return ret;
 }
 EXPORT_SYMBOL(vm_brk_flags);

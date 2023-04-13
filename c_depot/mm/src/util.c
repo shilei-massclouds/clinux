@@ -38,9 +38,11 @@ vm_mmap_pgoff(struct file *file, unsigned long addr,
     LIST_HEAD(uf);
 
     ret = do_mmap(file, addr, len, prot, flag, pgoff, &populate, &uf);
+    printk("%s: 2 populate(%lu)\n", __func__, populate);
     if (populate)
         mm_populate(ret, populate);
 
+    printk("%s: 3\n", __func__);
     return ret;
 }
 

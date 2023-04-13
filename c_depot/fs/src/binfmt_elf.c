@@ -777,6 +777,10 @@ static int load_elf_binary(struct linux_binprm *bprm)
      * mapping in the interpreter, to make sure it doesn't wind
      * up getting placed where the bss needs to go.
      */
+
+    /* Todo: for unikernel, set VM_LOCKED */
+    current->mm->def_flags |= VM_LOCKED;
+
     retval = set_brk(elf_bss, elf_brk, bss_prot);
     if (retval)
         panic("set brk error!");
@@ -831,12 +835,18 @@ static int load_elf_binary(struct linux_binprm *bprm)
     mm->end_data = end_data;
     mm->start_stack = bprm->p;
 
+    /* for unikernel, extend stack to 4 PAGES */
+    {
+        unsigned long stack_range = 4 * PAGE_SIZE;
+        mm_populate(STACK_TOP_MAX - stack_range, stack_range);
+    }
+
     printk("###### %s: switch unikernel entry(%lx) sp(%lx) ######\n",
            __func__, elf_entry, bprm->p);
     {
         printk("%s: 1 current (%p)\n", __func__, current);
         save_current();
-        printk("%s: 2 current (%p)\n", __func__, get_saved_current());
+        printk("%s: 2 current (%p)\n", __func__, current);
     }
     switch_to_unikernel(elf_entry, bprm->p);
 

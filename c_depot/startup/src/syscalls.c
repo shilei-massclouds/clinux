@@ -193,6 +193,7 @@ EXPORT_SYMBOL(ksys_do_vfs_ioctl);
 
 SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
 {
+    long ret;
     if (ksys_do_vfs_ioctl == NULL) {
         sbi_puts("NOT register ksys_do_vfs_ioctl yet!\n");
         sbi_srst_power_off();

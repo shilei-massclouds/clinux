@@ -51,11 +51,14 @@
 #define VM_MAYSHARE     0x00000080
 
 #define VM_GROWSDOWN    0x00000100  /* general info on the segment */
+#define VM_PFNMAP       0x00000400  /* Page-ranges managed without "struct page", just pure PFN */
 #define VM_DENYWRITE    0x00000800  /* ETXTBSY on write attempts.. */
 #define VM_LOCKED       0x00002000
+#define VM_IO           0x00004000  /* Memory mapped I/O or similar */
 #define VM_GROWSUP      VM_NONE
 #define VM_SEQ_READ     0x00008000  /* App will access data sequentially */
 #define VM_RAND_READ    0x00010000  /* App will not benefit from clustered reads */
+#define VM_LOCKONFAULT  0x00080000  /* Lock the pages covered when they are faulted in */
 #define VM_ACCOUNT      0x00100000  /* Is a VM accounted object */
 #define VM_NORESERVE    0x00200000  /* should the VM suppress accounting */
 #define VM_SYNC         0x00800000  /* Synchronous page faults */
@@ -80,6 +83,7 @@
 #define FOLL_NOWAIT 0x20    /* if a disk transfer is needed, start the IO
                              * and return without waiting upon it */
 #define FOLL_POPULATE   0x40    /* fault in page */
+#define FOLL_NUMA   0x200   /* force NUMA hinting page fault */
 #define FOLL_TRIED  0x800   /* a retry, previous pass started an IO */
 
 #define FOLL_MLOCK  0x1000  /* lock present pages */
@@ -422,5 +426,12 @@ extern sys_mmap_t riscv_sys_mmap;
 typedef int
 (*do_vm_munmap_t)(unsigned long start, size_t len, bool downgrade);
 extern do_vm_munmap_t do_vm_munmap;
+
+typedef long
+(*__get_user_pages_t)(struct mm_struct *mm,
+                      unsigned long start, unsigned long nr_pages,
+                      unsigned int gup_flags, struct page **pages,
+                      struct vm_area_struct **vmas, int *locked);
+extern __get_user_pages_t __get_user_pages_cb;
 
 #endif /* _RISCV_MM_H_ */

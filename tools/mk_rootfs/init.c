@@ -1,11 +1,9 @@
 /* Init process */
 
-#include <unistd.h>
+#include <stdio.h>
 
 int main()
 {
-    char buf[] = "[Hello, world!]\n";
-
-    write(STDOUT_FILENO, buf, sizeof(buf));
+    printf("[Hello, sqlite3!]\n");
     return 0;
 }

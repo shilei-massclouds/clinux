@@ -121,6 +121,8 @@ void *alloc_pages_exact(size_t size, gfp_t gfp_mask);
 
 void free_pages_exact(void *virt, size_t size);
 
+phys_addr_t buddy_phys_alloc(phys_addr_t size, phys_addr_t align);
+
 /*
  * The set of flags that only affect watermark checking and reclaim
  * behaviour. This is used by the MM to obey the caller constraints
