@@ -73,12 +73,12 @@ qemu_args += \
 	-bios default \
 	-kernel $(KMODULE_DIR)/startup.bin \
     -drive if=pflash,file=$(KMODULE_DIR)/bootrd.disk,format=raw,unit=1 \
-	-device virtio-blk-device,drive=disk0 \
-	-drive id=disk0,if=none,format=raw,file=/tmp/disk.img \
 	-device virtio-net-device,netdev=net0 \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
 	-nographic \
     #-d in_asm -D /tmp/insturction.log
+	#-device virtio-blk-device,drive=disk0 \
+	#-drive id=disk0,if=none,format=raw,file=/tmp/disk.img \
 
 # All components subdir
 components = \
