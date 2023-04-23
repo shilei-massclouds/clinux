@@ -31,12 +31,14 @@ git clone https://git.qemu.org/git/qemu.git --depth 1
 make
 ```
 ##### cLinux
+
+### Build & Test for c_depot
 ```sh
-make
-make bootrd
-make run
+make tools
+cd c_depot
+make clean && make && make bootrd
+make justrun
 ```
-### Test
 Now there're three profiles
 ```sh
 $ make profiles
@@ -93,13 +95,12 @@ cloud@server:~/gitStudy/clinux$
 ```
 Now this is a Linux-kernel-like OS from boot to first user-process(init).
 For experiment, this user-process init just prints [Hello, wolrd!] and exit.
-> Note: `Profile [1]: arceos_hello[3a1208]` can't be selected now.
-> We need to introduce ArceOS's objs first as below:
-### Import components from ArceOS and Test
-Patch and script are in directory `thirty_part/arceos/`.
-Copy both these files into the top directory of arceos first.
-1. Patch arceos
-    At the top directory of arceos, execute `git apply prepare_export_obj.patch`
-2. Export objs from arceos to clinux
-    At the top directory of arceos, execute `./export_objs.sh`
-3. Return to clinux, make && make run
+
+### Build & Test for rust_depot(Components from ArceOS)
+```sh
+make tools
+cd rust_depot
+make clean && make && make bootrd
+make justrun
+```
+And we can use `make profiles` to check all profiles available.
