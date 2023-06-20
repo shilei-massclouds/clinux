@@ -103,3 +103,5 @@ Copy both these files into the top directory of arceos first.
 2. Export objs from arceos to clinux
     At the top directory of arceos, execute `./export_objs.sh`
 3. Return to clinux, make && make run
+
+Temporarily pause!
