@@ -63,9 +63,11 @@ justrun:
 clean:
 	@rm -f `find $(KMODULE_DIR) ! -name README.md -type f`
 	@rm -rf ./target
+	@$(MAKE) -C ../tools clean
 
 bootrd: FORCE
 	@rm -f $(KMODULE_DIR)/bootrd.disk $(KMODULE_DIR)/top_*.json
+	@$(MAKE) -C ../tools
 	@ ../tools/mk_bootrd/mk_bootrd
 
 profiles:
