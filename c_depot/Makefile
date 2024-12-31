@@ -44,6 +44,9 @@ components := \
 	sys userboot \
 	top_helloworld top_linux
 
+all: build
+	@:
+
 build: $(components)
 	@:
 
@@ -75,4 +78,4 @@ profiles:
 
 FORCE:
 
-.PHONY: build components predirs clean FORCE
+.PHONY: all build components predirs clean FORCE
