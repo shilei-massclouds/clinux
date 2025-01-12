@@ -11,6 +11,7 @@
 #include <printk.h>
 #include <memblock.h>
 #include <mmzone.h>
+#include <fdt.h>
 
 #define INIT_MEMBLOCK_REGIONS           128
 #define INIT_MEMBLOCK_RESERVED_REGIONS  INIT_MEMBLOCK_REGIONS
@@ -612,19 +613,12 @@ init_module(void)
         memblock_add(dt_memory_base, dt_memory_size);
 
     memblock_reserve(kernel_start, kernel_size);
+    memblock_reserve(dtb_early_pa, fdt_totalsize(initial_boot_params));
 
     setup_vm_final(memblock.memory.regions,
                    memblock.memory.cnt,
                    memblock_phys_alloc);
 
-    /*
-    {
-        char *p = (char *) 0xffffffe0802c1000;
-        printk("module[memblock]: set 802c1000...\n");
-        *p = 1;
-        printk("module[memblock]: set 802c1000!\n");
-    }
-    */
     printk("module[memblock]: init end!\n");
     return 0;
 }
