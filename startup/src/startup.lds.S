@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 
-#include <page.h>
-#include <thread_info.h>
+#include <asm/page.h>
+#include <asm/thread_info.h>
 
 #define LOAD_OFFSET PAGE_OFFSET
 

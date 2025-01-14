@@ -10,8 +10,7 @@
 #include <assert.h>
 
 #include "module.h"
-#include "../../include/config.h"
-#include "../../include/bootrd.h"
+#include "../../startup/src/bootrd.h"
 
 #define MIN(i, j) (((i) < (j)) ? (i) : (j))
 
