@@ -142,18 +142,18 @@ secondary_start_common:
 	tail smp_callin
 #endif /* CONFIG_SMP */
 
-.align 2
-setup_trap_vector:
-	/* Set trap vector to exception handler */
-	la a0, handle_exception
-	csrw CSR_TVEC, a0
-
-	/*
-	 * Set sup0 scratch register to 0, indicating to exception vector that
-	 * we are presently executing in kernel.
-	 */
-	csrw CSR_SCRATCH, zero
-	ret
+//.align 2
+//setup_trap_vector:
+//	/* Set trap vector to exception handler */
+//	la a0, handle_exception
+//	csrw CSR_TVEC, a0
+//
+//	/*
+//	 * Set sup0 scratch register to 0, indicating to exception vector that
+//	 * we are presently executing in kernel.
+//	 */
+//	csrw CSR_SCRATCH, zero
+//	ret
 
 .Lsecondary_park:
 	/* We lack SMP support or have too many harts, so park this hart */
@@ -248,18 +248,18 @@ clear_bss_done:
 	call relocate
 #endif /* CONFIG_MMU */
 
-	call setup_trap_vector
+	//call setup_trap_vector
 	/* Restore C environment */
-	la tp, init_task
-	sw zero, TASK_TI_CPU(tp)
+	//la tp, init_task
+	//sw zero, TASK_TI_CPU(tp)
 	la sp, init_thread_union + THREAD_SIZE
 
 #ifdef CONFIG_KASAN
 	call kasan_early_init
 #endif
 	/* Start the kernel */
-	call soc_early_init
-	call parse_dtb
+	//call soc_early_init
+	//call parse_dtb
 	tail start_kernel
 
 .Lsecondary_start:

@@ -56,6 +56,7 @@ SECTIONS
     sdata = .;
     .data : AT(ADDR(.data) - LOAD_OFFSET) {
         . = ALIGN(PAGE_SIZE);
+        init_thread_union = .;
         _init_stack = .;
         init_stack = .;
         . = init_stack + THREAD_SIZE;
@@ -70,7 +71,7 @@ SECTIONS
 
     . = ALIGN(PAGE_SIZE);
 
-    _bss_start = .;
+    __bss_start = .;
     . = ALIGN(PAGE_SIZE);
     .sbss : AT(ADDR(.sbss) - LOAD_OFFSET) {
         *(.sbss);
@@ -83,7 +84,7 @@ SECTIONS
         . = ALIGN(PAGE_SIZE);
         *(.bss);
     }
-    _bss_stop = .;
+    __bss_stop = .;
 
     ekernel = .;
     _end = .;
