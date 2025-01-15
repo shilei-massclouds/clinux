@@ -4,38 +4,14 @@
 #include <asm/sbi.h>
 #include "booter.h"
 
-#define UL_STR_SIZE 17  /* include '\0' */
+#define UL_STR_SIZE 19  /* prefix with '0x' and end with '\0' */
 
 void
 start_kernel(void)
 {
+    load_modules();
     booter_panic();
 }
-
-int
-ul_to_str(unsigned long n, char *str, size_t len)
-{
-    int i;
-
-    /* include '\0' */
-    if (len != 17)
-        return -1;
-
-    for (i = 1; i <= 16; i++) {
-        char c = (n >> ((16 - i)*4)) & 0xF;
-        if (c >= 10) {
-            c -= 10;
-            c += 'A';
-        } else {
-            c += '0';
-        }
-        str[i-1] = c;
-    }
-    str[16] = '\0';
-
-    return 0;
-}
-EXPORT_SYMBOL(ul_to_str);
 
 void sbi_puts(const char *s)
 {
@@ -50,16 +26,31 @@ EXPORT_SYMBOL(sbi_puts);
 void sbi_put_u64(unsigned long n)
 {
     char buf[UL_STR_SIZE];
-    ul_to_str(n, buf, sizeof(buf));
+    hex_to_str(n, buf, sizeof(buf));
     sbi_puts(buf);
 }
 EXPORT_SYMBOL(sbi_put_u64);
 
+void sbi_put_dec(unsigned long n)
+{
+    char buf[UL_STR_SIZE];
+    dec_to_str(n, buf, sizeof(buf));
+    sbi_puts(buf);
+}
+EXPORT_SYMBOL(sbi_put_dec);
+
+/*
 void booter_panic(void)
 {
     sbi_puts("\n########################\n");
-    //sbi_puts("PANIC: %s (%s:%u)\n", __FUNCTION__, __FILE__, __LINE__);
-    //sbi_puts(args);
+    sbi_puts("PANIC: ");
+    sbi_puts(__FUNCTION__);
+    sbi_puts(" (");
+    sbi_puts(__FILE__);
+    sbi_puts(":");
+    sbi_put_u64(__LINE__);
+    sbi_puts(")");
     sbi_puts("\n########################\n");
     sbi_shutdown();
 }
+*/

@@ -25,6 +25,10 @@
 
 #include "booter.h"
 
+/* Physical address of kernel */
+uintptr_t kernel_start_pa = 0;
+EXPORT_SYMBOL(kernel_start_pa);
+
 //
 //unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)]
 //							__page_aligned_bss;
@@ -430,6 +434,9 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	dtb_early_va = (void *)fix_to_virt(FIX_FDT) + (dtb_pa & ~PAGE_MASK);
 	/* Save physical address for memblock reservation */
 	dtb_early_pa = dtb_pa;
+
+    /* Save physical address of kernel */
+    kernel_start_pa = load_pa;
 }
 #else
 asmlinkage void __init setup_vm(uintptr_t dtb_pa)
