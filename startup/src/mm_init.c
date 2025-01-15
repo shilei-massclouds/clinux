@@ -297,7 +297,7 @@ static void __init create_pmd_mapping(pmd_t *pmdp,
 	}
 
 	if (pmd_none(pmdp[pmd_idx])) {
-        booter_panic();
+        booter_panic("Cannot alloc pte in booter!");
 	} else {
 		pte_phys = PFN_PHYS(_pmd_pfn(pmdp[pmd_idx]));
 		ptep = get_pte_virt(pte_phys);
@@ -336,7 +336,10 @@ static void __init create_pgd_mapping(pgd_t *pgdp,
 	}
 
 	if (pgd_val(pgdp[pgd_idx]) == 0) {
-        booter_panic();
+        next_phys = alloc_pgd_next(va);
+        pgdp[pgd_idx] = pfn_pgd(PFN_DOWN(next_phys), PAGE_TABLE);
+        nextp = get_pgd_next_virt(next_phys);
+        memset(nextp, 0, PAGE_SIZE);
 	} else {
 		next_phys = PFN_PHYS(_pgd_pfn(pgdp[pgd_idx]));
 		nextp = get_pgd_next_virt(next_phys);
@@ -429,6 +432,13 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 		create_pte_mapping(fixmap_pte, va,
 				   dtb_pa + (va - __fix_to_virt(FIX_FDT)),
 				   PAGE_SIZE, PAGE_KERNEL);
+
+    /* Qemu pflash acts as the repository of modules,
+     * startup loads modules from it.
+     * The pflash is located at 0x22000000 in PA,
+     * just setup identity-mapping for the first pgdir temporily. */
+	create_pgd_mapping(early_pg_dir, FLASH_VA,
+                    FLASH_PA & PGDIR_MASK, PGDIR_SIZE, PAGE_KERNEL);
 
 	/* Save pointer to DTB for early FDT parsing */
 	dtb_early_va = (void *)fix_to_virt(FIX_FDT) + (dtb_pa & ~PAGE_MASK);

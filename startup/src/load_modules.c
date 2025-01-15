@@ -157,6 +157,9 @@ mod_indexes_in_flash(uint32_t *pnum)
         sbi_puts("bootrd: bad version\n");
         sbi_shutdown();
     }
+    if (bh->profile_num == 0) {
+        booter_panic("bootrd: no profile! add one top component at least!");
+    }
 
     struct profile_header *ph =
         (struct profile_header *) (FLASH_VA + bh->current_profile);
@@ -169,6 +172,7 @@ mod_indexes_in_flash(uint32_t *pnum)
         sbi_shutdown();
     }
     *pnum = ph->mod_num;
+    sbi_put_dec(*pnum);
     return (uint64_t *) ((uintptr_t) ph + sizeof(*ph));
 }
 

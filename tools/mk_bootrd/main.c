@@ -907,7 +907,7 @@ void
 complete_bootrd(struct bootrd_header *hdr, FILE *fp)
 {
     if (hdr->profile_num == 0)
-        printf("Warning: No top components FOUND! Please check!\n");
+        printf("Warning: No top components! Please check!\n");
 
     if (need_handle_candidates) {
         fclose(fp);

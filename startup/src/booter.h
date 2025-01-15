@@ -27,7 +27,7 @@ extern void load_modules(void);
 //extern void booter_panic(void);
 extern void sbi_shutdown(void);
 
-#define booter_panic() \
+#define booter_panic(args...) \
 do { \
     sbi_puts("\n########################\n"); \
     sbi_puts("PANIC: "); \
@@ -36,7 +36,7 @@ do { \
     sbi_puts(__FILE__); \
     sbi_puts(":"); \
     sbi_put_dec(__LINE__); \
-    sbi_puts(")"); \
+    sbi_puts(")\n" args ""); \
     sbi_puts("\n########################\n"); \
     sbi_shutdown(); \
 } while (0);

@@ -10,7 +10,7 @@ void
 start_kernel(void)
 {
     load_modules();
-    booter_panic();
+    booter_panic("Cannot reach here!");
 }
 
 void sbi_puts(const char *s)
@@ -38,19 +38,3 @@ void sbi_put_dec(unsigned long n)
     sbi_puts(buf);
 }
 EXPORT_SYMBOL(sbi_put_dec);
-
-/*
-void booter_panic(void)
-{
-    sbi_puts("\n########################\n");
-    sbi_puts("PANIC: ");
-    sbi_puts(__FUNCTION__);
-    sbi_puts(" (");
-    sbi_puts(__FILE__);
-    sbi_puts(":");
-    sbi_put_u64(__LINE__);
-    sbi_puts(")");
-    sbi_puts("\n########################\n");
-    sbi_shutdown();
-}
-*/
