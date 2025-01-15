@@ -40,16 +40,16 @@ SECTIONS
     }
     _rodata_end = .;
 
-    _ksymtab : AT(ADDR(_ksymtab) - LOAD_OFFSET) {
-        _start_ksymtab = .;
-        KEEP(*(SORT(_ksymtab)));
-        _end_ksymtab = .;
+    __ksymtab : AT(ADDR(__ksymtab) - LOAD_OFFSET) {
+        __start_ksymtab = .;
+        KEEP(*(SORT(___ksymtab+*)));
+        __end_ksymtab = .;
     }
 
-    _ksymtab_strings : AT(ADDR(_ksymtab_strings) - LOAD_OFFSET) {
-        _start_ksymtab_strings = .;
-        KEEP(*(_ksymtab_strings));
-        _end_ksymtab_strings = .;
+    __ksymtab_strings : AT(ADDR(__ksymtab_strings) - LOAD_OFFSET) {
+        __start_ksymtab_strings = .;
+        KEEP(*(__ksymtab_strings));
+        __end_ksymtab_strings = .;
     }
 
     _data_start = .;

@@ -18,10 +18,10 @@
 extern char _end[];
 extern uintptr_t kernel_start_pa;
 
-extern const struct kernel_symbol _start_ksymtab[];
-extern const struct kernel_symbol _end_ksymtab[];
+extern const struct kernel_symbol __start_ksymtab[];
+extern const struct kernel_symbol __end_ksymtab[];
 
-#define ksymtab_num (_end_ksymtab - _start_ksymtab)
+#define ksymtab_num (__end_ksymtab - __start_ksymtab)
 
 LIST_HEAD(modules);
 EXPORT_SYMBOL(modules);
@@ -56,7 +56,7 @@ struct load_info {
 static void
 init_kernel_module(void)
 {
-    kernel_module.syms = _start_ksymtab;
+    kernel_module.syms = __start_ksymtab;
     kernel_module.num_syms = ksymtab_num;
 
     list_add_tail(&kernel_module.list, &modules);
@@ -172,7 +172,6 @@ mod_indexes_in_flash(uint32_t *pnum)
         sbi_shutdown();
     }
     *pnum = ph->mod_num;
-    sbi_put_dec(*pnum);
     return (uint64_t *) ((uintptr_t) ph + sizeof(*ph));
 }
 
@@ -477,8 +476,8 @@ finalize_module(uintptr_t addr, struct load_info *info)
     INIT_LIST_HEAD(&mod->list);
     list_add_tail(&mod->list, &modules);
 
-    start = (struct kernel_symbol *) query_sym("_start_mod_ksymtab", info);
-    end = (struct kernel_symbol *) query_sym("_end_mod_ksymtab", info);
+    start = (struct kernel_symbol *) query_sym("__start_mod_ksymtab", info);
+    end = (struct kernel_symbol *) query_sym("__end_mod_ksymtab", info);
 
     mod->syms = start;
     mod->num_syms = end - start;

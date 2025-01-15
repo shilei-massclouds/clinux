@@ -382,6 +382,10 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	uintptr_t load_sz = (uintptr_t)(&_end) - load_pa;
 	uintptr_t map_size = best_map_size(load_pa, MAX_EARLY_MAPPING_SIZE);
 
+    /* The second pmd is for temporary area. */
+    BUG_ON(load_sz > PMD_SIZE);
+    load_sz = 2 * PMD_SIZE;
+
 	va_pa_offset = PAGE_OFFSET - load_pa;
 	pfn_base = PFN_DOWN(load_pa);
 

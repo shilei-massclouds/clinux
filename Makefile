@@ -22,7 +22,8 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt startup
+	prebuilt startup \
+	top_booter
 #	prebuilt startup lib \
 #	rbtree radix_tree bitmap xarray hashtable \
 #	early_dt of of_irq platform \

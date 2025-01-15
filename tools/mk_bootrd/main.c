@@ -162,10 +162,10 @@ detect_syms_range(void)
         if (strstr(line, " _start\n")) {
             char *tail = strchr(line, ' ');
             base = strtoul(line, &tail, 16);
-        } else if (strstr(line, " _start_ksymtab_strings\n")) {
+        } else if (strstr(line, " __start_ksymtab_strings\n")) {
             char *tail = strchr(line, ' ');
             start = strtoul(line, &tail, 16);
-        } else if (strstr(line, " _end_ksymtab_strings\n")) {
+        } else if (strstr(line, " __end_ksymtab_strings\n")) {
             char *tail = strchr(line, ' ');
             end = strtoul(line, &tail, 16);
         }
@@ -211,7 +211,7 @@ init_symtable(void)
     char *cur;
 
     detect_syms_range();
-    //printf("range(0x%x, 0x%x)\n", ksym_ptr, ksym_num);
+    printf("range(0x%x, 0x%x)\n", ksym_ptr, ksym_num);
 
     char filename[256] = {0};
     sprintf(filename, "%s/startup.bin", kmod_dir);
@@ -413,7 +413,7 @@ analysis_module(module *mod)
             free(strtab);
         } else {
             const char *name = secstrings + shdr->sh_name;
-            if (strcmp(name, "_ksymtab_strings") == 0) {
+            if (strcmp(name, "__ksymtab_strings") == 0) {
                 char *ksym_str = get_strtab(shdr, fp);
                 export_symbols(ksym_str, ksym_str + shdr->sh_size,
                                &symbols, mod);
@@ -783,7 +783,7 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
             hdr->current_profile = hdr->profile_offset;
         }
 #if 1
-        if (strncmp(mod->name, "top_linux", strlen("top_linux")) == 0)
+        if (strncmp(mod->name, "top_booter", strlen("top_booter")) == 0)
             hdr->current_profile = ftell(fp);
 #else
         if (strncmp(mod->name, "top_echoserver", strlen("top_echoserver")) == 0)

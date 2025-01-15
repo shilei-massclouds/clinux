@@ -2,10 +2,10 @@
 
 SECTIONS
 {
-    _ksymtab 0 : {
-        _start_mod_ksymtab = .;
-        KEEP(*(SORT(_ksymtab)));
-        _end_mod_ksymtab = .;
+    __ksymtab 0 : {
+        __start_mod_ksymtab = .;
+        KEEP(*(SORT(__ksymtab)));
+        __end_mod_ksymtab = .;
     }
-    _ksymtab_strings 0 : { KEEP(*(_ksymtab_strings)); }
+    __ksymtab_strings 0 : { KEEP(*(__ksymtab_strings)); }
 }
