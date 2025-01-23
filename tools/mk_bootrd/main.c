@@ -329,7 +329,8 @@ match_undef(const char *name, match_callback cb, module *mod)
     if (head == NULL) {
         printf("mod '%s': undef sym '%s' cannot be resolved!\n",
                mod->name, name);
-        terminate();
+        //terminate();
+        return;
     }
 
     if (head->next == NULL)
