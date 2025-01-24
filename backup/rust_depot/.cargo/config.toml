@@ -1,8 +1,0 @@
-[profile.release]
-lto = false
-
-[target.riscv64gc-unknown-none-elf]
-rustflags = [
-    "-Clink-arg=-Tstartup/linker_riscv64.lds",
-    "-Csymbol-mangling-version=v0"
-]

@@ -1,3 +1,0 @@
-[toolchain]
-profile = "minimal"
-components = ["rust-src", "llvm-tools-preview", "rustfmt", "clippy"]
