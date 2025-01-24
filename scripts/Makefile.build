@@ -29,7 +29,7 @@ TARGET_DIR = target/$(obj)
 BOOTRD_DIR = target/_bootrd
 
 mod_lds := scripts/module.lds
-elf_lds := $(TARGET_DIR)/startup.lds
+elf_lds := $(TARGET_DIR)/booter.lds
 
 include $(obj)/Makefile
 

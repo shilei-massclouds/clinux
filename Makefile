@@ -10,7 +10,7 @@ QEMU_ARGS := -m 512M
 QEMU_ARGS += \
 	-machine virt \
 	-bios default \
-	-kernel $(KMODULE_DIR)/startup.bin \
+	-kernel $(KMODULE_DIR)/booter.bin \
     -drive if=pflash,file=$(KMODULE_DIR)/bootrd.disk,format=raw,unit=1 \
 	-device virtio-blk-device,drive=disk0 \
 	-drive id=disk0,if=none,format=raw,file=/tmp/disk.img \
@@ -22,9 +22,9 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt startup \
+	prebuilt booter \
 	top_booter
-#	prebuilt startup lib \
+#	prebuilt booter lib \
 #	rbtree radix_tree bitmap xarray hashtable \
 #	early_dt of of_irq platform \
 #	mm memblock buddy slab \

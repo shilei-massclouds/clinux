@@ -10,7 +10,7 @@
 #include <assert.h>
 
 #include "module.h"
-#include "../../startup/src/bootrd.h"
+#include "../../booter/src/bootrd.h"
 
 #define MIN(i, j) (((i) < (j)) ? (i) : (j))
 
@@ -28,7 +28,7 @@ char *kmod_dir = NULL;
 typedef depend* (*match_callback)(module *mod, symbol *sym);
 static bool need_handle_candidates = false;
 
-static module mod_startup;
+static module mod_booter;
 
 static uint32_t ksym_ptr;
 static uint32_t ksym_num;
@@ -98,7 +98,7 @@ discover_modules(FILE *fp)
 {
     int n;
     struct dirent **namelist;
-    bool has_startup = false;
+    bool has_booter = false;
     bool has_system_map = false;
 
     n = scandir(kmod_dir, &namelist, NULL, NULL);
@@ -120,9 +120,9 @@ discover_modules(FILE *fp)
 
             /* write into bootrd disk */
             write_mod_to_bootrd(mod, fp);
-        } else if (!strcmp(namelist[n]->d_name, "startup.bin")) {
-            has_startup = true;
-        } else if (!strcmp(namelist[n]->d_name, "startup.map")) {
+        } else if (!strcmp(namelist[n]->d_name, "booter.bin")) {
+            has_booter = true;
+        } else if (!strcmp(namelist[n]->d_name, "booter.map")) {
             has_system_map = true;
         }
 
@@ -130,13 +130,13 @@ discover_modules(FILE *fp)
     }
     free(namelist);
 
-    if (!has_startup) {
-        printf("%s: No startup.bin\n", __func__);
+    if (!has_booter) {
+        printf("%s: No booter.bin\n", __func__);
         exit(-1);
     }
 
     if (!has_system_map) {
-        printf("%s: No startup.map\n", __func__);
+        printf("%s: No booter.map\n", __func__);
         exit(-1);
     }
 }
@@ -151,10 +151,10 @@ detect_syms_range(void)
     uint64_t end = 0;
 
     char filename[256] = {0};
-    sprintf(filename, "%s/startup.map", kmod_dir);
+    sprintf(filename, "%s/booter.map", kmod_dir);
     fp = fopen(filename, "r");
     if (fp == NULL) {
-        printf("No startup.map\n");
+        printf("No booter.map\n");
         exit(-1);
     }
 
@@ -214,10 +214,10 @@ init_symtable(void)
     printf("range(0x%x, 0x%x)\n", ksym_ptr, ksym_num);
 
     char filename[256] = {0};
-    sprintf(filename, "%s/startup.bin", kmod_dir);
+    sprintf(filename, "%s/booter.bin", kmod_dir);
     fp = fopen(filename, "rb");
     if (fp == NULL) {
-        printf("No startup.bin\n");
+        printf("No booter.bin\n");
         exit(-1);
     }
 
@@ -226,7 +226,7 @@ init_symtable(void)
     buf = calloc(ksym_num, 1);
     fread(buf, 1, ksym_num, fp);
 
-    export_symbols(buf, buf + ksym_num, &symbols, &mod_startup);
+    export_symbols(buf, buf + ksym_num, &symbols, &mod_booter);
 
     free(buf);
     fclose(fp);
@@ -433,8 +433,8 @@ verify_dependency(const char *name, const char *dep_name,
 {
     //printf("%s: verify '%s' depend '%s'\n", __func__, name, dep_name);
 
-    /* Of course, module 'startup' always exists. */
-    if (strncmp(dep_name, "startup", strlen("startup")) == 0)
+    /* Of course, module 'booter' always exists. */
+    if (strncmp(dep_name, "booter", strlen("booter")) == 0)
         return true;
 
     struct json_object *depend_obj = NULL;
@@ -521,7 +521,7 @@ traverse_dependency(module *mod,
             if (dep_mods == NULL)
                 dep_mods = json_object_new_array();
 
-            if (strncmp(d->mod->name, "startup", strlen("startup")) != 0) {
+            if (strncmp(d->mod->name, "booter", strlen("booter")) != 0) {
                 json_object_array_add(dep_mods,
                                       json_object_new_string(d->mod->name));
             }
@@ -706,14 +706,14 @@ sort_modules(struct bootrd_header *hdr, sort_callback cb, FILE *fp)
     list_head *p, *n;
     module *mod;
 
-    /* Init startup module */
-    mod_startup.name = "startup";
-    mod_startup.status = M_STATUS_DONE;
+    /* Init booter module */
+    mod_booter.name = "booter";
+    mod_booter.status = M_STATUS_DONE;
 
     discover_modules(fp);
     hdr->mod_num = num_modules;
 
-    /* Init ksymtab based on startup.bin. */
+    /* Init ksymtab based on booter.bin. */
     init_symtable();
 
     /* For each module, register its exported symbols into a list */

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include "../../startup/src/bootrd.h"
+#include "../../booter/src/bootrd.h"
 
 static void
 get_profile_header(FILE *fp, u32 offset, struct profile_header *ph)

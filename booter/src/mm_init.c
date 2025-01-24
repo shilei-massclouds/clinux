@@ -438,7 +438,7 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 				   PAGE_SIZE, PAGE_KERNEL);
 
     /* Qemu pflash acts as the repository of modules,
-     * startup loads modules from it.
+     * booter loads modules from it.
      * The pflash is located at 0x22000000 in PA,
      * just setup identity-mapping for the first pgdir temporily. */
 	create_pgd_mapping(early_pg_dir, FLASH_VA,

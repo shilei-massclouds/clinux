@@ -497,7 +497,7 @@ do_init_module(struct module *mod)
 /*
  * Qemu pflash(cfi-flash) cannot be write directly,
  * so copy module to a temporary area for writing.
- * From PAGE_OFFSET, the first pmd holds startup code.
+ * From PAGE_OFFSET, the first pmd holds booter code.
  * We just use the back half of the second pmd for temporary
  * area. NOTE: check module size less than (PMD_SIZE / 2).
  */
@@ -576,19 +576,19 @@ void load_modules(void)
 {
     struct module *mod;
 
-    sbi_puts("startup: init framework ...\n");
+    sbi_puts("booter: init framework ...\n");
 
     init_kernel_module();
 
-    sbi_puts("startup: load all components ...\n");
+    sbi_puts("booter: load all components ...\n");
 
     init_other_modules();
 
-    sbi_puts("startup: prepare init components ...\n");
+    sbi_puts("booter: prepare init components ...\n");
 
     list_for_each_entry(mod, &modules, list) {
         do_init_module(mod);
     }
 
-    sbi_puts("startup: init components ok!\n");
+    sbi_puts("booter: init components ok!\n");
 }

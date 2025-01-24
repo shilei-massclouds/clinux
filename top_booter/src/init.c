@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <linux/types.h>
-#include "../../startup/src/booter.h"
+#include "../../booter/src/booter.h"
 
 int
 init_module(void)
