@@ -32,6 +32,7 @@
 #include <asm/byteorder.h>
 #include <asm/word-at-a-time.h>
 #include <asm/page.h>
+#include "../../booter/src/booter.h"
 
 #ifndef __HAVE_ARCH_STRNCASECMP
 /**
@@ -1150,6 +1151,9 @@ EXPORT_SYMBOL(strreplace);
 void fortify_panic(const char *name)
 {
 	//pr_emerg("detected buffer overflow in %s\n", name);
+    sbi_puts("detected buffer overflow in");
+    sbi_puts(name);
+    sbi_puts("\n");
 	BUG();
 }
 EXPORT_SYMBOL(fortify_panic);

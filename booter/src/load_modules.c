@@ -257,6 +257,7 @@ simplify_symbols(const struct load_info *info)
             sbi_puts("SHN_UNDEF: ");
             sbi_puts(name);
             sbi_puts(" can't be resolved\n");
+            sbi_shutdown();
             break;
         default:
             sym[i].st_value += info->sechdrs[sym[i].st_shndx].sh_addr;
@@ -483,7 +484,7 @@ finalize_module(uintptr_t addr, struct load_info *info)
     mod->num_syms = end - start;
 
     mod->init = (init_module_t) query_sym("init_module", info);
-    mod->exit = (exit_module_t) query_sym("exit_module", info);
+    mod->exit = (exit_module_t) query_sym("cleanup_module", info);
     return mod;
 }
 

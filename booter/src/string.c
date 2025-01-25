@@ -18,6 +18,7 @@ void *memset(void *s, int c, size_t count)
 {
     return __memset(s, c, count);
 }
+EXPORT_SYMBOL(memset);
 
 /**
  * memcpy - Copy one area of memory to another
@@ -32,6 +33,7 @@ void *memcpy(void *dest, const void *src, size_t count)
 {
     return __memcpy(dest, src, count);
 }
+EXPORT_SYMBOL(memcpy);
 
 /**
  * memcmp - Compare two areas of memory

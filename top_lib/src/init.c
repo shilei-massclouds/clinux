@@ -10,8 +10,11 @@ init_module(void)
 {
     unsigned long data = 2;
     sbi_puts("module[top_lib]: init begin ...\n");
-    int pos = find_last_bit(&data, 16);
-    sbi_put_dec(pos);
+    //int pos = find_last_bit(&data, 16);
+    //sbi_put_dec(pos);
+    char *p = strchrnul("hello", 'e');
+    sbi_put_u64((unsigned long)p);
+    memset(&data, 0, sizeof(data));
     sbi_puts("\n");
     sbi_puts("module[top_lib]: init end!\n");
     return 0;

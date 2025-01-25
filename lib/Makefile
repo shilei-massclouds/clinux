@@ -3,7 +3,7 @@
 obj_y := init.o
 obj_y += ctype.o
 obj_y += find_bit.o
-#obj_y += string.o
+obj_y += string.o
 #obj_y += vsprintf.o
 #obj_y += printk.o
 #obj_y += params.o
