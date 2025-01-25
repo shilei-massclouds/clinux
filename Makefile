@@ -23,7 +23,11 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter \
-	top_booter
+	lib top_lib \
+	#printk \
+	#top_printk
+	#top_booter
+
 #	prebuilt booter lib \
 #	rbtree radix_tree bitmap xarray hashtable \
 #	early_dt of of_irq platform \

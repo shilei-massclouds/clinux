@@ -18,7 +18,6 @@ void *memset(void *s, int c, size_t count)
 {
     return __memset(s, c, count);
 }
-EXPORT_SYMBOL(memset);
 
 /**
  * memcpy - Copy one area of memory to another
@@ -33,7 +32,6 @@ void *memcpy(void *dest, const void *src, size_t count)
 {
     return __memcpy(dest, src, count);
 }
-EXPORT_SYMBOL(memcpy);
 
 /**
  * memcmp - Compare two areas of memory
@@ -51,7 +49,6 @@ int memcmp(const void *cs, const void *ct, size_t count)
             break;
     return res;
 }
-EXPORT_SYMBOL(memcmp);
 
 /**
  * strcmp - Compare two strings
@@ -72,7 +69,6 @@ int strcmp(const char *cs, const char *ct)
     }
     return 0;
 }
-EXPORT_SYMBOL(strcmp);
 
 int hex_to_str(unsigned long n, char *str, size_t len)
 {
