@@ -2116,6 +2116,7 @@ static bool suppress_message_printing(int level) { return false; }
 
 #endif /* CONFIG_PRINTK */
 
+/*
 #ifdef CONFIG_EARLY_PRINTK
 struct console *early_console;
 
@@ -2135,6 +2136,7 @@ asmlinkage __visible void early_printk(const char *fmt, ...)
 	early_console->write(early_console, buf, n);
 }
 #endif
+*/
 
 static int __add_preferred_console(char *name, int idx, char *options,
 				   char *brl_options, bool user_specified)

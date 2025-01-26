@@ -21,7 +21,7 @@ CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 
 AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-asynchronous-unwind-tables -fno-unwind-tables \
-	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__
+	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__ -DMODULE
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug
 OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S
 

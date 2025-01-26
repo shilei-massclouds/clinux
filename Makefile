@@ -23,9 +23,10 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter \
-	lib top_lib \
-	#printk \
-	#top_printk
+	lib \
+	early_printk top_early_printk \
+	#top_lib \
+	#printk top_printk \
 	#top_booter
 
 #	prebuilt booter lib \
