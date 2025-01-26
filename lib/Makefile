@@ -10,6 +10,3 @@ obj_y += hexdump.o
 obj_y += uaccess.o
 obj_y += usercopy.o
 obj_y += kstrtox.o
-#obj_y += params.o
-#obj_y += time.o
-#obj_y += find_bit.o

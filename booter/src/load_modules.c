@@ -254,9 +254,9 @@ simplify_symbols(const struct load_info *info)
                 break;
             }
 
-            sbi_puts("SHN_UNDEF: ");
+            sbi_puts("SHN_UNDEF: '");
             sbi_puts(name);
-            sbi_puts(" can't be resolved\n");
+            sbi_puts("' can't be resolved\n");
             sbi_shutdown();
             break;
         default:
@@ -377,8 +377,14 @@ apply_relocate_add(const struct load_info *info, unsigned int relsec)
         case R_RISCV_ADD32:
             *(u32 *)location += (u32)v;
             break;
+        case R_RISCV_ADD64:
+            *(u64 *)location += (u64)v;
+            break;
         case R_RISCV_SUB32:
             *(u32 *)location -= (u32)v;
+            break;
+        case R_RISCV_SUB64:
+            *(u64 *)location -= (u64)v;
             break;
         case R_RISCV_PCREL_LO12_I:
         case R_RISCV_PCREL_LO12_S: {
