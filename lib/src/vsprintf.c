@@ -711,6 +711,7 @@ static char *pointer_string(char *buf, char *end,
 /* Make pointers available for printing early in the boot sequence. */
 static int debug_boot_weak_hash __ro_after_init;
 
+/*
 static int __init debug_boot_weak_hash_enable(char *str)
 {
 	debug_boot_weak_hash = 1;
@@ -718,6 +719,7 @@ static int __init debug_boot_weak_hash_enable(char *str)
 	return 0;
 }
 early_param("debug_boot_weak_hash", debug_boot_weak_hash_enable);
+*/
 
 static DEFINE_STATIC_KEY_TRUE(not_filled_random_ptr_key);
 static siphash_key_t ptr_key __read_mostly;

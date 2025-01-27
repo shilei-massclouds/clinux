@@ -16,19 +16,20 @@ INCLUDES := -isystem /usr/lib/gcc-cross/riscv64-linux-gnu/11/include -I./arch/ri
 
 CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-asynchronous-unwind-tables -fno-unwind-tables \
-	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__ -DMODULE \
+	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__ \
 	-O2 -Wno-stringop-overflow
 
 AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-asynchronous-unwind-tables -fno-unwind-tables \
-	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__ -DMODULE
+	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__
+
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug
 OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S
 
 TARGET_DIR = target/$(obj)
 BOOTRD_DIR = target/_bootrd
 
-mod_lds := scripts/module.lds
+#mod_lds := scripts/module.lds
 elf_lds := $(TARGET_DIR)/booter.lds
 
 include $(obj)/Makefile
@@ -73,9 +74,9 @@ endef
 _build: $(target_y)
 	@:
 
-$(TARGET_DIR)/$(obj).ko: $(obj_y) $(mod_lds)
+$(TARGET_DIR)/$(obj).ko: $(obj_y)
 	@printf "LD\t$@\n"
-	@$(LD) -r $(LDFLAGS) -T $(mod_lds) -o $@ $(obj_y)
+	@$(LD) -r $(LDFLAGS) -o $@ $(obj_y)
 	@cp $@ $(BOOTRD_DIR)
 
 $(TARGET_DIR)/$(obj).bin: $(TARGET_DIR)/$(obj).elf $(TARGET_DIR)/$(obj).map

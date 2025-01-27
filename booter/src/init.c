@@ -9,7 +9,6 @@
 void
 start_kernel(void)
 {
-    load_modules();
     booter_panic("Cannot reach here!");
 }
 
