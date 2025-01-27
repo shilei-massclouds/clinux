@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <linux/printk.h>
+#include "../../booter/src/booter.h"
 
 int
 init_module(void)
