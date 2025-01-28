@@ -5,6 +5,7 @@ export MAKE := @make --no-print-directory
 export KMODULE_DIR = ./target/_bootrd
 
 TOP ?= top_early_printk
+TOP_COMPONENT := $(TOP)
 
 CROSS_ := riscv64-linux-gnu-
 CPP := $(CC) -E
@@ -72,12 +73,10 @@ necessities: $(components)
 
 #build: tools bootrd
 #	@ ./tools/mk_bootrd/mk_bootrd
-#
-#tools:
-#	$(MAKE) -C ./tools
-#
-#bootrd: $(components)
-#
+
+tools:
+	$(MAKE) -C ./tools
+
 $(components): predirs FORCE
 	@mkdir -p ./target/$@
 	$(MAKE) -f ./scripts/Makefile.build obj=$@
