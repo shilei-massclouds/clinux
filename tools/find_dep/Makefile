@@ -2,25 +2,17 @@
 
 PHONY := all clean run
 
-CC := gcc
-
-INCLUDES := -I.
-CFLAGS := $(shell pkg-config --cflags json-c) -DCL_TOOLS
-LDFLAGS := $(shell pkg-config --libs json-c)
-
-TARGET := find_dep
-
-all: $(TARGET)
+all: build
 	@:
 
-$(TARGET): main.c
-	@printf "MK\t$@\n"
-	@$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $^ $(LDFLAGS)
+build:
+	@printf "MK\tfind_dep\n"
+	@cargo build --release
 
 clean:
-	@rm -rf *.o *.json $(TARGET)
+	@cargo clean
 
-run:
-	@:
+run: build
+	@./target/release/find_dep ../../target/_bootrd/ top_early_printk
 
 .PHONY: $(PHONY)

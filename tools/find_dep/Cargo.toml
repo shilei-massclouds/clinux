@@ -1,0 +1,12 @@
+[package]
+name = "find_dep"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+glob = "0.3.2"
+xmas-elf = "0.9.1"
+
+[profile.release]
+lto = true
