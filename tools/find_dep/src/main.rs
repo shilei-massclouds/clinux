@@ -1,10 +1,12 @@
 use std::env;
 use std::fs::File;
 use std::io::Read;
+use std::io::{BufReader, BufRead};
 use std::sync::Arc;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::collections::HashMap;
 use std::cell::RefCell;
+use std::path::Path;
 use xmas_elf::ElfFile;
 use xmas_elf::sections::ShType::SymTab;
 use xmas_elf::sections::SectionData::SymbolTable64;
@@ -42,14 +44,55 @@ fn main() -> Result<()> {
     let top_name = &args[2];
     println!("find_dep {} {}", kmod_path, top_name);
 
-    let mods = discover_modules(&kmod_path, &top_name)?;
+    let (top_kmod, sym_map) = discover_modules(&kmod_path, &top_name)?;
+    build_dependency(&top_kmod, &sym_map)?;
+    traverse(top_kmod)?;
     Ok(())
 }
 
-fn discover_modules(kmod_path: &str, top_name: &str) -> Result<()> {
-    let mut has_top = false;
+fn traverse(kmod: ModuleRef) -> Result<()> {
+    if kmod.done.swap(true, Ordering::Relaxed) {
+        return Ok(());
+    }
+    for depend in kmod.dependencies.borrow().iter() {
+        traverse(depend.clone())?;
+        println!("{} -> {}", kmod.name, depend.name);
+    }
+    println!("Seq: {}", kmod.name);
+    Ok(())
+}
+
+fn find_dependency(kmod: &ModuleRef, name: &str) -> bool {
+    kmod.dependencies.borrow().iter().find(|x| x.name == name).is_some()
+}
+
+fn build_dependency(kmod: &ModuleRef, sym_map: &HashMap<String, ModuleRef>) -> Result<()> {
+    let mut remained = Vec::<String>::new();
+    while let Some(undef) = kmod.undef_syms.borrow_mut().pop() {
+        if let Some(dep) = sym_map.get(&undef) {
+            if !find_dependency(kmod, &dep.name) {
+                println!("undef: {} {}", undef, dep.name);
+                kmod.dependencies.borrow_mut().push(dep.clone());
+                build_dependency(dep, sym_map)?;
+            }
+        } else {
+            remained.push(undef);
+        }
+    }
+
+    if !remained.is_empty() {
+        panic!("mod '{}' has undef symbols:\n{}\n",
+            kmod.name, remained.join("\n"));
+    }
+    Ok(())
+}
+
+fn discover_modules(
+    kmod_path: &str, top_name: &str
+) -> Result<(ModuleRef, HashMap<String, ModuleRef>)> {
+    let mut top_kmod = None;
     let mut sym_map: HashMap<String, ModuleRef> = HashMap::new();
-    let modules = Vec::<ModuleRef>::new();
+    let mut modules = Vec::<ModuleRef>::new();
 
     let expr = format!("{}/*.ko", kmod_path);
     for entry in glob::glob(expr.as_str())? {
@@ -61,9 +104,6 @@ fn discover_modules(kmod_path: &str, top_name: &str) -> Result<()> {
         let name = name.strip_suffix(".ko")
             .ok_or(anyhow!("bad module name: '{}'", name))?;
         println!("path: {}; name: {}", path, name);
-        if !has_top && name == top_name {
-            has_top = true;
-        }
 
         let mut kmod = Module::new(name);
 
@@ -74,13 +114,35 @@ fn discover_modules(kmod_path: &str, top_name: &str) -> Result<()> {
 
         let kmod = Arc::new(kmod);
         export_symbols(&mut sym_map, &kmod, &elf)?;
+        modules.push(kmod.clone());
 
-        /*
-        */
+        if name == top_name {
+            assert!(top_kmod.is_none());
+            top_kmod = Some(kmod);
+        }
     }
 
-    if !has_top {
+    if top_kmod.is_none() {
         panic!("No top '{}'\n", top_name);
+    }
+    add_lds_symbols(&mut sym_map)?;
+    Ok((top_kmod.unwrap(), sym_map))
+}
+
+fn add_lds_symbols(sym_map: &mut HashMap<String, ModuleRef>) -> Result<()> {
+    let mut kmod = Arc::new(Module::new("lds"));
+
+    let cwd = env::current_exe().unwrap();
+    let cwd = cwd.parent().unwrap().parent().unwrap().parent().unwrap();
+    let conf = cwd.join("lds.conf");
+    let f = BufReader::new(File::open(conf.clone())?);
+    for line in f.lines().map_while(Result::ok) {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        println!("line: {}", line);
+        sym_map.insert(line.to_owned(), kmod.clone());
     }
     Ok(())
 }
