@@ -2,7 +2,7 @@
 ARCH ?= riscv64
 
 export MAKE := @make --no-print-directory
-export KMODULE_DIR = ./target/_bootrd
+export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
 TOP ?= top_early_printk
 TOP_COMPONENT := $(TOP)
@@ -43,8 +43,9 @@ components := \
 	#printk top_printk \
 	#top_booter
 
-BLOCKS := booter.ko lib.ko early_printk.ko top_early_printk.ko
-_BLOCKS := $(addprefix $(KMODULE_DIR)/, $(BLOCKS))
+#BLOCKS := booter.ko lib.ko early_printk.ko top_early_printk.ko
+#_BLOCKS := $(addprefix $(KMODULE_DIR), $(BLOCKS))
+SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 
 all: tools build
 
@@ -62,7 +63,8 @@ target/kernel.map: target/kernel.elf
 
 target/kernel.elf: necessities target/booter.lds
 	@printf "LD\t$@\n"
-	@$(LD) $(LDFLAGS) -T target/booter.lds -o $@ $(_BLOCKS)
+	@printf "selected: $(SELECTED)\n"
+	@$(LD) $(LDFLAGS) -T target/booter.lds -o $@ $(SELECTED)
 
 target/booter.lds: booter/src/booter.lds.S
 	@printf "AS\t$<\n"
@@ -70,6 +72,7 @@ target/booter.lds: booter/src/booter.lds.S
 
 necessities: $(components)
 	@printf "Discover necessities ...\n"
+	./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP)
 
 #build: tools bootrd
 #	@ ./tools/mk_bootrd/mk_bootrd
