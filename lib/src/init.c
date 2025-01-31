@@ -19,3 +19,11 @@ void __warn_printk(const char *fmt, ...)
     sbi_shutdown();
 }
 EXPORT_SYMBOL(__warn_printk);
+
+int cl_lib_init(void)
+{
+    sbi_puts("module[lib]: init begin ...\n");
+    sbi_puts("module[lib]: init end!\n");
+    return 0;
+}
+EXPORT_SYMBOL(cl_lib_init);

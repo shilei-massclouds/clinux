@@ -76,6 +76,8 @@ fn main() -> Result<()> {
     assert_eq!(payload.names.remove(0), "lds");
     debug!("Selected: {}", payload.names.join(" "));
     output_components(&payload, kmod_path)?;
+    assert_eq!(payload.names.remove(0), "booter");
+    output_initfile(&payload, kmod_path)?;
     Ok(())
 }
 
@@ -86,6 +88,23 @@ fn output_components(payload: &Payload, path: &str) -> Result<()> {
     let fname = format!("{}selected.in", path);
     let mut f = File::create(fname)?;
     f.write_all(names.join(" ").as_bytes())?;
+    Ok(())
+}
+
+fn output_initfile(payload: &Payload, path: &str) -> Result<()> {
+    let fname = format!("{}cl_init.c", path);
+    let mut f = File::create(fname)?;
+    for name in &payload.names {
+        writeln!(f, "extern int cl_{}_init();", name)?;
+    }
+    writeln!(f, "")?;
+    writeln!(f, "int cl_init()")?;
+    writeln!(f, "{{")?;
+    for name in &payload.names {
+        writeln!(f, "    cl_{}_init();", name)?;
+    }
+    writeln!(f, "    return 0;")?;
+    writeln!(f, "}}")?;
     Ok(())
 }
 

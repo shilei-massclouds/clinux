@@ -4,7 +4,7 @@
 #include "../../booter/src/booter.h"
 
 int
-init_module(void)
+cl_top_early_printk_init(void)
 {
     char *s = "Hello, early_printk!";
     int num = 101;
@@ -13,3 +13,4 @@ init_module(void)
     sbi_puts("module[top_early_printk]: init end!\n");
     return 0;
 }
+EXPORT_SYMBOL(cl_top_early_printk_init);

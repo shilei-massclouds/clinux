@@ -7,17 +7,7 @@ export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 TOP ?= top_early_printk
 TOP_COMPONENT := $(TOP)
 
-CROSS_ := riscv64-linux-gnu-
-CPP := $(CC) -E
-NM  := $(CROSS_)nm
-LD  := $(CROSS_)ld
-LDFLAGS := -melf64lriscv --build-id=none --strip-debug
-OBJCOPY := $(CROSS_)objcopy
-OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S
-
-INCLUDES := -isystem /usr/lib/gcc-cross/riscv64-linux-gnu/11/include -I./arch/riscv/include -I./arch/riscv/include/generated \
-	-I./include -I./arch/riscv/include/uapi -I./arch/riscv/include/generated/uapi -I./include/uapi -I./include/generated/uapi \
-	-include ./include/linux/kconfig.h -include ./include/linux/compiler_types.h
+include ./scripts/Makefile.include
 
 # QEMU
 QEMU := qemu-system-$(ARCH)
@@ -44,27 +34,35 @@ components := \
 	#top_booter
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
+CL_INIT := $(KMODULE_DIR)cl_init
 
-all: tools build
+all: predirs tools build
 
 tools:
 
 build: target/kernel.bin
 
 target/kernel.bin: target/kernel.elf target/kernel.map
+	@printf "CP\t$@\n"
 	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
 
 target/kernel.map: target/kernel.elf
 	@$(NM) -n $< | \
 		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
 
-target/kernel.elf: necessities target/booter.lds
+target/kernel.elf: target/booter.lds $(CL_INIT).o
 	@printf "LD\t$@\n"
-	@$(LD) $(LDFLAGS) -T target/booter.lds -o $@ $(SELECTED)
+	@$(LD) $(LDFLAGS) -T target/booter.lds -o $@ $(SELECTED) $(CL_INIT).o
 
 target/booter.lds: booter/src/booter.lds.S
 	@printf "AS\t$<\n"
 	@$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
+
+$(CL_INIT).o: $(CL_INIT).c
+	@printf "CC\t$<\n"
+	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) -DKBUILD_MODNAME='"$(obj)"' $(INCLUDES) -c -o $@ $<
+
+$(CL_INIT).c: necessities
 
 necessities: $(components)
 	@./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP)
@@ -72,7 +70,7 @@ necessities: $(components)
 tools:
 	$(MAKE) -C ./tools
 
-$(components): predirs FORCE
+$(components): FORCE
 	@mkdir -p ./target/$@
 	$(MAKE) -f ./scripts/Makefile.build obj=$@
 

@@ -6,9 +6,12 @@
 
 #define UL_STR_SIZE 19  /* prefix with '0x' and end with '\0' */
 
+extern int cl_init();
+
 void
 start_kernel(void)
 {
+    cl_init();
     booter_panic("Cannot reach here!");
 }
 
