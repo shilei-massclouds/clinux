@@ -82,7 +82,7 @@ run: build
 
 clean:
 	@rm -rf ./target
-	$(MAKE) -C ./tools clean
+	#$(MAKE) -C ./tools clean
 
 FORCE:
 
