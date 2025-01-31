@@ -45,11 +45,15 @@ type ModuleRef = Arc<Module>;
 
 struct Payload {
     names: Vec<String>,
+    last_msg: String,
 }
 
 impl Payload {
     pub fn new() -> Self {
-        Self { names: vec![] }
+        Self {
+            names: vec![],
+            last_msg: String::new(),
+        }
     }
 }
 
@@ -95,11 +99,13 @@ fn traverse(kmod: ModuleRef, payload: &mut Payload) -> Result<()> {
         if status.contains(ModuleStatus::DONE) {
             return Ok(());
         }
-        panic!("Cyclic chain: {}", kmod.name);
+        panic!("Cyclic chain: {}", payload.last_msg);
     }
 
     for depend in kmod.dependencies.borrow().iter() {
+        payload.last_msg = format!("{} -> {}", kmod.name, depend.name);
         traverse(depend.clone(), payload)?;
+        payload.last_msg = String::new();
         debug!("{} -> {}", kmod.name, depend.name);
     }
     kmod.status.fetch_or(ModuleStatus::DONE.bits(), Ordering::SeqCst);
@@ -113,7 +119,9 @@ fn find_dependency(kmod: &ModuleRef, name: &str) -> bool {
 
 fn build_dependency(kmod: &ModuleRef, sym_map: &HashMap<String, ModuleRef>) -> Result<()> {
     let mut remained = Vec::<String>::new();
-    while let Some(undef) = kmod.undef_syms.borrow_mut().pop() {
+    let undef_syms = kmod.undef_syms.take();
+    assert!(kmod.undef_syms.borrow().is_empty());
+    for undef in undef_syms {
         if let Some(dep) = sym_map.get(&undef) {
             if !find_dependency(kmod, &dep.name) {
                 debug!("undef: {} {}", undef, dep.name);

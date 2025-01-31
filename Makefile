@@ -43,8 +43,6 @@ components := \
 	#printk top_printk \
 	#top_booter
 
-#BLOCKS := booter.ko lib.ko early_printk.ko top_early_printk.ko
-#_BLOCKS := $(addprefix $(KMODULE_DIR), $(BLOCKS))
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 
 all: tools build
@@ -54,7 +52,6 @@ tools:
 build: target/kernel.bin
 
 target/kernel.bin: target/kernel.elf target/kernel.map
-	@printf "Build kernel: $(TOP) ...\n"
 	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
 
 target/kernel.map: target/kernel.elf
@@ -63,7 +60,6 @@ target/kernel.map: target/kernel.elf
 
 target/kernel.elf: necessities target/booter.lds
 	@printf "LD\t$@\n"
-	@printf "selected: $(SELECTED)\n"
 	@$(LD) $(LDFLAGS) -T target/booter.lds -o $@ $(SELECTED)
 
 target/booter.lds: booter/src/booter.lds.S
@@ -71,11 +67,7 @@ target/booter.lds: booter/src/booter.lds.S
 	@$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
 
 necessities: $(components)
-	@printf "Discover necessities ...\n"
-	./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP)
-
-#build: tools bootrd
-#	@ ./tools/mk_bootrd/mk_bootrd
+	@./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP)
 
 tools:
 	$(MAKE) -C ./tools
