@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::Read;
 use std::io::{BufReader, BufRead};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::path::Path;
@@ -14,10 +14,20 @@ use xmas_elf::symbol_table::Entry;
 use xmas_elf::symbol_table::Entry64;
 use xmas_elf::sections::SHN_UNDEF;
 use anyhow::{Result, anyhow};
+use bitflags::bitflags;
+
+bitflags! {
+    /// Module Status (bitwise layout).
+    struct ModuleStatus: usize {
+        const INITIAL   = 0b00;
+        const TOUCHED   = 0b01;
+        const DONE      = 0b10;
+    }
+}
 
 struct Module {
     name: String,
-    done: AtomicBool,
+    status: AtomicUsize,
     undef_syms: RefCell<Vec<String>>,
     dependencies: RefCell<Vec<ModuleRef>>,
 }
@@ -26,7 +36,7 @@ impl Module {
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_owned(),
-            done: AtomicBool::new(false),
+            status: AtomicUsize::new(ModuleStatus::INITIAL.bits()),
             undef_syms: RefCell::new(vec![]),
             dependencies: RefCell::new(vec![]),
         }
@@ -34,6 +44,10 @@ impl Module {
 }
 
 type ModuleRef = Arc<Module>;
+
+struct Payload {
+    names: Vec<String>,
+}
 
 fn main() -> Result<()> {
     let args: Vec<_> = env::args().collect();
@@ -51,13 +65,23 @@ fn main() -> Result<()> {
 }
 
 fn traverse(kmod: ModuleRef) -> Result<()> {
-    if kmod.done.swap(true, Ordering::Relaxed) {
-        return Ok(());
+    let status = kmod.status.fetch_or(
+        ModuleStatus::TOUCHED.bits(),
+        Ordering::SeqCst
+    );
+    let status = ModuleStatus::from_bits_truncate(status);
+    if status.contains(ModuleStatus::TOUCHED) {
+        if status.contains(ModuleStatus::DONE) {
+            return Ok(());
+        }
+        panic!("Cyclic chain: {}", kmod.name);
     }
+
     for depend in kmod.dependencies.borrow().iter() {
         traverse(depend.clone())?;
         println!("{} -> {}", kmod.name, depend.name);
     }
+    kmod.status.store(ModuleStatus::DONE.bits(), Ordering::SeqCst);
     println!("Seq: {}", kmod.name);
     Ok(())
 }
