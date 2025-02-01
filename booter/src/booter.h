@@ -13,7 +13,6 @@ typedef void (*exit_module_t)(void);
 extern int hex_to_str(unsigned long n, char *str, size_t len);
 extern int dec_to_str(unsigned long n, char *str, size_t len);
 
-//extern void booter_panic(void);
 extern void sbi_shutdown(void);
 
 #define booter_panic(args...) \

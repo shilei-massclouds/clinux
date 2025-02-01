@@ -6,7 +6,7 @@
 #include "../../booter/src/booter.h"
 
 int
-init_module(void)
+cl_top_lib_init(void)
 {
     unsigned long data = 2;
     sbi_puts("module[top_lib]: init begin ...\n");
@@ -19,3 +19,4 @@ init_module(void)
     sbi_puts("module[top_lib]: init end!\n");
     return 0;
 }
+EXPORT_SYMBOL(cl_top_lib_init);

@@ -55,7 +55,6 @@ static void __init earlycon_init(struct earlycon_device *device,
     */
 }
 
-//static int __init init_early_printk(void)
 int
 cl_early_printk_init(void)
 {
@@ -81,4 +80,3 @@ cl_early_printk_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_early_printk_init);
-//module_init(init_early_printk);

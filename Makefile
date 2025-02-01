@@ -5,7 +5,7 @@ export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
 TOP ?= top_early_printk
-TOP_COMPONENT := $(TOP)
+export TOP_COMPONENT := $(TOP)
 
 include ./scripts/Makefile.include
 
@@ -26,19 +26,14 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter \
-	lib \
-	early_printk top_early_printk \
-	#top_lib \
-	#printk top_printk \
-	#top_booter
+	prebuilt booter lib early_printk
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init
 
 all: build
 
-build: predirs tools target/kernel.bin
+build: clean predirs tools target/kernel.bin
 
 target/kernel.bin: target/kernel.elf target/kernel.map
 	@printf "CP\t$@\n"
@@ -62,7 +57,7 @@ $(CL_INIT).o: $(CL_INIT).c
 
 $(CL_INIT).c: necessities
 
-necessities: $(components)
+necessities: $(components) $(KMODULE_DIR)$(TOP_COMPONENT).ko
 	@./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP)
 
 tools:
@@ -71,6 +66,12 @@ tools:
 $(components): FORCE
 	@mkdir -p ./target/$@
 	$(MAKE) -f ./scripts/Makefile.build obj=$@
+
+$(KMODULE_DIR)$(TOP_COMPONENT).ko: FORCE
+	@rm -rf ./target/top_component
+	@mkdir -p ./target/top_component
+	$(MAKE) -f ./scripts/Makefile.build obj=top_component
+	@mv $(KMODULE_DIR)top_component.ko $(KMODULE_DIR)$(TOP_COMPONENT).ko
 
 predirs:
 	@mkdir -p ./target/_bootrd
