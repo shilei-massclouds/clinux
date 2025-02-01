@@ -8,7 +8,7 @@ all: build
 
 build:
 	@printf "MK\tfind_dep\n"
-	@cargo build --release
+	@cargo build -q --release
 
 clean:
 	@rm -f ./selected.in

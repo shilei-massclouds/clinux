@@ -4,8 +4,8 @@ ARCH ?= riscv64
 export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
-TOP ?= top_early_printk
-export TOP_COMPONENT := $(TOP)
+TOP ?= early_printk
+export TOP_COMPONENT := top_$(TOP)
 
 include ./scripts/Makefile.include
 
@@ -33,7 +33,7 @@ CL_INIT := $(KMODULE_DIR)cl_init
 
 all: build
 
-build: clean predirs tools target/kernel.bin
+build: predirs tools target/kernel.bin
 
 target/kernel.bin: target/kernel.elf target/kernel.map
 	@printf "CP\t$@\n"
@@ -57,8 +57,8 @@ $(CL_INIT).o: $(CL_INIT).c
 
 $(CL_INIT).c: necessities
 
-necessities: $(components) $(KMODULE_DIR)$(TOP_COMPONENT).ko
-	@./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP)
+necessities: $(components) top_component
+	@./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP_COMPONENT)
 
 tools:
 	$(MAKE) -C ./tools
@@ -67,7 +67,7 @@ $(components): FORCE
 	@mkdir -p ./target/$@
 	$(MAKE) -f ./scripts/Makefile.build obj=$@
 
-$(KMODULE_DIR)$(TOP_COMPONENT).ko: FORCE
+top_component: FORCE
 	@rm -rf ./target/top_component
 	@mkdir -p ./target/top_component
 	$(MAKE) -f ./scripts/Makefile.build obj=top_component
@@ -85,4 +85,4 @@ clean:
 
 FORCE:
 
-.PHONY: all build tools necessities components predirs clean FORCE
+.PHONY: all build tools necessities components predirs clean top_component FORCE
