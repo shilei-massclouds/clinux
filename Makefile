@@ -48,11 +48,11 @@ target/kernel.map: target/kernel.elf
 	@$(NM) -n $< | \
 		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
 
-target/kernel.elf: target/booter.lds $(CL_INIT).o
+target/kernel.elf: target/vmlinux.lds $(CL_INIT).o
 	@printf "LD\t$@\n"
-	@$(LD) $(LDFLAGS) -T target/booter.lds -o $@ $(SELECTED) $(CL_INIT).o
+	@$(LD) $(LDFLAGS) -T target/vmlinux.lds -o $@ $(SELECTED) $(CL_INIT).o
 
-target/booter.lds: booter/src/booter.lds.S
+target/vmlinux.lds: booter/src/vmlinux.lds.S
 	@printf "AS\t$<\n"
 	@$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
 

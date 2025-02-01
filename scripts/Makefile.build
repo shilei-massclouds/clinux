@@ -5,9 +5,6 @@ include ./scripts/Makefile.include
 TARGET_DIR = target/$(obj)
 BOOTRD_DIR = target/_bootrd
 
-#mod_lds := scripts/module.lds
-elf_lds := $(TARGET_DIR)/booter.lds
-
 include $(obj)/Makefile
 
 target_y := $(if $(target_y), \
@@ -55,26 +52,9 @@ $(TARGET_DIR)/$(obj).ko: $(obj_y)
 	@$(LD) -r $(LDFLAGS) -o $@ $(obj_y)
 	@cp $@ $(BOOTRD_DIR)
 
-$(TARGET_DIR)/$(obj).bin: $(TARGET_DIR)/$(obj).elf $(TARGET_DIR)/$(obj).map
-	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
-	@cp $@ $(BOOTRD_DIR)
-
-$(TARGET_DIR)/$(obj).map: $(TARGET_DIR)/$(obj).elf
-	@$(NM) -n $< | \
-		grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $@
-	@cp $@ $(BOOTRD_DIR)
-
-$(TARGET_DIR)/$(obj).elf: $(obj_y) $(elf_lds)
-	@printf "LD\t$@\n"
-	@$(LD) $(LDFLAGS) -T $(elf_lds) -o $@ $(obj_y)
-
 $(TARGET_DIR)/%.o: $(obj)/src/%.c
 	@printf "CC\t$<\n"
 	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) -DKBUILD_MODNAME='"$(obj)"' $(INCLUDES) -c -o $@ $<
-
-$(elf_lds): $(obj)/src/$(obj).lds.S
-	@printf "AS\t$<\n"
-	@$(CPP) $(INCLUDES) -P -Uriscv -D__ASSEMBLY__ -o $@ $<
 
 $(TARGET_DIR)/%.o: $(obj)/src/%.S
 	@printf "AS\t$<\n"

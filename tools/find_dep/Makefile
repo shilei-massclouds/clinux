@@ -11,7 +11,6 @@ build:
 	@cargo build --release
 
 clean:
-	#@cargo clean
 	@rm -f ./selected.in
 
 run: build

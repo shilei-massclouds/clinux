@@ -3,15 +3,6 @@
 #ifndef _BOOTER_H_
 #define _BOOTER_H_
 
-/*
- * Qemu pflash is used for modules repository
- * Note: we should select the second pflash (unit=1),
- * because the first pflash only acts as BIOS.
- */
-#define FLASH_SIZE      0x0000000002000000UL
-#define FLASH_PA        0x0000000022000000UL
-#define FLASH_VA        FLASH_PA
-
 extern void sbi_puts(const char *s);
 extern void sbi_put_u64(unsigned long n);
 extern void sbi_put_dec(unsigned long n);
