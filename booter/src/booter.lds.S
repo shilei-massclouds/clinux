@@ -1,91 +1,103 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
-
-#include <asm/page.h>
-#include <asm/thread_info.h>
+/*
+ * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2017 SiFive
+ */
 
 #define LOAD_OFFSET PAGE_OFFSET
+#include <asm/vmlinux.lds.h>
+#include <asm/page.h>
+#include <asm/cache.h>
+#include <asm/thread_info.h>
+#include <asm/set_memory.h>
 
+#include <linux/sizes.h>
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
+//jiffies = jiffies_64;
+
 SECTIONS
 {
-    . = LOAD_OFFSET;
+	/* Beginning of code and text segment */
+	. = LOAD_OFFSET;
+	_start = .;
+	HEAD_TEXT_SECTION
+	. = ALIGN(PAGE_SIZE);
 
-    _start = .;
+	__init_begin = .;
+	INIT_TEXT_SECTION(PAGE_SIZE)
+	. = ALIGN(8);
+	__soc_early_init_table : {
+		__soc_early_init_table_start = .;
+		KEEP(*(__soc_early_init_table))
+		__soc_early_init_table_end = .;
+	}
+	__soc_builtin_dtb_table : {
+		__soc_builtin_dtb_table_start = .;
+		KEEP(*(__soc_builtin_dtb_table))
+		__soc_builtin_dtb_table_end = .;
+	}
+	/* we have to discard exit text and such at runtime, not link time */
+	.exit.text :
+	{
+		EXIT_TEXT
+	}
+	.exit.data :
+	{
+		EXIT_DATA
+	}
+	PERCPU_SECTION(L1_CACHE_BYTES)
+	__init_end = .;
 
-    .head.text : AT(ADDR(.head.text) - LOAD_OFFSET) {
-        *(.head.text);
-    }
+	. = ALIGN(SECTION_ALIGN);
+	.text : {
+		_text = .;
+		_stext = .;
+		TEXT_TEXT
+		SCHED_TEXT
+		CPUIDLE_TEXT
+		LOCK_TEXT
+		KPROBES_TEXT
+		ENTRY_TEXT
+		IRQENTRY_TEXT
+		SOFTIRQENTRY_TEXT
+		*(.fixup)
+		_etext = .;
+	}
 
-    . = ALIGN(PAGE_SIZE);
+	INIT_DATA_SECTION(16)
 
-    .init.text : AT(ADDR(.init.text) - LOAD_OFFSET) {
-        *(.init.text);
-    }
+	/* Start of data section */
+	_sdata = .;
+	RO_DATA(SECTION_ALIGN)
+	.srodata : {
+		*(.srodata*)
+	}
 
-    .init.data : AT(ADDR(.init.data) - LOAD_OFFSET) {
-        *(.init.data);
-    }
+	EXCEPTION_TABLE(0x10)
 
-    _text_start = .;
-    .text : AT(ADDR(.text) - LOAD_OFFSET) {
-        *(.text);
-    }
-    _text_end = .;
+	. = ALIGN(SECTION_ALIGN);
+	_data = .;
 
-    _rodata_start = .;
-    .rodata : AT(ADDR(.rodata) - LOAD_OFFSET) {
-        *(.rodata);
-    }
-    _rodata_end = .;
+	RW_DATA(L1_CACHE_BYTES, PAGE_SIZE, THREAD_SIZE)
+	.sdata : {
+		__global_pointer$ = . + 0x800;
+		*(.sdata*)
+		/* End of data section */
+		_edata = .;
+	}
 
-    __ksymtab : AT(ADDR(__ksymtab) - LOAD_OFFSET) {
-        __start_ksymtab = .;
-        KEEP(*(SORT(___ksymtab+*)));
-        __end_ksymtab = .;
-    }
+	BSS_SECTION(PAGE_SIZE, PAGE_SIZE, 0)
 
-    __ksymtab_strings : AT(ADDR(__ksymtab_strings) - LOAD_OFFSET) {
-        __start_ksymtab_strings = .;
-        KEEP(*(__ksymtab_strings));
-        __end_ksymtab_strings = .;
-    }
+	.rel.dyn : {
+		*(.rel.dyn*)
+	}
 
-    _data_start = .;
-    sdata = .;
-    .data : AT(ADDR(.data) - LOAD_OFFSET) {
-        . = ALIGN(PAGE_SIZE);
-        init_thread_union = .;
-        _init_stack = .;
-        init_stack = .;
-        . = init_stack + THREAD_SIZE;
-        _init_stack_top = .;
-        init_stack_top = .;
-        *(.data);
-        *(.sdata);
-        __global_pointer$ = . + 0x800;
-    }
-    edata = .;
-    _data_end = .;
+	_end = .;
 
-    . = ALIGN(PAGE_SIZE);
+	STABS_DEBUG
+	DWARF_DEBUG
 
-    __bss_start = .;
-    . = ALIGN(PAGE_SIZE);
-    .sbss : AT(ADDR(.sbss) - LOAD_OFFSET) {
-        *(.sbss);
-    }
-
-    . = ALIGN(PAGE_SIZE);
-    .bss : AT(ADDR(.bss) - LOAD_OFFSET) {
-        . = ALIGN(PAGE_SIZE);
-        *(.bss..page_aligned);
-        . = ALIGN(PAGE_SIZE);
-        *(.bss);
-    }
-    __bss_stop = .;
-
-    ekernel = .;
-    _end = .;
+	DISCARDS
 }

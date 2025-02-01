@@ -22,7 +22,7 @@ QEMU_ARGS += \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
 	-nographic \
     -append "earlycon=sbi root=/dev/vda rw console=ttyS0" \
-    #-d in_asm -D /tmp/insturction.log
+    -d in_asm -D /tmp/insturction.log
 
 # All component subdir
 components := \
@@ -36,11 +36,9 @@ components := \
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init
 
-all: predirs tools build
+all: build
 
-tools:
-
-build: target/kernel.bin
+build: predirs tools target/kernel.bin
 
 target/kernel.bin: target/kernel.elf target/kernel.map
 	@printf "CP\t$@\n"
@@ -82,7 +80,7 @@ run: build
 
 clean:
 	@rm -rf ./target
-	#$(MAKE) -C ./tools clean
+	$(MAKE) -C ./tools clean
 
 FORCE:
 

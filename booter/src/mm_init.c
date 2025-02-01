@@ -25,10 +25,6 @@
 
 #include "booter.h"
 
-/* Physical address of kernel */
-uintptr_t kernel_start_pa = 0;
-EXPORT_SYMBOL(kernel_start_pa);
-
 //
 //unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)]
 //							__page_aligned_bss;
@@ -382,10 +378,6 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 	uintptr_t load_sz = (uintptr_t)(&_end) - load_pa;
 	uintptr_t map_size = best_map_size(load_pa, MAX_EARLY_MAPPING_SIZE);
 
-    /* The second pmd is for temporary area. */
-    BUG_ON(load_sz > PMD_SIZE);
-    load_sz = 2 * PMD_SIZE;
-
 	va_pa_offset = PAGE_OFFSET - load_pa;
 	pfn_base = PFN_DOWN(load_pa);
 
@@ -437,20 +429,10 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 				   dtb_pa + (va - __fix_to_virt(FIX_FDT)),
 				   PAGE_SIZE, PAGE_KERNEL);
 
-    /* Qemu pflash acts as the repository of modules,
-     * booter loads modules from it.
-     * The pflash is located at 0x22000000 in PA,
-     * just setup identity-mapping for the first pgdir temporily. */
-	create_pgd_mapping(early_pg_dir, FLASH_VA,
-                    FLASH_PA & PGDIR_MASK, PGDIR_SIZE, PAGE_KERNEL);
-
 	/* Save pointer to DTB for early FDT parsing */
 	dtb_early_va = (void *)fix_to_virt(FIX_FDT) + (dtb_pa & ~PAGE_MASK);
 	/* Save physical address for memblock reservation */
 	dtb_early_pa = dtb_pa;
-
-    /* Save physical address of kernel */
-    kernel_start_pa = load_pa;
 }
 #else
 asmlinkage void __init setup_vm(uintptr_t dtb_pa)
