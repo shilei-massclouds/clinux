@@ -2073,6 +2073,10 @@ EXPORT_SYMBOL_GPL(vprintk_default);
  *
  * See the vsnprintf() documentation for format string extensions over C99.
  */
+//
+// Setup hook for 'printk' in booter.
+//
+/*
 asmlinkage __visible int printk(const char *fmt, ...)
 {
 	va_list args;
@@ -2085,6 +2089,7 @@ asmlinkage __visible int printk(const char *fmt, ...)
 	return r;
 }
 EXPORT_SYMBOL(printk);
+*/
 
 #else /* CONFIG_PRINTK */
 

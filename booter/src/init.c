@@ -45,3 +45,11 @@ void sbi_put_dec(unsigned long n)
     sbi_puts(buf);
 }
 EXPORT_SYMBOL(sbi_put_dec);
+
+asmlinkage __visible int printk(const char *fmt, ...)
+{
+    // Skip 2 characters: KERN_SOH and KERN_LEVEL
+    sbi_puts(fmt + 2);
+    return 0;
+}
+EXPORT_SYMBOL(printk);
