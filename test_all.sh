@@ -5,8 +5,8 @@ GREEN_C='\033[92;1m'
 END_C='\033[0m'
 
 TESTCASES="
-    booter
-    lib
+    booter lib params
+	spinlock semaphore
     early_printk
 "
 
