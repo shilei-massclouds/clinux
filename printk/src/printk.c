@@ -171,44 +171,44 @@ __setup("printk.devkmsg=", control_devkmsg);
 
 char devkmsg_log_str[DEVKMSG_STR_MAX_SIZE] = "ratelimit";
 
-int devkmsg_sysctl_set_loglvl(struct ctl_table *table, int write,
-			      void *buffer, size_t *lenp, loff_t *ppos)
-{
-	char old_str[DEVKMSG_STR_MAX_SIZE];
-	unsigned int old;
-	int err;
-
-	if (write) {
-		if (devkmsg_log & DEVKMSG_LOG_MASK_LOCK)
-			return -EINVAL;
-
-		old = devkmsg_log;
-		strncpy(old_str, devkmsg_log_str, DEVKMSG_STR_MAX_SIZE);
-	}
-
-	err = proc_dostring(table, write, buffer, lenp, ppos);
-	if (err)
-		return err;
-
-	if (write) {
-		err = __control_devkmsg(devkmsg_log_str);
-
-		/*
-		 * Do not accept an unknown string OR a known string with
-		 * trailing crap...
-		 */
-		if (err < 0 || (err + 1 != *lenp)) {
-
-			/* ... and restore old setting. */
-			devkmsg_log = old;
-			strncpy(devkmsg_log_str, old_str, DEVKMSG_STR_MAX_SIZE);
-
-			return -EINVAL;
-		}
-	}
-
-	return 0;
-}
+//int devkmsg_sysctl_set_loglvl(struct ctl_table *table, int write,
+//			      void *buffer, size_t *lenp, loff_t *ppos)
+//{
+//	char old_str[DEVKMSG_STR_MAX_SIZE];
+//	unsigned int old;
+//	int err;
+//
+//	if (write) {
+//		if (devkmsg_log & DEVKMSG_LOG_MASK_LOCK)
+//			return -EINVAL;
+//
+//		old = devkmsg_log;
+//		strncpy(old_str, devkmsg_log_str, DEVKMSG_STR_MAX_SIZE);
+//	}
+//
+//	err = proc_dostring(table, write, buffer, lenp, ppos);
+//	if (err)
+//		return err;
+//
+//	if (write) {
+//		err = __control_devkmsg(devkmsg_log_str);
+//
+//		/*
+//		 * Do not accept an unknown string OR a known string with
+//		 * trailing crap...
+//		 */
+//		if (err < 0 || (err + 1 != *lenp)) {
+//
+//			/* ... and restore old setting. */
+//			devkmsg_log = old;
+//			strncpy(devkmsg_log_str, old_str, DEVKMSG_STR_MAX_SIZE);
+//
+//			return -EINVAL;
+//		}
+//	}
+//
+//	return 0;
+//}
 
 /* Number of registered extended console drivers. */
 static int nr_ext_console_drivers;
@@ -1060,6 +1060,7 @@ static int devkmsg_release(struct inode *inode, struct file *file)
 	return 0;
 }
 
+/*
 const struct file_operations kmsg_fops = {
 	.open = devkmsg_open,
 	.read = devkmsg_read,
@@ -1068,6 +1069,7 @@ const struct file_operations kmsg_fops = {
 	.poll = devkmsg_poll,
 	.release = devkmsg_release,
 };
+*/
 
 #ifdef CONFIG_CRASH_CORE
 /*
@@ -1536,125 +1538,127 @@ static void syslog_clear(void)
 	logbuf_unlock_irq();
 }
 
-int do_syslog(int type, char __user *buf, int len, int source)
-{
-	bool clear = false;
-	static int saved_console_loglevel = LOGLEVEL_DEFAULT;
-	int error;
+//int do_syslog(int type, char __user *buf, int len, int source)
+//{
+//	bool clear = false;
+//	static int saved_console_loglevel = LOGLEVEL_DEFAULT;
+//	int error;
+//
+//	error = check_syslog_permissions(type, source);
+//	if (error)
+//		return error;
+//
+//	switch (type) {
+//	case SYSLOG_ACTION_CLOSE:	/* Close log */
+//		break;
+//	case SYSLOG_ACTION_OPEN:	/* Open log */
+//		break;
+//	case SYSLOG_ACTION_READ:	/* Read from log */
+//		if (!buf || len < 0)
+//			return -EINVAL;
+//		if (!len)
+//			return 0;
+//		if (!access_ok(buf, len))
+//			return -EFAULT;
+//		error = wait_event_interruptible(log_wait,
+//						 syslog_seq != log_next_seq);
+//		if (error)
+//			return error;
+//		error = syslog_print(buf, len);
+//		break;
+//	/* Read/clear last kernel messages */
+//	case SYSLOG_ACTION_READ_CLEAR:
+//		clear = true;
+//		/* FALL THRU */
+//	/* Read last kernel messages */
+//	case SYSLOG_ACTION_READ_ALL:
+//		if (!buf || len < 0)
+//			return -EINVAL;
+//		if (!len)
+//			return 0;
+//		if (!access_ok(buf, len))
+//			return -EFAULT;
+//		error = syslog_print_all(buf, len, clear);
+//		break;
+//	/* Clear ring buffer */
+//	case SYSLOG_ACTION_CLEAR:
+//		syslog_clear();
+//		break;
+//	/* Disable logging to console */
+//	case SYSLOG_ACTION_CONSOLE_OFF:
+//		if (saved_console_loglevel == LOGLEVEL_DEFAULT)
+//			saved_console_loglevel = console_loglevel;
+//		console_loglevel = minimum_console_loglevel;
+//		break;
+//	/* Enable logging to console */
+//	case SYSLOG_ACTION_CONSOLE_ON:
+//		if (saved_console_loglevel != LOGLEVEL_DEFAULT) {
+//			console_loglevel = saved_console_loglevel;
+//			saved_console_loglevel = LOGLEVEL_DEFAULT;
+//		}
+//		break;
+//	/* Set level of messages printed to console */
+//	case SYSLOG_ACTION_CONSOLE_LEVEL:
+//		if (len < 1 || len > 8)
+//			return -EINVAL;
+//		if (len < minimum_console_loglevel)
+//			len = minimum_console_loglevel;
+//		console_loglevel = len;
+//		/* Implicitly re-enable logging to console */
+//		saved_console_loglevel = LOGLEVEL_DEFAULT;
+//		break;
+//	/* Number of chars in the log buffer */
+//	case SYSLOG_ACTION_SIZE_UNREAD:
+//		logbuf_lock_irq();
+//		if (syslog_seq < log_first_seq) {
+//			/* messages are gone, move to first one */
+//			syslog_seq = log_first_seq;
+//			syslog_idx = log_first_idx;
+//			syslog_partial = 0;
+//		}
+//		if (source == SYSLOG_FROM_PROC) {
+//			/*
+//			 * Short-cut for poll(/"proc/kmsg") which simply checks
+//			 * for pending data, not the size; return the count of
+//			 * records, not the length.
+//			 */
+//			error = log_next_seq - syslog_seq;
+//		} else {
+//			u64 seq = syslog_seq;
+//			u32 idx = syslog_idx;
+//			bool time = syslog_partial ? syslog_time : printk_time;
+//
+//			while (seq < log_next_seq) {
+//				struct printk_log *msg = log_from_idx(idx);
+//
+//				error += msg_print_text(msg, true, time, NULL,
+//							0);
+//				time = printk_time;
+//				idx = log_next(idx);
+//				seq++;
+//			}
+//			error -= syslog_partial;
+//		}
+//		logbuf_unlock_irq();
+//		break;
+//	/* Size of the log buffer */
+//	case SYSLOG_ACTION_SIZE_BUFFER:
+//		error = log_buf_len;
+//		break;
+//	default:
+//		error = -EINVAL;
+//		break;
+//	}
+//
+//	return error;
+//}
 
-	error = check_syslog_permissions(type, source);
-	if (error)
-		return error;
-
-	switch (type) {
-	case SYSLOG_ACTION_CLOSE:	/* Close log */
-		break;
-	case SYSLOG_ACTION_OPEN:	/* Open log */
-		break;
-	case SYSLOG_ACTION_READ:	/* Read from log */
-		if (!buf || len < 0)
-			return -EINVAL;
-		if (!len)
-			return 0;
-		if (!access_ok(buf, len))
-			return -EFAULT;
-		error = wait_event_interruptible(log_wait,
-						 syslog_seq != log_next_seq);
-		if (error)
-			return error;
-		error = syslog_print(buf, len);
-		break;
-	/* Read/clear last kernel messages */
-	case SYSLOG_ACTION_READ_CLEAR:
-		clear = true;
-		/* FALL THRU */
-	/* Read last kernel messages */
-	case SYSLOG_ACTION_READ_ALL:
-		if (!buf || len < 0)
-			return -EINVAL;
-		if (!len)
-			return 0;
-		if (!access_ok(buf, len))
-			return -EFAULT;
-		error = syslog_print_all(buf, len, clear);
-		break;
-	/* Clear ring buffer */
-	case SYSLOG_ACTION_CLEAR:
-		syslog_clear();
-		break;
-	/* Disable logging to console */
-	case SYSLOG_ACTION_CONSOLE_OFF:
-		if (saved_console_loglevel == LOGLEVEL_DEFAULT)
-			saved_console_loglevel = console_loglevel;
-		console_loglevel = minimum_console_loglevel;
-		break;
-	/* Enable logging to console */
-	case SYSLOG_ACTION_CONSOLE_ON:
-		if (saved_console_loglevel != LOGLEVEL_DEFAULT) {
-			console_loglevel = saved_console_loglevel;
-			saved_console_loglevel = LOGLEVEL_DEFAULT;
-		}
-		break;
-	/* Set level of messages printed to console */
-	case SYSLOG_ACTION_CONSOLE_LEVEL:
-		if (len < 1 || len > 8)
-			return -EINVAL;
-		if (len < minimum_console_loglevel)
-			len = minimum_console_loglevel;
-		console_loglevel = len;
-		/* Implicitly re-enable logging to console */
-		saved_console_loglevel = LOGLEVEL_DEFAULT;
-		break;
-	/* Number of chars in the log buffer */
-	case SYSLOG_ACTION_SIZE_UNREAD:
-		logbuf_lock_irq();
-		if (syslog_seq < log_first_seq) {
-			/* messages are gone, move to first one */
-			syslog_seq = log_first_seq;
-			syslog_idx = log_first_idx;
-			syslog_partial = 0;
-		}
-		if (source == SYSLOG_FROM_PROC) {
-			/*
-			 * Short-cut for poll(/"proc/kmsg") which simply checks
-			 * for pending data, not the size; return the count of
-			 * records, not the length.
-			 */
-			error = log_next_seq - syslog_seq;
-		} else {
-			u64 seq = syslog_seq;
-			u32 idx = syslog_idx;
-			bool time = syslog_partial ? syslog_time : printk_time;
-
-			while (seq < log_next_seq) {
-				struct printk_log *msg = log_from_idx(idx);
-
-				error += msg_print_text(msg, true, time, NULL,
-							0);
-				time = printk_time;
-				idx = log_next(idx);
-				seq++;
-			}
-			error -= syslog_partial;
-		}
-		logbuf_unlock_irq();
-		break;
-	/* Size of the log buffer */
-	case SYSLOG_ACTION_SIZE_BUFFER:
-		error = log_buf_len;
-		break;
-	default:
-		error = -EINVAL;
-		break;
-	}
-
-	return error;
-}
-
+/*
 SYSCALL_DEFINE3(syslog, int, type, char __user *, buf, int, len)
 {
 	return do_syslog(type, buf, len, SYSLOG_FROM_READER);
 }
+*/
 
 /*
  * Special console_lock variants that help to reduce the risk of soft-lockups.

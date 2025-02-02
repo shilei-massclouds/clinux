@@ -4,7 +4,7 @@ ARCH ?= riscv64
 export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
-TOP ?= early_printk
+TOP ?= printk
 export TOP_COMPONENT := top_$(TOP)
 
 include ./scripts/Makefile.include
@@ -26,14 +26,17 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter lib early_printk
+	prebuilt booter lib \
+	params \
+	spinlock semaphore \
+	early_printk printk
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init
 
 all: build
 
-build: predirs tools target/kernel.bin
+build: preclean predirs tools target/kernel.bin
 
 target/kernel.bin: target/kernel.elf target/kernel.map
 	@printf "CP\t$@\n"
@@ -82,6 +85,9 @@ run: build
 clean:
 	@rm -rf ./target
 	$(MAKE) -C ./tools clean
+
+preclean:
+	@rm -f $(CL_INIT).c
 
 FORCE:
 

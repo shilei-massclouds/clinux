@@ -15,7 +15,7 @@
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
-//jiffies = jiffies_64;
+jiffies = jiffies_64;
 
 SECTIONS
 {

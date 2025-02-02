@@ -2,9 +2,14 @@
 
 #include <linux/export.h>
 #include <asm/sbi.h>
+#include <linux/cache.h>
+#include <linux/jiffies.h>
 #include "booter.h"
 
 #define UL_STR_SIZE 19  /* prefix with '0x' and end with '\0' */
+
+__visible u64 jiffies_64 __cacheline_aligned_in_smp = INITIAL_JIFFIES;
+EXPORT_SYMBOL(jiffies_64);
 
 extern int cl_init();
 
