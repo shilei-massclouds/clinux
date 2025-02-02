@@ -32,6 +32,7 @@
 //
 extern char _start[];
 void *dtb_early_va;
+EXPORT_SYMBOL(dtb_early_va);
 //
 //static void __init zone_sizes_init(void)
 //{
