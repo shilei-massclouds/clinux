@@ -7,6 +7,8 @@ export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 TOP ?= early_fdt
 export TOP_COMPONENT := top_$(TOP)
 
+DISK_IMG := $(CURDIR)/tools/mk_rootfs/rootfs.ext2
+
 include ./scripts/Makefile.include
 
 # QEMU
@@ -17,7 +19,7 @@ QEMU_ARGS += \
 	-bios default \
 	-kernel target/kernel.bin \
 	-device virtio-blk-device,drive=disk0 \
-	-drive id=disk0,if=none,format=raw,file=/tmp/disk.img \
+	-drive id=disk0,if=none,format=raw,file=$(DISK_IMG) \
 	-device virtio-net-device,netdev=net0 \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
 	-nographic \
