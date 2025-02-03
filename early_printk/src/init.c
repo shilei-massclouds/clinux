@@ -8,7 +8,10 @@
 
 #define EARLYCON_NAME "sbi"
 
+DECLARE_HOOK(int, vprintk_func, const char *fmt, va_list args);
+
 extern int early_sbi_setup(struct earlycon_device *device, const char *opt);
+extern int early_vprintk(const char *fmt, va_list args);
 
 static struct console early_con = {
     .name =     "uart",     /* fixed up at earlycon registration */
@@ -55,6 +58,8 @@ static void __init earlycon_init(struct earlycon_device *device,
     */
 }
 
+DEFINE_ENABLE_FUNC(early_printk);
+
 int
 cl_early_printk_init(void)
 {
@@ -75,6 +80,7 @@ cl_early_printk_init(void)
     }
 
     early_console = early_console_dev.con;
+    REGISTER_HOOK(early_vprintk, vprintk_func);
 
     sbi_puts("module[early_printk]: init end!\n");
     return 0;

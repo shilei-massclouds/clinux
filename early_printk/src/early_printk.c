@@ -1,22 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
+#include <stdarg.h>
 #include <linux/console.h>
+#include "../../booter/src/booter.h"
 
 struct console *early_console;
 
-asmlinkage __visible void early_printk(const char *fmt, ...)
+int early_vprintk(const char *fmt, va_list args)
 {
-	va_list ap;
-	char buf[512];
-	int n;
+    int n;
+    char buf[512];
 
-	if (!early_console)
-		return;
+    if (!early_console) {
+        booter_panic("No early_console!");
+    }
 
-	va_start(ap, fmt);
-	n = vscnprintf(buf, sizeof(buf), fmt, ap);
-	va_end(ap);
-
-	early_console->write(early_console, buf, n);
+    n = vscnprintf(buf, sizeof(buf), fmt, args);
+    early_console->write(early_console, buf, n);
 }
-EXPORT_SYMBOL(early_printk);

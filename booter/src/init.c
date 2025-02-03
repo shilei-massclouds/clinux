@@ -46,10 +46,25 @@ void sbi_put_dec(unsigned long n)
 }
 EXPORT_SYMBOL(sbi_put_dec);
 
+DEFINE_HOOK(int, vprintk_func, const char *fmt, va_list args);
+
+//
+// Hook for printk
+//
 asmlinkage __visible int printk(const char *fmt, ...)
 {
-    // Skip 2 characters: KERN_SOH and KERN_LEVEL
-    sbi_puts(fmt + 2);
+    if (HAS_HOOK(vprintk_func)) {
+        int ret;
+        va_list args;
+        va_start(args, fmt);
+        INVOKE_HOOK_RET(ret, vprintk_func, printk_skip_level(fmt), args);
+        va_end(args);
+        return ret;
+    }
+
+    // Fallthrough
+    sbi_puts("[RAW] ");
+    sbi_puts(printk_skip_level(fmt));
     return 0;
 }
 EXPORT_SYMBOL(printk);

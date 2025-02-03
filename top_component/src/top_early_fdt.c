@@ -19,6 +19,7 @@ int
 cl_top_early_fdt_init(void)
 {
     sbi_puts("module[top_early_fdt]: init begin ...\n");
+    ENABLE_COMPONENT(early_printk);
     parse_dtb();
     sbi_puts("module[top_early_fdt]: init end!\n");
     return 0;
