@@ -4,6 +4,7 @@
 #include <linux/module.h>
 #include <linux/console.h>
 #include <linux/serial_core.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 #define EARLYCON_NAME "sbi"

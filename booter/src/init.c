@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include <linux/export.h>
-#include <asm/sbi.h>
 #include <linux/cache.h>
 #include <linux/jiffies.h>
+#include <asm/sbi.h>
+#include <cl_hook.h>
 #include "booter.h"
 
 #define UL_STR_SIZE 19  /* prefix with '0x' and end with '\0' */

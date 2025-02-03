@@ -29,49 +29,4 @@ do { \
     sbi_shutdown(); \
 } while (0);
 
-#define DECLARE_HOOK(rtype, name, ...)  \
-    extern rtype (*cl_##name##_hook)(__VA_ARGS__);
-
-#define DEFINE_HOOK(rtype, name, ...)  \
-    rtype (*cl_##name##_hook)(__VA_ARGS__); \
-    EXPORT_SYMBOL(cl_##name##_hook);
-
-#define REGISTER_HOOK(from, to)  \
-    cl_##to##_hook = from;
-
-#define HAS_HOOK(name, ...)  \
-    (cl_##name##_hook != NULL)
-
-#define INVOKE_HOOK(name, ...)  \
-    do { \
-        if (HAS_HOOK(name)) { \
-            cl_##name##_hook(__VA_ARGS__); \
-        } else { \
-            sbi_puts("************************\nBad Hook: "); \
-            sbi_puts(#name); \
-            sbi_puts("\n************************\n"); \
-            sbi_shutdown(); \
-        } \
-    } while (0)
-
-#define INVOKE_HOOK_RET(ret, name, ...)  \
-    do { \
-        if (HAS_HOOK(name)) { \
-            ret = cl_##name##_hook(__VA_ARGS__); \
-        } else { \
-            sbi_puts("************************\nBad Hook: "); \
-            sbi_puts(#name); \
-            sbi_puts("\n************************\n"); \
-            sbi_shutdown(); \
-        } \
-    } while (0)
-
-#define DEFINE_ENABLE_FUNC(name) \
-    void enable_##name(void) {} \
-    EXPORT_SYMBOL(enable_##name);
-
-#define ENABLE_COMPONENT(name) \
-    extern void enable_##name(); \
-    enable_##name();
-
 #endif /* _BOOTER_H_ */

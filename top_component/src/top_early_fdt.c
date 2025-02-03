@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/of_fdt.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 extern void *dtb_early_va;
