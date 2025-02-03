@@ -14,6 +14,7 @@ unsigned long phys_initrd_size __initdata;
 
 /* Untouched command line saved by arch-specific code. */
 char __initdata boot_command_line[COMMAND_LINE_SIZE];
+EXPORT_SYMBOL(boot_command_line);
 
 int
 cl_early_fdt_init(void)

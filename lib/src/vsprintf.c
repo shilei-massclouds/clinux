@@ -2218,9 +2218,7 @@ static noinline_for_stack
 char *pointer(const char *fmt, char *buf, char *end, void *ptr,
 	      struct printf_spec spec)
 {
-    sbi_puts("booter:vsprintf: unimplemented pointer.\n");
-    sbi_shutdown();
-//	switch (*fmt) {
+	switch (*fmt) {
 //	case 'S':
 //	case 's':
 //		ptr = dereference_symbol_descriptor(ptr);
@@ -2264,8 +2262,8 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
 //		return restricted_pointer(buf, end, ptr, spec);
 //	case 'N':
 //		return netdev_bits(buf, end, ptr, spec, fmt);
-//	case 'a':
-//		return address_val(buf, end, ptr, spec, fmt);
+	case 'a':
+		return address_val(buf, end, ptr, spec, fmt);
 //	case 'd':
 //		return dentry_name(buf, end, ptr, spec, fmt);
 //	case 't':
@@ -2300,10 +2298,15 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
 //		default:
 //			return error_string(buf, end, "(einval)", spec);
 //		}
-//	}
-//
-//	/* default is to _not_ leak addresses, hash before printing */
-//	return ptr_to_id(buf, end, ptr, spec);
+	}
+
+    sbi_puts("booter:vsprintf: unimplemented pointer.\n");
+    sbi_puts(fmt);
+    sbi_puts("\n");
+    sbi_shutdown();
+
+	/* default is to _not_ leak addresses, hash before printing */
+	return ptr_to_id(buf, end, ptr, spec);
 }
 
 /*

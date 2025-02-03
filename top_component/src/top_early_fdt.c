@@ -27,6 +27,10 @@ cl_top_early_fdt_init(void)
 
     parse_dtb();
 
+    sbi_puts("BOOT Command Line:\n ");
+    sbi_puts(boot_command_line);
+    sbi_puts("\n");
+
     // Enable early-option 'memblock'='debug' to dump memblock.
     do_early_param("memblock", "debug", NULL, NULL);
     memblock_dump_all();
