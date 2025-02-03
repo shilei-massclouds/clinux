@@ -4,7 +4,7 @@ ARCH ?= riscv64
 export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
-TOP ?= memblock
+TOP ?= early_fdt
 export TOP_COMPONENT := top_$(TOP)
 
 DISK_IMG := $(CURDIR)/tools/mk_rootfs/rootfs.ext2

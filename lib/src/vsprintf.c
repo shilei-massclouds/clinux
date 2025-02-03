@@ -2218,7 +2218,7 @@ static noinline_for_stack
 char *pointer(const char *fmt, char *buf, char *end, void *ptr,
 	      struct printf_spec spec)
 {
-    sbi_puts("unimplemented pointer.\n");
+    sbi_puts("booter:vsprintf: unimplemented pointer.\n");
     sbi_shutdown();
 //	switch (*fmt) {
 //	case 'S':

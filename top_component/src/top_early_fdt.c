@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/of_fdt.h>
+#include <linux/memblock.h>
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
@@ -22,6 +23,7 @@ cl_top_early_fdt_init(void)
     sbi_puts("module[top_early_fdt]: init begin ...\n");
     ENABLE_COMPONENT(early_printk);
     parse_dtb();
+    memblock_dump_all();
     sbi_puts("module[top_early_fdt]: init end!\n");
     return 0;
 }

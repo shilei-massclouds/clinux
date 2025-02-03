@@ -133,6 +133,8 @@ struct memblock_type physmem = {
 #endif
 
 int memblock_debug __initdata_memblock;
+EXPORT_SYMBOL(memblock_debug);
+
 static bool system_has_some_mirror __initdata_memblock = false;
 static int memblock_can_resize __initdata_memblock;
 static int memblock_memory_in_slab __initdata_memblock = 0;
@@ -845,53 +847,54 @@ int __init_memblock memblock_reserve(phys_addr_t base, phys_addr_t size)
 //	return memblock_add_range(&physmem, base, size, MAX_NUMNODES, 0);
 //}
 //#endif
-//
-///**
-// * memblock_setclr_flag - set or clear flag for a memory region
-// * @base: base address of the region
-// * @size: size of the region
-// * @set: set or clear the flag
-// * @flag: the flag to udpate
-// *
-// * This function isolates region [@base, @base + @size), and sets/clears flag
-// *
-// * Return: 0 on success, -errno on failure.
-// */
-//static int __init_memblock memblock_setclr_flag(phys_addr_t base,
-//				phys_addr_t size, int set, int flag)
-//{
-//	struct memblock_type *type = &memblock.memory;
-//	int i, ret, start_rgn, end_rgn;
-//
-//	ret = memblock_isolate_range(type, base, size, &start_rgn, &end_rgn);
-//	if (ret)
-//		return ret;
-//
-//	for (i = start_rgn; i < end_rgn; i++) {
-//		struct memblock_region *r = &type->regions[i];
-//
-//		if (set)
-//			r->flags |= flag;
-//		else
-//			r->flags &= ~flag;
-//	}
-//
-//	memblock_merge_regions(type);
-//	return 0;
-//}
-//
-///**
-// * memblock_mark_hotplug - Mark hotpluggable memory with flag MEMBLOCK_HOTPLUG.
-// * @base: the base phys addr of the region
-// * @size: the size of the region
-// *
-// * Return: 0 on success, -errno on failure.
-// */
-//int __init_memblock memblock_mark_hotplug(phys_addr_t base, phys_addr_t size)
-//{
-//	return memblock_setclr_flag(base, size, 1, MEMBLOCK_HOTPLUG);
-//}
-//
+
+/**
+ * memblock_setclr_flag - set or clear flag for a memory region
+ * @base: base address of the region
+ * @size: size of the region
+ * @set: set or clear the flag
+ * @flag: the flag to udpate
+ *
+ * This function isolates region [@base, @base + @size), and sets/clears flag
+ *
+ * Return: 0 on success, -errno on failure.
+ */
+static int __init_memblock memblock_setclr_flag(phys_addr_t base,
+				phys_addr_t size, int set, int flag)
+{
+	struct memblock_type *type = &memblock.memory;
+	int i, ret, start_rgn, end_rgn;
+
+	ret = memblock_isolate_range(type, base, size, &start_rgn, &end_rgn);
+	if (ret)
+		return ret;
+
+	for (i = start_rgn; i < end_rgn; i++) {
+		struct memblock_region *r = &type->regions[i];
+
+		if (set)
+			r->flags |= flag;
+		else
+			r->flags &= ~flag;
+	}
+
+	memblock_merge_regions(type);
+	return 0;
+}
+
+/**
+ * memblock_mark_hotplug - Mark hotpluggable memory with flag MEMBLOCK_HOTPLUG.
+ * @base: the base phys addr of the region
+ * @size: the size of the region
+ *
+ * Return: 0 on success, -errno on failure.
+ */
+int __init_memblock memblock_mark_hotplug(phys_addr_t base, phys_addr_t size)
+{
+	return memblock_setclr_flag(base, size, 1, MEMBLOCK_HOTPLUG);
+}
+EXPORT_SYMBOL(memblock_mark_hotplug);
+
 ///**
 // * memblock_clear_hotplug - Clear flag MEMBLOCK_HOTPLUG for a specified region.
 // * @base: the base phys addr of the region
@@ -1889,60 +1892,61 @@ void __init_memblock __next_mem_range_rev(u64 *idx, int nid,
 //{
 //	return memblock.current_limit;
 //}
-//
-//static void __init_memblock memblock_dump(struct memblock_type *type)
-//{
-//	phys_addr_t base, end, size;
-//	enum memblock_flags flags;
-//	int idx;
-//	struct memblock_region *rgn;
-//
-//	pr_info(" %s.cnt  = 0x%lx\n", type->name, type->cnt);
-//
-//	for_each_memblock_type(idx, type, rgn) {
-//		char nid_buf[32] = "";
-//
-//		base = rgn->base;
-//		size = rgn->size;
-//		end = base + size - 1;
-//		flags = rgn->flags;
-//#ifdef CONFIG_NEED_MULTIPLE_NODES
-//		if (memblock_get_region_node(rgn) != MAX_NUMNODES)
-//			snprintf(nid_buf, sizeof(nid_buf), " on node %d",
-//				 memblock_get_region_node(rgn));
-//#endif
-//		pr_info(" %s[%#x]\t[%pa-%pa], %pa bytes%s flags: %#x\n",
-//			type->name, idx, &base, &end, &size, nid_buf, flags);
-//	}
-//}
-//
-//void __init_memblock __memblock_dump_all(void)
-//{
-//	pr_info("MEMBLOCK configuration:\n");
-//	pr_info(" memory size = %pa reserved size = %pa\n",
-//		&memblock.memory.total_size,
-//		&memblock.reserved.total_size);
-//
-//	memblock_dump(&memblock.memory);
-//	memblock_dump(&memblock.reserved);
-//#ifdef CONFIG_HAVE_MEMBLOCK_PHYS_MAP
-//	memblock_dump(&physmem);
-//#endif
-//}
-//
+
+static void __init_memblock memblock_dump(struct memblock_type *type)
+{
+	phys_addr_t base, end, size;
+	enum memblock_flags flags;
+	int idx;
+	struct memblock_region *rgn;
+
+	pr_info(" %s.cnt  = 0x%lx\n", type->name, type->cnt);
+
+	for_each_memblock_type(idx, type, rgn) {
+		char nid_buf[32] = "";
+
+		base = rgn->base;
+		size = rgn->size;
+		end = base + size - 1;
+		flags = rgn->flags;
+#ifdef CONFIG_NEED_MULTIPLE_NODES
+		if (memblock_get_region_node(rgn) != MAX_NUMNODES)
+			snprintf(nid_buf, sizeof(nid_buf), " on node %d",
+				 memblock_get_region_node(rgn));
+#endif
+		pr_info(" %s[%#x]\t[%pa-%pa], %pa bytes%s flags: %#x\n",
+			type->name, idx, &base, &end, &size, nid_buf, flags);
+	}
+}
+
+void __init_memblock __memblock_dump_all(void)
+{
+	pr_info("MEMBLOCK configuration:\n");
+	pr_info(" memory size = %pa reserved size = %pa\n",
+		&memblock.memory.total_size,
+		&memblock.reserved.total_size);
+
+	memblock_dump(&memblock.memory);
+	memblock_dump(&memblock.reserved);
+#ifdef CONFIG_HAVE_MEMBLOCK_PHYS_MAP
+	memblock_dump(&physmem);
+#endif
+}
+EXPORT_SYMBOL(__memblock_dump_all);
+
 //void __init memblock_allow_resize(void)
 //{
 //	memblock_can_resize = 1;
 //}
-//
-//static int __init early_memblock(char *p)
-//{
-//	if (p && strstr(p, "debug"))
-//		memblock_debug = 1;
-//	return 0;
-//}
-//early_param("memblock", early_memblock);
-//
+
+static int __init early_memblock(char *p)
+{
+	if (p && strstr(p, "debug"))
+		memblock_debug = 1;
+	return 0;
+}
+early_param("memblock", early_memblock);
+
 //static void __init __free_pages_memory(unsigned long start, unsigned long end)
 //{
 //	int order;
