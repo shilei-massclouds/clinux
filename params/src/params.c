@@ -74,30 +74,31 @@
 //	}
 //	spin_unlock(&kmalloced_params_lock);
 //}
-//
-//static char dash2underscore(char c)
-//{
-//	if (c == '-')
-//		return '_';
-//	return c;
-//}
-//
-//bool parameqn(const char *a, const char *b, size_t n)
-//{
-//	size_t i;
-//
-//	for (i = 0; i < n; i++) {
-//		if (dash2underscore(a[i]) != dash2underscore(b[i]))
-//			return false;
-//	}
-//	return true;
-//}
-//
-//bool parameq(const char *a, const char *b)
-//{
-//	return parameqn(a, b, strlen(a)+1);
-//}
-//
+
+static char dash2underscore(char c)
+{
+	if (c == '-')
+		return '_';
+	return c;
+}
+
+bool parameqn(const char *a, const char *b, size_t n)
+{
+	size_t i;
+
+	for (i = 0; i < n; i++) {
+		if (dash2underscore(a[i]) != dash2underscore(b[i]))
+			return false;
+	}
+	return true;
+}
+
+bool parameq(const char *a, const char *b)
+{
+	return parameqn(a, b, strlen(a)+1);
+}
+EXPORT_SYMBOL(parameq);
+
 //static bool param_check_unsafe(const struct kernel_param *kp)
 //{
 //	if (kp->flags & KERNEL_PARAM_FL_HWPARAM &&
@@ -129,7 +130,7 @@
 //
 //	/* Find parameter */
 //	for (i = 0; i < num_params; i++) {
-//		if (parameq(param, params[i].name)) {
+////		if (parameq(param, params[i].name)) {
 //			if (params[i].level < min_level
 //			    || params[i].level > max_level)
 //				return 0;

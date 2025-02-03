@@ -5,6 +5,7 @@
 #include <linux/of_fdt.h>
 #include <linux/memblock.h>
 #include <cl_hook.h>
+#include <cl_types.h>
 #include "../../booter/src/booter.h"
 
 extern void *dtb_early_va;
@@ -21,9 +22,15 @@ int
 cl_top_early_fdt_init(void)
 {
     sbi_puts("module[top_early_fdt]: init begin ...\n");
+
     ENABLE_COMPONENT(early_printk);
+
     parse_dtb();
+
+    // Enable early-option 'memblock'='debug' to dump memblock.
+    do_early_param("memblock", "debug", NULL, NULL);
     memblock_dump_all();
+
     sbi_puts("module[top_early_fdt]: init end!\n");
     return 0;
 }
