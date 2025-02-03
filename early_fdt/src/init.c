@@ -28,13 +28,3 @@ void add_bootloader_randomness(const void *buf, unsigned int size)
 {
     booter_panic("No impl 'add_bootloader_randomness'.");
 }
-
-int __init_memblock memblock_add(phys_addr_t base, phys_addr_t size)
-{
-    booter_panic("No impl 'memblock_add'.");
-}
-
-int __init_memblock memblock_mark_hotplug(phys_addr_t base, phys_addr_t size)
-{
-    booter_panic("No impl 'memblock_mark_hotplug'.");
-}

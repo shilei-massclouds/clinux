@@ -4,7 +4,7 @@ ARCH ?= riscv64
 export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
-TOP ?= early_fdt
+TOP ?= memblock
 export TOP_COMPONENT := top_$(TOP)
 
 DISK_IMG := $(CURDIR)/tools/mk_rootfs/rootfs.ext2
@@ -30,6 +30,7 @@ QEMU_ARGS += \
 components := \
 	prebuilt booter lib \
 	early_fdt params \
+	memblock \
 	spinlock semaphore \
 	early_printk printk
 
