@@ -1340,126 +1340,127 @@ EXPORT_SYMBOL(memblock_set_node);
 //}
 //
 //#endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */
-//
-///**
-// * memblock_alloc_range_nid - allocate boot memory block
-// * @size: size of memory block to be allocated in bytes
-// * @align: alignment of the region and block's size
-// * @start: the lower bound of the memory region to allocate (phys address)
-// * @end: the upper bound of the memory region to allocate (phys address)
-// * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
-// * @exact_nid: control the allocation fall back to other nodes
-// *
-// * The allocation is performed from memory region limited by
-// * memblock.current_limit if @end == %MEMBLOCK_ALLOC_ACCESSIBLE.
-// *
-// * If the specified node can not hold the requested memory and @exact_nid
-// * is false, the allocation falls back to any node in the system.
-// *
-// * For systems with memory mirroring, the allocation is attempted first
-// * from the regions with mirroring enabled and then retried from any
-// * memory region.
-// *
-// * In addition, function sets the min_count to 0 using kmemleak_alloc_phys for
-// * allocated boot memory block, so that it is never reported as leaks.
-// *
-// * Return:
-// * Physical address of allocated memory block on success, %0 on failure.
-// */
-//phys_addr_t __init memblock_alloc_range_nid(phys_addr_t size,
-//					phys_addr_t align, phys_addr_t start,
-//					phys_addr_t end, int nid,
-//					bool exact_nid)
-//{
-//	enum memblock_flags flags = choose_memblock_flags();
-//	phys_addr_t found;
-//
-//	if (WARN_ONCE(nid == MAX_NUMNODES, "Usage of MAX_NUMNODES is deprecated. Use NUMA_NO_NODE instead\n"))
-//		nid = NUMA_NO_NODE;
-//
-//	if (!align) {
-//		/* Can't use WARNs this early in boot on powerpc */
-//		dump_stack();
-//		align = SMP_CACHE_BYTES;
-//	}
-//
-//again:
-//	found = memblock_find_in_range_node(size, align, start, end, nid,
-//					    flags);
-//	if (found && !memblock_reserve(found, size))
-//		goto done;
-//
-//	if (nid != NUMA_NO_NODE && !exact_nid) {
-//		found = memblock_find_in_range_node(size, align, start,
-//						    end, NUMA_NO_NODE,
-//						    flags);
-//		if (found && !memblock_reserve(found, size))
-//			goto done;
-//	}
-//
-//	if (flags & MEMBLOCK_MIRROR) {
-//		flags &= ~MEMBLOCK_MIRROR;
-//		pr_warn("Could not allocate %pap bytes of mirrored memory\n",
-//			&size);
-//		goto again;
-//	}
-//
-//	return 0;
-//
-//done:
-//	/* Skip kmemleak for kasan_init() due to high volume. */
-//	if (end != MEMBLOCK_ALLOC_KASAN)
-//		/*
-//		 * The min_count is set to 0 so that memblock allocated
-//		 * blocks are never reported as leaks. This is because many
-//		 * of these blocks are only referred via the physical
-//		 * address which is not looked up by kmemleak.
-//		 */
-//		kmemleak_alloc_phys(found, size, 0, 0);
-//
-//	return found;
-//}
-//
-///**
-// * memblock_phys_alloc_range - allocate a memory block inside specified range
-// * @size: size of memory block to be allocated in bytes
-// * @align: alignment of the region and block's size
-// * @start: the lower bound of the memory region to allocate (physical address)
-// * @end: the upper bound of the memory region to allocate (physical address)
-// *
-// * Allocate @size bytes in the between @start and @end.
-// *
-// * Return: physical address of the allocated memory block on success,
-// * %0 on failure.
-// */
-//phys_addr_t __init memblock_phys_alloc_range(phys_addr_t size,
-//					     phys_addr_t align,
-//					     phys_addr_t start,
-//					     phys_addr_t end)
-//{
-//	return memblock_alloc_range_nid(size, align, start, end, NUMA_NO_NODE,
-//					false);
-//}
-//
-///**
-// * memblock_phys_alloc_try_nid - allocate a memory block from specified MUMA node
-// * @size: size of memory block to be allocated in bytes
-// * @align: alignment of the region and block's size
-// * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
-// *
-// * Allocates memory block from the specified NUMA node. If the node
-// * has no available memory, attempts to allocated from any node in the
-// * system.
-// *
-// * Return: physical address of the allocated memory block on success,
-// * %0 on failure.
-// */
-//phys_addr_t __init memblock_phys_alloc_try_nid(phys_addr_t size, phys_addr_t align, int nid)
-//{
-//	return memblock_alloc_range_nid(size, align, 0,
-//					MEMBLOCK_ALLOC_ACCESSIBLE, nid, false);
-//}
-//
+
+/**
+ * memblock_alloc_range_nid - allocate boot memory block
+ * @size: size of memory block to be allocated in bytes
+ * @align: alignment of the region and block's size
+ * @start: the lower bound of the memory region to allocate (phys address)
+ * @end: the upper bound of the memory region to allocate (phys address)
+ * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
+ * @exact_nid: control the allocation fall back to other nodes
+ *
+ * The allocation is performed from memory region limited by
+ * memblock.current_limit if @end == %MEMBLOCK_ALLOC_ACCESSIBLE.
+ *
+ * If the specified node can not hold the requested memory and @exact_nid
+ * is false, the allocation falls back to any node in the system.
+ *
+ * For systems with memory mirroring, the allocation is attempted first
+ * from the regions with mirroring enabled and then retried from any
+ * memory region.
+ *
+ * In addition, function sets the min_count to 0 using kmemleak_alloc_phys for
+ * allocated boot memory block, so that it is never reported as leaks.
+ *
+ * Return:
+ * Physical address of allocated memory block on success, %0 on failure.
+ */
+phys_addr_t __init memblock_alloc_range_nid(phys_addr_t size,
+					phys_addr_t align, phys_addr_t start,
+					phys_addr_t end, int nid,
+					bool exact_nid)
+{
+	enum memblock_flags flags = choose_memblock_flags();
+	phys_addr_t found;
+
+	if (WARN_ONCE(nid == MAX_NUMNODES, "Usage of MAX_NUMNODES is deprecated. Use NUMA_NO_NODE instead\n"))
+		nid = NUMA_NO_NODE;
+
+	if (!align) {
+		/* Can't use WARNs this early in boot on powerpc */
+		dump_stack();
+		align = SMP_CACHE_BYTES;
+	}
+
+again:
+	found = memblock_find_in_range_node(size, align, start, end, nid,
+					    flags);
+	if (found && !memblock_reserve(found, size))
+		goto done;
+
+	if (nid != NUMA_NO_NODE && !exact_nid) {
+		found = memblock_find_in_range_node(size, align, start,
+						    end, NUMA_NO_NODE,
+						    flags);
+		if (found && !memblock_reserve(found, size))
+			goto done;
+	}
+
+	if (flags & MEMBLOCK_MIRROR) {
+		flags &= ~MEMBLOCK_MIRROR;
+		pr_warn("Could not allocate %pap bytes of mirrored memory\n",
+			&size);
+		goto again;
+	}
+
+	return 0;
+
+done:
+	/* Skip kmemleak for kasan_init() due to high volume. */
+	if (end != MEMBLOCK_ALLOC_KASAN)
+		/*
+		 * The min_count is set to 0 so that memblock allocated
+		 * blocks are never reported as leaks. This is because many
+		 * of these blocks are only referred via the physical
+		 * address which is not looked up by kmemleak.
+		 */
+		kmemleak_alloc_phys(found, size, 0, 0);
+
+	return found;
+}
+
+/**
+ * memblock_phys_alloc_range - allocate a memory block inside specified range
+ * @size: size of memory block to be allocated in bytes
+ * @align: alignment of the region and block's size
+ * @start: the lower bound of the memory region to allocate (physical address)
+ * @end: the upper bound of the memory region to allocate (physical address)
+ *
+ * Allocate @size bytes in the between @start and @end.
+ *
+ * Return: physical address of the allocated memory block on success,
+ * %0 on failure.
+ */
+phys_addr_t __init memblock_phys_alloc_range(phys_addr_t size,
+					     phys_addr_t align,
+					     phys_addr_t start,
+					     phys_addr_t end)
+{
+	return memblock_alloc_range_nid(size, align, start, end, NUMA_NO_NODE,
+					false);
+}
+EXPORT_SYMBOL(memblock_phys_alloc_range);
+
+/**
+ * memblock_phys_alloc_try_nid - allocate a memory block from specified MUMA node
+ * @size: size of memory block to be allocated in bytes
+ * @align: alignment of the region and block's size
+ * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
+ *
+ * Allocates memory block from the specified NUMA node. If the node
+ * has no available memory, attempts to allocated from any node in the
+ * system.
+ *
+ * Return: physical address of the allocated memory block on success,
+ * %0 on failure.
+ */
+phys_addr_t __init memblock_phys_alloc_try_nid(phys_addr_t size, phys_addr_t align, int nid)
+{
+	return memblock_alloc_range_nid(size, align, 0,
+					MEMBLOCK_ALLOC_ACCESSIBLE, nid, false);
+}
+
 ///**
 // * memblock_alloc_internal - allocate boot memory block
 // * @size: size of memory block to be allocated in bytes

@@ -4,7 +4,7 @@ ARCH ?= riscv64
 export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
-TOP ?= bootmem
+TOP ?= paging
 export TOP_COMPONENT := top_$(TOP)
 
 DEBUG ?= n
@@ -39,7 +39,7 @@ components := \
 	prebuilt booter lib \
 	early_fdt params \
 	user user_namespace \
-	memblock bootmem \
+	memblock bootmem paging \
 	spinlock semaphore \
 	early_printk printk
 

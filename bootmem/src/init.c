@@ -17,7 +17,7 @@ extern char _start[];
 unsigned long max_mapnr;
 EXPORT_SYMBOL(max_mapnr);
 
-static phys_addr_t dtb_early_pa __initdata;
+extern phys_addr_t dtb_early_pa;
 
 #ifndef INIT_MM_CONTEXT
 #define INIT_MM_CONTEXT(name)

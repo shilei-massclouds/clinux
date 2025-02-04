@@ -10,6 +10,7 @@ TESTCASES="
     early_fdt params
 	spinlock semaphore
     early_printk
+    bootmem
 "
 
 PASSED=0
