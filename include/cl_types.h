@@ -5,6 +5,8 @@
 
 #include <linux/init.h>
 
+extern void parse_dtb(void);
+
 extern int __init do_early_param(char *param, char *val,
                  const char *unused, void *arg);
 
