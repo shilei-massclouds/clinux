@@ -7,7 +7,10 @@
 
 extern void parse_dtb(void);
 
-extern int __init do_early_param(char *param, char *val,
+extern int do_early_param(char *param, char *val,
                  const char *unused, void *arg);
+
+extern void setup_kernel_in_mm(void);
+extern void setup_bootmem(void);
 
 #endif /* _CL_TYPES_H_ */

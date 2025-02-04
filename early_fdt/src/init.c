@@ -10,10 +10,17 @@
 
 extern void *dtb_early_va;
 
-unsigned long initrd_start, initrd_end;
+unsigned long initrd_start;
+EXPORT_SYMBOL(initrd_start);
+unsigned long initrd_end;
+EXPORT_SYMBOL(initrd_end);
 int initrd_below_start_ok;
+EXPORT_SYMBOL(initrd_below_start_ok);
+
 phys_addr_t phys_initrd_start __initdata;
+EXPORT_SYMBOL(phys_initrd_start);
 unsigned long phys_initrd_size __initdata;
+EXPORT_SYMBOL(phys_initrd_size);
 
 /* Untouched command line saved by arch-specific code. */
 char __initdata boot_command_line[COMMAND_LINE_SIZE];

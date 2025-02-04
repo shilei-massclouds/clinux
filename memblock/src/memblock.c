@@ -98,8 +98,11 @@ EXPORT_SYMBOL(contig_page_data);
 #endif
 
 unsigned long max_low_pfn;
+EXPORT_SYMBOL(max_low_pfn);
 unsigned long min_low_pfn;
+EXPORT_SYMBOL(min_low_pfn);
 unsigned long max_pfn;
+EXPORT_SYMBOL(max_pfn);
 unsigned long long max_possible_pfn;
 
 static struct memblock_region memblock_memory_init_regions[INIT_MEMBLOCK_REGIONS] __initdata_memblock;
@@ -122,6 +125,7 @@ struct memblock memblock __initdata_memblock = {
 	.bottom_up		= false,
 	.current_limit		= MEMBLOCK_ALLOC_ANYWHERE,
 };
+EXPORT_SYMBOL(memblock);
 
 #ifdef CONFIG_HAVE_MEMBLOCK_PHYS_MAP
 struct memblock_type physmem = {
@@ -151,26 +155,26 @@ static inline phys_addr_t memblock_cap_size(phys_addr_t base, phys_addr_t *size)
 	return *size = min(*size, PHYS_ADDR_MAX - base);
 }
 
-///*
-// * Address comparison utilities
-// */
-//static unsigned long __init_memblock memblock_addrs_overlap(phys_addr_t base1, phys_addr_t size1,
-//				       phys_addr_t base2, phys_addr_t size2)
-//{
-//	return ((base1 < (base2 + size2)) && (base2 < (base1 + size1)));
-//}
-//
-//bool __init_memblock memblock_overlaps_region(struct memblock_type *type,
-//					phys_addr_t base, phys_addr_t size)
-//{
-//	unsigned long i;
-//
-//	for (i = 0; i < type->cnt; i++)
-//		if (memblock_addrs_overlap(base, size, type->regions[i].base,
-//					   type->regions[i].size))
-//			break;
-//	return i < type->cnt;
-//}
+/*
+ * Address comparison utilities
+ */
+static unsigned long __init_memblock memblock_addrs_overlap(phys_addr_t base1, phys_addr_t size1,
+				       phys_addr_t base2, phys_addr_t size2)
+{
+	return ((base1 < (base2 + size2)) && (base2 < (base1 + size1)));
+}
+
+bool __init_memblock memblock_overlaps_region(struct memblock_type *type,
+					phys_addr_t base, phys_addr_t size)
+{
+	unsigned long i;
+
+	for (i = 0; i < type->cnt; i++)
+		if (memblock_addrs_overlap(base, size, type->regions[i].base,
+					   type->regions[i].size))
+			break;
+	return i < type->cnt;
+}
 
 /**
  * __memblock_find_range_bottom_up - find free area utility in bottom-up
@@ -353,6 +357,7 @@ again:
 
 	return ret;
 }
+EXPORT_SYMBOL(memblock_find_in_range);
 
 static void __init_memblock memblock_remove_region(struct memblock_type *type, unsigned long r)
 {
@@ -797,15 +802,16 @@ static int __init_memblock memblock_remove_range(struct memblock_type *type,
 	return 0;
 }
 
-//int __init_memblock memblock_remove(phys_addr_t base, phys_addr_t size)
-//{
-//	phys_addr_t end = base + size - 1;
-//
-//	memblock_dbg("%s: [%pa-%pa] %pS\n", __func__,
-//		     &base, &end, (void *)_RET_IP_);
-//
-//	return memblock_remove_range(&memblock.memory, base, size);
-//}
+int __init_memblock memblock_remove(phys_addr_t base, phys_addr_t size)
+{
+	phys_addr_t end = base + size - 1;
+
+	memblock_dbg("%s: [%pa-%pa] %pS\n", __func__,
+		     &base, &end, (void *)_RET_IP_);
+
+	return memblock_remove_range(&memblock.memory, base, size);
+}
+EXPORT_SYMBOL(memblock_remove);
 
 /**
  * memblock_free - free boot memory block
@@ -825,6 +831,7 @@ int __init_memblock memblock_free(phys_addr_t base, phys_addr_t size)
 	kmemleak_free_part_phys(base, size);
 	return memblock_remove_range(&memblock.reserved, base, size);
 }
+EXPORT_SYMBOL(memblock_free);
 
 int __init_memblock memblock_reserve(phys_addr_t base, phys_addr_t size)
 {
@@ -835,6 +842,7 @@ int __init_memblock memblock_reserve(phys_addr_t base, phys_addr_t size)
 
 	return memblock_add_range(&memblock.reserved, base, size, MAX_NUMNODES, 0);
 }
+EXPORT_SYMBOL(memblock_reserve);
 
 //#ifdef CONFIG_HAVE_MEMBLOCK_PHYS_MAP
 //int __init_memblock memblock_physmem_add(phys_addr_t base, phys_addr_t size)
@@ -1234,39 +1242,40 @@ void __init_memblock __next_mem_range_rev(u64 *idx, int nid,
 //	if (out_nid)
 //		*out_nid = r_nid;
 //}
-//
-///**
-// * memblock_set_node - set node ID on memblock regions
-// * @base: base of area to set node ID for
-// * @size: size of area to set node ID for
-// * @type: memblock type to set node ID for
-// * @nid: node ID to set
-// *
-// * Set the nid of memblock @type regions in [@base, @base + @size) to @nid.
-// * Regions which cross the area boundaries are split as necessary.
-// *
-// * Return:
-// * 0 on success, -errno on failure.
-// */
-//int __init_memblock memblock_set_node(phys_addr_t base, phys_addr_t size,
-//				      struct memblock_type *type, int nid)
-//{
-//#ifdef CONFIG_NEED_MULTIPLE_NODES
-//	int start_rgn, end_rgn;
-//	int i, ret;
-//
-//	ret = memblock_isolate_range(type, base, size, &start_rgn, &end_rgn);
-//	if (ret)
-//		return ret;
-//
-//	for (i = start_rgn; i < end_rgn; i++)
-//		memblock_set_region_node(&type->regions[i], nid);
-//
-//	memblock_merge_regions(type);
-//#endif
-//	return 0;
-//}
-//
+
+/**
+ * memblock_set_node - set node ID on memblock regions
+ * @base: base of area to set node ID for
+ * @size: size of area to set node ID for
+ * @type: memblock type to set node ID for
+ * @nid: node ID to set
+ *
+ * Set the nid of memblock @type regions in [@base, @base + @size) to @nid.
+ * Regions which cross the area boundaries are split as necessary.
+ *
+ * Return:
+ * 0 on success, -errno on failure.
+ */
+int __init_memblock memblock_set_node(phys_addr_t base, phys_addr_t size,
+				      struct memblock_type *type, int nid)
+{
+#ifdef CONFIG_NEED_MULTIPLE_NODES
+	int start_rgn, end_rgn;
+	int i, ret;
+
+	ret = memblock_isolate_range(type, base, size, &start_rgn, &end_rgn);
+	if (ret)
+		return ret;
+
+	for (i = start_rgn; i < end_rgn; i++)
+		memblock_set_region_node(&type->regions[i], nid);
+
+	memblock_merge_regions(type);
+#endif
+	return 0;
+}
+EXPORT_SYMBOL(memblock_set_node);
+
 //#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
 ///**
 // * __next_mem_pfn_range_in_zone - iterator for for_each_*_range_in_zone()
@@ -1675,14 +1684,15 @@ void __init_memblock __next_mem_range_rev(u64 *idx, int nid,
 //{
 //	return memblock.memory.regions[0].base;
 //}
-//
-//phys_addr_t __init_memblock memblock_end_of_DRAM(void)
-//{
-//	int idx = memblock.memory.cnt - 1;
-//
-//	return (memblock.memory.regions[idx].base + memblock.memory.regions[idx].size);
-//}
-//
+
+phys_addr_t __init_memblock memblock_end_of_DRAM(void)
+{
+	int idx = memblock.memory.cnt - 1;
+
+	return (memblock.memory.regions[idx].base + memblock.memory.regions[idx].size);
+}
+EXPORT_SYMBOL(memblock_end_of_DRAM);
+
 //static phys_addr_t __init_memblock __find_max_addr(phys_addr_t limit)
 //{
 //	phys_addr_t max_addr = PHYS_ADDR_MAX;
@@ -1767,25 +1777,25 @@ void __init_memblock __next_mem_range_rev(u64 *idx, int nid,
 //
 //	memblock_cap_memory_range(0, max_addr);
 //}
-//
-//static int __init_memblock memblock_search(struct memblock_type *type, phys_addr_t addr)
-//{
-//	unsigned int left = 0, right = type->cnt;
-//
-//	do {
-//		unsigned int mid = (right + left) / 2;
-//
-//		if (addr < type->regions[mid].base)
-//			right = mid;
-//		else if (addr >= (type->regions[mid].base +
-//				  type->regions[mid].size))
-//			left = mid + 1;
-//		else
-//			return mid;
-//	} while (left < right);
-//	return -1;
-//}
-//
+
+static int __init_memblock memblock_search(struct memblock_type *type, phys_addr_t addr)
+{
+	unsigned int left = 0, right = type->cnt;
+
+	do {
+		unsigned int mid = (right + left) / 2;
+
+		if (addr < type->regions[mid].base)
+			right = mid;
+		else if (addr >= (type->regions[mid].base +
+				  type->regions[mid].size))
+			left = mid + 1;
+		else
+			return mid;
+	} while (left < right);
+	return -1;
+}
+
 //bool __init_memblock memblock_is_reserved(phys_addr_t addr)
 //{
 //	return memblock_search(&memblock.reserved, addr) != -1;
@@ -1819,45 +1829,47 @@ void __init_memblock __next_mem_range_rev(u64 *idx, int nid,
 //
 //	return memblock_get_region_node(&type->regions[mid]);
 //}
-//
-///**
-// * memblock_is_region_memory - check if a region is a subset of memory
-// * @base: base of region to check
-// * @size: size of region to check
-// *
-// * Check if the region [@base, @base + @size) is a subset of a memory block.
-// *
-// * Return:
-// * 0 if false, non-zero if true
-// */
-//bool __init_memblock memblock_is_region_memory(phys_addr_t base, phys_addr_t size)
-//{
-//	int idx = memblock_search(&memblock.memory, base);
-//	phys_addr_t end = base + memblock_cap_size(base, &size);
-//
-//	if (idx == -1)
-//		return false;
-//	return (memblock.memory.regions[idx].base +
-//		 memblock.memory.regions[idx].size) >= end;
-//}
-//
-///**
-// * memblock_is_region_reserved - check if a region intersects reserved memory
-// * @base: base of region to check
-// * @size: size of region to check
-// *
-// * Check if the region [@base, @base + @size) intersects a reserved
-// * memory block.
-// *
-// * Return:
-// * True if they intersect, false if not.
-// */
-//bool __init_memblock memblock_is_region_reserved(phys_addr_t base, phys_addr_t size)
-//{
-//	memblock_cap_size(base, &size);
-//	return memblock_overlaps_region(&memblock.reserved, base, size);
-//}
-//
+
+/**
+ * memblock_is_region_memory - check if a region is a subset of memory
+ * @base: base of region to check
+ * @size: size of region to check
+ *
+ * Check if the region [@base, @base + @size) is a subset of a memory block.
+ *
+ * Return:
+ * 0 if false, non-zero if true
+ */
+bool __init_memblock memblock_is_region_memory(phys_addr_t base, phys_addr_t size)
+{
+	int idx = memblock_search(&memblock.memory, base);
+	phys_addr_t end = base + memblock_cap_size(base, &size);
+
+	if (idx == -1)
+		return false;
+	return (memblock.memory.regions[idx].base +
+		 memblock.memory.regions[idx].size) >= end;
+}
+EXPORT_SYMBOL(memblock_is_region_memory);
+
+/**
+ * memblock_is_region_reserved - check if a region intersects reserved memory
+ * @base: base of region to check
+ * @size: size of region to check
+ *
+ * Check if the region [@base, @base + @size) intersects a reserved
+ * memory block.
+ *
+ * Return:
+ * True if they intersect, false if not.
+ */
+bool __init_memblock memblock_is_region_reserved(phys_addr_t base, phys_addr_t size)
+{
+	memblock_cap_size(base, &size);
+	return memblock_overlaps_region(&memblock.reserved, base, size);
+}
+EXPORT_SYMBOL(memblock_is_region_reserved);
+
 //void __init_memblock memblock_trim_memory(phys_addr_t align)
 //{
 //	phys_addr_t start, end, orig_start, orig_end;
@@ -1934,10 +1946,11 @@ void __init_memblock __memblock_dump_all(void)
 }
 EXPORT_SYMBOL(__memblock_dump_all);
 
-//void __init memblock_allow_resize(void)
-//{
-//	memblock_can_resize = 1;
-//}
+void __init memblock_allow_resize(void)
+{
+	memblock_can_resize = 1;
+}
+EXPORT_SYMBOL(memblock_allow_resize);
 
 static int __init early_memblock(char *p)
 {

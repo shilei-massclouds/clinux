@@ -79,20 +79,20 @@
 //		}
 //	}
 //}
-//
-//static bool of_fdt_device_is_available(const void *blob, unsigned long node)
-//{
-//	const char *status = fdt_getprop(blob, node, "status", NULL);
-//
-//	if (!status)
-//		return true;
-//
-//	if (!strcmp(status, "ok") || !strcmp(status, "okay"))
-//		return true;
-//
-//	return false;
-//}
-//
+
+static bool of_fdt_device_is_available(const void *blob, unsigned long node)
+{
+	const char *status = fdt_getprop(blob, node, "status", NULL);
+
+	if (!status)
+		return true;
+
+	if (!strcmp(status, "ok") || !strcmp(status, "okay"))
+		return true;
+
+	return false;
+}
+
 //static void *unflatten_dt_alloc(void **mem, unsigned long size,
 //				       unsigned long align)
 //{
@@ -470,140 +470,141 @@ void *initial_boot_params __ro_after_init;
 #ifdef CONFIG_OF_EARLY_FLATTREE
 
 static u32 of_fdt_crc32;
-//
-///**
-// * __reserved_mem_reserve_reg() - reserve all memory described in 'reg' property
-// */
-//static int __init __reserved_mem_reserve_reg(unsigned long node,
-//					     const char *uname)
-//{
-//	int t_len = (dt_root_addr_cells + dt_root_size_cells) * sizeof(__be32);
-//	phys_addr_t base, size;
-//	int len;
-//	const __be32 *prop;
-//	int first = 1;
-//	bool nomap;
-//
-//	prop = of_get_flat_dt_prop(node, "reg", &len);
-//	if (!prop)
-//		return -ENOENT;
-//
-//	if (len && len % t_len != 0) {
-//		pr_err("Reserved memory: invalid reg property in '%s', skipping node.\n",
-//		       uname);
-//		return -EINVAL;
-//	}
-//
-//	nomap = of_get_flat_dt_prop(node, "no-map", NULL) != NULL;
-//
-//	while (len >= t_len) {
-//		base = dt_mem_next_cell(dt_root_addr_cells, &prop);
-//		size = dt_mem_next_cell(dt_root_size_cells, &prop);
-//
-//		if (size &&
-//		    early_init_dt_reserve_memory_arch(base, size, nomap) == 0)
-//			pr_debug("Reserved memory: reserved region for node '%s': base %pa, size %ld MiB\n",
-//				uname, &base, (unsigned long)size / SZ_1M);
-//		else
-//			pr_info("Reserved memory: failed to reserve memory for node '%s': base %pa, size %ld MiB\n",
-//				uname, &base, (unsigned long)size / SZ_1M);
-//
-//		len -= t_len;
-//		if (first) {
-//			fdt_reserved_mem_save_node(node, uname, base, size);
-//			first = 0;
-//		}
-//	}
-//	return 0;
-//}
-//
-///**
-// * __reserved_mem_check_root() - check if #size-cells, #address-cells provided
-// * in /reserved-memory matches the values supported by the current implementation,
-// * also check if ranges property has been provided
-// */
-//static int __init __reserved_mem_check_root(unsigned long node)
-//{
-//	const __be32 *prop;
-//
-//	prop = of_get_flat_dt_prop(node, "#size-cells", NULL);
-//	if (!prop || be32_to_cpup(prop) != dt_root_size_cells)
-//		return -EINVAL;
-//
-//	prop = of_get_flat_dt_prop(node, "#address-cells", NULL);
-//	if (!prop || be32_to_cpup(prop) != dt_root_addr_cells)
-//		return -EINVAL;
-//
-//	prop = of_get_flat_dt_prop(node, "ranges", NULL);
-//	if (!prop)
-//		return -EINVAL;
-//	return 0;
-//}
-//
-///**
-// * fdt_scan_reserved_mem() - scan a single FDT node for reserved memory
-// */
-//static int __init __fdt_scan_reserved_mem(unsigned long node, const char *uname,
-//					  int depth, void *data)
-//{
-//	static int found;
-//	int err;
-//
-//	if (!found && depth == 1 && strcmp(uname, "reserved-memory") == 0) {
-//		if (__reserved_mem_check_root(node) != 0) {
-//			pr_err("Reserved memory: unsupported node format, ignoring\n");
-//			/* break scan */
-//			return 1;
-//		}
-//		found = 1;
-//		/* scan next node */
-//		return 0;
-//	} else if (!found) {
-//		/* scan next node */
-//		return 0;
-//	} else if (found && depth < 2) {
-//		/* scanning of /reserved-memory has been finished */
-//		return 1;
-//	}
-//
-//	if (!of_fdt_device_is_available(initial_boot_params, node))
-//		return 0;
-//
-//	err = __reserved_mem_reserve_reg(node, uname);
-//	if (err == -ENOENT && of_get_flat_dt_prop(node, "size", NULL))
-//		fdt_reserved_mem_save_node(node, uname, 0, 0);
-//
-//	/* scan next node */
-//	return 0;
-//}
-//
-///**
-// * early_init_fdt_scan_reserved_mem() - create reserved memory regions
-// *
-// * This function grabs memory from early allocator for device exclusive use
-// * defined in device tree structures. It should be called by arch specific code
-// * once the early allocator (i.e. memblock) has been fully activated.
-// */
-//void __init early_init_fdt_scan_reserved_mem(void)
-//{
-//	int n;
-//	u64 base, size;
-//
-//	if (!initial_boot_params)
-//		return;
-//
-//	/* Process header /memreserve/ fields */
-//	for (n = 0; ; n++) {
-//		fdt_get_mem_rsv(initial_boot_params, n, &base, &size);
-//		if (!size)
-//			break;
-//		early_init_dt_reserve_memory_arch(base, size, false);
-//	}
-//
-//	of_scan_flat_dt(__fdt_scan_reserved_mem, NULL);
-//	fdt_init_reserved_mem();
-//}
-//
+
+/**
+ * __reserved_mem_reserve_reg() - reserve all memory described in 'reg' property
+ */
+static int __init __reserved_mem_reserve_reg(unsigned long node,
+					     const char *uname)
+{
+	int t_len = (dt_root_addr_cells + dt_root_size_cells) * sizeof(__be32);
+	phys_addr_t base, size;
+	int len;
+	const __be32 *prop;
+	int first = 1;
+	bool nomap;
+
+	prop = of_get_flat_dt_prop(node, "reg", &len);
+	if (!prop)
+		return -ENOENT;
+
+	if (len && len % t_len != 0) {
+		pr_err("Reserved memory: invalid reg property in '%s', skipping node.\n",
+		       uname);
+		return -EINVAL;
+	}
+
+	nomap = of_get_flat_dt_prop(node, "no-map", NULL) != NULL;
+
+	while (len >= t_len) {
+		base = dt_mem_next_cell(dt_root_addr_cells, &prop);
+		size = dt_mem_next_cell(dt_root_size_cells, &prop);
+
+		if (size &&
+		    early_init_dt_reserve_memory_arch(base, size, nomap) == 0)
+			pr_debug("Reserved memory: reserved region for node '%s': base %pa, size %ld MiB\n",
+				uname, &base, (unsigned long)size / SZ_1M);
+		else
+			pr_info("Reserved memory: failed to reserve memory for node '%s': base %pa, size %ld MiB\n",
+				uname, &base, (unsigned long)size / SZ_1M);
+
+		len -= t_len;
+		if (first) {
+			fdt_reserved_mem_save_node(node, uname, base, size);
+			first = 0;
+		}
+	}
+	return 0;
+}
+
+/**
+ * __reserved_mem_check_root() - check if #size-cells, #address-cells provided
+ * in /reserved-memory matches the values supported by the current implementation,
+ * also check if ranges property has been provided
+ */
+static int __init __reserved_mem_check_root(unsigned long node)
+{
+	const __be32 *prop;
+
+	prop = of_get_flat_dt_prop(node, "#size-cells", NULL);
+	if (!prop || be32_to_cpup(prop) != dt_root_size_cells)
+		return -EINVAL;
+
+	prop = of_get_flat_dt_prop(node, "#address-cells", NULL);
+	if (!prop || be32_to_cpup(prop) != dt_root_addr_cells)
+		return -EINVAL;
+
+	prop = of_get_flat_dt_prop(node, "ranges", NULL);
+	if (!prop)
+		return -EINVAL;
+	return 0;
+}
+
+/**
+ * fdt_scan_reserved_mem() - scan a single FDT node for reserved memory
+ */
+static int __init __fdt_scan_reserved_mem(unsigned long node, const char *uname,
+					  int depth, void *data)
+{
+	static int found;
+	int err;
+
+	if (!found && depth == 1 && strcmp(uname, "reserved-memory") == 0) {
+		if (__reserved_mem_check_root(node) != 0) {
+			pr_err("Reserved memory: unsupported node format, ignoring\n");
+			/* break scan */
+			return 1;
+		}
+		found = 1;
+		/* scan next node */
+		return 0;
+	} else if (!found) {
+		/* scan next node */
+		return 0;
+	} else if (found && depth < 2) {
+		/* scanning of /reserved-memory has been finished */
+		return 1;
+	}
+
+	if (!of_fdt_device_is_available(initial_boot_params, node))
+		return 0;
+
+	err = __reserved_mem_reserve_reg(node, uname);
+	if (err == -ENOENT && of_get_flat_dt_prop(node, "size", NULL))
+		fdt_reserved_mem_save_node(node, uname, 0, 0);
+
+	/* scan next node */
+	return 0;
+}
+
+/**
+ * early_init_fdt_scan_reserved_mem() - create reserved memory regions
+ *
+ * This function grabs memory from early allocator for device exclusive use
+ * defined in device tree structures. It should be called by arch specific code
+ * once the early allocator (i.e. memblock) has been fully activated.
+ */
+void __init early_init_fdt_scan_reserved_mem(void)
+{
+	int n;
+	u64 base, size;
+
+	if (!initial_boot_params)
+		return;
+
+	/* Process header /memreserve/ fields */
+	for (n = 0; ; n++) {
+		fdt_get_mem_rsv(initial_boot_params, n, &base, &size);
+		if (!size)
+			break;
+		early_init_dt_reserve_memory_arch(base, size, false);
+	}
+
+	of_scan_flat_dt(__fdt_scan_reserved_mem, NULL);
+	fdt_init_reserved_mem();
+}
+EXPORT_SYMBOL(early_init_fdt_scan_reserved_mem);
+
 ///**
 // * early_init_fdt_reserve_self() - reserve the memory used by the FDT blob
 // */
@@ -710,48 +711,48 @@ const void *__init of_get_flat_dt_prop(unsigned long node, const char *name,
 	return fdt_getprop(initial_boot_params, node, name, size);
 }
 
-///**
-// * of_fdt_is_compatible - Return true if given node from the given blob has
-// * compat in its compatible list
-// * @blob: A device tree blob
-// * @node: node to test
-// * @compat: compatible string to compare with compatible list.
-// *
-// * On match, returns a non-zero value with smaller values returned for more
-// * specific compatible values.
-// */
-//static int of_fdt_is_compatible(const void *blob,
-//		      unsigned long node, const char *compat)
-//{
-//	const char *cp;
-//	int cplen;
-//	unsigned long l, score = 0;
-//
-//	cp = fdt_getprop(blob, node, "compatible", &cplen);
-//	if (cp == NULL)
-//		return 0;
-//	while (cplen > 0) {
-//		score++;
-//		if (of_compat_cmp(cp, compat, strlen(compat)) == 0)
-//			return score;
-//		l = strlen(cp) + 1;
-//		cp += l;
-//		cplen -= l;
-//	}
-//
-//	return 0;
-//}
-//
-///**
-// * of_flat_dt_is_compatible - Return true if given node has compat in compatible list
-// * @node: node to test
-// * @compat: compatible string to compare with compatible list.
-// */
-//int __init of_flat_dt_is_compatible(unsigned long node, const char *compat)
-//{
-//	return of_fdt_is_compatible(initial_boot_params, node, compat);
-//}
-//
+/**
+ * of_fdt_is_compatible - Return true if given node from the given blob has
+ * compat in its compatible list
+ * @blob: A device tree blob
+ * @node: node to test
+ * @compat: compatible string to compare with compatible list.
+ *
+ * On match, returns a non-zero value with smaller values returned for more
+ * specific compatible values.
+ */
+static int of_fdt_is_compatible(const void *blob,
+		      unsigned long node, const char *compat)
+{
+	const char *cp;
+	int cplen;
+	unsigned long l, score = 0;
+
+	cp = fdt_getprop(blob, node, "compatible", &cplen);
+	if (cp == NULL)
+		return 0;
+	while (cplen > 0) {
+		score++;
+		if (of_compat_cmp(cp, compat, strlen(compat)) == 0)
+			return score;
+		l = strlen(cp) + 1;
+		cp += l;
+		cplen -= l;
+	}
+
+	return 0;
+}
+
+/**
+ * of_flat_dt_is_compatible - Return true if given node has compat in compatible list
+ * @node: node to test
+ * @compat: compatible string to compare with compatible list.
+ */
+int __init of_flat_dt_is_compatible(unsigned long node, const char *compat)
+{
+	return of_fdt_is_compatible(initial_boot_params, node, compat);
+}
+
 ///**
 // * of_flat_dt_match - Return true if node matches a list of compatible values
 // */
@@ -1146,15 +1147,15 @@ int __init __weak early_init_dt_mark_hotplug_memory_arch(u64 base, u64 size)
 {
 	return memblock_mark_hotplug(base, size);
 }
-//
-//int __init __weak early_init_dt_reserve_memory_arch(phys_addr_t base,
-//					phys_addr_t size, bool nomap)
-//{
-//	if (nomap)
-//		return memblock_remove(base, size);
-//	return memblock_reserve(base, size);
-//}
-//
+
+int __init __weak early_init_dt_reserve_memory_arch(phys_addr_t base,
+					phys_addr_t size, bool nomap)
+{
+	if (nomap)
+		return memblock_remove(base, size);
+	return memblock_reserve(base, size);
+}
+
 //static void * __init early_init_dt_alloc_memory_arch(u64 size, u64 align)
 //{
 //	void *ptr = memblock_alloc(size, align);

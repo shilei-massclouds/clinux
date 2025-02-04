@@ -6,7 +6,7 @@
  * Copyright (C) 2006 David Gibson, IBM Corporation.
  */
 
-//#include "libfdt_env.h"
+#include <linux/libfdt_env.h>
 #include "fdt.h"
 
 #ifdef __cplusplus
