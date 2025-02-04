@@ -7,6 +7,14 @@ export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 TOP ?= params
 export TOP_COMPONENT := top_$(TOP)
 
+DEBUG ?= n
+ifeq ($(DEBUG),y)
+  DEBUG_INC := -DDEBUG
+else
+  DEBUG_INC :=
+endif
+export DEBUG_INC
+
 DISK_IMG := $(CURDIR)/tools/mk_rootfs/rootfs.ext2
 
 include ./scripts/Makefile.include

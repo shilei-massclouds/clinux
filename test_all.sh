@@ -26,7 +26,7 @@ do
     set +e
     ret_str=$(cat ${TEST}/expect_output 2>/dev/null)
     if [ -z "${ret_str}" ]; then
-        ret_str="\[\S*\]: init end!"
+        ret_str="\[top_${TEST}\]: init end!"
     fi
     #echo "***** ${ret_str}"
 

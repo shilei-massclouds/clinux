@@ -18,7 +18,7 @@ void
 start_kernel(void)
 {
     cl_init();
-    booter_panic("Cannot reach here!");
+    booter_panic("Kernel has been terminated!");
 }
 
 void sbi_puts(const char *s)
