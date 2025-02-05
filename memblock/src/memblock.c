@@ -1210,38 +1210,39 @@ void __init_memblock __next_mem_range_rev(u64 *idx, int nid,
 	*idx = ULLONG_MAX;
 }
 
-///*
-// * Common iterator interface used to define for_each_mem_pfn_range().
-// */
-//void __init_memblock __next_mem_pfn_range(int *idx, int nid,
-//				unsigned long *out_start_pfn,
-//				unsigned long *out_end_pfn, int *out_nid)
-//{
-//	struct memblock_type *type = &memblock.memory;
-//	struct memblock_region *r;
-//	int r_nid;
-//
-//	while (++*idx < type->cnt) {
-//		r = &type->regions[*idx];
-//		r_nid = memblock_get_region_node(r);
-//
-//		if (PFN_UP(r->base) >= PFN_DOWN(r->base + r->size))
-//			continue;
-//		if (nid == MAX_NUMNODES || nid == r_nid)
-//			break;
-//	}
-//	if (*idx >= type->cnt) {
-//		*idx = -1;
-//		return;
-//	}
-//
-//	if (out_start_pfn)
-//		*out_start_pfn = PFN_UP(r->base);
-//	if (out_end_pfn)
-//		*out_end_pfn = PFN_DOWN(r->base + r->size);
-//	if (out_nid)
-//		*out_nid = r_nid;
-//}
+/*
+ * Common iterator interface used to define for_each_mem_pfn_range().
+ */
+void __init_memblock __next_mem_pfn_range(int *idx, int nid,
+				unsigned long *out_start_pfn,
+				unsigned long *out_end_pfn, int *out_nid)
+{
+	struct memblock_type *type = &memblock.memory;
+	struct memblock_region *r;
+	int r_nid;
+
+	while (++*idx < type->cnt) {
+		r = &type->regions[*idx];
+		r_nid = memblock_get_region_node(r);
+
+		if (PFN_UP(r->base) >= PFN_DOWN(r->base + r->size))
+			continue;
+		if (nid == MAX_NUMNODES || nid == r_nid)
+			break;
+	}
+	if (*idx >= type->cnt) {
+		*idx = -1;
+		return;
+	}
+
+	if (out_start_pfn)
+		*out_start_pfn = PFN_UP(r->base);
+	if (out_end_pfn)
+		*out_end_pfn = PFN_DOWN(r->base + r->size);
+	if (out_nid)
+		*out_nid = r_nid;
+}
+EXPORT_SYMBOL(__next_mem_pfn_range);
 
 /**
  * memblock_set_node - set node ID on memblock regions
@@ -1461,58 +1462,58 @@ phys_addr_t __init memblock_phys_alloc_try_nid(phys_addr_t size, phys_addr_t ali
 					MEMBLOCK_ALLOC_ACCESSIBLE, nid, false);
 }
 
-///**
-// * memblock_alloc_internal - allocate boot memory block
-// * @size: size of memory block to be allocated in bytes
-// * @align: alignment of the region and block's size
-// * @min_addr: the lower bound of the memory region to allocate (phys address)
-// * @max_addr: the upper bound of the memory region to allocate (phys address)
-// * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
-// * @exact_nid: control the allocation fall back to other nodes
-// *
-// * Allocates memory block using memblock_alloc_range_nid() and
-// * converts the returned physical address to virtual.
-// *
-// * The @min_addr limit is dropped if it can not be satisfied and the allocation
-// * will fall back to memory below @min_addr. Other constraints, such
-// * as node and mirrored memory will be handled again in
-// * memblock_alloc_range_nid().
-// *
-// * Return:
-// * Virtual address of allocated memory block on success, NULL on failure.
-// */
-//static void * __init memblock_alloc_internal(
-//				phys_addr_t size, phys_addr_t align,
-//				phys_addr_t min_addr, phys_addr_t max_addr,
-//				int nid, bool exact_nid)
-//{
-//	phys_addr_t alloc;
-//
-//	/*
-//	 * Detect any accidental use of these APIs after slab is ready, as at
-//	 * this moment memblock may be deinitialized already and its
-//	 * internal data may be destroyed (after execution of memblock_free_all)
-//	 */
-//	if (WARN_ON_ONCE(slab_is_available()))
-//		return kzalloc_node(size, GFP_NOWAIT, nid);
-//
-//	if (max_addr > memblock.current_limit)
-//		max_addr = memblock.current_limit;
-//
-//	alloc = memblock_alloc_range_nid(size, align, min_addr, max_addr, nid,
-//					exact_nid);
-//
-//	/* retry allocation without lower limit */
-//	if (!alloc && min_addr)
-//		alloc = memblock_alloc_range_nid(size, align, 0, max_addr, nid,
-//						exact_nid);
-//
-//	if (!alloc)
-//		return NULL;
-//
-//	return phys_to_virt(alloc);
-//}
-//
+/**
+ * memblock_alloc_internal - allocate boot memory block
+ * @size: size of memory block to be allocated in bytes
+ * @align: alignment of the region and block's size
+ * @min_addr: the lower bound of the memory region to allocate (phys address)
+ * @max_addr: the upper bound of the memory region to allocate (phys address)
+ * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
+ * @exact_nid: control the allocation fall back to other nodes
+ *
+ * Allocates memory block using memblock_alloc_range_nid() and
+ * converts the returned physical address to virtual.
+ *
+ * The @min_addr limit is dropped if it can not be satisfied and the allocation
+ * will fall back to memory below @min_addr. Other constraints, such
+ * as node and mirrored memory will be handled again in
+ * memblock_alloc_range_nid().
+ *
+ * Return:
+ * Virtual address of allocated memory block on success, NULL on failure.
+ */
+static void * __init memblock_alloc_internal(
+				phys_addr_t size, phys_addr_t align,
+				phys_addr_t min_addr, phys_addr_t max_addr,
+				int nid, bool exact_nid)
+{
+	phys_addr_t alloc;
+
+	/*
+	 * Detect any accidental use of these APIs after slab is ready, as at
+	 * this moment memblock may be deinitialized already and its
+	 * internal data may be destroyed (after execution of memblock_free_all)
+	 */
+	if (WARN_ON_ONCE(slab_is_available()))
+		return kzalloc_node(size, GFP_NOWAIT, nid);
+
+	if (max_addr > memblock.current_limit)
+		max_addr = memblock.current_limit;
+
+	alloc = memblock_alloc_range_nid(size, align, min_addr, max_addr, nid,
+					exact_nid);
+
+	/* retry allocation without lower limit */
+	if (!alloc && min_addr)
+		alloc = memblock_alloc_range_nid(size, align, 0, max_addr, nid,
+						exact_nid);
+
+	if (!alloc)
+		return NULL;
+
+	return phys_to_virt(alloc);
+}
+
 ///**
 // * memblock_alloc_exact_nid_raw - allocate boot memory block on the exact node
 // * without zeroing memory
@@ -1587,42 +1588,43 @@ phys_addr_t __init memblock_phys_alloc_try_nid(phys_addr_t size, phys_addr_t ali
 //
 //	return ptr;
 //}
-//
-///**
-// * memblock_alloc_try_nid - allocate boot memory block
-// * @size: size of memory block to be allocated in bytes
-// * @align: alignment of the region and block's size
-// * @min_addr: the lower bound of the memory region from where the allocation
-// *	  is preferred (phys address)
-// * @max_addr: the upper bound of the memory region from where the allocation
-// *	      is preferred (phys address), or %MEMBLOCK_ALLOC_ACCESSIBLE to
-// *	      allocate only from memory limited by memblock.current_limit value
-// * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
-// *
-// * Public function, provides additional debug information (including caller
-// * info), if enabled. This function zeroes the allocated memory.
-// *
-// * Return:
-// * Virtual address of allocated memory block on success, NULL on failure.
-// */
-//void * __init memblock_alloc_try_nid(
-//			phys_addr_t size, phys_addr_t align,
-//			phys_addr_t min_addr, phys_addr_t max_addr,
-//			int nid)
-//{
-//	void *ptr;
-//
-//	memblock_dbg("%s: %llu bytes align=0x%llx nid=%d from=%pa max_addr=%pa %pS\n",
-//		     __func__, (u64)size, (u64)align, nid, &min_addr,
-//		     &max_addr, (void *)_RET_IP_);
-//	ptr = memblock_alloc_internal(size, align,
-//					   min_addr, max_addr, nid, false);
-//	if (ptr)
-//		memset(ptr, 0, size);
-//
-//	return ptr;
-//}
-//
+
+/**
+ * memblock_alloc_try_nid - allocate boot memory block
+ * @size: size of memory block to be allocated in bytes
+ * @align: alignment of the region and block's size
+ * @min_addr: the lower bound of the memory region from where the allocation
+ *	  is preferred (phys address)
+ * @max_addr: the upper bound of the memory region from where the allocation
+ *	      is preferred (phys address), or %MEMBLOCK_ALLOC_ACCESSIBLE to
+ *	      allocate only from memory limited by memblock.current_limit value
+ * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
+ *
+ * Public function, provides additional debug information (including caller
+ * info), if enabled. This function zeroes the allocated memory.
+ *
+ * Return:
+ * Virtual address of allocated memory block on success, NULL on failure.
+ */
+void * __init memblock_alloc_try_nid(
+			phys_addr_t size, phys_addr_t align,
+			phys_addr_t min_addr, phys_addr_t max_addr,
+			int nid)
+{
+	void *ptr;
+
+	memblock_dbg("%s: %llu bytes align=0x%llx nid=%d from=%pa max_addr=%pa %pS\n",
+		     __func__, (u64)size, (u64)align, nid, &min_addr,
+		     &max_addr, (void *)_RET_IP_);
+	ptr = memblock_alloc_internal(size, align,
+					   min_addr, max_addr, nid, false);
+	if (ptr)
+		memset(ptr, 0, size);
+
+	return ptr;
+}
+EXPORT_SYMBOL(memblock_alloc_try_nid);
+
 ///**
 // * __memblock_free_late - free pages directly to buddy allocator
 // * @base: phys starting address of the  boot memory block
@@ -1679,12 +1681,13 @@ phys_addr_t __init memblock_phys_alloc_try_nid(phys_addr_t size, phys_addr_t ali
 //
 //	return PFN_PHYS(pages);
 //}
-//
-///* lowest address */
-//phys_addr_t __init_memblock memblock_start_of_DRAM(void)
-//{
-//	return memblock.memory.regions[0].base;
-//}
+
+/* lowest address */
+phys_addr_t __init_memblock memblock_start_of_DRAM(void)
+{
+	return memblock.memory.regions[0].base;
+}
+EXPORT_SYMBOL(memblock_start_of_DRAM);
 
 phys_addr_t __init_memblock memblock_end_of_DRAM(void)
 {

@@ -13,9 +13,14 @@
 
 extern char _start[];
 
+#ifndef CONFIG_NEED_MULTIPLE_NODES
 /* use the per-pgdat data instead for discontigmem - mbligh */
 unsigned long max_mapnr;
 EXPORT_SYMBOL(max_mapnr);
+
+struct page *mem_map;
+EXPORT_SYMBOL(mem_map);
+#endif
 
 extern phys_addr_t dtb_early_pa;
 

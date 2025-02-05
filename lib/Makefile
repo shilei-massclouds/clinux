@@ -16,3 +16,4 @@ obj_y += delay.o
 obj_y += cmdline.o
 obj_y += ratelimit.o
 obj_y += sort.o
+obj_y += hweight.o
