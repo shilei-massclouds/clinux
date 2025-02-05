@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/kernel.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 enum system_states system_state __read_mostly;
@@ -12,6 +13,7 @@ int
 cl_sched_init(void)
 {
     sbi_puts("module[sched]: init begin ...\n");
+    ENABLE_COMPONENT(base_init);
     sbi_puts("module[sched]: init end!\n");
     return 0;
 }
