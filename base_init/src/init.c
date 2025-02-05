@@ -14,16 +14,16 @@
 #include "../../sched/src/sched.h"
 
 int
-cl_init_base_init(void)
+cl_base_init_init(void)
 {
-    sbi_puts("module[init_base]: init begin ...\n");
+    sbi_puts("module[base_init]: init begin ...\n");
     riscv_current_is_tp = &init_task;
-    sbi_puts("module[init_base]: init end!\n");
+    sbi_puts("module[base_init]: init end!\n");
     return 0;
 }
-EXPORT_SYMBOL(cl_init_base_init);
+EXPORT_SYMBOL(cl_base_init_init);
 
-DEFINE_ENABLE_FUNC(init_base);
+DEFINE_ENABLE_FUNC(base_init_init);
 
 long do_no_restart_syscall(struct restart_block *param)
 {

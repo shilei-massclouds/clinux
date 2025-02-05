@@ -238,87 +238,87 @@ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
 //			cpu_relax();
 //	}
 //}
-//
-///*
-// * RQ-clock updating methods:
-// */
-//
-//static void update_rq_clock_task(struct rq *rq, s64 delta)
-//{
-///*
-// * In theory, the compile should just see 0 here, and optimize out the call
-// * to sched_rt_avg_update. But I don't trust it...
-// */
-//	s64 __maybe_unused steal = 0, irq_delta = 0;
-//
-//#ifdef CONFIG_IRQ_TIME_ACCOUNTING
-//	irq_delta = irq_time_read(cpu_of(rq)) - rq->prev_irq_time;
-//
-//	/*
-//	 * Since irq_time is only updated on {soft,}irq_exit, we might run into
-//	 * this case when a previous update_rq_clock() happened inside a
-//	 * {soft,}irq region.
-//	 *
-//	 * When this happens, we stop ->clock_task and only update the
-//	 * prev_irq_time stamp to account for the part that fit, so that a next
-//	 * update will consume the rest. This ensures ->clock_task is
-//	 * monotonic.
-//	 *
-//	 * It does however cause some slight miss-attribution of {soft,}irq
-//	 * time, a more accurate solution would be to update the irq_time using
-//	 * the current rq->clock timestamp, except that would require using
-//	 * atomic ops.
-//	 */
-//	if (irq_delta > delta)
-//		irq_delta = delta;
-//
-//	rq->prev_irq_time += irq_delta;
-//	delta -= irq_delta;
-//#endif
-//#ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
-//	if (static_key_false((&paravirt_steal_rq_enabled))) {
-//		steal = paravirt_steal_clock(cpu_of(rq));
-//		steal -= rq->prev_steal_time_rq;
-//
-//		if (unlikely(steal > delta))
-//			steal = delta;
-//
-//		rq->prev_steal_time_rq += steal;
-//		delta -= steal;
-//	}
-//#endif
-//
-//	rq->clock_task += delta;
-//
-//#ifdef CONFIG_HAVE_SCHED_AVG_IRQ
-//	if ((irq_delta + steal) && sched_feat(NONTASK_CAPACITY))
-//		update_irq_load_avg(rq, irq_delta + steal);
-//#endif
-//	update_rq_clock_pelt(rq, delta);
-//}
-//
-//void update_rq_clock(struct rq *rq)
-//{
-//	s64 delta;
-//
-//	lockdep_assert_held(&rq->lock);
-//
-//	if (rq->clock_update_flags & RQCF_ACT_SKIP)
-//		return;
-//
-//#ifdef CONFIG_SCHED_DEBUG
-//	if (sched_feat(WARN_DOUBLE_CLOCK))
-//		SCHED_WARN_ON(rq->clock_update_flags & RQCF_UPDATED);
-//	rq->clock_update_flags |= RQCF_UPDATED;
-//#endif
-//
-//	delta = sched_clock_cpu(cpu_of(rq)) - rq->clock;
-//	if (delta < 0)
-//		return;
-//	rq->clock += delta;
-//	update_rq_clock_task(rq, delta);
-//}
-//
+
+/*
+ * RQ-clock updating methods:
+ */
+
+static void update_rq_clock_task(struct rq *rq, s64 delta)
+{
+/*
+ * In theory, the compile should just see 0 here, and optimize out the call
+ * to sched_rt_avg_update. But I don't trust it...
+ */
+	s64 __maybe_unused steal = 0, irq_delta = 0;
+
+#ifdef CONFIG_IRQ_TIME_ACCOUNTING
+	irq_delta = irq_time_read(cpu_of(rq)) - rq->prev_irq_time;
+
+	/*
+	 * Since irq_time is only updated on {soft,}irq_exit, we might run into
+	 * this case when a previous update_rq_clock() happened inside a
+	 * {soft,}irq region.
+	 *
+	 * When this happens, we stop ->clock_task and only update the
+	 * prev_irq_time stamp to account for the part that fit, so that a next
+	 * update will consume the rest. This ensures ->clock_task is
+	 * monotonic.
+	 *
+	 * It does however cause some slight miss-attribution of {soft,}irq
+	 * time, a more accurate solution would be to update the irq_time using
+	 * the current rq->clock timestamp, except that would require using
+	 * atomic ops.
+	 */
+	if (irq_delta > delta)
+		irq_delta = delta;
+
+	rq->prev_irq_time += irq_delta;
+	delta -= irq_delta;
+#endif
+#ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
+	if (static_key_false((&paravirt_steal_rq_enabled))) {
+		steal = paravirt_steal_clock(cpu_of(rq));
+		steal -= rq->prev_steal_time_rq;
+
+		if (unlikely(steal > delta))
+			steal = delta;
+
+		rq->prev_steal_time_rq += steal;
+		delta -= steal;
+	}
+#endif
+
+	rq->clock_task += delta;
+
+#ifdef CONFIG_HAVE_SCHED_AVG_IRQ
+	if ((irq_delta + steal) && sched_feat(NONTASK_CAPACITY))
+		update_irq_load_avg(rq, irq_delta + steal);
+#endif
+	update_rq_clock_pelt(rq, delta);
+}
+
+void update_rq_clock(struct rq *rq)
+{
+	s64 delta;
+
+	lockdep_assert_held(&rq->lock);
+
+	if (rq->clock_update_flags & RQCF_ACT_SKIP)
+		return;
+
+#ifdef CONFIG_SCHED_DEBUG
+	if (sched_feat(WARN_DOUBLE_CLOCK))
+		SCHED_WARN_ON(rq->clock_update_flags & RQCF_UPDATED);
+	rq->clock_update_flags |= RQCF_UPDATED;
+#endif
+
+	delta = sched_clock_cpu(cpu_of(rq)) - rq->clock;
+	if (delta < 0)
+		return;
+	rq->clock += delta;
+	update_rq_clock_task(rq, delta);
+}
+
 //static inline void
 //rq_csd_init(struct rq *rq, call_single_data_t *csd, smp_call_func_t func)
 //{
@@ -327,121 +327,121 @@ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
 //	csd->info = rq;
 //}
 //
-//#ifdef CONFIG_SCHED_HRTICK
-///*
-// * Use HR-timers to deliver accurate preemption points.
-// */
-//
-//static void hrtick_clear(struct rq *rq)
-//{
-//	if (hrtimer_active(&rq->hrtick_timer))
-//		hrtimer_cancel(&rq->hrtick_timer);
-//}
-//
-///*
-// * High-resolution timer tick.
-// * Runs from hardirq context with interrupts disabled.
-// */
-//static enum hrtimer_restart hrtick(struct hrtimer *timer)
-//{
-//	struct rq *rq = container_of(timer, struct rq, hrtick_timer);
-//	struct rq_flags rf;
-//
-//	WARN_ON_ONCE(cpu_of(rq) != smp_processor_id());
-//
-//	rq_lock(rq, &rf);
-//	update_rq_clock(rq);
-//	rq->curr->sched_class->task_tick(rq, rq->curr, 1);
-//	rq_unlock(rq, &rf);
-//
-//	return HRTIMER_NORESTART;
-//}
-//
-//#ifdef CONFIG_SMP
-//
-//static void __hrtick_restart(struct rq *rq)
-//{
-//	struct hrtimer *timer = &rq->hrtick_timer;
-//
-//	hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED_HARD);
-//}
-//
-///*
-// * called from hardirq (IPI) context
-// */
-//static void __hrtick_start(void *arg)
-//{
-//	struct rq *rq = arg;
-//	struct rq_flags rf;
-//
-//	rq_lock(rq, &rf);
-//	__hrtick_restart(rq);
-//	rq_unlock(rq, &rf);
-//}
-//
-///*
-// * Called to set the hrtick timer state.
-// *
-// * called with rq->lock held and irqs disabled
-// */
-//void hrtick_start(struct rq *rq, u64 delay)
-//{
-//	struct hrtimer *timer = &rq->hrtick_timer;
-//	ktime_t time;
-//	s64 delta;
-//
-//	/*
-//	 * Don't schedule slices shorter than 10000ns, that just
-//	 * doesn't make sense and can cause timer DoS.
-//	 */
-//	delta = max_t(s64, delay, 10000LL);
-//	time = ktime_add_ns(timer->base->get_time(), delta);
-//
-//	hrtimer_set_expires(timer, time);
-//
-//	if (rq == this_rq())
-//		__hrtick_restart(rq);
-//	else
-//		smp_call_function_single_async(cpu_of(rq), &rq->hrtick_csd);
-//}
-//
-//#else
-///*
-// * Called to set the hrtick timer state.
-// *
-// * called with rq->lock held and irqs disabled
-// */
-//void hrtick_start(struct rq *rq, u64 delay)
-//{
-//	/*
-//	 * Don't schedule slices shorter than 10000ns, that just
-//	 * doesn't make sense. Rely on vruntime for fairness.
-//	 */
-//	delay = max_t(u64, delay, 10000LL);
-//	hrtimer_start(&rq->hrtick_timer, ns_to_ktime(delay),
-//		      HRTIMER_MODE_REL_PINNED_HARD);
-//}
-//
-//#endif /* CONFIG_SMP */
-//
-//static void hrtick_rq_init(struct rq *rq)
-//{
-//#ifdef CONFIG_SMP
-//	rq_csd_init(rq, &rq->hrtick_csd, __hrtick_start);
-//#endif
-//	hrtimer_init(&rq->hrtick_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_HARD);
-//	rq->hrtick_timer.function = hrtick;
-//}
-//#else	/* CONFIG_SCHED_HRTICK */
-//static inline void hrtick_clear(struct rq *rq)
-//{
-//}
-//
-//static inline void hrtick_rq_init(struct rq *rq)
-//{
-//}
-//#endif	/* CONFIG_SCHED_HRTICK */
-//
+#ifdef CONFIG_SCHED_HRTICK
+/*
+ * Use HR-timers to deliver accurate preemption points.
+ */
+
+static void hrtick_clear(struct rq *rq)
+{
+	if (hrtimer_active(&rq->hrtick_timer))
+		hrtimer_cancel(&rq->hrtick_timer);
+}
+
+/*
+ * High-resolution timer tick.
+ * Runs from hardirq context with interrupts disabled.
+ */
+static enum hrtimer_restart hrtick(struct hrtimer *timer)
+{
+	struct rq *rq = container_of(timer, struct rq, hrtick_timer);
+	struct rq_flags rf;
+
+	WARN_ON_ONCE(cpu_of(rq) != smp_processor_id());
+
+	rq_lock(rq, &rf);
+	update_rq_clock(rq);
+	rq->curr->sched_class->task_tick(rq, rq->curr, 1);
+	rq_unlock(rq, &rf);
+
+	return HRTIMER_NORESTART;
+}
+
+#ifdef CONFIG_SMP
+
+static void __hrtick_restart(struct rq *rq)
+{
+	struct hrtimer *timer = &rq->hrtick_timer;
+
+	hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED_HARD);
+}
+
+/*
+ * called from hardirq (IPI) context
+ */
+static void __hrtick_start(void *arg)
+{
+	struct rq *rq = arg;
+	struct rq_flags rf;
+
+	rq_lock(rq, &rf);
+	__hrtick_restart(rq);
+	rq_unlock(rq, &rf);
+}
+
+/*
+ * Called to set the hrtick timer state.
+ *
+ * called with rq->lock held and irqs disabled
+ */
+void hrtick_start(struct rq *rq, u64 delay)
+{
+	struct hrtimer *timer = &rq->hrtick_timer;
+	ktime_t time;
+	s64 delta;
+
+	/*
+	 * Don't schedule slices shorter than 10000ns, that just
+	 * doesn't make sense and can cause timer DoS.
+	 */
+	delta = max_t(s64, delay, 10000LL);
+	time = ktime_add_ns(timer->base->get_time(), delta);
+
+	hrtimer_set_expires(timer, time);
+
+	if (rq == this_rq())
+		__hrtick_restart(rq);
+	else
+		smp_call_function_single_async(cpu_of(rq), &rq->hrtick_csd);
+}
+
+#else
+/*
+ * Called to set the hrtick timer state.
+ *
+ * called with rq->lock held and irqs disabled
+ */
+void hrtick_start(struct rq *rq, u64 delay)
+{
+	/*
+	 * Don't schedule slices shorter than 10000ns, that just
+	 * doesn't make sense. Rely on vruntime for fairness.
+	 */
+	delay = max_t(u64, delay, 10000LL);
+	hrtimer_start(&rq->hrtick_timer, ns_to_ktime(delay),
+		      HRTIMER_MODE_REL_PINNED_HARD);
+}
+
+#endif /* CONFIG_SMP */
+
+static void hrtick_rq_init(struct rq *rq)
+{
+#ifdef CONFIG_SMP
+	rq_csd_init(rq, &rq->hrtick_csd, __hrtick_start);
+#endif
+	hrtimer_init(&rq->hrtick_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_HARD);
+	rq->hrtick_timer.function = hrtick;
+}
+#else	/* CONFIG_SCHED_HRTICK */
+static inline void hrtick_clear(struct rq *rq)
+{
+}
+
+static inline void hrtick_rq_init(struct rq *rq)
+{
+}
+#endif	/* CONFIG_SCHED_HRTICK */
+
 ///*
 // * cmpxchg based fetch_or, macro so it works for different integer types
 // */
@@ -3371,326 +3371,326 @@ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
 //	task_rq_unlock(rq, p, &rf);
 //}
 //
-//#ifdef CONFIG_PREEMPT_NOTIFIERS
-//
-//static DEFINE_STATIC_KEY_FALSE(preempt_notifier_key);
-//
-//void preempt_notifier_inc(void)
-//{
-//	static_branch_inc(&preempt_notifier_key);
-//}
-//EXPORT_SYMBOL_GPL(preempt_notifier_inc);
-//
-//void preempt_notifier_dec(void)
-//{
-//	static_branch_dec(&preempt_notifier_key);
-//}
-//EXPORT_SYMBOL_GPL(preempt_notifier_dec);
-//
-///**
-// * preempt_notifier_register - tell me when current is being preempted & rescheduled
-// * @notifier: notifier struct to register
-// */
-//void preempt_notifier_register(struct preempt_notifier *notifier)
-//{
-//	if (!static_branch_unlikely(&preempt_notifier_key))
-//		WARN(1, "registering preempt_notifier while notifiers disabled\n");
-//
-//	hlist_add_head(&notifier->link, &current->preempt_notifiers);
-//}
-//EXPORT_SYMBOL_GPL(preempt_notifier_register);
-//
-///**
-// * preempt_notifier_unregister - no longer interested in preemption notifications
-// * @notifier: notifier struct to unregister
-// *
-// * This is *not* safe to call from within a preemption notifier.
-// */
-//void preempt_notifier_unregister(struct preempt_notifier *notifier)
-//{
-//	hlist_del(&notifier->link);
-//}
-//EXPORT_SYMBOL_GPL(preempt_notifier_unregister);
-//
-//static void __fire_sched_in_preempt_notifiers(struct task_struct *curr)
-//{
-//	struct preempt_notifier *notifier;
-//
-//	hlist_for_each_entry(notifier, &curr->preempt_notifiers, link)
-//		notifier->ops->sched_in(notifier, raw_smp_processor_id());
-//}
-//
-//static __always_inline void fire_sched_in_preempt_notifiers(struct task_struct *curr)
-//{
-//	if (static_branch_unlikely(&preempt_notifier_key))
-//		__fire_sched_in_preempt_notifiers(curr);
-//}
-//
-//static void
-//__fire_sched_out_preempt_notifiers(struct task_struct *curr,
-//				   struct task_struct *next)
-//{
-//	struct preempt_notifier *notifier;
-//
-//	hlist_for_each_entry(notifier, &curr->preempt_notifiers, link)
-//		notifier->ops->sched_out(notifier, next);
-//}
-//
-//static __always_inline void
-//fire_sched_out_preempt_notifiers(struct task_struct *curr,
-//				 struct task_struct *next)
-//{
-//	if (static_branch_unlikely(&preempt_notifier_key))
-//		__fire_sched_out_preempt_notifiers(curr, next);
-//}
-//
-//#else /* !CONFIG_PREEMPT_NOTIFIERS */
-//
-//static inline void fire_sched_in_preempt_notifiers(struct task_struct *curr)
-//{
-//}
-//
-//static inline void
-//fire_sched_out_preempt_notifiers(struct task_struct *curr,
-//				 struct task_struct *next)
-//{
-//}
-//
-//#endif /* CONFIG_PREEMPT_NOTIFIERS */
-//
-//static inline void prepare_task(struct task_struct *next)
-//{
-//#ifdef CONFIG_SMP
-//	/*
-//	 * Claim the task as running, we do this before switching to it
-//	 * such that any running task will have this set.
-//	 *
-//	 * See the ttwu() WF_ON_CPU case and its ordering comment.
-//	 */
-//	WRITE_ONCE(next->on_cpu, 1);
-//#endif
-//}
-//
-//static inline void finish_task(struct task_struct *prev)
-//{
-//#ifdef CONFIG_SMP
-//	/*
-//	 * This must be the very last reference to @prev from this CPU. After
-//	 * p->on_cpu is cleared, the task can be moved to a different CPU. We
-//	 * must ensure this doesn't happen until the switch is completely
-//	 * finished.
-//	 *
-//	 * In particular, the load of prev->state in finish_task_switch() must
-//	 * happen before this.
-//	 *
-//	 * Pairs with the smp_cond_load_acquire() in try_to_wake_up().
-//	 */
-//	smp_store_release(&prev->on_cpu, 0);
-//#endif
-//}
-//
-//static inline void
-//prepare_lock_switch(struct rq *rq, struct task_struct *next, struct rq_flags *rf)
-//{
-//	/*
-//	 * Since the runqueue lock will be released by the next
-//	 * task (which is an invalid locking op but in the case
-//	 * of the scheduler it's an obvious special-case), so we
-//	 * do an early lockdep release here:
-//	 */
-//	rq_unpin_lock(rq, rf);
-//	spin_release(&rq->lock.dep_map, _THIS_IP_);
-//#ifdef CONFIG_DEBUG_SPINLOCK
-//	/* this is a valid case when another task releases the spinlock */
-//	rq->lock.owner = next;
-//#endif
-//}
-//
-//static inline void finish_lock_switch(struct rq *rq)
-//{
-//	/*
-//	 * If we are tracking spinlock dependencies then we have to
-//	 * fix up the runqueue lock - which gets 'carried over' from
-//	 * prev into current:
-//	 */
-//	spin_acquire(&rq->lock.dep_map, 0, 0, _THIS_IP_);
-//	raw_spin_unlock_irq(&rq->lock);
-//}
-//
-///*
-// * NOP if the arch has not defined these:
-// */
-//
-//#ifndef prepare_arch_switch
-//# define prepare_arch_switch(next)	do { } while (0)
-//#endif
-//
-//#ifndef finish_arch_post_lock_switch
-//# define finish_arch_post_lock_switch()	do { } while (0)
-//#endif
-//
-///**
-// * prepare_task_switch - prepare to switch tasks
-// * @rq: the runqueue preparing to switch
-// * @prev: the current task that is being switched out
-// * @next: the task we are going to switch to.
-// *
-// * This is called with the rq lock held and interrupts off. It must
-// * be paired with a subsequent finish_task_switch after the context
-// * switch.
-// *
-// * prepare_task_switch sets up locking and calls architecture specific
-// * hooks.
-// */
-//static inline void
-//prepare_task_switch(struct rq *rq, struct task_struct *prev,
-//		    struct task_struct *next)
-//{
-//	kcov_prepare_switch(prev);
-//	sched_info_switch(rq, prev, next);
-//	perf_event_task_sched_out(prev, next);
-//	rseq_preempt(prev);
-//	fire_sched_out_preempt_notifiers(prev, next);
-//	prepare_task(next);
-//	prepare_arch_switch(next);
-//}
-//
-///**
-// * finish_task_switch - clean up after a task-switch
-// * @prev: the thread we just switched away from.
-// *
-// * finish_task_switch must be called after the context switch, paired
-// * with a prepare_task_switch call before the context switch.
-// * finish_task_switch will reconcile locking set up by prepare_task_switch,
-// * and do any other architecture-specific cleanup actions.
-// *
-// * Note that we may have delayed dropping an mm in context_switch(). If
-// * so, we finish that here outside of the runqueue lock. (Doing it
-// * with the lock held can cause deadlocks; see schedule() for
-// * details.)
-// *
-// * The context switch have flipped the stack from under us and restored the
-// * local variables which were saved when this task called schedule() in the
-// * past. prev == current is still correct but we need to recalculate this_rq
-// * because prev may have moved to another CPU.
-// */
-//static struct rq *finish_task_switch(struct task_struct *prev)
-//	__releases(rq->lock)
-//{
-//	struct rq *rq = this_rq();
-//	struct mm_struct *mm = rq->prev_mm;
-//	long prev_state;
-//
-//	/*
-//	 * The previous task will have left us with a preempt_count of 2
-//	 * because it left us after:
-//	 *
-//	 *	schedule()
-//	 *	  preempt_disable();			// 1
-//	 *	  __schedule()
-//	 *	    raw_spin_lock_irq(&rq->lock)	// 2
-//	 *
-//	 * Also, see FORK_PREEMPT_COUNT.
-//	 */
-//	if (WARN_ONCE(preempt_count() != 2*PREEMPT_DISABLE_OFFSET,
-//		      "corrupted preempt_count: %s/%d/0x%x\n",
-//		      current->comm, current->pid, preempt_count()))
-//		preempt_count_set(FORK_PREEMPT_COUNT);
-//
-//	rq->prev_mm = NULL;
-//
-//	/*
-//	 * A task struct has one reference for the use as "current".
-//	 * If a task dies, then it sets TASK_DEAD in tsk->state and calls
-//	 * schedule one last time. The schedule call will never return, and
-//	 * the scheduled task must drop that reference.
-//	 *
-//	 * We must observe prev->state before clearing prev->on_cpu (in
-//	 * finish_task), otherwise a concurrent wakeup can get prev
-//	 * running on another CPU and we could rave with its RUNNING -> DEAD
-//	 * transition, resulting in a double drop.
-//	 */
-//	prev_state = prev->state;
-//	vtime_task_switch(prev);
-//	perf_event_task_sched_in(prev, current);
-//	finish_task(prev);
-//	finish_lock_switch(rq);
-//	finish_arch_post_lock_switch();
-//	kcov_finish_switch(current);
-//
-//	fire_sched_in_preempt_notifiers(current);
-//	/*
-//	 * When switching through a kernel thread, the loop in
-//	 * membarrier_{private,global}_expedited() may have observed that
-//	 * kernel thread and not issued an IPI. It is therefore possible to
-//	 * schedule between user->kernel->user threads without passing though
-//	 * switch_mm(). Membarrier requires a barrier after storing to
-//	 * rq->curr, before returning to userspace, so provide them here:
-//	 *
-//	 * - a full memory barrier for {PRIVATE,GLOBAL}_EXPEDITED, implicitly
-//	 *   provided by mmdrop(),
-//	 * - a sync_core for SYNC_CORE.
-//	 */
-//	if (mm) {
-//		membarrier_mm_sync_core_before_usermode(mm);
-//		mmdrop(mm);
-//	}
-//	if (unlikely(prev_state == TASK_DEAD)) {
-//		if (prev->sched_class->task_dead)
-//			prev->sched_class->task_dead(prev);
-//
-//		/*
-//		 * Remove function-return probe instances associated with this
-//		 * task and put them back on the free list.
-//		 */
-//		kprobe_flush_task(prev);
-//
-//		/* Task is done with its stack. */
-//		put_task_stack(prev);
-//
-//		put_task_struct_rcu_user(prev);
-//	}
-//
-//	tick_nohz_task_switch();
-//	return rq;
-//}
-//
-//#ifdef CONFIG_SMP
-//
-///* rq->lock is NOT held, but preemption is disabled */
-//static void __balance_callback(struct rq *rq)
-//{
-//	struct callback_head *head, *next;
-//	void (*func)(struct rq *rq);
-//	unsigned long flags;
-//
-//	raw_spin_lock_irqsave(&rq->lock, flags);
-//	head = rq->balance_callback;
-//	rq->balance_callback = NULL;
-//	while (head) {
-//		func = (void (*)(struct rq *))head->func;
-//		next = head->next;
-//		head->next = NULL;
-//		head = next;
-//
-//		func(rq);
-//	}
-//	raw_spin_unlock_irqrestore(&rq->lock, flags);
-//}
-//
-//static inline void balance_callback(struct rq *rq)
-//{
-//	if (unlikely(rq->balance_callback))
-//		__balance_callback(rq);
-//}
-//
-//#else
-//
-//static inline void balance_callback(struct rq *rq)
-//{
-//}
-//
-//#endif
+#ifdef CONFIG_PREEMPT_NOTIFIERS
+
+static DEFINE_STATIC_KEY_FALSE(preempt_notifier_key);
+
+void preempt_notifier_inc(void)
+{
+	static_branch_inc(&preempt_notifier_key);
+}
+EXPORT_SYMBOL_GPL(preempt_notifier_inc);
+
+void preempt_notifier_dec(void)
+{
+	static_branch_dec(&preempt_notifier_key);
+}
+EXPORT_SYMBOL_GPL(preempt_notifier_dec);
+
+/**
+ * preempt_notifier_register - tell me when current is being preempted & rescheduled
+ * @notifier: notifier struct to register
+ */
+void preempt_notifier_register(struct preempt_notifier *notifier)
+{
+	if (!static_branch_unlikely(&preempt_notifier_key))
+		WARN(1, "registering preempt_notifier while notifiers disabled\n");
+
+	hlist_add_head(&notifier->link, &current->preempt_notifiers);
+}
+EXPORT_SYMBOL_GPL(preempt_notifier_register);
+
+/**
+ * preempt_notifier_unregister - no longer interested in preemption notifications
+ * @notifier: notifier struct to unregister
+ *
+ * This is *not* safe to call from within a preemption notifier.
+ */
+void preempt_notifier_unregister(struct preempt_notifier *notifier)
+{
+	hlist_del(&notifier->link);
+}
+EXPORT_SYMBOL_GPL(preempt_notifier_unregister);
+
+static void __fire_sched_in_preempt_notifiers(struct task_struct *curr)
+{
+	struct preempt_notifier *notifier;
+
+	hlist_for_each_entry(notifier, &curr->preempt_notifiers, link)
+		notifier->ops->sched_in(notifier, raw_smp_processor_id());
+}
+
+static __always_inline void fire_sched_in_preempt_notifiers(struct task_struct *curr)
+{
+	if (static_branch_unlikely(&preempt_notifier_key))
+		__fire_sched_in_preempt_notifiers(curr);
+}
+
+static void
+__fire_sched_out_preempt_notifiers(struct task_struct *curr,
+				   struct task_struct *next)
+{
+	struct preempt_notifier *notifier;
+
+	hlist_for_each_entry(notifier, &curr->preempt_notifiers, link)
+		notifier->ops->sched_out(notifier, next);
+}
+
+static __always_inline void
+fire_sched_out_preempt_notifiers(struct task_struct *curr,
+				 struct task_struct *next)
+{
+	if (static_branch_unlikely(&preempt_notifier_key))
+		__fire_sched_out_preempt_notifiers(curr, next);
+}
+
+#else /* !CONFIG_PREEMPT_NOTIFIERS */
+
+static inline void fire_sched_in_preempt_notifiers(struct task_struct *curr)
+{
+}
+
+static inline void
+fire_sched_out_preempt_notifiers(struct task_struct *curr,
+				 struct task_struct *next)
+{
+}
+
+#endif /* CONFIG_PREEMPT_NOTIFIERS */
+
+static inline void prepare_task(struct task_struct *next)
+{
+#ifdef CONFIG_SMP
+	/*
+	 * Claim the task as running, we do this before switching to it
+	 * such that any running task will have this set.
+	 *
+	 * See the ttwu() WF_ON_CPU case and its ordering comment.
+	 */
+	WRITE_ONCE(next->on_cpu, 1);
+#endif
+}
+
+static inline void finish_task(struct task_struct *prev)
+{
+#ifdef CONFIG_SMP
+	/*
+	 * This must be the very last reference to @prev from this CPU. After
+	 * p->on_cpu is cleared, the task can be moved to a different CPU. We
+	 * must ensure this doesn't happen until the switch is completely
+	 * finished.
+	 *
+	 * In particular, the load of prev->state in finish_task_switch() must
+	 * happen before this.
+	 *
+	 * Pairs with the smp_cond_load_acquire() in try_to_wake_up().
+	 */
+	smp_store_release(&prev->on_cpu, 0);
+#endif
+}
+
+static inline void
+prepare_lock_switch(struct rq *rq, struct task_struct *next, struct rq_flags *rf)
+{
+	/*
+	 * Since the runqueue lock will be released by the next
+	 * task (which is an invalid locking op but in the case
+	 * of the scheduler it's an obvious special-case), so we
+	 * do an early lockdep release here:
+	 */
+	rq_unpin_lock(rq, rf);
+	spin_release(&rq->lock.dep_map, _THIS_IP_);
+#ifdef CONFIG_DEBUG_SPINLOCK
+	/* this is a valid case when another task releases the spinlock */
+	rq->lock.owner = next;
+#endif
+}
+
+static inline void finish_lock_switch(struct rq *rq)
+{
+	/*
+	 * If we are tracking spinlock dependencies then we have to
+	 * fix up the runqueue lock - which gets 'carried over' from
+	 * prev into current:
+	 */
+	spin_acquire(&rq->lock.dep_map, 0, 0, _THIS_IP_);
+	raw_spin_unlock_irq(&rq->lock);
+}
+
+/*
+ * NOP if the arch has not defined these:
+ */
+
+#ifndef prepare_arch_switch
+# define prepare_arch_switch(next)	do { } while (0)
+#endif
+
+#ifndef finish_arch_post_lock_switch
+# define finish_arch_post_lock_switch()	do { } while (0)
+#endif
+
+/**
+ * prepare_task_switch - prepare to switch tasks
+ * @rq: the runqueue preparing to switch
+ * @prev: the current task that is being switched out
+ * @next: the task we are going to switch to.
+ *
+ * This is called with the rq lock held and interrupts off. It must
+ * be paired with a subsequent finish_task_switch after the context
+ * switch.
+ *
+ * prepare_task_switch sets up locking and calls architecture specific
+ * hooks.
+ */
+static inline void
+prepare_task_switch(struct rq *rq, struct task_struct *prev,
+		    struct task_struct *next)
+{
+	kcov_prepare_switch(prev);
+	sched_info_switch(rq, prev, next);
+	perf_event_task_sched_out(prev, next);
+	rseq_preempt(prev);
+	fire_sched_out_preempt_notifiers(prev, next);
+	prepare_task(next);
+	prepare_arch_switch(next);
+}
+
+/**
+ * finish_task_switch - clean up after a task-switch
+ * @prev: the thread we just switched away from.
+ *
+ * finish_task_switch must be called after the context switch, paired
+ * with a prepare_task_switch call before the context switch.
+ * finish_task_switch will reconcile locking set up by prepare_task_switch,
+ * and do any other architecture-specific cleanup actions.
+ *
+ * Note that we may have delayed dropping an mm in context_switch(). If
+ * so, we finish that here outside of the runqueue lock. (Doing it
+ * with the lock held can cause deadlocks; see schedule() for
+ * details.)
+ *
+ * The context switch have flipped the stack from under us and restored the
+ * local variables which were saved when this task called schedule() in the
+ * past. prev == current is still correct but we need to recalculate this_rq
+ * because prev may have moved to another CPU.
+ */
+static struct rq *finish_task_switch(struct task_struct *prev)
+	__releases(rq->lock)
+{
+	struct rq *rq = this_rq();
+	struct mm_struct *mm = rq->prev_mm;
+	long prev_state;
+
+	/*
+	 * The previous task will have left us with a preempt_count of 2
+	 * because it left us after:
+	 *
+	 *	schedule()
+	 *	  preempt_disable();			// 1
+	 *	  __schedule()
+	 *	    raw_spin_lock_irq(&rq->lock)	// 2
+	 *
+	 * Also, see FORK_PREEMPT_COUNT.
+	 */
+	if (WARN_ONCE(preempt_count() != 2*PREEMPT_DISABLE_OFFSET,
+		      "corrupted preempt_count: %s/%d/0x%x\n",
+		      current->comm, current->pid, preempt_count()))
+		preempt_count_set(FORK_PREEMPT_COUNT);
+
+	rq->prev_mm = NULL;
+
+	/*
+	 * A task struct has one reference for the use as "current".
+	 * If a task dies, then it sets TASK_DEAD in tsk->state and calls
+	 * schedule one last time. The schedule call will never return, and
+	 * the scheduled task must drop that reference.
+	 *
+	 * We must observe prev->state before clearing prev->on_cpu (in
+	 * finish_task), otherwise a concurrent wakeup can get prev
+	 * running on another CPU and we could rave with its RUNNING -> DEAD
+	 * transition, resulting in a double drop.
+	 */
+	prev_state = prev->state;
+	vtime_task_switch(prev);
+	perf_event_task_sched_in(prev, current);
+	finish_task(prev);
+	finish_lock_switch(rq);
+	finish_arch_post_lock_switch();
+	kcov_finish_switch(current);
+
+	fire_sched_in_preempt_notifiers(current);
+	/*
+	 * When switching through a kernel thread, the loop in
+	 * membarrier_{private,global}_expedited() may have observed that
+	 * kernel thread and not issued an IPI. It is therefore possible to
+	 * schedule between user->kernel->user threads without passing though
+	 * switch_mm(). Membarrier requires a barrier after storing to
+	 * rq->curr, before returning to userspace, so provide them here:
+	 *
+	 * - a full memory barrier for {PRIVATE,GLOBAL}_EXPEDITED, implicitly
+	 *   provided by mmdrop(),
+	 * - a sync_core for SYNC_CORE.
+	 */
+	if (mm) {
+		membarrier_mm_sync_core_before_usermode(mm);
+		mmdrop(mm);
+	}
+	if (unlikely(prev_state == TASK_DEAD)) {
+		if (prev->sched_class->task_dead)
+			prev->sched_class->task_dead(prev);
+
+		/*
+		 * Remove function-return probe instances associated with this
+		 * task and put them back on the free list.
+		 */
+		kprobe_flush_task(prev);
+
+		/* Task is done with its stack. */
+		put_task_stack(prev);
+
+		put_task_struct_rcu_user(prev);
+	}
+
+	tick_nohz_task_switch();
+	return rq;
+}
+
+#ifdef CONFIG_SMP
+
+/* rq->lock is NOT held, but preemption is disabled */
+static void __balance_callback(struct rq *rq)
+{
+	struct callback_head *head, *next;
+	void (*func)(struct rq *rq);
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	head = rq->balance_callback;
+	rq->balance_callback = NULL;
+	while (head) {
+		func = (void (*)(struct rq *))head->func;
+		next = head->next;
+		head->next = NULL;
+		head = next;
+
+		func(rq);
+	}
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+}
+
+static inline void balance_callback(struct rq *rq)
+{
+	if (unlikely(rq->balance_callback))
+		__balance_callback(rq);
+}
+
+#else
+
+static inline void balance_callback(struct rq *rq)
+{
+}
+
+#endif
 //
 ///**
 // * schedule_tail - first thing a freshly forked thread must call.
@@ -3719,68 +3719,68 @@ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
 //
 //	calculate_sigpending();
 //}
-//
-///*
-// * context_switch - switch to the new MM and the new thread's register state.
-// */
-//static __always_inline struct rq *
-//context_switch(struct rq *rq, struct task_struct *prev,
-//	       struct task_struct *next, struct rq_flags *rf)
-//{
-//	prepare_task_switch(rq, prev, next);
-//
-//	/*
-//	 * For paravirt, this is coupled with an exit in switch_to to
-//	 * combine the page table reload and the switch backend into
-//	 * one hypercall.
-//	 */
-//	arch_start_context_switch(prev);
-//
-//	/*
-//	 * kernel -> kernel   lazy + transfer active
-//	 *   user -> kernel   lazy + mmgrab() active
-//	 *
-//	 * kernel ->   user   switch + mmdrop() active
-//	 *   user ->   user   switch
-//	 */
-//	if (!next->mm) {                                // to kernel
-//		enter_lazy_tlb(prev->active_mm, next);
-//
-//		next->active_mm = prev->active_mm;
-//		if (prev->mm)                           // from user
-//			mmgrab(prev->active_mm);
-//		else
-//			prev->active_mm = NULL;
-//	} else {                                        // to user
-//		membarrier_switch_mm(rq, prev->active_mm, next->mm);
-//		/*
-//		 * sys_membarrier() requires an smp_mb() between setting
-//		 * rq->curr / membarrier_switch_mm() and returning to userspace.
-//		 *
-//		 * The below provides this either through switch_mm(), or in
-//		 * case 'prev->active_mm == next->mm' through
-//		 * finish_task_switch()'s mmdrop().
-//		 */
-//		switch_mm_irqs_off(prev->active_mm, next->mm, next);
-//
-//		if (!prev->mm) {                        // from kernel
-//			/* will mmdrop() in finish_task_switch(). */
-//			rq->prev_mm = prev->active_mm;
-//			prev->active_mm = NULL;
-//		}
-//	}
-//
-//	rq->clock_update_flags &= ~(RQCF_ACT_SKIP|RQCF_REQ_SKIP);
-//
-//	prepare_lock_switch(rq, next, rf);
-//
-//	/* Here we just switch the register state and the stack. */
-//	switch_to(prev, next, prev);
-//	barrier();
-//
-//	return finish_task_switch(prev);
-//}
-//
+
+/*
+ * context_switch - switch to the new MM and the new thread's register state.
+ */
+static __always_inline struct rq *
+context_switch(struct rq *rq, struct task_struct *prev,
+	       struct task_struct *next, struct rq_flags *rf)
+{
+	prepare_task_switch(rq, prev, next);
+
+	/*
+	 * For paravirt, this is coupled with an exit in switch_to to
+	 * combine the page table reload and the switch backend into
+	 * one hypercall.
+	 */
+	arch_start_context_switch(prev);
+
+	/*
+	 * kernel -> kernel   lazy + transfer active
+	 *   user -> kernel   lazy + mmgrab() active
+	 *
+	 * kernel ->   user   switch + mmdrop() active
+	 *   user ->   user   switch
+	 */
+	if (!next->mm) {                                // to kernel
+		enter_lazy_tlb(prev->active_mm, next);
+
+		next->active_mm = prev->active_mm;
+		if (prev->mm)                           // from user
+			mmgrab(prev->active_mm);
+		else
+			prev->active_mm = NULL;
+	} else {                                        // to user
+		membarrier_switch_mm(rq, prev->active_mm, next->mm);
+		/*
+		 * sys_membarrier() requires an smp_mb() between setting
+		 * rq->curr / membarrier_switch_mm() and returning to userspace.
+		 *
+		 * The below provides this either through switch_mm(), or in
+		 * case 'prev->active_mm == next->mm' through
+		 * finish_task_switch()'s mmdrop().
+		 */
+		switch_mm_irqs_off(prev->active_mm, next->mm, next);
+
+		if (!prev->mm) {                        // from kernel
+			/* will mmdrop() in finish_task_switch(). */
+			rq->prev_mm = prev->active_mm;
+			prev->active_mm = NULL;
+		}
+	}
+
+	rq->clock_update_flags &= ~(RQCF_ACT_SKIP|RQCF_REQ_SKIP);
+
+	prepare_lock_switch(rq, next, rf);
+
+	/* Here we just switch the register state and the stack. */
+	switch_to(prev, next, prev);
+	barrier();
+
+	return finish_task_switch(prev);
+}
+
 ///*
 // * nr_running and nr_context_switches:
 // *
@@ -4152,82 +4152,82 @@ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
 //static inline void sched_tick_start(int cpu) { }
 //static inline void sched_tick_stop(int cpu) { }
 //#endif
-//
-//#if defined(CONFIG_PREEMPTION) && (defined(CONFIG_DEBUG_PREEMPT) || \
-//				defined(CONFIG_TRACE_PREEMPT_TOGGLE))
-///*
-// * If the value passed in is equal to the current preempt count
-// * then we just disabled preemption. Start timing the latency.
-// */
-//static inline void preempt_latency_start(int val)
-//{
-//	if (preempt_count() == val) {
-//		unsigned long ip = get_lock_parent_ip();
-//#ifdef CONFIG_DEBUG_PREEMPT
-//		current->preempt_disable_ip = ip;
-//#endif
-//		trace_preempt_off(CALLER_ADDR0, ip);
-//	}
-//}
-//
-//void preempt_count_add(int val)
-//{
-//#ifdef CONFIG_DEBUG_PREEMPT
-//	/*
-//	 * Underflow?
-//	 */
-//	if (DEBUG_LOCKS_WARN_ON((preempt_count() < 0)))
-//		return;
-//#endif
-//	__preempt_count_add(val);
-//#ifdef CONFIG_DEBUG_PREEMPT
-//	/*
-//	 * Spinlock count overflowing soon?
-//	 */
-//	DEBUG_LOCKS_WARN_ON((preempt_count() & PREEMPT_MASK) >=
-//				PREEMPT_MASK - 10);
-//#endif
-//	preempt_latency_start(val);
-//}
-//EXPORT_SYMBOL(preempt_count_add);
-//NOKPROBE_SYMBOL(preempt_count_add);
-//
-///*
-// * If the value passed in equals to the current preempt count
-// * then we just enabled preemption. Stop timing the latency.
-// */
-//static inline void preempt_latency_stop(int val)
-//{
-//	if (preempt_count() == val)
-//		trace_preempt_on(CALLER_ADDR0, get_lock_parent_ip());
-//}
-//
-//void preempt_count_sub(int val)
-//{
-//#ifdef CONFIG_DEBUG_PREEMPT
-//	/*
-//	 * Underflow?
-//	 */
-//	if (DEBUG_LOCKS_WARN_ON(val > preempt_count()))
-//		return;
-//	/*
-//	 * Is the spinlock portion underflowing?
-//	 */
-//	if (DEBUG_LOCKS_WARN_ON((val < PREEMPT_MASK) &&
-//			!(preempt_count() & PREEMPT_MASK)))
-//		return;
-//#endif
-//
-//	preempt_latency_stop(val);
-//	__preempt_count_sub(val);
-//}
-//EXPORT_SYMBOL(preempt_count_sub);
-//NOKPROBE_SYMBOL(preempt_count_sub);
-//
-//#else
-//static inline void preempt_latency_start(int val) { }
-//static inline void preempt_latency_stop(int val) { }
-//#endif
+
+#if defined(CONFIG_PREEMPTION) && (defined(CONFIG_DEBUG_PREEMPT) || \
+				defined(CONFIG_TRACE_PREEMPT_TOGGLE))
+/*
+ * If the value passed in is equal to the current preempt count
+ * then we just disabled preemption. Start timing the latency.
+ */
+static inline void preempt_latency_start(int val)
+{
+	if (preempt_count() == val) {
+		unsigned long ip = get_lock_parent_ip();
+#ifdef CONFIG_DEBUG_PREEMPT
+		current->preempt_disable_ip = ip;
+#endif
+		trace_preempt_off(CALLER_ADDR0, ip);
+	}
+}
+
+void preempt_count_add(int val)
+{
+#ifdef CONFIG_DEBUG_PREEMPT
+	/*
+	 * Underflow?
+	 */
+	if (DEBUG_LOCKS_WARN_ON((preempt_count() < 0)))
+		return;
+#endif
+	__preempt_count_add(val);
+#ifdef CONFIG_DEBUG_PREEMPT
+	/*
+	 * Spinlock count overflowing soon?
+	 */
+	DEBUG_LOCKS_WARN_ON((preempt_count() & PREEMPT_MASK) >=
+				PREEMPT_MASK - 10);
+#endif
+	preempt_latency_start(val);
+}
+EXPORT_SYMBOL(preempt_count_add);
+NOKPROBE_SYMBOL(preempt_count_add);
+
+/*
+ * If the value passed in equals to the current preempt count
+ * then we just enabled preemption. Stop timing the latency.
+ */
+static inline void preempt_latency_stop(int val)
+{
+	if (preempt_count() == val)
+		trace_preempt_on(CALLER_ADDR0, get_lock_parent_ip());
+}
+
+void preempt_count_sub(int val)
+{
+#ifdef CONFIG_DEBUG_PREEMPT
+	/*
+	 * Underflow?
+	 */
+	if (DEBUG_LOCKS_WARN_ON(val > preempt_count()))
+		return;
+	/*
+	 * Is the spinlock portion underflowing?
+	 */
+	if (DEBUG_LOCKS_WARN_ON((val < PREEMPT_MASK) &&
+			!(preempt_count() & PREEMPT_MASK)))
+		return;
+#endif
+
+	preempt_latency_stop(val);
+	__preempt_count_sub(val);
+}
+EXPORT_SYMBOL(preempt_count_sub);
+NOKPROBE_SYMBOL(preempt_count_sub);
+
+#else
+static inline void preempt_latency_start(int val) { }
+static inline void preempt_latency_stop(int val) { }
+#endif
 
 static inline unsigned long get_preempt_disable_ip(struct task_struct *p)
 {
@@ -4238,301 +4238,301 @@ static inline unsigned long get_preempt_disable_ip(struct task_struct *p)
 #endif
 }
 
-///*
-// * Print scheduling while atomic bug:
-// */
-//static noinline void __schedule_bug(struct task_struct *prev)
-//{
-//	/* Save this before calling printk(), since that will clobber it */
-//	unsigned long preempt_disable_ip = get_preempt_disable_ip(current);
-//
-//	if (oops_in_progress)
-//		return;
-//
-//	printk(KERN_ERR "BUG: scheduling while atomic: %s/%d/0x%08x\n",
-//		prev->comm, prev->pid, preempt_count());
-//
-//	debug_show_held_locks(prev);
-//	print_modules();
-//	if (irqs_disabled())
-//		print_irqtrace_events(prev);
-//	if (IS_ENABLED(CONFIG_DEBUG_PREEMPT)
-//	    && in_atomic_preempt_off()) {
-//		pr_err("Preemption disabled at:");
-//		print_ip_sym(KERN_ERR, preempt_disable_ip);
-//	}
-//	if (panic_on_warn)
-//		panic("scheduling while atomic\n");
-//
-//	dump_stack();
-//	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
-//}
-//
-///*
-// * Various schedule()-time debugging checks and statistics:
-// */
-//static inline void schedule_debug(struct task_struct *prev, bool preempt)
-//{
-//#ifdef CONFIG_SCHED_STACK_END_CHECK
-//	if (task_stack_end_corrupted(prev))
-//		panic("corrupted stack end detected inside scheduler\n");
-//
-//	if (task_scs_end_corrupted(prev))
-//		panic("corrupted shadow stack detected inside scheduler\n");
-//#endif
-//
-//#ifdef CONFIG_DEBUG_ATOMIC_SLEEP
-//	if (!preempt && prev->state && prev->non_block_count) {
-//		printk(KERN_ERR "BUG: scheduling in a non-blocking section: %s/%d/%i\n",
-//			prev->comm, prev->pid, prev->non_block_count);
-//		dump_stack();
-//		add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
-//	}
-//#endif
-//
-//	if (unlikely(in_atomic_preempt_off())) {
-//		__schedule_bug(prev);
-//		preempt_count_set(PREEMPT_DISABLED);
-//	}
-//	rcu_sleep_check();
-//
-//	profile_hit(SCHED_PROFILING, __builtin_return_address(0));
-//
-//	schedstat_inc(this_rq()->sched_count);
-//}
-//
-//static void put_prev_task_balance(struct rq *rq, struct task_struct *prev,
-//				  struct rq_flags *rf)
-//{
-//#ifdef CONFIG_SMP
-//	const struct sched_class *class;
-//	/*
-//	 * We must do the balancing pass before put_prev_task(), such
-//	 * that when we release the rq->lock the task is in the same
-//	 * state as before we took rq->lock.
-//	 *
-//	 * We can terminate the balance pass as soon as we know there is
-//	 * a runnable task of @class priority or higher.
-//	 */
-//	for_class_range(class, prev->sched_class, &idle_sched_class) {
-//		if (class->balance(rq, prev, rf))
-//			break;
-//	}
-//#endif
-//
-//	put_prev_task(rq, prev);
-//}
-//
-///*
-// * Pick up the highest-prio task:
-// */
-//static inline struct task_struct *
-//pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
-//{
-//	const struct sched_class *class;
-//	struct task_struct *p;
-//
-//	/*
-//	 * Optimization: we know that if all tasks are in the fair class we can
-//	 * call that function directly, but only if the @prev task wasn't of a
-//	 * higher scheduling class, because otherwise those loose the
-//	 * opportunity to pull in more work from other CPUs.
-//	 */
-//	if (likely(prev->sched_class <= &fair_sched_class &&
-//		   rq->nr_running == rq->cfs.h_nr_running)) {
-//
-//		p = pick_next_task_fair(rq, prev, rf);
-//		if (unlikely(p == RETRY_TASK))
-//			goto restart;
-//
-//		/* Assumes fair_sched_class->next == idle_sched_class */
-//		if (!p) {
-//			put_prev_task(rq, prev);
-//			p = pick_next_task_idle(rq);
-//		}
-//
-//		return p;
-//	}
-//
-//restart:
-//	put_prev_task_balance(rq, prev, rf);
-//
-//	for_each_class(class) {
-//		p = class->pick_next_task(rq);
-//		if (p)
-//			return p;
-//	}
-//
-//	/* The idle class should always have a runnable task: */
-//	BUG();
-//}
-//
-///*
-// * __schedule() is the main scheduler function.
-// *
-// * The main means of driving the scheduler and thus entering this function are:
-// *
-// *   1. Explicit blocking: mutex, semaphore, waitqueue, etc.
-// *
-// *   2. TIF_NEED_RESCHED flag is checked on interrupt and userspace return
-// *      paths. For example, see arch/x86/entry_64.S.
-// *
-// *      To drive preemption between tasks, the scheduler sets the flag in timer
-// *      interrupt handler scheduler_tick().
-// *
-// *   3. Wakeups don't really cause entry into schedule(). They add a
-// *      task to the run-queue and that's it.
-// *
-// *      Now, if the new task added to the run-queue preempts the current
-// *      task, then the wakeup sets TIF_NEED_RESCHED and schedule() gets
-// *      called on the nearest possible occasion:
-// *
-// *       - If the kernel is preemptible (CONFIG_PREEMPTION=y):
-// *
-// *         - in syscall or exception context, at the next outmost
-// *           preempt_enable(). (this might be as soon as the wake_up()'s
-// *           spin_unlock()!)
-// *
-// *         - in IRQ context, return from interrupt-handler to
-// *           preemptible context
-// *
-// *       - If the kernel is not preemptible (CONFIG_PREEMPTION is not set)
-// *         then at the next:
-// *
-// *          - cond_resched() call
-// *          - explicit schedule() call
-// *          - return from syscall or exception to user-space
-// *          - return from interrupt-handler to user-space
-// *
-// * WARNING: must be called with preemption disabled!
-// */
-//static void __sched notrace __schedule(bool preempt)
-//{
-//	struct task_struct *prev, *next;
-//	unsigned long *switch_count;
-//	unsigned long prev_state;
-//	struct rq_flags rf;
-//	struct rq *rq;
-//	int cpu;
-//
-//	cpu = smp_processor_id();
-//	rq = cpu_rq(cpu);
-//	prev = rq->curr;
-//
-//	schedule_debug(prev, preempt);
-//
-//	if (sched_feat(HRTICK))
-//		hrtick_clear(rq);
-//
-//	local_irq_disable();
-//	rcu_note_context_switch(preempt);
-//
-//	/*
-//	 * Make sure that signal_pending_state()->signal_pending() below
-//	 * can't be reordered with __set_current_state(TASK_INTERRUPTIBLE)
-//	 * done by the caller to avoid the race with signal_wake_up():
-//	 *
-//	 * __set_current_state(@state)		signal_wake_up()
-//	 * schedule()				  set_tsk_thread_flag(p, TIF_SIGPENDING)
-//	 *					  wake_up_state(p, state)
-//	 *   LOCK rq->lock			    LOCK p->pi_state
-//	 *   smp_mb__after_spinlock()		    smp_mb__after_spinlock()
-//	 *     if (signal_pending_state())	    if (p->state & @state)
-//	 *
-//	 * Also, the membarrier system call requires a full memory barrier
-//	 * after coming from user-space, before storing to rq->curr.
-//	 */
-//	rq_lock(rq, &rf);
-//	smp_mb__after_spinlock();
-//
-//	/* Promote REQ to ACT */
-//	rq->clock_update_flags <<= 1;
-//	update_rq_clock(rq);
-//
-//	switch_count = &prev->nivcsw;
-//
-//	/*
-//	 * We must load prev->state once (task_struct::state is volatile), such
-//	 * that:
-//	 *
-//	 *  - we form a control dependency vs deactivate_task() below.
-//	 *  - ptrace_{,un}freeze_traced() can change ->state underneath us.
-//	 */
-//	prev_state = prev->state;
-//	if (!preempt && prev_state) {
-//		if (signal_pending_state(prev_state, prev)) {
-//			prev->state = TASK_RUNNING;
-//		} else {
-//			prev->sched_contributes_to_load =
-//				(prev_state & TASK_UNINTERRUPTIBLE) &&
-//				!(prev_state & TASK_NOLOAD) &&
-//				!(prev->flags & PF_FROZEN);
-//
-//			if (prev->sched_contributes_to_load)
-//				rq->nr_uninterruptible++;
-//
-//			/*
-//			 * __schedule()			ttwu()
-//			 *   prev_state = prev->state;    if (p->on_rq && ...)
-//			 *   if (prev_state)		    goto out;
-//			 *     p->on_rq = 0;		  smp_acquire__after_ctrl_dep();
-//			 *				  p->state = TASK_WAKING
-//			 *
-//			 * Where __schedule() and ttwu() have matching control dependencies.
-//			 *
-//			 * After this, schedule() must not care about p->state any more.
-//			 */
-//			deactivate_task(rq, prev, DEQUEUE_SLEEP | DEQUEUE_NOCLOCK);
-//
-//			if (prev->in_iowait) {
-//				atomic_inc(&rq->nr_iowait);
-//				delayacct_blkio_start();
-//			}
-//		}
-//		switch_count = &prev->nvcsw;
-//	}
-//
-//	next = pick_next_task(rq, prev, &rf);
-//	clear_tsk_need_resched(prev);
-//	clear_preempt_need_resched();
-//
-//	if (likely(prev != next)) {
-//		rq->nr_switches++;
-//		/*
-//		 * RCU users of rcu_dereference(rq->curr) may not see
-//		 * changes to task_struct made by pick_next_task().
-//		 */
-//		RCU_INIT_POINTER(rq->curr, next);
-//		/*
-//		 * The membarrier system call requires each architecture
-//		 * to have a full memory barrier after updating
-//		 * rq->curr, before returning to user-space.
-//		 *
-//		 * Here are the schemes providing that barrier on the
-//		 * various architectures:
-//		 * - mm ? switch_mm() : mmdrop() for x86, s390, sparc, PowerPC.
-//		 *   switch_mm() rely on membarrier_arch_switch_mm() on PowerPC.
-//		 * - finish_lock_switch() for weakly-ordered
-//		 *   architectures where spin_unlock is a full barrier,
-//		 * - switch_to() for arm64 (weakly-ordered, spin_unlock
-//		 *   is a RELEASE barrier),
-//		 */
-//		++*switch_count;
-//
-//		psi_sched_switch(prev, next, !task_on_rq_queued(prev));
-//
-//		trace_sched_switch(preempt, prev, next);
-//
-//		/* Also unlocks the rq: */
-//		rq = context_switch(rq, prev, next, &rf);
-//	} else {
-//		rq->clock_update_flags &= ~(RQCF_ACT_SKIP|RQCF_REQ_SKIP);
-//		rq_unlock_irq(rq, &rf);
-//	}
-//
-//	balance_callback(rq);
-//}
-//
+/*
+ * Print scheduling while atomic bug:
+ */
+static noinline void __schedule_bug(struct task_struct *prev)
+{
+	/* Save this before calling printk(), since that will clobber it */
+	unsigned long preempt_disable_ip = get_preempt_disable_ip(current);
+
+	if (oops_in_progress)
+		return;
+
+	printk(KERN_ERR "BUG: scheduling while atomic: %s/%d/0x%08x\n",
+		prev->comm, prev->pid, preempt_count());
+
+	debug_show_held_locks(prev);
+	print_modules();
+	if (irqs_disabled())
+		print_irqtrace_events(prev);
+	if (IS_ENABLED(CONFIG_DEBUG_PREEMPT)
+	    && in_atomic_preempt_off()) {
+		pr_err("Preemption disabled at:");
+		print_ip_sym(KERN_ERR, preempt_disable_ip);
+	}
+	if (panic_on_warn)
+		panic("scheduling while atomic\n");
+
+	dump_stack();
+	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
+}
+
+/*
+ * Various schedule()-time debugging checks and statistics:
+ */
+static inline void schedule_debug(struct task_struct *prev, bool preempt)
+{
+#ifdef CONFIG_SCHED_STACK_END_CHECK
+	if (task_stack_end_corrupted(prev))
+		panic("corrupted stack end detected inside scheduler\n");
+
+	if (task_scs_end_corrupted(prev))
+		panic("corrupted shadow stack detected inside scheduler\n");
+#endif
+
+#ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+	if (!preempt && prev->state && prev->non_block_count) {
+		printk(KERN_ERR "BUG: scheduling in a non-blocking section: %s/%d/%i\n",
+			prev->comm, prev->pid, prev->non_block_count);
+		dump_stack();
+		add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
+	}
+#endif
+
+	if (unlikely(in_atomic_preempt_off())) {
+		__schedule_bug(prev);
+		preempt_count_set(PREEMPT_DISABLED);
+	}
+	rcu_sleep_check();
+
+	profile_hit(SCHED_PROFILING, __builtin_return_address(0));
+
+	schedstat_inc(this_rq()->sched_count);
+}
+
+static void put_prev_task_balance(struct rq *rq, struct task_struct *prev,
+				  struct rq_flags *rf)
+{
+#ifdef CONFIG_SMP
+	const struct sched_class *class;
+	/*
+	 * We must do the balancing pass before put_prev_task(), such
+	 * that when we release the rq->lock the task is in the same
+	 * state as before we took rq->lock.
+	 *
+	 * We can terminate the balance pass as soon as we know there is
+	 * a runnable task of @class priority or higher.
+	 */
+	for_class_range(class, prev->sched_class, &idle_sched_class) {
+		if (class->balance(rq, prev, rf))
+			break;
+	}
+#endif
+
+	put_prev_task(rq, prev);
+}
+
+/*
+ * Pick up the highest-prio task:
+ */
+static inline struct task_struct *
+pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
+{
+	const struct sched_class *class;
+	struct task_struct *p;
+
+	/*
+	 * Optimization: we know that if all tasks are in the fair class we can
+	 * call that function directly, but only if the @prev task wasn't of a
+	 * higher scheduling class, because otherwise those loose the
+	 * opportunity to pull in more work from other CPUs.
+	 */
+	if (likely(prev->sched_class <= &fair_sched_class &&
+		   rq->nr_running == rq->cfs.h_nr_running)) {
+
+		p = pick_next_task_fair(rq, prev, rf);
+		if (unlikely(p == RETRY_TASK))
+			goto restart;
+
+		/* Assumes fair_sched_class->next == idle_sched_class */
+		if (!p) {
+			put_prev_task(rq, prev);
+			p = pick_next_task_idle(rq);
+		}
+
+		return p;
+	}
+
+restart:
+	put_prev_task_balance(rq, prev, rf);
+
+	for_each_class(class) {
+		p = class->pick_next_task(rq);
+		if (p)
+			return p;
+	}
+
+	/* The idle class should always have a runnable task: */
+	BUG();
+}
+
+/*
+ * __schedule() is the main scheduler function.
+ *
+ * The main means of driving the scheduler and thus entering this function are:
+ *
+ *   1. Explicit blocking: mutex, semaphore, waitqueue, etc.
+ *
+ *   2. TIF_NEED_RESCHED flag is checked on interrupt and userspace return
+ *      paths. For example, see arch/x86/entry_64.S.
+ *
+ *      To drive preemption between tasks, the scheduler sets the flag in timer
+ *      interrupt handler scheduler_tick().
+ *
+ *   3. Wakeups don't really cause entry into schedule(). They add a
+ *      task to the run-queue and that's it.
+ *
+ *      Now, if the new task added to the run-queue preempts the current
+ *      task, then the wakeup sets TIF_NEED_RESCHED and schedule() gets
+ *      called on the nearest possible occasion:
+ *
+ *       - If the kernel is preemptible (CONFIG_PREEMPTION=y):
+ *
+ *         - in syscall or exception context, at the next outmost
+ *           preempt_enable(). (this might be as soon as the wake_up()'s
+ *           spin_unlock()!)
+ *
+ *         - in IRQ context, return from interrupt-handler to
+ *           preemptible context
+ *
+ *       - If the kernel is not preemptible (CONFIG_PREEMPTION is not set)
+ *         then at the next:
+ *
+ *          - cond_resched() call
+ *          - explicit schedule() call
+ *          - return from syscall or exception to user-space
+ *          - return from interrupt-handler to user-space
+ *
+ * WARNING: must be called with preemption disabled!
+ */
+static void __sched notrace __schedule(bool preempt)
+{
+	struct task_struct *prev, *next;
+	unsigned long *switch_count;
+	unsigned long prev_state;
+	struct rq_flags rf;
+	struct rq *rq;
+	int cpu;
+
+	cpu = smp_processor_id();
+	rq = cpu_rq(cpu);
+	prev = rq->curr;
+
+	schedule_debug(prev, preempt);
+
+	if (sched_feat(HRTICK))
+		hrtick_clear(rq);
+
+	local_irq_disable();
+	rcu_note_context_switch(preempt);
+
+	/*
+	 * Make sure that signal_pending_state()->signal_pending() below
+	 * can't be reordered with __set_current_state(TASK_INTERRUPTIBLE)
+	 * done by the caller to avoid the race with signal_wake_up():
+	 *
+	 * __set_current_state(@state)		signal_wake_up()
+	 * schedule()				  set_tsk_thread_flag(p, TIF_SIGPENDING)
+	 *					  wake_up_state(p, state)
+	 *   LOCK rq->lock			    LOCK p->pi_state
+	 *   smp_mb__after_spinlock()		    smp_mb__after_spinlock()
+	 *     if (signal_pending_state())	    if (p->state & @state)
+	 *
+	 * Also, the membarrier system call requires a full memory barrier
+	 * after coming from user-space, before storing to rq->curr.
+	 */
+	rq_lock(rq, &rf);
+	smp_mb__after_spinlock();
+
+	/* Promote REQ to ACT */
+	rq->clock_update_flags <<= 1;
+	update_rq_clock(rq);
+
+	switch_count = &prev->nivcsw;
+
+	/*
+	 * We must load prev->state once (task_struct::state is volatile), such
+	 * that:
+	 *
+	 *  - we form a control dependency vs deactivate_task() below.
+	 *  - ptrace_{,un}freeze_traced() can change ->state underneath us.
+	 */
+	prev_state = prev->state;
+	if (!preempt && prev_state) {
+		if (signal_pending_state(prev_state, prev)) {
+			prev->state = TASK_RUNNING;
+		} else {
+			prev->sched_contributes_to_load =
+				(prev_state & TASK_UNINTERRUPTIBLE) &&
+				!(prev_state & TASK_NOLOAD) &&
+				!(prev->flags & PF_FROZEN);
+
+			if (prev->sched_contributes_to_load)
+				rq->nr_uninterruptible++;
+
+			/*
+			 * __schedule()			ttwu()
+			 *   prev_state = prev->state;    if (p->on_rq && ...)
+			 *   if (prev_state)		    goto out;
+			 *     p->on_rq = 0;		  smp_acquire__after_ctrl_dep();
+			 *				  p->state = TASK_WAKING
+			 *
+			 * Where __schedule() and ttwu() have matching control dependencies.
+			 *
+			 * After this, schedule() must not care about p->state any more.
+			 */
+			deactivate_task(rq, prev, DEQUEUE_SLEEP | DEQUEUE_NOCLOCK);
+
+			if (prev->in_iowait) {
+				atomic_inc(&rq->nr_iowait);
+				delayacct_blkio_start();
+			}
+		}
+		switch_count = &prev->nvcsw;
+	}
+
+	next = pick_next_task(rq, prev, &rf);
+	clear_tsk_need_resched(prev);
+	clear_preempt_need_resched();
+
+	if (likely(prev != next)) {
+		rq->nr_switches++;
+		/*
+		 * RCU users of rcu_dereference(rq->curr) may not see
+		 * changes to task_struct made by pick_next_task().
+		 */
+		RCU_INIT_POINTER(rq->curr, next);
+		/*
+		 * The membarrier system call requires each architecture
+		 * to have a full memory barrier after updating
+		 * rq->curr, before returning to user-space.
+		 *
+		 * Here are the schemes providing that barrier on the
+		 * various architectures:
+		 * - mm ? switch_mm() : mmdrop() for x86, s390, sparc, PowerPC.
+		 *   switch_mm() rely on membarrier_arch_switch_mm() on PowerPC.
+		 * - finish_lock_switch() for weakly-ordered
+		 *   architectures where spin_unlock is a full barrier,
+		 * - switch_to() for arm64 (weakly-ordered, spin_unlock
+		 *   is a RELEASE barrier),
+		 */
+		++*switch_count;
+
+		psi_sched_switch(prev, next, !task_on_rq_queued(prev));
+
+		trace_sched_switch(preempt, prev, next);
+
+		/* Also unlocks the rq: */
+		rq = context_switch(rq, prev, next, &rf);
+	} else {
+		rq->clock_update_flags &= ~(RQCF_ACT_SKIP|RQCF_REQ_SKIP);
+		rq_unlock_irq(rq, &rf);
+	}
+
+	balance_callback(rq);
+}
+
 //void __noreturn do_task_dead(void)
 //{
 //	/* Causes final put_task_struct in finish_task_switch(): */
@@ -4661,36 +4661,36 @@ static inline unsigned long get_preempt_disable_ip(struct task_struct *p)
 //	schedule();
 //	preempt_disable();
 //}
-//
-//static void __sched notrace preempt_schedule_common(void)
-//{
-//	do {
-//		/*
-//		 * Because the function tracer can trace preempt_count_sub()
-//		 * and it also uses preempt_enable/disable_notrace(), if
-//		 * NEED_RESCHED is set, the preempt_enable_notrace() called
-//		 * by the function tracer will call this function again and
-//		 * cause infinite recursion.
-//		 *
-//		 * Preemption must be disabled here before the function
-//		 * tracer can trace. Break up preempt_disable() into two
-//		 * calls. One to disable preemption without fear of being
-//		 * traced. The other to still record the preemption latency,
-//		 * which can also be traced by the function tracer.
-//		 */
-//		preempt_disable_notrace();
-//		preempt_latency_start(1);
-//		__schedule(true);
-//		preempt_latency_stop(1);
-//		preempt_enable_no_resched_notrace();
-//
-//		/*
-//		 * Check again in case we missed a preemption opportunity
-//		 * between schedule and now.
-//		 */
-//	} while (need_resched());
-//}
-//
+
+static void __sched notrace preempt_schedule_common(void)
+{
+	do {
+		/*
+		 * Because the function tracer can trace preempt_count_sub()
+		 * and it also uses preempt_enable/disable_notrace(), if
+		 * NEED_RESCHED is set, the preempt_enable_notrace() called
+		 * by the function tracer will call this function again and
+		 * cause infinite recursion.
+		 *
+		 * Preemption must be disabled here before the function
+		 * tracer can trace. Break up preempt_disable() into two
+		 * calls. One to disable preemption without fear of being
+		 * traced. The other to still record the preemption latency,
+		 * which can also be traced by the function tracer.
+		 */
+		preempt_disable_notrace();
+		preempt_latency_start(1);
+		__schedule(true);
+		preempt_latency_stop(1);
+		preempt_enable_no_resched_notrace();
+
+		/*
+		 * Check again in case we missed a preemption opportunity
+		 * between schedule and now.
+		 */
+	} while (need_resched());
+}
+
 //#ifdef CONFIG_PREEMPTION
 ///*
 // * This is the entry point to schedule() from in-kernel preemption
@@ -6111,20 +6111,20 @@ static inline unsigned long get_preempt_disable_ip(struct task_struct *p)
 //	do_sched_yield();
 //	return 0;
 //}
-//
-//#ifndef CONFIG_PREEMPTION
-//int __sched _cond_resched(void)
-//{
-//	if (should_resched(0)) {
-//		preempt_schedule_common();
-//		return 1;
-//	}
-//	rcu_all_qs();
-//	return 0;
-//}
-//EXPORT_SYMBOL(_cond_resched);
-//#endif
-//
+
+#ifndef CONFIG_PREEMPTION
+int __sched _cond_resched(void)
+{
+	if (should_resched(0)) {
+		preempt_schedule_common();
+		return 1;
+	}
+	rcu_all_qs();
+	return 0;
+}
+EXPORT_SYMBOL(_cond_resched);
+#endif
+
 ///*
 // * __cond_resched_lock() - if a reschedule is pending, drop the given lock,
 // * call schedule, and on return reacquire the lock.

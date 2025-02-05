@@ -136,16 +136,3 @@ void dump_page(struct page *page, const char *reason)
 {
     booter_panic("No impl 'dump_page'.");
 }
-
-int _cond_resched(void)
-{
-    booter_panic("No impl '_cond_resched'.");
-    return 0;
-}
-EXPORT_SYMBOL(_cond_resched);
-
-void panic(const char *fmt, ...)
-{
-    booter_panic("No impl 'panic'.");
-    do {} while(1);
-}

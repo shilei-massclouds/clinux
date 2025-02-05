@@ -37,7 +37,8 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter lib \
-	init_base \
+	base_init \
+	hrtimer \
 	early_fdt params \
 	sched wait \
 	memblock bootmem paging \
