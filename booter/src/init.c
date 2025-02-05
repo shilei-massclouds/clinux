@@ -4,6 +4,7 @@
 #include <linux/cache.h>
 #include <linux/jiffies.h>
 #include <asm/sbi.h>
+#include <asm/current.h>
 #include <cl_hook.h>
 #include "booter.h"
 

@@ -142,19 +142,10 @@ int _cond_resched(void)
     booter_panic("No impl '_cond_resched'.");
     return 0;
 }
+EXPORT_SYMBOL(_cond_resched);
 
 void panic(const char *fmt, ...)
 {
     booter_panic("No impl 'panic'.");
     do {} while(1);
-}
-
-void __init_waitqueue_head(struct wait_queue_head *wq_head, const char *name, struct lock_class_key *key)
-{
-    booter_panic("No impl '__init_waitqueue_head'.");
-}
-
-void ___might_sleep(const char *file, int line, int preempt_offset)
-{
-    booter_panic("No impl '___might_sleep'.");
 }

@@ -5,10 +5,10 @@
 #include "../../booter/src/booter.h"
 
 int
-cl_user_init(void)
+cl_wait_init(void)
 {
-    sbi_puts("module[user]: init begin ...\n");
-    sbi_puts("module[user]: init end!\n");
+    sbi_puts("module[wait]: init begin ...\n");
+    sbi_puts("module[wait]: init end!\n");
     return 0;
 }
-EXPORT_SYMBOL(cl_user_init);
+EXPORT_SYMBOL(cl_wait_init);

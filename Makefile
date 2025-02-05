@@ -38,10 +38,10 @@ QEMU_ARGS += \
 components := \
 	prebuilt booter lib \
 	early_fdt params \
-	user user_namespace \
+	sched wait \
 	memblock bootmem paging \
 	spinlock semaphore \
-	early_printk printk
+	early_printk
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init

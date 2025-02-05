@@ -6047,7 +6047,9 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 		 */
 		if (!(pfn & (pageblock_nr_pages - 1))) {
 			set_pageblock_migratetype(page, MIGRATE_MOVABLE);
+    printk("==============> step1\n");
 			cond_resched();
+    printk("==============> step2\n");
 		}
 		pfn++;
 	}

@@ -30,7 +30,9 @@ void kfree(const void *objp)
     booter_panic("No impl 'kfree'.");
 }
 
+/*
 void dump_stack(void)
 {
     booter_panic("No impl 'dump_stack'.");
 }
+*/

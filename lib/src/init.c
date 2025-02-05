@@ -2,7 +2,16 @@
 
 #include <linux/types.h>
 #include <linux/export.h>
+#include <linux/sched.h>
+#include <linux/sched/debug.h>
 #include "../../booter/src/booter.h"
+
+/*
+ * Low level drivers may need that to know if they can schedule in
+ * their unblank() callback or not. So let's export it.
+ */
+int oops_in_progress;
+EXPORT_SYMBOL(oops_in_progress);
 
 #if defined(CONFIG_PROVE_LOCKING) || defined(CONFIG_DEBUG_ATOMIC_SLEEP)
 void __might_fault(const char *file, int line)
@@ -27,3 +36,36 @@ int cl_lib_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_lib_init);
+
+void print_worker_info(const char *log_lvl, struct task_struct *task)
+{
+    booter_panic("No impl 'print_worker_info'.");
+}
+
+int __kernel_text_address(unsigned long addr)
+{
+    booter_panic("No impl '__kernel_text_address'.");
+}
+
+int in_sched_functions(unsigned long addr)
+{
+  return in_lock_functions(addr) ||
+      (addr >= (unsigned long)__sched_text_start
+      && addr < (unsigned long)__sched_text_end);
+}
+
+const char *print_tainted(void)
+{
+    booter_panic("No impl 'print_tainted'.");
+}
+
+bool ns_capable(struct user_namespace *ns, int cap)
+{
+    booter_panic("No impl 'ns_capable'.");
+}
+EXPORT_SYMBOL(ns_capable);
+
+void key_put(struct key *key)
+{
+    booter_panic("No impl 'key_put'.");
+}

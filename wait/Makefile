@@ -1,4 +1,4 @@
 # SPDX-License-Identifier: GPL-2.0
 
 obj_y := init.o
-obj_y += user_namespace.o
+obj_y += wait.o

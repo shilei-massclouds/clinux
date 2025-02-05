@@ -16,10 +16,12 @@ cl_printk_init(void)
 }
 EXPORT_SYMBOL(cl_printk_init);
 
+/*
 int __sched _cond_resched(void)
 {
     booter_panic("No impl '_cond_resched'.");
 }
+*/
 
 void console_sysfs_notify(void)
 {
@@ -31,6 +33,7 @@ bool irq_work_queue(struct irq_work *work)
     booter_panic("No impl 'irq_work_queue'.");
 }
 
+/*
 void * __init memblock_alloc_try_nid(
             phys_addr_t size, phys_addr_t align,
             phys_addr_t min_addr, phys_addr_t max_addr,
@@ -38,16 +41,19 @@ void * __init memblock_alloc_try_nid(
 {
     booter_panic("No impl 'memblock_alloc_try_nid'.");
 }
+*/
 
 void __might_sleep(const char *file, int line, int preempt_offset)
 {
     booter_panic("No impl '__might_sleep'.");
 }
 
+/*
 void ___might_sleep(const char *file, int line, int preempt_offset)
 {
     booter_panic("No impl '___might_sleep'.");
 }
+*/
 
 void __init n_tty_init(void)
 {
