@@ -41,6 +41,7 @@ components := \
 	hrtimer \
 	early_fdt params \
 	sched wait \
+	resource \
 	memblock bootmem paging \
 	spinlock semaphore \
 	early_printk

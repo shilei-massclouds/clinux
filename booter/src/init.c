@@ -19,7 +19,7 @@ void
 start_kernel(void)
 {
     cl_init();
-    booter_panic("Kernel has been terminated!");
+    booter_panic("Kernel has been terminated normally!");
 }
 
 void sbi_puts(const char *s)
