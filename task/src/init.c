@@ -13,17 +13,37 @@
 #include "../../booter/src/booter.h"
 #include "../../sched/src/sched.h"
 
-int
-cl_base_init_init(void)
+static void
+setup_task(void)
 {
-    sbi_puts("module[base_init]: init begin ...\n");
-    riscv_current_is_tp = &init_task;
-    sbi_puts("module[base_init]: init end!\n");
+    static bool inited = false;
+    if (!inited) {
+        riscv_current_is_tp = &init_task;
+        init_task.thread_info.cpu = 0;
+        inited = true;
+    }
+}
+
+int
+cl_task_init(void)
+{
+    sbi_puts("module[task]: init begin ...\n");
+    setup_task();
+    sbi_puts("module[task]: init end!\n");
     return 0;
 }
-EXPORT_SYMBOL(cl_base_init_init);
+EXPORT_SYMBOL(cl_task_init);
 
-DEFINE_ENABLE_FUNC(base_init_init);
+DEFINE_ENABLE_FUNC(task);
+
+void set_task_stack_end_magic(struct task_struct *tsk)
+{
+    unsigned long *stackend;
+
+    stackend = end_of_stack(tsk);
+    *stackend = STACK_END_MAGIC;    /* for overflow detection */
+}
+EXPORT_SYMBOL(set_task_stack_end_magic);
 
 long do_no_restart_syscall(struct restart_block *param)
 {
@@ -228,4 +248,3 @@ struct user_struct root_user = {
     .ratelimit  = RATELIMIT_STATE_INIT(root_user.ratelimit, 0, 0),
 };
 
-DEFINE_ENABLE_FUNC(base_init);

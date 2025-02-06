@@ -50,4 +50,7 @@
     extern void enable_##name(); \
     enable_##name();
 
+// Alias for ENABLE_COMPONENT
+#define REQUIRE_COMPONENT(name) ENABLE_COMPONENT(name)
+
 #endif /* _CL_HOOK_H_ */

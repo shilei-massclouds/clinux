@@ -13,4 +13,6 @@ extern int do_early_param(char *param, char *val,
 extern void setup_kernel_in_mm(void);
 extern void setup_bootmem(void);
 
+extern void set_task_stack_end_magic(struct task_struct *tsk);
+
 #endif /* _CL_TYPES_H_ */

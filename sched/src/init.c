@@ -21,7 +21,7 @@ int
 cl_sched_init(void)
 {
     sbi_puts("module[sched]: init begin ...\n");
-    ENABLE_COMPONENT(base_init);
+    REQUIRE_COMPONENT(task);
     sbi_puts("module[sched]: init end!\n");
     return 0;
 }

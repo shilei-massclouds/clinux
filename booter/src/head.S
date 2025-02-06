@@ -248,10 +248,20 @@ clear_bss_done:
 	call relocate
 #endif /* CONFIG_MMU */
 
-	//call setup_trap_vector
+	/*
+     * Move 'call setup_trap_vector' to trap_init().
+     */
+
+    /*
+	 * Move these lines to setup_task().
+     * Note: Initialize 'tp' to zero.
+	 *
+	 * 'la tp, init_task'
+	 * 'sw zero, TASK_TI_CPU(tp)'
+     */
+    mv tp, zero
+
 	/* Restore C environment */
-	//la tp, init_task
-	//sw zero, TASK_TI_CPU(tp)
 	la sp, init_thread_union + THREAD_SIZE
 
 #ifdef CONFIG_KASAN
@@ -259,7 +269,10 @@ clear_bss_done:
 #endif
 	/* Start the kernel */
 	//call soc_early_init
-	//call parse_dtb
+
+	/*
+     * Move 'call parse_dtb' to start_kernel().
+     */
 	tail start_kernel
 
 .Lsecondary_start:
