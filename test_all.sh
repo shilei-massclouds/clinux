@@ -11,6 +11,8 @@ TESTCASES="
 	spinlock semaphore
     early_printk
     bootmem
+    paging
+    linux
 "
 
 PASSED=0

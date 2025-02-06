@@ -4,7 +4,7 @@ ARCH ?= riscv64
 export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
-TOP ?= paging
+TOP ?= linux
 export TOP_COMPONENT := top_$(TOP)
 
 DEBUG ?= n
