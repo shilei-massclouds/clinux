@@ -37,13 +37,13 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter lib \
-	task \
+	cpu task \
 	hrtimer \
 	early_fdt params \
-	sched wait \
+	early_sched wait \
 	resource \
 	memblock bootmem paging \
-	spinlock semaphore \
+	spinlock semaphore mutex \
 	early_printk
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)

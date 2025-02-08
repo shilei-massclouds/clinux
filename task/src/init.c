@@ -11,7 +11,7 @@
 #include <linux/ipc_namespace.h>
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
-#include "../../sched/src/sched.h"
+#include "../../early_sched/src/sched.h"
 
 static void
 setup_task(void)
@@ -174,6 +174,7 @@ struct css_set init_css_set = {
      */
     .dfl_cgrp       = &cgrp_dfl_root.cgrp,
 };
+EXPORT_SYMBOL(init_css_set);
 
 #ifdef CONFIG_KEYS
 static struct key_tag init_net_key_domain = { .usage = REFCOUNT_INIT(1) };

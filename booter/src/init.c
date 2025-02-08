@@ -70,3 +70,38 @@ asmlinkage __visible int printk(const char *fmt, ...)
     return 0;
 }
 EXPORT_SYMBOL(printk);
+
+void __warn_printk(const char *fmt, ...)
+{
+    if (HAS_HOOK(vprintk_func)) {
+        int ret;
+        va_list args;
+        pr_warn(CUT_HERE);
+        va_start(args, fmt);
+        INVOKE_HOOK_RET(ret, vprintk_func, printk_skip_level(fmt), args);
+        va_end(args);
+        return;
+    }
+
+    // Fallthrough
+    sbi_puts("[RAW_WARN] ");
+    sbi_puts(printk_skip_level(fmt));
+}
+EXPORT_SYMBOL(__warn_printk);
+
+/**
+ *  panic - halt the system
+ *  @fmt: The text string to print
+ *
+ *  Display a message, then perform cleanups.
+ *
+ *  This function never returns.
+ */
+void __weak panic(const char *fmt, ...)
+{
+    sbi_puts("[RAW_PANIC] ");
+    sbi_puts(fmt);
+    sbi_shutdown();
+    do {} while (1);
+}
+EXPORT_SYMBOL(panic);

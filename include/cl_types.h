@@ -4,6 +4,7 @@
 #define _CL_TYPES_H_
 
 #include <linux/init.h>
+#include <linux/sched.h>
 
 extern void parse_dtb(void);
 

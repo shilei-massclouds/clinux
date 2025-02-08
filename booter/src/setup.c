@@ -15,6 +15,12 @@
 // */
 atomic_t hart_lottery __section(.sdata);
 unsigned long boot_cpu_hartid;
+EXPORT_SYMBOL(boot_cpu_hartid);
+bool early_boot_irqs_disabled __read_mostly;
+EXPORT_SYMBOL(early_boot_irqs_disabled);
+
+enum system_states system_state __read_mostly;
+EXPORT_SYMBOL(system_state);
 
 //#include <linux/init.h>
 //#include <linux/mm.h>

@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
 
 obj_y := init.o
-obj_y += core.o
-obj_y += debug.o
-obj_y += fair.o
+obj_y += mutex.o
+obj_y += mutex-debug.o

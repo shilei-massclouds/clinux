@@ -22,13 +22,6 @@ void __might_fault(const char *file, int line)
 EXPORT_SYMBOL(__might_fault);
 #endif
 
-void __warn_printk(const char *fmt, ...)
-{
-    sbi_puts("unimplemented __warn_printk!");
-    sbi_shutdown();
-}
-EXPORT_SYMBOL(__warn_printk);
-
 int cl_lib_init(void)
 {
     sbi_puts("module[lib]: init begin ...\n");
