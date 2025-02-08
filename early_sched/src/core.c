@@ -7419,9 +7419,9 @@
 //#endif
 //
 #ifdef CONFIG_CGROUP_SCHED
-///* task_group_lock serializes the addition/removal of task groups */
-//static DEFINE_SPINLOCK(task_group_lock);
-//
+/* task_group_lock serializes the addition/removal of task groups */
+static DEFINE_SPINLOCK(task_group_lock);
+
 //static inline void alloc_uclamp_sched_group(struct task_group *tg,
 //					    struct task_group *parent)
 //{
@@ -7467,7 +7467,7 @@
 //	sched_free_group(tg);
 //	return ERR_PTR(-ENOMEM);
 //}
-//
+
 //void sched_online_group(struct task_group *tg, struct task_group *parent)
 //{
 //	unsigned long flags;
@@ -7485,7 +7485,7 @@
 //
 //	online_fair_sched_group(tg);
 //}
-//
+
 ///* rcu callback to free various structures associated with a task group */
 //static void sched_free_group_rcu(struct rcu_head *rhp)
 //{
@@ -7603,13 +7603,15 @@ cpu_cgroup_css_alloc(struct cgroup_subsys_state *parent_css)
 /* Expose task group only after completing cgroup initialization */
 static int cpu_cgroup_css_online(struct cgroup_subsys_state *css)
 {
+    /*
+	struct task_group *tg = css_tg(css);
+	struct task_group *parent = css_tg(css->parent);
+
+	if (parent)
+		sched_online_group(tg, parent);
+        */
+
     booter_panic("No impl in cgroup.");
-//	struct task_group *tg = css_tg(css);
-//	struct task_group *parent = css_tg(css->parent);
-//
-//	if (parent)
-//		sched_online_group(tg, parent);
-//
 //#ifdef CONFIG_UCLAMP_TASK_GROUP
 //	/* Propagate the effective uclamp value for the new group */
 //	cpu_util_update_eff(css);
@@ -7637,12 +7639,13 @@ static void cpu_cgroup_css_free(struct cgroup_subsys_state *css)
     booter_panic("No impl in cgroup.");
 }
 
-///*
-// * This is called before wake_up_new_task(), therefore we really only
-// * have to set its group bits, all the other stuff does not apply.
-// */
-//static void cpu_cgroup_fork(struct task_struct *task)
-//{
+/*
+ * This is called before wake_up_new_task(), therefore we really only
+ * have to set its group bits, all the other stuff does not apply.
+ */
+static void cpu_cgroup_fork(struct task_struct *task)
+{
+    booter_panic("No impl in cgroup.");
 //	struct rq_flags rf;
 //	struct rq *rq;
 //
@@ -7652,46 +7655,50 @@ static void cpu_cgroup_css_free(struct cgroup_subsys_state *css)
 //	sched_change_group(task, TASK_SET_GROUP);
 //
 //	task_rq_unlock(rq, task, &rf);
-//}
+}
 
 static int cpu_cgroup_can_attach(struct cgroup_taskset *tset)
 {
-	struct task_struct *task;
-	struct cgroup_subsys_state *css;
-	int ret = 0;
-
-	cgroup_taskset_for_each(task, css, tset) {
-#ifdef CONFIG_RT_GROUP_SCHED
-		if (!sched_rt_can_attach(css_tg(css), task))
-			return -EINVAL;
-#endif
-		/*
-		 * Serialize against wake_up_new_task() such that if its
-		 * running, we're sure to observe its full state.
-		 */
-		raw_spin_lock_irq(&task->pi_lock);
-		/*
-		 * Avoid calling sched_move_task() before wake_up_new_task()
-		 * has happened. This would lead to problems with PELT, due to
-		 * move wanting to detach+attach while we're not attached yet.
-		 */
-		if (task->state == TASK_NEW)
-			ret = -EINVAL;
-		raw_spin_unlock_irq(&task->pi_lock);
-
-		if (ret)
-			break;
-	}
-	return ret;
+    booter_panic("No impl in cgroup.");
+//	struct task_struct *task;
+//	struct cgroup_subsys_state *css;
+//	int ret = 0;
+//
+//	cgroup_taskset_for_each(task, css, tset) {
+//#ifdef CONFIG_RT_GROUP_SCHED
+//		if (!sched_rt_can_attach(css_tg(css), task))
+//			return -EINVAL;
+//#endif
+//		/*
+//		 * Serialize against wake_up_new_task() such that if its
+//		 * running, we're sure to observe its full state.
+//		 */
+//		raw_spin_lock_irq(&task->pi_lock);
+//		/*
+//		 * Avoid calling sched_move_task() before wake_up_new_task()
+//		 * has happened. This would lead to problems with PELT, due to
+//		 * move wanting to detach+attach while we're not attached yet.
+//		 */
+//		if (task->state == TASK_NEW)
+//			ret = -EINVAL;
+//		raw_spin_unlock_irq(&task->pi_lock);
+//
+//		if (ret)
+//			break;
+//	}
+//	return ret;
 }
 
 static void cpu_cgroup_attach(struct cgroup_taskset *tset)
 {
+    booter_panic("No impl in cgroup.");
+    /*
 	struct task_struct *task;
 	struct cgroup_subsys_state *css;
 
 	cgroup_taskset_for_each(task, css, tset)
 		sched_move_task(task);
+        */
 }
 
 //#ifdef CONFIG_UCLAMP_TASK_GROUP
@@ -8238,28 +8245,31 @@ static u64 cpu_shares_read_u64(struct cgroup_subsys_state *css,
 //	{ }	/* Terminate */
 //};
 
-//static int cpu_extra_stat_show(struct seq_file *sf,
-//			       struct cgroup_subsys_state *css)
-//{
-//#ifdef CONFIG_CFS_BANDWIDTH
-//	{
-//		struct task_group *tg = css_tg(css);
-//		struct cfs_bandwidth *cfs_b = &tg->cfs_bandwidth;
-//		u64 throttled_usec;
-//
-//		throttled_usec = cfs_b->throttled_time;
-//		do_div(throttled_usec, NSEC_PER_USEC);
-//
-//		seq_printf(sf, "nr_periods %d\n"
-//			   "nr_throttled %d\n"
-//			   "throttled_usec %llu\n",
-//			   cfs_b->nr_periods, cfs_b->nr_throttled,
-//			   throttled_usec);
-//	}
-//#endif
-//	return 0;
-//}
-//
+static int cpu_extra_stat_show(struct seq_file *sf,
+			       struct cgroup_subsys_state *css)
+{
+/*
+#ifdef CONFIG_CFS_BANDWIDTH
+	{
+		struct task_group *tg = css_tg(css);
+		struct cfs_bandwidth *cfs_b = &tg->cfs_bandwidth;
+		u64 throttled_usec;
+
+		throttled_usec = cfs_b->throttled_time;
+		do_div(throttled_usec, NSEC_PER_USEC);
+
+		seq_printf(sf, "nr_periods %d\n"
+			   "nr_throttled %d\n"
+			   "throttled_usec %llu\n",
+			   cfs_b->nr_periods, cfs_b->nr_throttled,
+			   throttled_usec);
+	}
+#endif
+*/
+    booter_panic("No impl in cgroup.");
+	return 0;
+}
+
 //#ifdef CONFIG_FAIR_GROUP_SCHED
 //static u64 cpu_weight_read_u64(struct cgroup_subsys_state *css,
 //			       struct cftype *cft)
@@ -8424,14 +8434,12 @@ struct cgroup_subsys cpu_cgrp_subsys = {
 	//.css_online	= cpu_cgroup_css_online,
 	.css_released	= cpu_cgroup_css_released,
 	.css_free	= cpu_cgroup_css_free,
-    /*
 	.css_extra_stat_show = cpu_extra_stat_show,
 	.fork		= cpu_cgroup_fork,
 	.can_attach	= cpu_cgroup_can_attach,
 	.attach		= cpu_cgroup_attach,
-	.legacy_cftypes	= cpu_legacy_files,
-	.dfl_cftypes	= cpu_files,
-    */
+	//.legacy_cftypes	= cpu_legacy_files,
+	//.dfl_cftypes	= cpu_files,
 	.early_init	= true,
 	.threaded	= true,
 };
