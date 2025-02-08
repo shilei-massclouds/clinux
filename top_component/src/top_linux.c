@@ -5,6 +5,7 @@
 #include <linux/sched/task.h>
 #include <linux/smp.h>
 #include <linux/cgroup.h>
+#include <linux/cpu.h>
 #include <asm/pgtable.h>
 #include <cl_hook.h>
 #include <cl_types.h>
@@ -31,6 +32,14 @@ cl_top_linux_init(void)
 
     local_irq_disable();
     early_boot_irqs_disabled = true;
+
+    /*
+     * Interrupts are still disabled. Do necessary setups, then
+     * enable them.
+     */
+    boot_cpu_init();
+    page_address_init();
+    pr_notice("%s", linux_banner);
 
     setup_kernel_in_mm();
     parse_early_param();
