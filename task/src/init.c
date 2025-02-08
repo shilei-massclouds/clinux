@@ -64,6 +64,7 @@ struct fs_struct init_fs = {
  * Every task in system belongs to this group at bootup.
  */
 struct task_group root_task_group;
+EXPORT_SYMBOL(root_task_group);
 LIST_HEAD(task_groups);
 
 /* Cacheline aligned slab cache for task_group */

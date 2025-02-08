@@ -27,8 +27,7 @@ cl_top_linux_init(void)
     smp_setup_processor_id();
     debug_objects_early_init();
 
-    // Note: disable cgroup.
-    //cgroup_init_early();
+    cgroup_init_early();
 
     local_irq_disable();
     early_boot_irqs_disabled = true;

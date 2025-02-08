@@ -37,7 +37,7 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter lib \
-	cpu task \
+	cpu task cgroup \
 	hrtimer \
 	early_fdt params \
 	early_sched wait \
