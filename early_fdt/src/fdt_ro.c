@@ -334,6 +334,7 @@ const char *fdt_get_name(const void *fdt, int nodeoffset, int *len)
 		*len = err;
 	return NULL;
 }
+EXPORT_SYMBOL(fdt_get_name);
 
 int fdt_first_property_offset(const void *fdt, int nodeoffset)
 {
@@ -344,6 +345,7 @@ int fdt_first_property_offset(const void *fdt, int nodeoffset)
 
 	return nextprop_(fdt, offset);
 }
+EXPORT_SYMBOL(fdt_first_property_offset);
 
 int fdt_next_property_offset(const void *fdt, int offset)
 {
@@ -352,6 +354,7 @@ int fdt_next_property_offset(const void *fdt, int offset)
 
 	return nextprop_(fdt, offset);
 }
+EXPORT_SYMBOL(fdt_next_property_offset);
 
 static const struct fdt_property *fdt_get_property_by_offset_(const void *fdt,
 						              int offset,
@@ -498,6 +501,7 @@ const void *fdt_getprop_by_offset(const void *fdt, int offset,
 		return prop->data + 4;
 	return prop->data;
 }
+EXPORT_SYMBOL(fdt_getprop_by_offset);
 
 const void *fdt_getprop(const void *fdt, int nodeoffset,
 			const char *name, int *lenp)

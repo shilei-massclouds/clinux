@@ -131,6 +131,7 @@ int fdt_check_header(const void *fdt)
 
 	return 0;
 }
+EXPORT_SYMBOL(fdt_check_header);
 
 const void *fdt_offset_ptr(const void *fdt, int offset, unsigned int len)
 {
@@ -263,6 +264,7 @@ int fdt_next_node(const void *fdt, int offset, int *depth)
 
 	return offset;
 }
+EXPORT_SYMBOL(fdt_next_node);
 
 int fdt_first_subnode(const void *fdt, int offset)
 {

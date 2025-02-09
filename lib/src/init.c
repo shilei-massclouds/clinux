@@ -4,6 +4,7 @@
 #include <linux/export.h>
 #include <linux/sched.h>
 #include <linux/sched/debug.h>
+#include <linux/kobject.h>
 #include "../../booter/src/booter.h"
 
 /*
@@ -62,3 +63,35 @@ void key_put(struct key *key)
 {
     booter_panic("No impl 'key_put'.");
 }
+
+void sysfs_remove_groups(struct kobject *kobj,
+				       const struct attribute_group **groups)
+{
+    booter_panic("No impl in 'lib'.");
+}
+
+void kfree_const(const void *x)
+{
+    booter_panic("No impl in 'lib'.");
+}
+
+void kernfs_put(struct kernfs_node *kn)
+{
+    booter_panic("No impl in 'lib'.");
+}
+
+int kobject_uevent(struct kobject *kobj, enum kobject_action action)
+{
+    booter_panic("No impl in 'lib'.");
+}
+
+void sysfs_remove_dir(struct kobject *kobj)
+{
+    booter_panic("No impl in 'lib'.");
+}
+
+int wake_up_process(struct task_struct *p)
+{
+    booter_panic("No impl in 'lib'.");
+}
+EXPORT_SYMBOL(wake_up_process);

@@ -466,6 +466,7 @@ int __initdata dt_root_addr_cells;
 int __initdata dt_root_size_cells;
 
 void *initial_boot_params __ro_after_init;
+EXPORT_SYMBOL(initial_boot_params);
 
 #ifdef CONFIG_OF_EARLY_FLATTREE
 

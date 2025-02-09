@@ -6,14 +6,34 @@
 #include <linux/smp.h>
 #include <linux/cgroup.h>
 #include <linux/cpu.h>
+#include <linux/security.h>
+#include <linux/of_fdt.h>
 #include <asm/pgtable.h>
 #include <cl_hook.h>
 #include <cl_types.h>
 #include "../../booter/src/booter.h"
 
+void __init setup_arch(char **cmdline_p)
+{
+    setup_kernel_in_mm();
+    *cmdline_p = boot_command_line;
+
+    parse_early_param();
+
+    setup_bootmem();
+    paging_init();
+#if IS_ENABLED(CONFIG_BUILTIN_DTB)
+    unflatten_and_copy_device_tree();
+#else
+    unflatten_device_tree();
+#endif
+}
+
 int
 cl_top_linux_init(void)
 {
+    char *command_line;
+
     sbi_puts("module[top_linux]: init begin ...\n");
     REQUIRE_COMPONENT(early_printk);
 
@@ -40,11 +60,10 @@ cl_top_linux_init(void)
     boot_cpu_init();
     page_address_init();
     pr_notice("%s", linux_banner);
+    early_security_init();
+    setup_arch(&command_line);
 
-    setup_kernel_in_mm();
-    parse_early_param();
-    setup_bootmem();
-    paging_init();
+    printk("command_line: '%s'\n", command_line);
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
 }
