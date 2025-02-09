@@ -39,8 +39,8 @@ components := \
 	prebuilt booter lib \
 	cpu task cgroup \
 	hrtimer \
+	kobject driver_base \
 	early_fdt params of_fdt \
-	driver_base \
 	early_sched wait \
 	resource \
 	memblock bootmem paging \
