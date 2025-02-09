@@ -153,6 +153,12 @@ static void __init setup_command_line(char *command_line)
 	}
 }
 
+#ifndef CONFIG_SMP
+static const unsigned int setup_max_cpus = NR_CPUS;
+static inline void setup_nr_cpu_ids(void) { }
+static inline void smp_prepare_cpus(unsigned int maxcpus) { }
+#endif
+
 int
 cl_top_linux_init(void)
 {
@@ -188,11 +194,9 @@ cl_top_linux_init(void)
     setup_arch(&command_line);
     setup_boot_config(command_line);
     setup_command_line(command_line);
-
-    /*
     setup_nr_cpu_ids();
     setup_per_cpu_areas();
-    */
+
     //smp_prepare_boot_cpu(); /* arch-specific boot-cpu hooks */
     //boot_cpu_hotplug_init();
 

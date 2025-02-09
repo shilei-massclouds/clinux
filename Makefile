@@ -38,7 +38,7 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter lib \
+	prebuilt booter lib math \
 	sbi \
 	cpu task cgroup \
 	hrtimer \
@@ -46,6 +46,7 @@ components := \
 	early_fdt params of_fdt \
 	early_sched wait \
 	resource dma \
+	percpu \
 	memblock bootmem paging \
 	spinlock semaphore mutex \
 	early_printk

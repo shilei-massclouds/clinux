@@ -24,3 +24,4 @@ obj_y += version.o
 obj_y += utsname.o
 obj_y += user_namespace.o
 obj_y += user.o
+obj_y += bitmap.o
