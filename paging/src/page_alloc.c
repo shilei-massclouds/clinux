@@ -2864,7 +2864,7 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 //	return alloced;
 //}
 //
-//#ifdef CONFIG_NUMA
+#ifdef CONFIG_NUMA
 ///*
 // * Called from the vmstat counter updater to drain pagesets of this
 // * currently executing processor on remote nodes after they have
@@ -2885,7 +2885,7 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 //		free_pcppages_bulk(zone, to_drain, pcp);
 //	local_irq_restore(flags);
 //}
-//#endif
+#endif
 //
 ///*
 // * Drain pcplists of the indicated processor and zone.
@@ -5169,39 +5169,39 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 //	}
 //}
 //EXPORT_SYMBOL(free_pages_exact);
-//
-///**
-// * nr_free_zone_pages - count number of pages beyond high watermark
-// * @offset: The zone index of the highest zone
-// *
-// * nr_free_zone_pages() counts the number of pages which are beyond the
-// * high watermark within all zones at or below a given zone index.  For each
-// * zone, the number of pages is calculated as:
-// *
-// *     nr_free_zone_pages = managed_pages - high_pages
-// *
-// * Return: number of pages beyond high watermark.
-// */
-//static unsigned long nr_free_zone_pages(int offset)
-//{
-//	struct zoneref *z;
-//	struct zone *zone;
-//
-//	/* Just pick one node, since fallback list is circular */
-//	unsigned long sum = 0;
-//
-//	struct zonelist *zonelist = node_zonelist(numa_node_id(), GFP_KERNEL);
-//
-//	for_each_zone_zonelist(zone, z, zonelist, offset) {
-//		unsigned long size = zone_managed_pages(zone);
-//		unsigned long high = high_wmark_pages(zone);
-//		if (size > high)
-//			sum += size - high;
-//	}
-//
-//	return sum;
-//}
-//
+
+/**
+ * nr_free_zone_pages - count number of pages beyond high watermark
+ * @offset: The zone index of the highest zone
+ *
+ * nr_free_zone_pages() counts the number of pages which are beyond the
+ * high watermark within all zones at or below a given zone index.  For each
+ * zone, the number of pages is calculated as:
+ *
+ *     nr_free_zone_pages = managed_pages - high_pages
+ *
+ * Return: number of pages beyond high watermark.
+ */
+static unsigned long nr_free_zone_pages(int offset)
+{
+	struct zoneref *z;
+	struct zone *zone;
+
+	/* Just pick one node, since fallback list is circular */
+	unsigned long sum = 0;
+
+	struct zonelist *zonelist = node_zonelist(numa_node_id(), GFP_KERNEL);
+
+	for_each_zone_zonelist(zone, z, zonelist, offset) {
+		unsigned long size = zone_managed_pages(zone);
+		unsigned long high = high_wmark_pages(zone);
+		if (size > high)
+			sum += size - high;
+	}
+
+	return sum;
+}
+
 ///**
 // * nr_free_buffer_pages - count number of pages beyond high watermark
 // *
@@ -5567,37 +5567,37 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 //
 //	show_swap_cache_info();
 //}
-//
-//static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
-//{
-//	zoneref->zone = zone;
-//	zoneref->zone_idx = zone_idx(zone);
-//}
-//
-///*
-// * Builds allocation fallback zone lists.
-// *
-// * Add all populated zones of a node to the zonelist.
-// */
-//static int build_zonerefs_node(pg_data_t *pgdat, struct zoneref *zonerefs)
-//{
-//	struct zone *zone;
-//	enum zone_type zone_type = MAX_NR_ZONES;
-//	int nr_zones = 0;
-//
-//	do {
-//		zone_type--;
-//		zone = pgdat->node_zones + zone_type;
-//		if (managed_zone(zone)) {
-//			zoneref_set_zone(zone, &zonerefs[nr_zones++]);
-//			check_highest_zone(zone_type);
-//		}
-//	} while (zone_type);
-//
-//	return nr_zones;
-//}
-//
-//#ifdef CONFIG_NUMA
+
+static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
+{
+	zoneref->zone = zone;
+	zoneref->zone_idx = zone_idx(zone);
+}
+
+/*
+ * Builds allocation fallback zone lists.
+ *
+ * Add all populated zones of a node to the zonelist.
+ */
+static int build_zonerefs_node(pg_data_t *pgdat, struct zoneref *zonerefs)
+{
+	struct zone *zone;
+	enum zone_type zone_type = MAX_NR_ZONES;
+	int nr_zones = 0;
+
+	do {
+		zone_type--;
+		zone = pgdat->node_zones + zone_type;
+		if (managed_zone(zone)) {
+			zoneref_set_zone(zone, &zonerefs[nr_zones++]);
+			check_highest_zone(zone_type);
+		}
+	} while (zone_type);
+
+	return nr_zones;
+}
+
+#ifdef CONFIG_NUMA
 //
 //static int __parse_numa_zonelist_order(char *s)
 //{
@@ -5628,150 +5628,150 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 //}
 //
 //
-//#define MAX_NODE_LOAD (nr_online_nodes)
-//static int node_load[MAX_NUMNODES];
-//
-///**
-// * find_next_best_node - find the next node that should appear in a given node's fallback list
-// * @node: node whose fallback list we're appending
-// * @used_node_mask: nodemask_t of already used nodes
-// *
-// * We use a number of factors to determine which is the next node that should
-// * appear on a given node's fallback list.  The node should not have appeared
-// * already in @node's fallback list, and it should be the next closest node
-// * according to the distance array (which contains arbitrary distance values
-// * from each node to each node in the system), and should also prefer nodes
-// * with no CPUs, since presumably they'll have very little allocation pressure
-// * on them otherwise.
-// *
-// * Return: node id of the found node or %NUMA_NO_NODE if no node is found.
-// */
-//static int find_next_best_node(int node, nodemask_t *used_node_mask)
-//{
-//	int n, val;
-//	int min_val = INT_MAX;
-//	int best_node = NUMA_NO_NODE;
-//	const struct cpumask *tmp = cpumask_of_node(0);
-//
-//	/* Use the local node if we haven't already */
-//	if (!node_isset(node, *used_node_mask)) {
-//		node_set(node, *used_node_mask);
-//		return node;
-//	}
-//
-//	for_each_node_state(n, N_MEMORY) {
-//
-//		/* Don't want a node to appear more than once */
-//		if (node_isset(n, *used_node_mask))
-//			continue;
-//
-//		/* Use the distance array to find the distance */
-//		val = node_distance(node, n);
-//
-//		/* Penalize nodes under us ("prefer the next node") */
-//		val += (n < node);
-//
-//		/* Give preference to headless and unused nodes */
-//		tmp = cpumask_of_node(n);
-//		if (!cpumask_empty(tmp))
-//			val += PENALTY_FOR_NODE_WITH_CPUS;
-//
-//		/* Slight preference for less loaded node */
-//		val *= (MAX_NODE_LOAD*MAX_NUMNODES);
-//		val += node_load[n];
-//
-//		if (val < min_val) {
-//			min_val = val;
-//			best_node = n;
-//		}
-//	}
-//
-//	if (best_node >= 0)
-//		node_set(best_node, *used_node_mask);
-//
-//	return best_node;
-//}
-//
-//
-///*
-// * Build zonelists ordered by node and zones within node.
-// * This results in maximum locality--normal zone overflows into local
-// * DMA zone, if any--but risks exhausting DMA zone.
-// */
-//static void build_zonelists_in_node_order(pg_data_t *pgdat, int *node_order,
-//		unsigned nr_nodes)
-//{
-//	struct zoneref *zonerefs;
-//	int i;
-//
-//	zonerefs = pgdat->node_zonelists[ZONELIST_FALLBACK]._zonerefs;
-//
-//	for (i = 0; i < nr_nodes; i++) {
-//		int nr_zones;
-//
-//		pg_data_t *node = NODE_DATA(node_order[i]);
-//
-//		nr_zones = build_zonerefs_node(node, zonerefs);
-//		zonerefs += nr_zones;
-//	}
-//	zonerefs->zone = NULL;
-//	zonerefs->zone_idx = 0;
-//}
-//
-///*
-// * Build gfp_thisnode zonelists
-// */
-//static void build_thisnode_zonelists(pg_data_t *pgdat)
-//{
-//	struct zoneref *zonerefs;
-//	int nr_zones;
-//
-//	zonerefs = pgdat->node_zonelists[ZONELIST_NOFALLBACK]._zonerefs;
-//	nr_zones = build_zonerefs_node(pgdat, zonerefs);
-//	zonerefs += nr_zones;
-//	zonerefs->zone = NULL;
-//	zonerefs->zone_idx = 0;
-//}
-//
+#define MAX_NODE_LOAD (nr_online_nodes)
+static int node_load[MAX_NUMNODES];
+
+/**
+ * find_next_best_node - find the next node that should appear in a given node's fallback list
+ * @node: node whose fallback list we're appending
+ * @used_node_mask: nodemask_t of already used nodes
+ *
+ * We use a number of factors to determine which is the next node that should
+ * appear on a given node's fallback list.  The node should not have appeared
+ * already in @node's fallback list, and it should be the next closest node
+ * according to the distance array (which contains arbitrary distance values
+ * from each node to each node in the system), and should also prefer nodes
+ * with no CPUs, since presumably they'll have very little allocation pressure
+ * on them otherwise.
+ *
+ * Return: node id of the found node or %NUMA_NO_NODE if no node is found.
+ */
+static int find_next_best_node(int node, nodemask_t *used_node_mask)
+{
+	int n, val;
+	int min_val = INT_MAX;
+	int best_node = NUMA_NO_NODE;
+	const struct cpumask *tmp = cpumask_of_node(0);
+
+	/* Use the local node if we haven't already */
+	if (!node_isset(node, *used_node_mask)) {
+		node_set(node, *used_node_mask);
+		return node;
+	}
+
+	for_each_node_state(n, N_MEMORY) {
+
+		/* Don't want a node to appear more than once */
+		if (node_isset(n, *used_node_mask))
+			continue;
+
+		/* Use the distance array to find the distance */
+		val = node_distance(node, n);
+
+		/* Penalize nodes under us ("prefer the next node") */
+		val += (n < node);
+
+		/* Give preference to headless and unused nodes */
+		tmp = cpumask_of_node(n);
+		if (!cpumask_empty(tmp))
+			val += PENALTY_FOR_NODE_WITH_CPUS;
+
+		/* Slight preference for less loaded node */
+		val *= (MAX_NODE_LOAD*MAX_NUMNODES);
+		val += node_load[n];
+
+		if (val < min_val) {
+			min_val = val;
+			best_node = n;
+		}
+	}
+
+	if (best_node >= 0)
+		node_set(best_node, *used_node_mask);
+
+	return best_node;
+}
+
+
+/*
+ * Build zonelists ordered by node and zones within node.
+ * This results in maximum locality--normal zone overflows into local
+ * DMA zone, if any--but risks exhausting DMA zone.
+ */
+static void build_zonelists_in_node_order(pg_data_t *pgdat, int *node_order,
+		unsigned nr_nodes)
+{
+	struct zoneref *zonerefs;
+	int i;
+
+	zonerefs = pgdat->node_zonelists[ZONELIST_FALLBACK]._zonerefs;
+
+	for (i = 0; i < nr_nodes; i++) {
+		int nr_zones;
+
+		pg_data_t *node = NODE_DATA(node_order[i]);
+
+		nr_zones = build_zonerefs_node(node, zonerefs);
+		zonerefs += nr_zones;
+	}
+	zonerefs->zone = NULL;
+	zonerefs->zone_idx = 0;
+}
+
+/*
+ * Build gfp_thisnode zonelists
+ */
+static void build_thisnode_zonelists(pg_data_t *pgdat)
+{
+	struct zoneref *zonerefs;
+	int nr_zones;
+
+	zonerefs = pgdat->node_zonelists[ZONELIST_NOFALLBACK]._zonerefs;
+	nr_zones = build_zonerefs_node(pgdat, zonerefs);
+	zonerefs += nr_zones;
+	zonerefs->zone = NULL;
+	zonerefs->zone_idx = 0;
+}
+
 ///*
 // * Build zonelists ordered by zone and nodes within zones.
 // * This results in conserving DMA zone[s] until all Normal memory is
 // * exhausted, but results in overflowing to remote node while memory
 // * may still exist in local DMA zone.
 // */
-//
-//static void build_zonelists(pg_data_t *pgdat)
-//{
-//	static int node_order[MAX_NUMNODES];
-//	int node, load, nr_nodes = 0;
-//	nodemask_t used_mask = NODE_MASK_NONE;
-//	int local_node, prev_node;
-//
-//	/* NUMA-aware ordering of nodes */
-//	local_node = pgdat->node_id;
-//	load = nr_online_nodes;
-//	prev_node = local_node;
-//
-//	memset(node_order, 0, sizeof(node_order));
-//	while ((node = find_next_best_node(local_node, &used_mask)) >= 0) {
-//		/*
-//		 * We don't want to pressure a particular node.
-//		 * So adding penalty to the first node in same
-//		 * distance group to make it round-robin.
-//		 */
-//		if (node_distance(local_node, node) !=
-//		    node_distance(local_node, prev_node))
-//			node_load[node] = load;
-//
-//		node_order[nr_nodes++] = node;
-//		prev_node = node;
-//		load--;
-//	}
-//
-//	build_zonelists_in_node_order(pgdat, node_order, nr_nodes);
-//	build_thisnode_zonelists(pgdat);
-//}
-//
+
+static void build_zonelists(pg_data_t *pgdat)
+{
+	static int node_order[MAX_NUMNODES];
+	int node, load, nr_nodes = 0;
+	nodemask_t used_mask = NODE_MASK_NONE;
+	int local_node, prev_node;
+
+	/* NUMA-aware ordering of nodes */
+	local_node = pgdat->node_id;
+	load = nr_online_nodes;
+	prev_node = local_node;
+
+	memset(node_order, 0, sizeof(node_order));
+	while ((node = find_next_best_node(local_node, &used_mask)) >= 0) {
+		/*
+		 * We don't want to pressure a particular node.
+		 * So adding penalty to the first node in same
+		 * distance group to make it round-robin.
+		 */
+		if (node_distance(local_node, node) !=
+		    node_distance(local_node, prev_node))
+			node_load[node] = load;
+
+		node_order[nr_nodes++] = node;
+		prev_node = node;
+		load--;
+	}
+
+	build_zonelists_in_node_order(pgdat, node_order, nr_nodes);
+	build_thisnode_zonelists(pgdat);
+}
+
 //#ifdef CONFIG_HAVE_MEMORYLESS_NODES
 ///*
 // * Return node id of node used for "local" allocations.
@@ -5792,46 +5792,46 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 //
 //static void setup_min_unmapped_ratio(void);
 //static void setup_min_slab_ratio(void);
-//#else	/* CONFIG_NUMA */
-//
-//static void build_zonelists(pg_data_t *pgdat)
-//{
-//	int node, local_node;
-//	struct zoneref *zonerefs;
-//	int nr_zones;
-//
-//	local_node = pgdat->node_id;
-//
-//	zonerefs = pgdat->node_zonelists[ZONELIST_FALLBACK]._zonerefs;
-//	nr_zones = build_zonerefs_node(pgdat, zonerefs);
-//	zonerefs += nr_zones;
-//
-//	/*
-//	 * Now we build the zonelist so that it contains the zones
-//	 * of all the other nodes.
-//	 * We don't want to pressure a particular node, so when
-//	 * building the zones for node N, we make sure that the
-//	 * zones coming right after the local ones are those from
-//	 * node N+1 (modulo N)
-//	 */
-//	for (node = local_node + 1; node < MAX_NUMNODES; node++) {
-//		if (!node_online(node))
-//			continue;
-//		nr_zones = build_zonerefs_node(NODE_DATA(node), zonerefs);
-//		zonerefs += nr_zones;
-//	}
-//	for (node = 0; node < local_node; node++) {
-//		if (!node_online(node))
-//			continue;
-//		nr_zones = build_zonerefs_node(NODE_DATA(node), zonerefs);
-//		zonerefs += nr_zones;
-//	}
-//
-//	zonerefs->zone = NULL;
-//	zonerefs->zone_idx = 0;
-//}
-//
-//#endif	/* CONFIG_NUMA */
+#else	/* CONFIG_NUMA */
+
+static void build_zonelists(pg_data_t *pgdat)
+{
+	int node, local_node;
+	struct zoneref *zonerefs;
+	int nr_zones;
+
+	local_node = pgdat->node_id;
+
+	zonerefs = pgdat->node_zonelists[ZONELIST_FALLBACK]._zonerefs;
+	nr_zones = build_zonerefs_node(pgdat, zonerefs);
+	zonerefs += nr_zones;
+
+	/*
+	 * Now we build the zonelist so that it contains the zones
+	 * of all the other nodes.
+	 * We don't want to pressure a particular node, so when
+	 * building the zones for node N, we make sure that the
+	 * zones coming right after the local ones are those from
+	 * node N+1 (modulo N)
+	 */
+	for (node = local_node + 1; node < MAX_NUMNODES; node++) {
+		if (!node_online(node))
+			continue;
+		nr_zones = build_zonerefs_node(NODE_DATA(node), zonerefs);
+		zonerefs += nr_zones;
+	}
+	for (node = 0; node < local_node; node++) {
+		if (!node_online(node))
+			continue;
+		nr_zones = build_zonerefs_node(NODE_DATA(node), zonerefs);
+		zonerefs += nr_zones;
+	}
+
+	zonerefs->zone = NULL;
+	zonerefs->zone_idx = 0;
+}
+
+#endif	/* CONFIG_NUMA */
 //
 ///*
 // * Boot pageset table. One per cpu which is going to be used for all
@@ -5848,118 +5848,119 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 // * not check if the processor is online before following the pageset pointer.
 // * Other parts of the kernel may not check if the zone is available.
 // */
-//static void setup_pageset(struct per_cpu_pageset *p, unsigned long batch);
+static void setup_pageset(struct per_cpu_pageset *p, unsigned long batch);
 static DEFINE_PER_CPU(struct per_cpu_pageset, boot_pageset);
 static DEFINE_PER_CPU(struct per_cpu_nodestat, boot_nodestats);
-//
-//static void __build_all_zonelists(void *data)
-//{
-//	int nid;
-//	int __maybe_unused cpu;
-//	pg_data_t *self = data;
-//	static DEFINE_SPINLOCK(lock);
-//
-//	spin_lock(&lock);
-//
-//#ifdef CONFIG_NUMA
-//	memset(node_load, 0, sizeof(node_load));
-//#endif
-//
-//	/*
-//	 * This node is hotadded and no memory is yet present.   So just
-//	 * building zonelists is fine - no need to touch other nodes.
-//	 */
-//	if (self && !node_online(self->node_id)) {
-//		build_zonelists(self);
-//	} else {
-//		for_each_online_node(nid) {
-//			pg_data_t *pgdat = NODE_DATA(nid);
-//
-//			build_zonelists(pgdat);
-//		}
-//
-//#ifdef CONFIG_HAVE_MEMORYLESS_NODES
-//		/*
-//		 * We now know the "local memory node" for each node--
-//		 * i.e., the node of the first zone in the generic zonelist.
-//		 * Set up numa_mem percpu variable for on-line cpus.  During
-//		 * boot, only the boot cpu should be on-line;  we'll init the
-//		 * secondary cpus' numa_mem as they come on-line.  During
-//		 * node/memory hotplug, we'll fixup all on-line cpus.
-//		 */
-//		for_each_online_cpu(cpu)
-//			set_cpu_numa_mem(cpu, local_memory_node(cpu_to_node(cpu)));
-//#endif
-//	}
-//
-//	spin_unlock(&lock);
-//}
-//
-//static noinline void __init
-//build_all_zonelists_init(void)
-//{
-//	int cpu;
-//
-//	__build_all_zonelists(NULL);
-//
-//	/*
-//	 * Initialize the boot_pagesets that are going to be used
-//	 * for bootstrapping processors. The real pagesets for
-//	 * each zone will be allocated later when the per cpu
-//	 * allocator is available.
-//	 *
-//	 * boot_pagesets are used also for bootstrapping offline
-//	 * cpus if the system is already booted because the pagesets
-//	 * are needed to initialize allocators on a specific cpu too.
-//	 * F.e. the percpu allocator needs the page allocator which
-//	 * needs the percpu allocator in order to allocate its pagesets
-//	 * (a chicken-egg dilemma).
-//	 */
-//	for_each_possible_cpu(cpu)
-//		setup_pageset(&per_cpu(boot_pageset, cpu), 0);
-//
-//	mminit_verify_zonelist();
-//	cpuset_init_current_mems_allowed();
-//}
-//
-///*
-// * unless system_state == SYSTEM_BOOTING.
-// *
-// * __ref due to call of __init annotated helper build_all_zonelists_init
-// * [protected by SYSTEM_BOOTING].
-// */
-//void __ref build_all_zonelists(pg_data_t *pgdat)
-//{
-//	unsigned long vm_total_pages;
-//
-//	if (system_state == SYSTEM_BOOTING) {
-//		build_all_zonelists_init();
-//	} else {
-//		__build_all_zonelists(pgdat);
-//		/* cpuset refresh routine should be here */
-//	}
-//	/* Get the number of free pages beyond high watermark in all zones. */
-//	vm_total_pages = nr_free_zone_pages(gfp_zone(GFP_HIGHUSER_MOVABLE));
-//	/*
-//	 * Disable grouping by mobility if the number of pages in the
-//	 * system is too low to allow the mechanism to work. It would be
-//	 * more accurate, but expensive to check per-zone. This check is
-//	 * made on memory-hotadd so a system can start with mobility
-//	 * disabled and enable it later
-//	 */
-//	if (vm_total_pages < (pageblock_nr_pages * MIGRATE_TYPES))
-//		page_group_by_mobility_disabled = 1;
-//	else
-//		page_group_by_mobility_disabled = 0;
-//
-//	pr_info("Built %u zonelists, mobility grouping %s.  Total pages: %ld\n",
-//		nr_online_nodes,
-//		page_group_by_mobility_disabled ? "off" : "on",
-//		vm_total_pages);
-//#ifdef CONFIG_NUMA
-//	pr_info("Policy zone: %s\n", zone_names[policy_zone]);
-//#endif
-//}
+
+static void __build_all_zonelists(void *data)
+{
+	int nid;
+	int __maybe_unused cpu;
+	pg_data_t *self = data;
+	static DEFINE_SPINLOCK(lock);
+
+	spin_lock(&lock);
+
+#ifdef CONFIG_NUMA
+	memset(node_load, 0, sizeof(node_load));
+#endif
+
+	/*
+	 * This node is hotadded and no memory is yet present.   So just
+	 * building zonelists is fine - no need to touch other nodes.
+	 */
+	if (self && !node_online(self->node_id)) {
+		build_zonelists(self);
+	} else {
+		for_each_online_node(nid) {
+			pg_data_t *pgdat = NODE_DATA(nid);
+
+			build_zonelists(pgdat);
+		}
+
+#ifdef CONFIG_HAVE_MEMORYLESS_NODES
+		/*
+		 * We now know the "local memory node" for each node--
+		 * i.e., the node of the first zone in the generic zonelist.
+		 * Set up numa_mem percpu variable for on-line cpus.  During
+		 * boot, only the boot cpu should be on-line;  we'll init the
+		 * secondary cpus' numa_mem as they come on-line.  During
+		 * node/memory hotplug, we'll fixup all on-line cpus.
+		 */
+		for_each_online_cpu(cpu)
+			set_cpu_numa_mem(cpu, local_memory_node(cpu_to_node(cpu)));
+#endif
+	}
+
+	spin_unlock(&lock);
+}
+
+static noinline void __init
+build_all_zonelists_init(void)
+{
+	int cpu;
+
+	__build_all_zonelists(NULL);
+
+	/*
+	 * Initialize the boot_pagesets that are going to be used
+	 * for bootstrapping processors. The real pagesets for
+	 * each zone will be allocated later when the per cpu
+	 * allocator is available.
+	 *
+	 * boot_pagesets are used also for bootstrapping offline
+	 * cpus if the system is already booted because the pagesets
+	 * are needed to initialize allocators on a specific cpu too.
+	 * F.e. the percpu allocator needs the page allocator which
+	 * needs the percpu allocator in order to allocate its pagesets
+	 * (a chicken-egg dilemma).
+	 */
+	for_each_possible_cpu(cpu)
+		setup_pageset(&per_cpu(boot_pageset, cpu), 0);
+
+	mminit_verify_zonelist();
+	cpuset_init_current_mems_allowed();
+}
+
+/*
+ * unless system_state == SYSTEM_BOOTING.
+ *
+ * __ref due to call of __init annotated helper build_all_zonelists_init
+ * [protected by SYSTEM_BOOTING].
+ */
+void __ref build_all_zonelists(pg_data_t *pgdat)
+{
+	unsigned long vm_total_pages;
+
+	if (system_state == SYSTEM_BOOTING) {
+		build_all_zonelists_init();
+	} else {
+		__build_all_zonelists(pgdat);
+		/* cpuset refresh routine should be here */
+	}
+	/* Get the number of free pages beyond high watermark in all zones. */
+	vm_total_pages = nr_free_zone_pages(gfp_zone(GFP_HIGHUSER_MOVABLE));
+	/*
+	 * Disable grouping by mobility if the number of pages in the
+	 * system is too low to allow the mechanism to work. It would be
+	 * more accurate, but expensive to check per-zone. This check is
+	 * made on memory-hotadd so a system can start with mobility
+	 * disabled and enable it later
+	 */
+	if (vm_total_pages < (pageblock_nr_pages * MIGRATE_TYPES))
+		page_group_by_mobility_disabled = 1;
+	else
+		page_group_by_mobility_disabled = 0;
+
+	pr_info("Built %u zonelists, mobility grouping %s.  Total pages: %ld\n",
+		nr_online_nodes,
+		page_group_by_mobility_disabled ? "off" : "on",
+		vm_total_pages);
+#ifdef CONFIG_NUMA
+	pr_info("Policy zone: %s\n", zone_names[policy_zone]);
+#endif
+}
+EXPORT_SYMBOL(build_all_zonelists);
 
 /* If zone is ZONE_MOVABLE but memory is mirrored, it is an overlapped init */
 static bool __meminit
@@ -6205,57 +6206,57 @@ static int zone_batchsize(struct zone *zone)
 #endif
 }
 
-///*
-// * pcp->high and pcp->batch values are related and dependent on one another:
-// * ->batch must never be higher then ->high.
-// * The following function updates them in a safe manner without read side
-// * locking.
-// *
-// * Any new users of pcp->batch and pcp->high should ensure they can cope with
-// * those fields changing asynchronously (acording to the above rule).
-// *
-// * mutex_is_locked(&pcp_batch_high_lock) required when calling this function
-// * outside of boot time (or some other assurance that no concurrent updaters
-// * exist).
-// */
-//static void pageset_update(struct per_cpu_pages *pcp, unsigned long high,
-//		unsigned long batch)
-//{
-//       /* start with a fail safe value for batch */
-//	pcp->batch = 1;
-//	smp_wmb();
-//
-//       /* Update high, then batch, in order */
-//	pcp->high = high;
-//	smp_wmb();
-//
-//	pcp->batch = batch;
-//}
-//
-///* a companion to pageset_set_high() */
-//static void pageset_set_batch(struct per_cpu_pageset *p, unsigned long batch)
-//{
-//	pageset_update(&p->pcp, 6 * batch, max(1UL, 1 * batch));
-//}
-//
-//static void pageset_init(struct per_cpu_pageset *p)
-//{
-//	struct per_cpu_pages *pcp;
-//	int migratetype;
-//
-//	memset(p, 0, sizeof(*p));
-//
-//	pcp = &p->pcp;
-//	for (migratetype = 0; migratetype < MIGRATE_PCPTYPES; migratetype++)
-//		INIT_LIST_HEAD(&pcp->lists[migratetype]);
-//}
-//
-//static void setup_pageset(struct per_cpu_pageset *p, unsigned long batch)
-//{
-//	pageset_init(p);
-//	pageset_set_batch(p, batch);
-//}
-//
+/*
+ * pcp->high and pcp->batch values are related and dependent on one another:
+ * ->batch must never be higher then ->high.
+ * The following function updates them in a safe manner without read side
+ * locking.
+ *
+ * Any new users of pcp->batch and pcp->high should ensure they can cope with
+ * those fields changing asynchronously (acording to the above rule).
+ *
+ * mutex_is_locked(&pcp_batch_high_lock) required when calling this function
+ * outside of boot time (or some other assurance that no concurrent updaters
+ * exist).
+ */
+static void pageset_update(struct per_cpu_pages *pcp, unsigned long high,
+		unsigned long batch)
+{
+       /* start with a fail safe value for batch */
+	pcp->batch = 1;
+	smp_wmb();
+
+       /* Update high, then batch, in order */
+	pcp->high = high;
+	smp_wmb();
+
+	pcp->batch = batch;
+}
+
+/* a companion to pageset_set_high() */
+static void pageset_set_batch(struct per_cpu_pageset *p, unsigned long batch)
+{
+	pageset_update(&p->pcp, 6 * batch, max(1UL, 1 * batch));
+}
+
+static void pageset_init(struct per_cpu_pageset *p)
+{
+	struct per_cpu_pages *pcp;
+	int migratetype;
+
+	memset(p, 0, sizeof(*p));
+
+	pcp = &p->pcp;
+	for (migratetype = 0; migratetype < MIGRATE_PCPTYPES; migratetype++)
+		INIT_LIST_HEAD(&pcp->lists[migratetype]);
+}
+
+static void setup_pageset(struct per_cpu_pageset *p, unsigned long batch)
+{
+	pageset_init(p);
+	pageset_set_batch(p, batch);
+}
+
 ///*
 // * pageset_set_high() sets the high water mark for hot per_cpu_pagelist
 // * to the value high for the pageset p.
