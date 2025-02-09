@@ -196,10 +196,8 @@ cl_top_linux_init(void)
     setup_command_line(command_line);
     setup_nr_cpu_ids();
     setup_per_cpu_areas();
-
-    //smp_prepare_boot_cpu(); /* arch-specific boot-cpu hooks */
-    //boot_cpu_hotplug_init();
-
+    smp_prepare_boot_cpu(); /* arch-specific boot-cpu hooks */
+    boot_cpu_hotplug_init();
 
     printk("command_line: '%s'\n", command_line);
     sbi_puts("module[top_linux]: init end!\n");

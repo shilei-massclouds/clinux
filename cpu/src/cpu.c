@@ -2510,6 +2510,7 @@ void __init boot_cpu_hotplug_init(void)
 #endif
 	this_cpu_write(cpuhp_state.state, CPUHP_ONLINE);
 }
+EXPORT_SYMBOL(boot_cpu_hotplug_init);
 
 /*
  * These are used for a global "mitigations=" cmdline option for toggling
