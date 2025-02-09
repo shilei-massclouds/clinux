@@ -519,22 +519,22 @@ static int __of_device_is_compatible(const struct device_node *device,
 	return score;
 }
 
-///** Checks if the given "compat" string matches one of the strings in
-// * the device's "compatible" property
-// */
-//int of_device_is_compatible(const struct device_node *device,
-//		const char *compat)
-//{
-//	unsigned long flags;
-//	int res;
-//
-//	raw_spin_lock_irqsave(&devtree_lock, flags);
-//	res = __of_device_is_compatible(device, compat, NULL, NULL);
-//	raw_spin_unlock_irqrestore(&devtree_lock, flags);
-//	return res;
-//}
-//EXPORT_SYMBOL(of_device_is_compatible);
-//
+/** Checks if the given "compat" string matches one of the strings in
+ * the device's "compatible" property
+ */
+int of_device_is_compatible(const struct device_node *device,
+		const char *compat)
+{
+	unsigned long flags;
+	int res;
+
+	raw_spin_lock_irqsave(&devtree_lock, flags);
+	res = __of_device_is_compatible(device, compat, NULL, NULL);
+	raw_spin_unlock_irqrestore(&devtree_lock, flags);
+	return res;
+}
+EXPORT_SYMBOL(of_device_is_compatible);
+
 ///** Checks if the device is compatible with any of the entries in
 // *  a NULL terminated array of strings. Returns the best match
 // *  score or 0.
@@ -771,43 +771,43 @@ struct device_node *of_get_next_available_child(const struct device_node *node,
 }
 EXPORT_SYMBOL(of_get_next_available_child);
 
-///**
-// *	of_get_next_cpu_node - Iterate on cpu nodes
-// *	@prev:	previous child of the /cpus node, or NULL to get first
-// *
-// *	Returns a cpu node pointer with refcount incremented, use of_node_put()
-// *	on it when done. Returns NULL when prev is the last child. Decrements
-// *	the refcount of prev.
-// */
-//struct device_node *of_get_next_cpu_node(struct device_node *prev)
-//{
-//	struct device_node *next = NULL;
-//	unsigned long flags;
-//	struct device_node *node;
-//
-//	if (!prev)
-//		node = of_find_node_by_path("/cpus");
-//
-//	raw_spin_lock_irqsave(&devtree_lock, flags);
-//	if (prev)
-//		next = prev->sibling;
-//	else if (node) {
-//		next = node->child;
-//		of_node_put(node);
-//	}
-//	for (; next; next = next->sibling) {
-//		if (!(of_node_name_eq(next, "cpu") ||
-//		      __of_node_is_type(next, "cpu")))
-//			continue;
-//		if (of_node_get(next))
-//			break;
-//	}
-//	of_node_put(prev);
-//	raw_spin_unlock_irqrestore(&devtree_lock, flags);
-//	return next;
-//}
-//EXPORT_SYMBOL(of_get_next_cpu_node);
-//
+/**
+ *	of_get_next_cpu_node - Iterate on cpu nodes
+ *	@prev:	previous child of the /cpus node, or NULL to get first
+ *
+ *	Returns a cpu node pointer with refcount incremented, use of_node_put()
+ *	on it when done. Returns NULL when prev is the last child. Decrements
+ *	the refcount of prev.
+ */
+struct device_node *of_get_next_cpu_node(struct device_node *prev)
+{
+	struct device_node *next = NULL;
+	unsigned long flags;
+	struct device_node *node;
+
+	if (!prev)
+		node = of_find_node_by_path("/cpus");
+
+	raw_spin_lock_irqsave(&devtree_lock, flags);
+	if (prev)
+		next = prev->sibling;
+	else if (node) {
+		next = node->child;
+		of_node_put(node);
+	}
+	for (; next; next = next->sibling) {
+		if (!(of_node_name_eq(next, "cpu") ||
+		      __of_node_is_type(next, "cpu")))
+			continue;
+		if (of_node_get(next))
+			break;
+	}
+	of_node_put(prev);
+	raw_spin_unlock_irqrestore(&devtree_lock, flags);
+	return next;
+}
+EXPORT_SYMBOL(of_get_next_cpu_node);
+
 ///**
 // * of_get_compatible_child - Find compatible child node
 // * @parent:	parent node
