@@ -8,7 +8,9 @@
 #include <linux/cpu.h>
 #include <linux/security.h>
 #include <linux/of_fdt.h>
+#include <linux/dma-direct.h>
 #include <asm/pgtable.h>
+#include <asm/sbi.h>
 #include <cl_hook.h>
 #include <cl_types.h>
 #include "../../booter/src/booter.h"
@@ -27,6 +29,24 @@ void __init setup_arch(char **cmdline_p)
 #else
     unflatten_device_tree();
 #endif
+
+#ifdef CONFIG_SWIOTLB
+    swiotlb_init(1);
+#endif
+
+#ifdef CONFIG_KASAN
+    kasan_init();
+#endif
+
+#if IS_ENABLED(CONFIG_RISCV_SBI)
+    sbi_init();
+#endif
+
+#ifdef CONFIG_SMP
+    setup_smp();
+#endif
+
+    riscv_fill_hwcap();
 }
 
 int

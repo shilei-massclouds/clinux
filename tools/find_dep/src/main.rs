@@ -12,7 +12,7 @@ use xmas_elf::symbol_table::Entry;
 use xmas_elf::sections::SHN_UNDEF;
 use anyhow::{Result, anyhow};
 use bitflags::bitflags;
-use log::debug;
+use log::{debug, info};
 
 bitflags! {
     /// Module Status (bitwise layout).
@@ -158,7 +158,7 @@ fn build_dependency(kmod: &ModuleRef, sym_map: &HashMap<String, ModuleRef>) -> R
     for undef in undef_syms {
         if let Some(dep) = sym_map.get(&undef) {
             if !find_dependency(kmod, &dep.name) {
-                debug!("undef: {} {}", undef, dep.name);
+                info!("{} -> {}:{}", kmod.name, dep.name, undef);
                 kmod.dependencies.borrow_mut().push(dep.clone());
                 build_dependency(dep, sym_map)?;
             }
