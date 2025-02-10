@@ -377,8 +377,8 @@ void __init mem_init(void)
     high_memory = (void *)(__va(PFN_PHYS(max_low_pfn)));
     memblock_free_all();
 
-    /*
     mem_init_print_info(NULL);
+    /*
     print_vm_layout();
     */
     sbi_puts("mem_init!!!\n");
