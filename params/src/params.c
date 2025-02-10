@@ -92,6 +92,7 @@ bool parameqn(const char *a, const char *b, size_t n)
 	}
 	return true;
 }
+EXPORT_SYMBOL(parameqn);
 
 bool parameq(const char *a, const char *b)
 {
@@ -214,6 +215,7 @@ char *parse_args(const char *doing,
 
 	return err;
 }
+EXPORT_SYMBOL(parse_args);
 
 ///* Lazy bastard, eh? */
 //#define STANDARD_PARAM_DEF(name, type, format, strtolfn)      		\

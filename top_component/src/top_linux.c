@@ -16,6 +16,12 @@
 #include <cl_types.h>
 #include "../../booter/src/booter.h"
 
+/*
+ * Boot command-line arguments
+ */
+#define MAX_INIT_ARGS CONFIG_INIT_ENV_ARG_LIMIT
+#define MAX_INIT_ENVS CONFIG_INIT_ENV_ARG_LIMIT
+
 /* Untouched saved command line (eg. for /proc) */
 char *saved_command_line;
 
@@ -159,10 +165,131 @@ static inline void setup_nr_cpu_ids(void) { }
 static inline void smp_prepare_cpus(unsigned int maxcpus) { }
 #endif
 
+static const char *argv_init[MAX_INIT_ARGS+2] = { "init", NULL, };
+const char *envp_init[MAX_INIT_ENVS+2] = { "HOME=/", "TERM=linux", NULL, };
+static const char *panic_later, *panic_param;
+
+extern const struct obs_kernel_param __setup_start[], __setup_end[];
+
+static bool __init obsolete_checksetup(char *line)
+{
+    const struct obs_kernel_param *p;
+    bool had_early_param = false;
+
+    p = __setup_start;
+    do {
+        int n = strlen(p->str);
+        if (parameqn(line, p->str, n)) {
+            if (p->early) {
+                /* Already done in parse_early_param?
+                 * (Needs exact match on param part).
+                 * Keep iterating, as we can have early
+                 * params and __setups of same names 8( */
+                if (line[n] == '\0' || line[n] == '=')
+                    had_early_param = true;
+            } else if (!p->setup_func) {
+                pr_warn("Parameter %s is obsolete, ignored\n",
+                    p->str);
+                return true;
+            } else if (p->setup_func(line + n))
+                return true;
+        }
+        p++;
+    } while (p < __setup_end);
+
+    return had_early_param;
+}
+
+/* Change NUL term back to "=", to make "param" the whole string. */
+static void __init repair_env_string(char *param, char *val)
+{
+    if (val) {
+        /* param=val or param="val"? */
+        if (val == param+strlen(param)+1)
+            val[-1] = '=';
+        else if (val == param+strlen(param)+2) {
+            val[-2] = '=';
+            memmove(val-1, val, strlen(val)+1);
+        } else
+            BUG();
+    }
+}
+
+/*
+ * Unknown boot options get handed to init, unless they look like
+ * unused parameters (modprobe will find them in /proc/cmdline).
+ */
+static int __init unknown_bootoption(char *param, char *val,
+				     const char *unused, void *arg)
+{
+	size_t len = strlen(param);
+
+	repair_env_string(param, val);
+
+	/* Handle obsolete-style parameters */
+	if (obsolete_checksetup(param))
+		return 0;
+
+	/* Unused module parameter. */
+	if (strnchr(param, len, '.'))
+		return 0;
+
+	if (panic_later)
+		return 0;
+
+	if (val) {
+		/* Environment option */
+		unsigned int i;
+		for (i = 0; envp_init[i]; i++) {
+			if (i == MAX_INIT_ENVS) {
+				panic_later = "env";
+				panic_param = param;
+			}
+			if (!strncmp(param, envp_init[i], len+1))
+				break;
+		}
+		envp_init[i] = param;
+	} else {
+		/* Command line option */
+		unsigned int i;
+		for (i = 0; argv_init[i]; i++) {
+			if (i == MAX_INIT_ARGS) {
+				panic_later = "init";
+				panic_param = param;
+			}
+		}
+		argv_init[i] = param;
+	}
+	return 0;
+}
+
+/* Anything after -- gets handed straight to init. */
+static int __init set_init_arg(char *param, char *val,
+                   const char *unused, void *arg)
+{
+    unsigned int i;
+
+    if (panic_later)
+        return 0;
+
+    repair_env_string(param, val);
+
+    for (i = 0; argv_init[i]; i++) {
+        if (i == MAX_INIT_ARGS) {
+            panic_later = "init";
+            panic_param = param;
+            return 0;
+        }
+    }
+    argv_init[i] = param;
+    return 0;
+}
+
 int
 cl_top_linux_init(void)
 {
     char *command_line;
+    char *after_dashes;
 
     sbi_puts("module[top_linux]: init begin ...\n");
     REQUIRE_COMPONENT(early_printk);
@@ -205,17 +332,19 @@ cl_top_linux_init(void)
     pr_notice("Kernel command line: %s\n", saved_command_line);
     /* parameters may set static keys */
     jump_label_init();
-//    parse_early_param();
-//    after_dashes = parse_args("Booting kernel",
-//                  static_command_line, __start___param,
-//                  __stop___param - __start___param,
-//                  -1, -1, NULL, &unknown_bootoption);
-//    if (!IS_ERR_OR_NULL(after_dashes))
-//        parse_args("Setting init args", after_dashes, NULL, 0, -1, -1,
-//               NULL, set_init_arg);
-//    if (extra_init_args)
-//        parse_args("Setting extra init args", extra_init_args,
-//               NULL, 0, -1, -1, NULL, set_init_arg);
+
+    // Note: some early params may not be setup.
+    parse_early_param();
+    after_dashes = parse_args("Booting kernel",
+                  static_command_line, __start___param,
+                  __stop___param - __start___param,
+                  -1, -1, NULL, &unknown_bootoption);
+    if (!IS_ERR_OR_NULL(after_dashes))
+        parse_args("Setting init args", after_dashes, NULL, 0, -1, -1,
+               NULL, set_init_arg);
+    if (extra_init_args)
+        parse_args("Setting extra init args", extra_init_args,
+               NULL, 0, -1, -1, NULL, set_init_arg);
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
