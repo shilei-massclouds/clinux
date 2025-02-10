@@ -47,6 +47,7 @@ components := \
 	early_sched wait \
 	resource dma \
 	percpu \
+	workqueue \
 	memblock bootmem paging page_alloc \
 	spinlock semaphore mutex \
 	early_printk

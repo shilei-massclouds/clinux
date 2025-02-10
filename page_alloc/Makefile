@@ -3,3 +3,4 @@
 obj_y := init.o
 obj_y += page_alloc.o
 obj_y += page_reporting.o
+obj_y += vmstat.o
