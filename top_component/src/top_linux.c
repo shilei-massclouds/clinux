@@ -10,6 +10,7 @@
 #include <linux/of_fdt.h>
 #include <linux/dma-direct.h>
 #include <linux/initrd.h>
+#include <linux/extable.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -352,7 +353,7 @@ cl_top_linux_init(void)
      */
     setup_log_buf(0);
     vfs_caches_init_early();
-    //sort_main_extable();
+    sort_main_extable();
     trap_init();
     //mm_init();
 

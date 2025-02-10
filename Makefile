@@ -51,7 +51,7 @@ components := \
 	workqueue \
 	memblock bootmem paging page_alloc \
 	spinlock semaphore mutex \
-	traps \
+	traps extable \
 	inode dcache \
 	early_printk printk
 
