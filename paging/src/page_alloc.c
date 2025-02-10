@@ -7466,6 +7466,7 @@ void __init free_area_init(unsigned long *max_zone_pfn)
 		check_for_memory(pgdat, nid);
 	}
 }
+EXPORT_SYMBOL(free_area_init);
 
 //static int __init cmdline_parse_core(char *p, unsigned long *core,
 //				     unsigned long *percent)

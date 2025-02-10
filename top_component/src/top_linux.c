@@ -42,6 +42,62 @@ static bool initargs_found;
 # define initargs_found false
 #endif
 
+extern void setup_vm_final(void);
+extern void free_area_init(unsigned long *max_zone_pfn);
+
+static void setup_zero_page(void)
+{
+    memset((void *)empty_zero_page, 0, PAGE_SIZE);
+}
+
+static void __init zone_sizes_init(void)
+{
+    unsigned long max_zone_pfns[MAX_NR_ZONES] = { 0, };
+
+#ifdef CONFIG_ZONE_DMA32
+    max_zone_pfns[ZONE_DMA32] = PFN_DOWN(min(4UL * SZ_1G,
+            (unsigned long) PFN_PHYS(max_low_pfn)));
+#endif
+    max_zone_pfns[ZONE_NORMAL] = max_low_pfn;
+
+    free_area_init(max_zone_pfns);
+}
+
+static void __init resource_init(void)
+{
+    struct memblock_region *region;
+
+    for_each_memblock(memory, region) {
+        struct resource *res;
+
+        res = memblock_alloc(sizeof(struct resource), SMP_CACHE_BYTES);
+        if (!res)
+            panic("%s: Failed to allocate %zu bytes\n", __func__,
+                  sizeof(struct resource));
+
+        if (memblock_is_nomap(region)) {
+            res->name = "reserved";
+            res->flags = IORESOURCE_MEM;
+        } else {
+            res->name = "System RAM";
+            res->flags = IORESOURCE_SYSTEM_RAM | IORESOURCE_BUSY;
+        }
+        res->start = __pfn_to_phys(memblock_region_memory_base_pfn(region));
+        res->end = __pfn_to_phys(memblock_region_memory_end_pfn(region)) - 1;
+
+        request_resource(&iomem_resource, res);
+    }
+}
+
+void __init paging_init(void)
+{
+    setup_vm_final();
+    sparse_init();
+    setup_zero_page();
+    zone_sizes_init();
+    resource_init();
+}
+
 void __init setup_arch(char **cmdline_p)
 {
     setup_kernel_in_mm();
@@ -311,6 +367,23 @@ static void __init report_meminit(void)
         pr_info("mem auto-init: clearing system memory may take some time...\n");
 }
 
+/* From 'arch/riscv/mm/init.c'. */
+void __init mem_init(void)
+{
+#ifdef CONFIG_FLATMEM
+    BUG_ON(!mem_map);
+#endif /* CONFIG_FLATMEM */
+
+    high_memory = (void *)(__va(PFN_PHYS(max_low_pfn)));
+    sbi_puts("mem_init!!!\n");
+    //memblock_free_all();
+
+    /*
+    mem_init_print_info(NULL);
+    print_vm_layout();
+    */
+}
+
 /*
  * Set up kernel memory allocators
  */
@@ -323,7 +396,7 @@ static void __init mm_init(void)
     page_ext_init_flatmem();
     init_debug_pagealloc();
     report_meminit();
-//    mem_init();
+    mem_init();
 //    kmem_cache_init();
 //    kmemleak_init();
 //    pgtable_init();

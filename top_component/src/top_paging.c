@@ -34,7 +34,6 @@ cl_top_paging_init(void)
     setup_kernel_in_mm();
     parse_early_param();
     setup_bootmem();
-    paging_init();
     sbi_puts("module[top_paging]: init end!\n");
     return 0;
 }

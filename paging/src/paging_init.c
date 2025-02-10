@@ -436,6 +436,7 @@ void __init setup_vm_final(void)
 	csr_write(CSR_SATP, PFN_DOWN(__pa_symbol(swapper_pg_dir)) | SATP_MODE);
 	local_flush_tlb_all();
 }
+EXPORT_SYMBOL(setup_vm_final);
 #else
 //asmlinkage void __init setup_vm(uintptr_t dtb_pa)
 //{
