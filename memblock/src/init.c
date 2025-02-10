@@ -2,6 +2,7 @@
 
 #include <linux/types.h>
 #include <linux/export.h>
+#include <linux/mm.h>
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
@@ -36,3 +37,8 @@ void dump_stack(void)
     booter_panic("No impl 'dump_stack'.");
 }
 */
+
+void page_init_poison(struct page *page, size_t size)
+{
+    booter_panic("No impl 'page_init_poison'.");
+}

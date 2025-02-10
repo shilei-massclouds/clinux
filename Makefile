@@ -51,6 +51,8 @@ components := \
 	workqueue \
 	memblock bootmem paging page_alloc \
 	spinlock semaphore mutex \
+	traps \
+	inode dcache \
 	early_printk printk
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)

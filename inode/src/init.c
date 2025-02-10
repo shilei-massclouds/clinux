@@ -5,10 +5,10 @@
 #include "../../booter/src/booter.h"
 
 int
-cl_dcache_init(void)
+cl_inode_init(void)
 {
-    sbi_puts("module[dcache]: init begin ...\n");
-    sbi_puts("module[dcache]: init end!\n");
+    sbi_puts("module[inode]: init begin ...\n");
+    sbi_puts("module[inode]: init end!\n");
     return 0;
 }
-EXPORT_SYMBOL(cl_dcache_init);
+EXPORT_SYMBOL(cl_inode_init);

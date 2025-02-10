@@ -2016,9 +2016,9 @@ EXPORT_SYMBOL(vm_node_stat);
 //}
 //
 //#endif
-//
-//struct workqueue_struct *mm_percpu_wq;
-//
+
+struct workqueue_struct *mm_percpu_wq;
+
 //void __init init_mm_internals(void)
 //{
 //	int ret __maybe_unused;

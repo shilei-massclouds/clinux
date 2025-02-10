@@ -358,6 +358,7 @@ EXPORT_SYMBOL(movable_zone);
 //#endif
 
 int page_group_by_mobility_disabled __read_mostly;
+EXPORT_SYMBOL(page_group_by_mobility_disabled);
 
 #ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
 ///*
@@ -549,6 +550,7 @@ void set_pageblock_migratetype(struct page *page, int migratetype)
 	set_pfnblock_flags_mask(page, (unsigned long)migratetype,
 				page_to_pfn(page), MIGRATETYPE_MASK);
 }
+EXPORT_SYMBOL(set_pageblock_migratetype);
 
 //#ifdef CONFIG_DEBUG_VM
 //static int page_outside_zone_boundaries(struct zone *zone, struct page *page)

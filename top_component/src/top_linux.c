@@ -351,12 +351,10 @@ cl_top_linux_init(void)
      * kmem_cache_init()
      */
     setup_log_buf(0);
-    /*
     vfs_caches_init_early();
-    sort_main_extable();
+    //sort_main_extable();
     trap_init();
-    mm_init();
-    */
+    //mm_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
