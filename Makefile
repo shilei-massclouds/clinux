@@ -42,6 +42,7 @@ components := \
 	sbi \
 	cpu task cgroup \
 	hrtimer \
+	jump_label \
 	kobject driver_base \
 	early_fdt params of_fdt \
 	early_sched wait \

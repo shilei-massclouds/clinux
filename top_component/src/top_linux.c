@@ -202,7 +202,21 @@ cl_top_linux_init(void)
     build_all_zonelists(NULL);
     page_alloc_init();
 
-    printk("command_line: '%s'\n", command_line);
+    pr_notice("Kernel command line: %s\n", saved_command_line);
+    /* parameters may set static keys */
+    jump_label_init();
+//    parse_early_param();
+//    after_dashes = parse_args("Booting kernel",
+//                  static_command_line, __start___param,
+//                  __stop___param - __start___param,
+//                  -1, -1, NULL, &unknown_bootoption);
+//    if (!IS_ERR_OR_NULL(after_dashes))
+//        parse_args("Setting init args", after_dashes, NULL, 0, -1, -1,
+//               NULL, set_init_arg);
+//    if (extra_init_args)
+//        parse_args("Setting extra init args", extra_init_args,
+//               NULL, 0, -1, -1, NULL, set_init_arg);
+
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
 }
