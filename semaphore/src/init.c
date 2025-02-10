@@ -5,11 +5,6 @@
 #include <linux/sched/debug.h>
 #include "../../booter/src/booter.h"
 
-int wake_up_process(struct task_struct *p)
-{
-    booter_panic("No impl 'wake_up_process'.");
-}
-
 signed long __sched schedule_timeout(signed long timeout)
 {
     booter_panic("No impl 'schedule_timeout'.");

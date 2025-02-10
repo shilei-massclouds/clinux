@@ -51,7 +51,7 @@ components := \
 	workqueue \
 	memblock bootmem paging page_alloc \
 	spinlock semaphore mutex \
-	early_printk
+	early_printk printk
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init

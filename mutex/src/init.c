@@ -25,12 +25,6 @@ void wake_up_q(struct wake_q_head *head)
     booter_panic("in mutex!");
 }
 
-int wake_up_process(struct task_struct *p)
-{
-    booter_panic("in mutex!");
-}
-EXPORT_SYMBOL(wake_up_process);
-
 void __sched schedule_preempt_disabled(void)
 {
     booter_panic("in mutex!");

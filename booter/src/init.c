@@ -53,7 +53,7 @@ DEFINE_HOOK(int, vprintk_func, const char *fmt, va_list args);
 //
 // Hook for printk
 //
-asmlinkage __visible int printk(const char *fmt, ...)
+asmlinkage __visible __weak int printk(const char *fmt, ...)
 {
     if (HAS_HOOK(vprintk_func)) {
         int ret;

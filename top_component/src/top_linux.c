@@ -346,6 +346,18 @@ cl_top_linux_init(void)
         parse_args("Setting extra init args", extra_init_args,
                NULL, 0, -1, -1, NULL, set_init_arg);
 
+    /*
+     * These use large bootmem allocations and must precede
+     * kmem_cache_init()
+     */
+    setup_log_buf(0);
+    /*
+    vfs_caches_init_early();
+    sort_main_extable();
+    trap_init();
+    mm_init();
+    */
+
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
 }

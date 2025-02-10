@@ -3032,24 +3032,25 @@
 //	raw_spin_unlock_irq(&p->pi_lock);
 //	return ret;
 //}
-//
-///**
-// * wake_up_process - Wake up a specific process
-// * @p: The process to be woken up.
-// *
-// * Attempt to wake up the nominated process and move it to the set of runnable
-// * processes.
-// *
-// * Return: 1 if the process was woken up, 0 if it was already running.
-// *
-// * This function executes a full memory barrier before accessing the task state.
-// */
-//int wake_up_process(struct task_struct *p)
-//{
-//	return try_to_wake_up(p, TASK_NORMAL, 0);
-//}
-//EXPORT_SYMBOL(wake_up_process);
-//
+
+/**
+ * wake_up_process - Wake up a specific process
+ * @p: The process to be woken up.
+ *
+ * Attempt to wake up the nominated process and move it to the set of runnable
+ * processes.
+ *
+ * Return: 1 if the process was woken up, 0 if it was already running.
+ *
+ * This function executes a full memory barrier before accessing the task state.
+ */
+int wake_up_process(struct task_struct *p)
+{
+    panic("During early stage, we should never reach here!\n");
+	//return try_to_wake_up(p, TASK_NORMAL, 0);
+}
+EXPORT_SYMBOL(wake_up_process);
+
 //int wake_up_state(struct task_struct *p, unsigned int state)
 //{
 //	return try_to_wake_up(p, state, 0);
