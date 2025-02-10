@@ -90,7 +90,7 @@ jump_label_sort_entries(struct jump_entry *start, struct jump_entry *stop)
 	sort(start, size, sizeof(struct jump_entry), jump_label_cmp, swapfn);
 }
 
-//static void jump_label_update(struct static_key *key);
+static void jump_label_update(struct static_key *key);
 
 /*
  * There are similar definitions for the !CONFIG_JUMP_LABEL case in jump_label.h.
@@ -160,38 +160,38 @@ EXPORT_SYMBOL_GPL(static_key_count);
 //	cpus_read_unlock();
 //}
 //EXPORT_SYMBOL_GPL(static_key_slow_inc);
-//
-//void static_key_enable_cpuslocked(struct static_key *key)
-//{
-//	STATIC_KEY_CHECK_USE(key);
-//	lockdep_assert_cpus_held();
-//
-//	if (atomic_read(&key->enabled) > 0) {
-//		WARN_ON_ONCE(atomic_read(&key->enabled) != 1);
-//		return;
-//	}
-//
-//	jump_label_lock();
-//	if (atomic_read(&key->enabled) == 0) {
-//		atomic_set(&key->enabled, -1);
-//		jump_label_update(key);
-//		/*
-//		 * See static_key_slow_inc().
-//		 */
-//		atomic_set_release(&key->enabled, 1);
-//	}
-//	jump_label_unlock();
-//}
-//EXPORT_SYMBOL_GPL(static_key_enable_cpuslocked);
-//
-//void static_key_enable(struct static_key *key)
-//{
-//	cpus_read_lock();
-//	static_key_enable_cpuslocked(key);
-//	cpus_read_unlock();
-//}
-//EXPORT_SYMBOL_GPL(static_key_enable);
-//
+
+void static_key_enable_cpuslocked(struct static_key *key)
+{
+	STATIC_KEY_CHECK_USE(key);
+	lockdep_assert_cpus_held();
+
+	if (atomic_read(&key->enabled) > 0) {
+		WARN_ON_ONCE(atomic_read(&key->enabled) != 1);
+		return;
+	}
+
+	jump_label_lock();
+	if (atomic_read(&key->enabled) == 0) {
+		atomic_set(&key->enabled, -1);
+		jump_label_update(key);
+		/*
+		 * See static_key_slow_inc().
+		 */
+		atomic_set_release(&key->enabled, 1);
+	}
+	jump_label_unlock();
+}
+EXPORT_SYMBOL_GPL(static_key_enable_cpuslocked);
+
+void static_key_enable(struct static_key *key)
+{
+	cpus_read_lock();
+	static_key_enable_cpuslocked(key);
+	cpus_read_unlock();
+}
+EXPORT_SYMBOL_GPL(static_key_enable);
+
 //void static_key_disable_cpuslocked(struct static_key *key)
 //{
 //	STATIC_KEY_CHECK_USE(key);
@@ -329,35 +329,35 @@ EXPORT_SYMBOL_GPL(static_key_count);
 //
 //	return 0;
 //}
-//
-///*
-// * Update code which is definitely not currently executing.
-// * Architectures which need heavyweight synchronization to modify
-// * running code can override this to make the non-live update case
-// * cheaper.
-// */
-//void __weak __init_or_module arch_jump_label_transform_static(struct jump_entry *entry,
-//					    enum jump_label_type type)
-//{
-//	arch_jump_label_transform(entry, type);
-//}
-//
-//static inline struct jump_entry *static_key_entries(struct static_key *key)
-//{
-//	WARN_ON_ONCE(key->type & JUMP_TYPE_LINKED);
-//	return (struct jump_entry *)(key->type & ~JUMP_TYPE_MASK);
-//}
-//
+
+/*
+ * Update code which is definitely not currently executing.
+ * Architectures which need heavyweight synchronization to modify
+ * running code can override this to make the non-live update case
+ * cheaper.
+ */
+void __weak __init_or_module arch_jump_label_transform_static(struct jump_entry *entry,
+					    enum jump_label_type type)
+{
+	arch_jump_label_transform(entry, type);
+}
+
+static inline struct jump_entry *static_key_entries(struct static_key *key)
+{
+	WARN_ON_ONCE(key->type & JUMP_TYPE_LINKED);
+	return (struct jump_entry *)(key->type & ~JUMP_TYPE_MASK);
+}
+
 //static inline bool static_key_type(struct static_key *key)
 //{
 //	return key->type & JUMP_TYPE_TRUE;
 //}
-//
-//static inline bool static_key_linked(struct static_key *key)
-//{
-//	return key->type & JUMP_TYPE_LINKED;
-//}
-//
+
+static inline bool static_key_linked(struct static_key *key)
+{
+	return key->type & JUMP_TYPE_LINKED;
+}
+
 //static inline void static_key_clear_linked(struct static_key *key)
 //{
 //	key->type &= ~JUMP_TYPE_LINKED;
@@ -398,57 +398,57 @@ static enum jump_label_type jump_label_type(struct jump_entry *entry)
 	return enabled ^ branch;
 }
 
-//static bool jump_label_can_update(struct jump_entry *entry, bool init)
-//{
-//	/*
-//	 * Cannot update code that was in an init text area.
-//	 */
-//	if (!init && jump_entry_is_init(entry))
-//		return false;
-//
-//	if (!kernel_text_address(jump_entry_code(entry))) {
-//		WARN_ONCE(!jump_entry_is_init(entry),
-//			  "can't patch jump_label at %pS",
-//			  (void *)jump_entry_code(entry));
-//		return false;
-//	}
-//
-//	return true;
-//}
-//
-//#ifndef HAVE_JUMP_LABEL_BATCH
-//static void __jump_label_update(struct static_key *key,
-//				struct jump_entry *entry,
-//				struct jump_entry *stop,
-//				bool init)
-//{
-//	for (; (entry < stop) && (jump_entry_key(entry) == key); entry++) {
-//		if (jump_label_can_update(entry, init))
-//			arch_jump_label_transform(entry, jump_label_type(entry));
-//	}
-//}
-//#else
-//static void __jump_label_update(struct static_key *key,
-//				struct jump_entry *entry,
-//				struct jump_entry *stop,
-//				bool init)
-//{
-//	for (; (entry < stop) && (jump_entry_key(entry) == key); entry++) {
-//
-//		if (!jump_label_can_update(entry, init))
-//			continue;
-//
-//		if (!arch_jump_label_transform_queue(entry, jump_label_type(entry))) {
-//			/*
-//			 * Queue is full: Apply the current queue and try again.
-//			 */
-//			arch_jump_label_transform_apply();
-//			BUG_ON(!arch_jump_label_transform_queue(entry, jump_label_type(entry)));
-//		}
-//	}
-//	arch_jump_label_transform_apply();
-//}
-//#endif
+static bool jump_label_can_update(struct jump_entry *entry, bool init)
+{
+	/*
+	 * Cannot update code that was in an init text area.
+	 */
+	if (!init && jump_entry_is_init(entry))
+		return false;
+
+	if (!kernel_text_address(jump_entry_code(entry))) {
+		WARN_ONCE(!jump_entry_is_init(entry),
+			  "can't patch jump_label at %pS",
+			  (void *)jump_entry_code(entry));
+		return false;
+	}
+
+	return true;
+}
+
+#ifndef HAVE_JUMP_LABEL_BATCH
+static void __jump_label_update(struct static_key *key,
+				struct jump_entry *entry,
+				struct jump_entry *stop,
+				bool init)
+{
+	for (; (entry < stop) && (jump_entry_key(entry) == key); entry++) {
+		if (jump_label_can_update(entry, init))
+			arch_jump_label_transform(entry, jump_label_type(entry));
+	}
+}
+#else
+static void __jump_label_update(struct static_key *key,
+				struct jump_entry *entry,
+				struct jump_entry *stop,
+				bool init)
+{
+	for (; (entry < stop) && (jump_entry_key(entry) == key); entry++) {
+
+		if (!jump_label_can_update(entry, init))
+			continue;
+
+		if (!arch_jump_label_transform_queue(entry, jump_label_type(entry))) {
+			/*
+			 * Queue is full: Apply the current queue and try again.
+			 */
+			arch_jump_label_transform_apply();
+			BUG_ON(!arch_jump_label_transform_queue(entry, jump_label_type(entry)));
+		}
+	}
+	arch_jump_label_transform_apply();
+}
+#endif
 
 void __init jump_label_init(void)
 {
@@ -496,7 +496,7 @@ void __init jump_label_init(void)
 }
 EXPORT_SYMBOL(jump_label_init);
 
-//#ifdef CONFIG_MODULES
+#ifdef CONFIG_MODULES
 //
 //static enum jump_label_type jump_label_init_type(struct jump_entry *entry)
 //{
@@ -507,19 +507,19 @@ EXPORT_SYMBOL(jump_label_init);
 //	/* See the comment in linux/jump_label.h */
 //	return type ^ branch;
 //}
-//
-//struct static_key_mod {
-//	struct static_key_mod *next;
-//	struct jump_entry *entries;
-//	struct module *mod;
-//};
-//
-//static inline struct static_key_mod *static_key_mod(struct static_key *key)
-//{
-//	WARN_ON_ONCE(!static_key_linked(key));
-//	return (struct static_key_mod *)(key->type & ~JUMP_TYPE_MASK);
-//}
-//
+
+struct static_key_mod {
+	struct static_key_mod *next;
+	struct jump_entry *entries;
+	struct module *mod;
+};
+
+static inline struct static_key_mod *static_key_mod(struct static_key *key)
+{
+	WARN_ON_ONCE(!static_key_linked(key));
+	return (struct static_key_mod *)(key->type & ~JUMP_TYPE_MASK);
+}
+
 ///***
 // * key->type and key->next are the same via union.
 // * This sets key->next and preserves the type bits.
@@ -554,32 +554,32 @@ EXPORT_SYMBOL(jump_label_init);
 //				mod->jump_entries + mod->num_jump_entries,
 //				start, end);
 //}
-//
-//static void __jump_label_mod_update(struct static_key *key)
-//{
-//	struct static_key_mod *mod;
-//
-//	for (mod = static_key_mod(key); mod; mod = mod->next) {
-//		struct jump_entry *stop;
-//		struct module *m;
-//
-//		/*
-//		 * NULL if the static_key is defined in a module
-//		 * that does not use it
-//		 */
-//		if (!mod->entries)
-//			continue;
-//
-//		m = mod->mod;
-//		if (!m)
-//			stop = __stop___jump_table;
-//		else
-//			stop = m->jump_entries + m->num_jump_entries;
-//		__jump_label_update(key, mod->entries, stop,
-//				    m && m->state == MODULE_STATE_COMING);
-//	}
-//}
-//
+
+static void __jump_label_mod_update(struct static_key *key)
+{
+	struct static_key_mod *mod;
+
+	for (mod = static_key_mod(key); mod; mod = mod->next) {
+		struct jump_entry *stop;
+		struct module *m;
+
+		/*
+		 * NULL if the static_key is defined in a module
+		 * that does not use it
+		 */
+		if (!mod->entries)
+			continue;
+
+		m = mod->mod;
+		if (!m)
+			stop = __stop___jump_table;
+		else
+			stop = m->jump_entries + m->num_jump_entries;
+		__jump_label_update(key, mod->entries, stop,
+				    m && m->state == MODULE_STATE_COMING);
+	}
+}
+
 ///***
 // * apply_jump_label_nops - patch module jump labels with arch_get_jump_label_nop()
 // * @mod: module to patch
@@ -756,7 +756,7 @@ EXPORT_SYMBOL(jump_label_init);
 //}
 //early_initcall(jump_label_init_module);
 //
-//#endif /* CONFIG_MODULES */
+#endif /* CONFIG_MODULES */
 //
 ///***
 // * jump_label_text_reserved - check if addr range is reserved
@@ -784,32 +784,32 @@ EXPORT_SYMBOL(jump_label_init);
 //#endif
 //	return ret;
 //}
-//
-//static void jump_label_update(struct static_key *key)
-//{
-//	struct jump_entry *stop = __stop___jump_table;
-//	struct jump_entry *entry;
-//#ifdef CONFIG_MODULES
-//	struct module *mod;
-//
-//	if (static_key_linked(key)) {
-//		__jump_label_mod_update(key);
-//		return;
-//	}
-//
-//	preempt_disable();
-//	mod = __module_address((unsigned long)key);
-//	if (mod)
-//		stop = mod->jump_entries + mod->num_jump_entries;
-//	preempt_enable();
-//#endif
-//	entry = static_key_entries(key);
-//	/* if there are no users, entry can be NULL */
-//	if (entry)
-//		__jump_label_update(key, entry, stop,
-//				    system_state < SYSTEM_RUNNING);
-//}
-//
+
+static void jump_label_update(struct static_key *key)
+{
+	struct jump_entry *stop = __stop___jump_table;
+	struct jump_entry *entry;
+#ifdef CONFIG_MODULES
+	struct module *mod;
+
+	if (static_key_linked(key)) {
+		__jump_label_mod_update(key);
+		return;
+	}
+
+	preempt_disable();
+	mod = __module_address((unsigned long)key);
+	if (mod)
+		stop = mod->jump_entries + mod->num_jump_entries;
+	preempt_enable();
+#endif
+	entry = static_key_entries(key);
+	/* if there are no users, entry can be NULL */
+	if (entry)
+		__jump_label_update(key, entry, stop,
+				    system_state < SYSTEM_RUNNING);
+}
+
 //#ifdef CONFIG_STATIC_KEYS_SELFTEST
 //static DEFINE_STATIC_KEY_TRUE(sk_true);
 //static DEFINE_STATIC_KEY_FALSE(sk_false);

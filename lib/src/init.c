@@ -35,10 +35,12 @@ void print_worker_info(const char *log_lvl, struct task_struct *task)
     booter_panic("No impl 'print_worker_info'.");
 }
 
+/*
 int __kernel_text_address(unsigned long addr)
 {
     booter_panic("No impl '__kernel_text_address'.");
 }
+*/
 
 int in_sched_functions(unsigned long addr)
 {

@@ -12,3 +12,8 @@ cl_extable_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_extable_init);
+
+bool is_module_text_address(unsigned long addr)
+{
+    booter_panic("No impl 'jump_label'.");
+}

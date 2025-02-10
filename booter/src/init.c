@@ -105,3 +105,9 @@ void __weak panic(const char *fmt, ...)
     do {} while (1);
 }
 EXPORT_SYMBOL(panic);
+
+void dump_stack(void)
+{
+    booter_panic("No impl 'dump_stack'.");
+}
+EXPORT_SYMBOL(dump_stack);

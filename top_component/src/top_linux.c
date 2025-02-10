@@ -286,6 +286,31 @@ static int __init set_init_arg(char *param, char *val,
     return 0;
 }
 
+/*
+ * Set up kernel memory allocators
+ */
+static void __init mm_init(void)
+{
+    /*
+     * page_ext requires contiguous pages,
+     * bigger than MAX_ORDER unless SPARSEMEM.
+     */
+    page_ext_init_flatmem();
+    init_debug_pagealloc();
+//    report_meminit();
+//    mem_init();
+//    kmem_cache_init();
+//    kmemleak_init();
+//    pgtable_init();
+//    debug_objects_mem_init();
+//    vmalloc_init();
+//    ioremap_huge_init();
+//    /* Should be run before the first non-init thread is created */
+//    init_espfix_bsp();
+//    /* Should be run after espfix64 is set up. */
+//    pti_init();
+}
+
 int
 cl_top_linux_init(void)
 {
@@ -355,7 +380,7 @@ cl_top_linux_init(void)
     vfs_caches_init_early();
     sort_main_extable();
     trap_init();
-    //mm_init();
+    mm_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

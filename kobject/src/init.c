@@ -40,3 +40,10 @@ void sysfs_remove_dir(struct kobject *kobj)
 {
     booter_panic("No impl in 'kobject'.");
 }
+
+/*
+void dump_stack(void)
+{
+    booter_panic("No impl 'kobject'.");
+}
+*/

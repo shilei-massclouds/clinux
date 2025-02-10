@@ -23,7 +23,8 @@
  *
  * NOT exported to modules - patching kernel text is a really delicate matter.
  */
-//DEFINE_MUTEX(text_mutex);
+DEFINE_MUTEX(text_mutex);
+EXPORT_SYMBOL(text_mutex);
 
 extern struct exception_table_entry __start___ex_table[];
 extern struct exception_table_entry __stop___ex_table[];
@@ -62,27 +63,27 @@ EXPORT_SYMBOL(sort_main_extable);
 //		e = search_bpf_extables(addr);
 //	return e;
 //}
-//
-//int init_kernel_text(unsigned long addr)
-//{
-//	if (addr >= (unsigned long)_sinittext &&
-//	    addr < (unsigned long)_einittext)
-//		return 1;
-//	return 0;
-//}
-//
-//int notrace core_kernel_text(unsigned long addr)
-//{
-//	if (addr >= (unsigned long)_stext &&
-//	    addr < (unsigned long)_etext)
-//		return 1;
-//
-//	if (system_state < SYSTEM_RUNNING &&
-//	    init_kernel_text(addr))
-//		return 1;
-//	return 0;
-//}
-//
+
+int init_kernel_text(unsigned long addr)
+{
+	if (addr >= (unsigned long)_sinittext &&
+	    addr < (unsigned long)_einittext)
+		return 1;
+	return 0;
+}
+
+int notrace core_kernel_text(unsigned long addr)
+{
+	if (addr >= (unsigned long)_stext &&
+	    addr < (unsigned long)_etext)
+		return 1;
+
+	if (system_state < SYSTEM_RUNNING &&
+	    init_kernel_text(addr))
+		return 1;
+	return 0;
+}
+
 ///**
 // * core_kernel_data - tell if addr points to kernel data
 // * @addr: address to test
@@ -100,65 +101,66 @@ EXPORT_SYMBOL(sort_main_extable);
 //		return 1;
 //	return 0;
 //}
-//
-//int __kernel_text_address(unsigned long addr)
-//{
-//	if (kernel_text_address(addr))
-//		return 1;
-//	/*
-//	 * There might be init symbols in saved stacktraces.
-//	 * Give those symbols a chance to be printed in
-//	 * backtraces (such as lockdep traces).
-//	 *
-//	 * Since we are after the module-symbols check, there's
-//	 * no danger of address overlap:
-//	 */
-//	if (init_kernel_text(addr))
-//		return 1;
-//	return 0;
-//}
-//
-//int kernel_text_address(unsigned long addr)
-//{
-//	bool no_rcu;
-//	int ret = 1;
-//
-//	if (core_kernel_text(addr))
-//		return 1;
-//
-//	/*
-//	 * If a stack dump happens while RCU is not watching, then
-//	 * RCU needs to be notified that it requires to start
-//	 * watching again. This can happen either by tracing that
-//	 * triggers a stack trace, or a WARN() that happens during
-//	 * coming back from idle, or cpu on or offlining.
-//	 *
-//	 * is_module_text_address() as well as the kprobe slots,
-//	 * is_bpf_text_address() and is_bpf_image_address require
-//	 * RCU to be watching.
-//	 */
-//	no_rcu = !rcu_is_watching();
-//
-//	/* Treat this like an NMI as it can happen anywhere */
-//	if (no_rcu)
-//		rcu_nmi_enter();
-//
-//	if (is_module_text_address(addr))
-//		goto out;
-//	if (is_ftrace_trampoline(addr))
-//		goto out;
-//	if (is_kprobe_optinsn_slot(addr) || is_kprobe_insn_slot(addr))
-//		goto out;
-//	if (is_bpf_text_address(addr))
-//		goto out;
-//	ret = 0;
-//out:
-//	if (no_rcu)
-//		rcu_nmi_exit();
-//
-//	return ret;
-//}
-//
+
+int __kernel_text_address(unsigned long addr)
+{
+	if (kernel_text_address(addr))
+		return 1;
+	/*
+	 * There might be init symbols in saved stacktraces.
+	 * Give those symbols a chance to be printed in
+	 * backtraces (such as lockdep traces).
+	 *
+	 * Since we are after the module-symbols check, there's
+	 * no danger of address overlap:
+	 */
+	if (init_kernel_text(addr))
+		return 1;
+	return 0;
+}
+
+int kernel_text_address(unsigned long addr)
+{
+	bool no_rcu;
+	int ret = 1;
+
+	if (core_kernel_text(addr))
+		return 1;
+
+	/*
+	 * If a stack dump happens while RCU is not watching, then
+	 * RCU needs to be notified that it requires to start
+	 * watching again. This can happen either by tracing that
+	 * triggers a stack trace, or a WARN() that happens during
+	 * coming back from idle, or cpu on or offlining.
+	 *
+	 * is_module_text_address() as well as the kprobe slots,
+	 * is_bpf_text_address() and is_bpf_image_address require
+	 * RCU to be watching.
+	 */
+	no_rcu = !rcu_is_watching();
+
+	/* Treat this like an NMI as it can happen anywhere */
+	if (no_rcu)
+		rcu_nmi_enter();
+
+	if (is_module_text_address(addr))
+		goto out;
+	if (is_ftrace_trampoline(addr))
+		goto out;
+	if (is_kprobe_optinsn_slot(addr) || is_kprobe_insn_slot(addr))
+		goto out;
+	if (is_bpf_text_address(addr))
+		goto out;
+	ret = 0;
+out:
+	if (no_rcu)
+		rcu_nmi_exit();
+
+	return ret;
+}
+EXPORT_SYMBOL(kernel_text_address);
+
 ///*
 // * On some architectures (PPC64, IA64) function pointers
 // * are actually only tokens to some data that then holds the

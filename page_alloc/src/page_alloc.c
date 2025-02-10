@@ -685,20 +685,21 @@ DEFINE_STATIC_KEY_FALSE(_debug_guardpage_enabled);
 //	return kstrtobool(buf, &_debug_pagealloc_enabled_early);
 //}
 //early_param("debug_pagealloc", early_debug_pagealloc);
-//
-//void init_debug_pagealloc(void)
-//{
-//	if (!debug_pagealloc_enabled())
-//		return;
-//
-//	static_branch_enable(&_debug_pagealloc_enabled);
-//
-//	if (!debug_guardpage_minorder())
-//		return;
-//
-//	static_branch_enable(&_debug_guardpage_enabled);
-//}
-//
+
+void init_debug_pagealloc(void)
+{
+	if (!debug_pagealloc_enabled())
+		return;
+
+	static_branch_enable(&_debug_pagealloc_enabled);
+
+	if (!debug_guardpage_minorder())
+		return;
+
+	static_branch_enable(&_debug_guardpage_enabled);
+}
+EXPORT_SYMBOL(init_debug_pagealloc);
+
 //static int __init debug_guardpage_minorder_setup(char *buf)
 //{
 //	unsigned long res;
