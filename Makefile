@@ -53,6 +53,7 @@ components := \
 	spinlock semaphore mutex \
 	traps extable \
 	inode dcache \
+	dump_stack \
 	early_printk printk
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)

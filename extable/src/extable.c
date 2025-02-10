@@ -118,6 +118,7 @@ int __kernel_text_address(unsigned long addr)
 		return 1;
 	return 0;
 }
+EXPORT_SYMBOL(__kernel_text_address);
 
 int kernel_text_address(unsigned long addr)
 {

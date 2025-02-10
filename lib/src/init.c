@@ -34,6 +34,7 @@ void print_worker_info(const char *log_lvl, struct task_struct *task)
 {
     booter_panic("No impl 'print_worker_info'.");
 }
+EXPORT_SYMBOL(print_worker_info);
 
 /*
 int __kernel_text_address(unsigned long addr)
@@ -48,11 +49,13 @@ int in_sched_functions(unsigned long addr)
       (addr >= (unsigned long)__sched_text_start
       && addr < (unsigned long)__sched_text_end);
 }
+EXPORT_SYMBOL(in_sched_functions);
 
 const char *print_tainted(void)
 {
     booter_panic("No impl 'print_tainted'.");
 }
+EXPORT_SYMBOL(print_tainted);
 
 bool ns_capable(struct user_namespace *ns, int cap)
 {
