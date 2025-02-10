@@ -19,3 +19,13 @@ struct device_link *device_link_add(struct device *consumer,
 {
     booter_panic("No impl in 'of_fdt'.");
 }
+
+void dev_printk(const char *level, const struct device *dev,
+        const char *fmt, ...)
+{
+    sbi_puts("[RAW_DEV_PRINTK]:");
+    sbi_puts(level);
+    sbi_puts(" - ");
+    sbi_puts(fmt);
+    sbi_puts("\n");
+}

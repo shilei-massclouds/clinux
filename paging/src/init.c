@@ -83,3 +83,4 @@ void dump_page(struct page *page, const char *reason)
 {
     booter_panic("No impl 'dump_page'.");
 }
+EXPORT_SYMBOL(dump_page);

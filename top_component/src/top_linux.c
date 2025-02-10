@@ -200,7 +200,7 @@ cl_top_linux_init(void)
     boot_cpu_hotplug_init();
 
     build_all_zonelists(NULL);
-    //page_alloc_init();
+    page_alloc_init();
 
     printk("command_line: '%s'\n", command_line);
     sbi_puts("module[top_linux]: init end!\n");

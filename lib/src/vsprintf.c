@@ -2300,10 +2300,12 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
 //		}
 	}
 
+    /*
     sbi_puts("booter:vsprintf: unimplemented pointer.\n");
     sbi_puts(fmt);
     sbi_puts("\n");
     sbi_shutdown();
+    */
 
 	/* default is to _not_ leak addresses, hash before printing */
 	return ptr_to_id(buf, end, ptr, spec);
