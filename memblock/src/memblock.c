@@ -903,18 +903,19 @@ int __init_memblock memblock_mark_hotplug(phys_addr_t base, phys_addr_t size)
 }
 EXPORT_SYMBOL(memblock_mark_hotplug);
 
-///**
-// * memblock_clear_hotplug - Clear flag MEMBLOCK_HOTPLUG for a specified region.
-// * @base: the base phys addr of the region
-// * @size: the size of the region
-// *
-// * Return: 0 on success, -errno on failure.
-// */
-//int __init_memblock memblock_clear_hotplug(phys_addr_t base, phys_addr_t size)
-//{
-//	return memblock_setclr_flag(base, size, 0, MEMBLOCK_HOTPLUG);
-//}
-//
+/**
+ * memblock_clear_hotplug - Clear flag MEMBLOCK_HOTPLUG for a specified region.
+ * @base: the base phys addr of the region
+ * @size: the size of the region
+ *
+ * Return: 0 on success, -errno on failure.
+ */
+int __init_memblock memblock_clear_hotplug(phys_addr_t base, phys_addr_t size)
+{
+	return memblock_setclr_flag(base, size, 0, MEMBLOCK_HOTPLUG);
+}
+EXPORT_SYMBOL(memblock_clear_hotplug);
+
 ///**
 // * memblock_mark_mirror - Mark mirrored memory with flag MEMBLOCK_MIRROR.
 // * @base: the base phys addr of the region
@@ -952,38 +953,39 @@ EXPORT_SYMBOL(memblock_mark_hotplug);
 //{
 //	return memblock_setclr_flag(base, size, 0, MEMBLOCK_NOMAP);
 //}
-//
-///**
-// * __next_reserved_mem_region - next function for for_each_reserved_region()
-// * @idx: pointer to u64 loop variable
-// * @out_start: ptr to phys_addr_t for start address of the region, can be %NULL
-// * @out_end: ptr to phys_addr_t for end address of the region, can be %NULL
-// *
-// * Iterate over all reserved memory regions.
-// */
-//void __init_memblock __next_reserved_mem_region(u64 *idx,
-//					   phys_addr_t *out_start,
-//					   phys_addr_t *out_end)
-//{
-//	struct memblock_type *type = &memblock.reserved;
-//
-//	if (*idx < type->cnt) {
-//		struct memblock_region *r = &type->regions[*idx];
-//		phys_addr_t base = r->base;
-//		phys_addr_t size = r->size;
-//
-//		if (out_start)
-//			*out_start = base;
-//		if (out_end)
-//			*out_end = base + size - 1;
-//
-//		*idx += 1;
-//		return;
-//	}
-//
-//	/* signal end of iteration */
-//	*idx = ULLONG_MAX;
-//}
+
+/**
+ * __next_reserved_mem_region - next function for for_each_reserved_region()
+ * @idx: pointer to u64 loop variable
+ * @out_start: ptr to phys_addr_t for start address of the region, can be %NULL
+ * @out_end: ptr to phys_addr_t for end address of the region, can be %NULL
+ *
+ * Iterate over all reserved memory regions.
+ */
+void __init_memblock __next_reserved_mem_region(u64 *idx,
+					   phys_addr_t *out_start,
+					   phys_addr_t *out_end)
+{
+	struct memblock_type *type = &memblock.reserved;
+
+	if (*idx < type->cnt) {
+		struct memblock_region *r = &type->regions[*idx];
+		phys_addr_t base = r->base;
+		phys_addr_t size = r->size;
+
+		if (out_start)
+			*out_start = base;
+		if (out_end)
+			*out_end = base + size - 1;
+
+		*idx += 1;
+		return;
+	}
+
+	/* signal end of iteration */
+	*idx = ULLONG_MAX;
+}
+EXPORT_SYMBOL(__next_reserved_mem_region);
 
 static bool should_skip_region(struct memblock_region *m, int nid, int flags)
 {
@@ -1111,6 +1113,7 @@ void __next_mem_range(u64 *idx, int nid, enum memblock_flags flags,
 	/* signal end of iteration */
 	*idx = ULLONG_MAX;
 }
+EXPORT_SYMBOL(__next_mem_range);
 
 /**
  * __next_mem_range_rev - generic next function for for_each_*_range_rev()
@@ -2018,30 +2021,7 @@ early_param("memblock", early_memblock);
 //
 //	return count;
 //}
-//
-//static int reset_managed_pages_done __initdata;
-//
-//void reset_node_managed_pages(pg_data_t *pgdat)
-//{
-//	struct zone *z;
-//
-//	for (z = pgdat->node_zones; z < pgdat->node_zones + MAX_NR_ZONES; z++)
-//		atomic_long_set(&z->managed_pages, 0);
-//}
-//
-//void __init reset_all_zones_managed_pages(void)
-//{
-//	struct pglist_data *pgdat;
-//
-//	if (reset_managed_pages_done)
-//		return;
-//
-//	for_each_online_pgdat(pgdat)
-//		reset_node_managed_pages(pgdat);
-//
-//	reset_managed_pages_done = 1;
-//}
-//
+
 ///**
 // * memblock_free_all - release free pages to the buddy allocator
 // *

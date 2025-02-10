@@ -1394,62 +1394,62 @@ static void free_one_page(struct zone *zone,
 //		set_page_address(page, __va(pfn << PAGE_SHIFT));
 //#endif
 //}
-//
-//#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
-//static void __meminit init_reserved_page(unsigned long pfn)
-//{
-//	pg_data_t *pgdat;
-//	int nid, zid;
-//
-//	if (!early_page_uninitialised(pfn))
-//		return;
-//
-//	nid = early_pfn_to_nid(pfn);
-//	pgdat = NODE_DATA(nid);
-//
-//	for (zid = 0; zid < MAX_NR_ZONES; zid++) {
-//		struct zone *zone = &pgdat->node_zones[zid];
-//
-//		if (pfn >= zone->zone_start_pfn && pfn < zone_end_pfn(zone))
-//			break;
-//	}
-//	__init_single_page(pfn_to_page(pfn), pfn, zid, nid);
-//}
-//#else
-//static inline void init_reserved_page(unsigned long pfn)
-//{
-//}
-//#endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */
-//
-///*
-// * Initialised pages do not have PageReserved set. This function is
-// * called for each range allocated by the bootmem allocator and
-// * marks the pages PageReserved. The remaining valid pages are later
-// * sent to the buddy page allocator.
-// */
-//void __meminit reserve_bootmem_region(phys_addr_t start, phys_addr_t end)
-//{
-//	unsigned long start_pfn = PFN_DOWN(start);
-//	unsigned long end_pfn = PFN_UP(end);
-//
-//	for (; start_pfn < end_pfn; start_pfn++) {
-//		if (pfn_valid(start_pfn)) {
-//			struct page *page = pfn_to_page(start_pfn);
-//
-//			init_reserved_page(start_pfn);
-//
-//			/* Avoid false-positive PageTail() */
-//			INIT_LIST_HEAD(&page->lru);
-//
-//			/*
-//			 * no need for atomic set_bit because the struct
-//			 * page is not visible yet so nobody should
-//			 * access it yet.
-//			 */
-//			__SetPageReserved(page);
-//		}
-//	}
-//}
+
+#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
+static void __meminit init_reserved_page(unsigned long pfn)
+{
+	pg_data_t *pgdat;
+	int nid, zid;
+
+	if (!early_page_uninitialised(pfn))
+		return;
+
+	nid = early_pfn_to_nid(pfn);
+	pgdat = NODE_DATA(nid);
+
+	for (zid = 0; zid < MAX_NR_ZONES; zid++) {
+		struct zone *zone = &pgdat->node_zones[zid];
+
+		if (pfn >= zone->zone_start_pfn && pfn < zone_end_pfn(zone))
+			break;
+	}
+	__init_single_page(pfn_to_page(pfn), pfn, zid, nid);
+}
+#else
+static inline void init_reserved_page(unsigned long pfn)
+{
+}
+#endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */
+
+/*
+ * Initialised pages do not have PageReserved set. This function is
+ * called for each range allocated by the bootmem allocator and
+ * marks the pages PageReserved. The remaining valid pages are later
+ * sent to the buddy page allocator.
+ */
+void __meminit reserve_bootmem_region(phys_addr_t start, phys_addr_t end)
+{
+	unsigned long start_pfn = PFN_DOWN(start);
+	unsigned long end_pfn = PFN_UP(end);
+
+	for (; start_pfn < end_pfn; start_pfn++) {
+		if (pfn_valid(start_pfn)) {
+			struct page *page = pfn_to_page(start_pfn);
+
+			init_reserved_page(start_pfn);
+
+			/* Avoid false-positive PageTail() */
+			INIT_LIST_HEAD(&page->lru);
+
+			/*
+			 * no need for atomic set_bit because the struct
+			 * page is not visible yet so nobody should
+			 * access it yet.
+			 */
+			__SetPageReserved(page);
+		}
+	}
+}
 
 static void __free_pages_ok(struct page *page, unsigned int order)
 {
@@ -1467,26 +1467,26 @@ static void __free_pages_ok(struct page *page, unsigned int order)
 	local_irq_restore(flags);
 }
 
-//void __free_pages_core(struct page *page, unsigned int order)
-//{
-//	unsigned int nr_pages = 1 << order;
-//	struct page *p = page;
-//	unsigned int loop;
-//
-//	prefetchw(p);
-//	for (loop = 0; loop < (nr_pages - 1); loop++, p++) {
-//		prefetchw(p + 1);
-//		__ClearPageReserved(p);
-//		set_page_count(p, 0);
-//	}
-//	__ClearPageReserved(p);
-//	set_page_count(p, 0);
-//
-//	atomic_long_add(nr_pages, &page_zone(page)->managed_pages);
-//	set_page_refcounted(page);
-//	__free_pages(page, order);
-//}
-//
+void __free_pages_core(struct page *page, unsigned int order)
+{
+	unsigned int nr_pages = 1 << order;
+	struct page *p = page;
+	unsigned int loop;
+
+	prefetchw(p);
+	for (loop = 0; loop < (nr_pages - 1); loop++, p++) {
+		prefetchw(p + 1);
+		__ClearPageReserved(p);
+		set_page_count(p, 0);
+	}
+	__ClearPageReserved(p);
+	set_page_count(p, 0);
+
+	atomic_long_add(nr_pages, &page_zone(page)->managed_pages);
+	set_page_refcounted(page);
+	__free_pages(page, order);
+}
+
 //#ifdef CONFIG_NEED_MULTIPLE_NODES
 //
 //static struct mminit_pfnnid_cache early_pfnnid_cache __meminitdata;
@@ -1530,15 +1530,15 @@ static void __free_pages_ok(struct page *page, unsigned int order)
 //	return nid;
 //}
 //#endif /* CONFIG_NEED_MULTIPLE_NODES */
-//
-//void __init memblock_free_pages(struct page *page, unsigned long pfn,
-//							unsigned int order)
-//{
-//	if (early_page_uninitialised(pfn))
-//		return;
-//	__free_pages_core(page, order);
-//}
-//
+
+void __init memblock_free_pages(struct page *page, unsigned long pfn,
+							unsigned int order)
+{
+	if (early_page_uninitialised(pfn))
+		return;
+	__free_pages_core(page, order);
+}
+
 ///*
 // * Check that the whole (or subset of) a pageblock given by the interval of
 // * [start_pfn, end_pfn) is valid and within the same zone, before scanning it
@@ -8813,3 +8813,98 @@ EXPORT_SYMBOL(alloc_large_system_hash);
 //	return hwpoisoned;
 //}
 //#endif
+
+static void __init __free_pages_memory(unsigned long start, unsigned long end)
+{
+	int order;
+
+	while (start < end) {
+		order = min(MAX_ORDER - 1UL, __ffs(start));
+
+		while (start + (1UL << order) > end)
+			order--;
+
+		memblock_free_pages(pfn_to_page(start), start, order);
+
+		start += (1UL << order);
+	}
+}
+
+static unsigned long __init __free_memory_core(phys_addr_t start,
+				 phys_addr_t end)
+{
+	unsigned long start_pfn = PFN_UP(start);
+	unsigned long end_pfn = min_t(unsigned long,
+				      PFN_DOWN(end), max_low_pfn);
+
+	if (start_pfn >= end_pfn)
+		return 0;
+
+	__free_pages_memory(start_pfn, end_pfn);
+
+	return end_pfn - start_pfn;
+}
+
+static unsigned long __init free_low_memory_core_early(void)
+{
+	unsigned long count = 0;
+	phys_addr_t start, end;
+	u64 i;
+
+	memblock_clear_hotplug(0, -1);
+
+	for_each_reserved_mem_region(i, &start, &end)
+		reserve_bootmem_region(start, end);
+
+	/*
+	 * We need to use NUMA_NO_NODE instead of NODE_DATA(0)->node_id
+	 *  because in some case like Node0 doesn't have RAM installed
+	 *  low ram will be on Node1
+	 */
+	for_each_free_mem_range(i, NUMA_NO_NODE, MEMBLOCK_NONE, &start, &end,
+				NULL)
+		count += __free_memory_core(start, end);
+
+	return count;
+}
+
+static int reset_managed_pages_done __initdata;
+
+void reset_node_managed_pages(pg_data_t *pgdat)
+{
+	struct zone *z;
+
+	for (z = pgdat->node_zones; z < pgdat->node_zones + MAX_NR_ZONES; z++)
+		atomic_long_set(&z->managed_pages, 0);
+}
+
+void __init reset_all_zones_managed_pages(void)
+{
+	struct pglist_data *pgdat;
+
+	if (reset_managed_pages_done)
+		return;
+
+	for_each_online_pgdat(pgdat)
+		reset_node_managed_pages(pgdat);
+
+	reset_managed_pages_done = 1;
+}
+
+/**
+ * memblock_free_all - release free pages to the buddy allocator
+ *
+ * Return: the number of pages actually released.
+ */
+unsigned long __init memblock_free_all(void)
+{
+	unsigned long pages;
+
+	reset_all_zones_managed_pages();
+
+	pages = free_low_memory_core_early();
+	totalram_pages_add(pages);
+
+	return pages;
+}
+EXPORT_SYMBOL(memblock_free_all);

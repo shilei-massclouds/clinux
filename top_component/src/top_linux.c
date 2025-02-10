@@ -375,13 +375,13 @@ void __init mem_init(void)
 #endif /* CONFIG_FLATMEM */
 
     high_memory = (void *)(__va(PFN_PHYS(max_low_pfn)));
-    sbi_puts("mem_init!!!\n");
-    //memblock_free_all();
+    memblock_free_all();
 
     /*
     mem_init_print_info(NULL);
     print_vm_layout();
     */
+    sbi_puts("mem_init!!!\n");
 }
 
 /*
