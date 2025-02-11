@@ -3,3 +3,4 @@
 obj_y := init.o
 obj_y += lcm.o
 obj_y += gcd.o
+obj_y += reciprocal_div.o

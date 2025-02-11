@@ -21,10 +21,11 @@ void sysfs_remove_groups(struct kobject *kobj,
     booter_panic("No impl in 'kobject'.");
 }
 
-void kfree_const(const void *x)
+void __weak kfree_const(const void *x)
 {
     booter_panic("No impl in 'kobject'.");
 }
+EXPORT_SYMBOL(kfree_const);
 
 void kernfs_put(struct kernfs_node *kn)
 {

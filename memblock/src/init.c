@@ -36,17 +36,11 @@ void *__kmalloc(size_t size, gfp_t flags)
     booter_panic("No impl '__kmalloc'.");
 }
 
-void kfree(const void *objp)
+void __weak kfree(const void *objp)
 {
     booter_panic("No impl 'kfree'.");
 }
-
-/*
-void dump_stack(void)
-{
-    booter_panic("No impl 'dump_stack'.");
-}
-*/
+EXPORT_SYMBOL(kfree);
 
 void page_init_poison(struct page *page, size_t size)
 {

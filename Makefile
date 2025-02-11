@@ -49,7 +49,8 @@ components := \
 	resource dma \
 	percpu \
 	workqueue \
-	memblock bootmem paging page_alloc \
+	memblock bootmem paging \
+	page_alloc slub \
 	spinlock semaphore mutex \
 	traps extable \
 	inode dcache \

@@ -120,6 +120,7 @@ unsigned long totalcma_pages __read_mostly;
 
 int percpu_pagelist_fraction;
 gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
+EXPORT_SYMBOL(gfp_allowed_mask);
 #ifdef CONFIG_INIT_ON_ALLOC_DEFAULT_ON
 DEFINE_STATIC_KEY_TRUE(init_on_alloc);
 #else
@@ -671,6 +672,7 @@ void prep_compound_page(struct page *page, unsigned int order)
 
 #ifdef CONFIG_DEBUG_PAGEALLOC
 unsigned int _debug_guardpage_minorder;
+EXPORT_SYMBOL(_debug_guardpage_minorder);
 
 bool _debug_pagealloc_enabled_early __read_mostly
 			= IS_ENABLED(CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT);
@@ -4401,6 +4403,7 @@ bool gfp_pfmemalloc_allowed(gfp_t gfp_mask)
 {
 	return !!__gfp_pfmemalloc_flags(gfp_mask);
 }
+EXPORT_SYMBOL(gfp_pfmemalloc_allowed);
 
 /*
  * Checks whether it makes sense to retry the reclaim to make a forward progress

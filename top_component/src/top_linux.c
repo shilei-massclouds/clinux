@@ -425,7 +425,7 @@ static void __init mm_init(void)
     init_debug_pagealloc();
     report_meminit();
     mem_init();
-//    kmem_cache_init();
+    kmem_cache_init();
 //    kmemleak_init();
 //    pgtable_init();
 //    debug_objects_mem_init();
