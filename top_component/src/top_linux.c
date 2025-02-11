@@ -11,6 +11,7 @@
 #include <linux/dma-direct.h>
 #include <linux/initrd.h>
 #include <linux/extable.h>
+#include <linux/kmemleak.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -412,6 +413,8 @@ void __init mem_init(void)
     print_vm_layout();
 }
 
+void __init __weak pgtable_cache_init(void) { }
+
 /*
  * Set up kernel memory allocators
  */
@@ -427,10 +430,10 @@ static void __init mm_init(void)
     mem_init();
     kmem_cache_init();
     sbi_puts("==========> mm_init\n");
-//    kmemleak_init();
-//    pgtable_init();
-//    debug_objects_mem_init();
-//    vmalloc_init();
+    kmemleak_init();
+    pgtable_init();
+    debug_objects_mem_init();
+    vmalloc_init();
 //    ioremap_huge_init();
 //    /* Should be run before the first non-init thread is created */
 //    init_espfix_bsp();

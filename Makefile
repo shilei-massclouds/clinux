@@ -40,6 +40,7 @@ QEMU_ARGS += \
 components := \
 	prebuilt booter lib math \
 	sbi \
+	mm_util \
 	cpu task cgroup \
 	hrtimer \
 	jump_label \
@@ -50,7 +51,7 @@ components := \
 	percpu \
 	workqueue \
 	memblock bootmem paging \
-	page_alloc slub \
+	page_alloc slub vmalloc \
 	spinlock semaphore mutex \
 	traps extable \
 	inode dcache \

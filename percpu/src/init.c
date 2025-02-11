@@ -36,6 +36,7 @@ void kvfree(const void *addr)
 {
     booter_panic("No impl 'percpu'.");
 }
+EXPORT_SYMBOL(kvfree);
 
 void *__kmalloc(size_t size, gfp_t flags)
 {

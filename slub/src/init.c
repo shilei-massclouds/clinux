@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/smp.h>
+#include <linux/kobject.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -36,9 +37,28 @@ void call_rcu(struct rcu_head *head, rcu_callback_t func)
 {
     booter_panic("No impl 'slub'.");
 }
+EXPORT_SYMBOL(call_rcu);
 
 void on_each_cpu_cond(smp_cond_func_t cond_func, smp_call_func_t func,
               void *info, bool wait)
 {
     booter_panic("No impl 'slub'.");
 }
+
+int sysfs_create_link(struct kobject *kobj, struct kobject *target,
+              const char *name)
+{
+    booter_panic("No impl 'slub'.");
+}
+
+void sysfs_remove_link(struct kobject *kobj, const char *name)
+{
+    booter_panic("No impl 'slub'.");
+}
+
+/*
+const char *kstrdup_const(const char *s, gfp_t gfp)
+{
+    booter_panic("No impl 'slub'.");
+}
+*/

@@ -4398,32 +4398,32 @@ EXPORT_SYMBOL(kmem_cache_init);
 //void __init kmem_cache_init_late(void)
 //{
 //}
-//
-//struct kmem_cache *
-//__kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
-//		   slab_flags_t flags, void (*ctor)(void *))
-//{
-//	struct kmem_cache *s;
-//
-//	s = find_mergeable(size, align, flags, name, ctor);
-//	if (s) {
-//		s->refcount++;
-//
-//		/*
-//		 * Adjust the object sizes so that we clear
-//		 * the complete object on kzalloc.
-//		 */
-//		s->object_size = max(s->object_size, size);
-//		s->inuse = max(s->inuse, ALIGN(size, sizeof(void *)));
-//
-//		if (sysfs_slab_alias(s, name)) {
-//			s->refcount--;
-//			s = NULL;
-//		}
-//	}
-//
-//	return s;
-//}
+
+struct kmem_cache *
+__kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
+		   slab_flags_t flags, void (*ctor)(void *))
+{
+	struct kmem_cache *s;
+
+	s = find_mergeable(size, align, flags, name, ctor);
+	if (s) {
+		s->refcount++;
+
+		/*
+		 * Adjust the object sizes so that we clear
+		 * the complete object on kzalloc.
+		 */
+		s->object_size = max(s->object_size, size);
+		s->inuse = max(s->inuse, ALIGN(size, sizeof(void *)));
+
+		if (sysfs_slab_alias(s, name)) {
+			s->refcount--;
+			s = NULL;
+		}
+	}
+
+	return s;
+}
 
 int __kmem_cache_create(struct kmem_cache *s, slab_flags_t flags)
 {
@@ -4444,28 +4444,27 @@ int __kmem_cache_create(struct kmem_cache *s, slab_flags_t flags)
 	return err;
 }
 
-//void *__kmalloc_track_caller(size_t size, gfp_t gfpflags, unsigned long caller)
-//{
-//	struct kmem_cache *s;
-//	void *ret;
-//
-//	if (unlikely(size > KMALLOC_MAX_CACHE_SIZE))
-//		return kmalloc_large(size, gfpflags);
-//
-//	s = kmalloc_slab(size, gfpflags);
-//
-//	if (unlikely(ZERO_OR_NULL_PTR(s)))
-//		return s;
-//
-//	ret = slab_alloc(s, gfpflags, caller);
-//
-//	/* Honor the call site pointer we received. */
-//	trace_kmalloc(caller, ret, size, s->size, gfpflags);
-//
-//	return ret;
-//}
-//EXPORT_SYMBOL(__kmalloc_track_caller);
-//
+void *__kmalloc_track_caller(size_t size, gfp_t gfpflags, unsigned long caller)
+{
+	struct kmem_cache *s;
+	void *ret;
+
+	if (unlikely(size > KMALLOC_MAX_CACHE_SIZE))
+		return kmalloc_large(size, gfpflags);
+
+	s = kmalloc_slab(size, gfpflags);
+
+	if (unlikely(ZERO_OR_NULL_PTR(s)))
+		return s;
+
+	ret = slab_alloc(s, gfpflags, caller);
+
+	/* Honor the call site pointer we received. */
+	trace_kmalloc(caller, ret, size, s->size, gfpflags);
+
+	return ret;
+}
+
 //#ifdef CONFIG_NUMA
 //void *__kmalloc_node_track_caller(size_t size, gfp_t gfpflags,
 //					int node, unsigned long caller)

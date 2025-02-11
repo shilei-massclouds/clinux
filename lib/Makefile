@@ -24,3 +24,4 @@ obj_y += user_namespace.o
 obj_y += user.o
 obj_y += bitmap.o
 obj_y += bsearch.o
+obj_y += rbtree.o
