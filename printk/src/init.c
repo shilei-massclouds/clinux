@@ -26,9 +26,9 @@ void __wake_up(struct wait_queue_head *wq_head, unsigned int mode,
 {
     booter_panic("No impl '__wake_up'.");
 }
-*/
 
 unsigned long long notrace sched_clock(void)
 {
     booter_panic("No impl 'sched_clock'.");
 }
+*/

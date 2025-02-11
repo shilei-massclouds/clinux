@@ -113,15 +113,15 @@ DEFINE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases) =
 	}
 };
 
-//static const int hrtimer_clock_to_base_table[MAX_CLOCKS] = {
-//	/* Make sure we catch unsupported clockids */
-//	[0 ... MAX_CLOCKS - 1]	= HRTIMER_MAX_CLOCK_BASES,
-//
-//	[CLOCK_REALTIME]	= HRTIMER_BASE_REALTIME,
-//	[CLOCK_MONOTONIC]	= HRTIMER_BASE_MONOTONIC,
-//	[CLOCK_BOOTTIME]	= HRTIMER_BASE_BOOTTIME,
-//	[CLOCK_TAI]		= HRTIMER_BASE_TAI,
-//};
+static const int hrtimer_clock_to_base_table[MAX_CLOCKS] = {
+	/* Make sure we catch unsupported clockids */
+	[0 ... MAX_CLOCKS - 1]	= HRTIMER_MAX_CLOCK_BASES,
+
+	[CLOCK_REALTIME]	= HRTIMER_BASE_REALTIME,
+	[CLOCK_MONOTONIC]	= HRTIMER_BASE_MONOTONIC,
+	[CLOCK_BOOTTIME]	= HRTIMER_BASE_BOOTTIME,
+	[CLOCK_TAI]		= HRTIMER_BASE_TAI,
+};
 
 /*
  * Functions and macros which are different for UP/SMP systems are kept in a
@@ -465,14 +465,14 @@ static inline void debug_hrtimer_activate(struct hrtimer *timer,
 					  enum hrtimer_mode mode) { }
 static inline void debug_hrtimer_deactivate(struct hrtimer *timer) { }
 #endif
-//
-//static inline void
-//debug_init(struct hrtimer *timer, clockid_t clockid,
-//	   enum hrtimer_mode mode)
-//{
-//	debug_hrtimer_init(timer);
-//	trace_hrtimer_init(timer, clockid, mode);
-//}
+
+static inline void
+debug_init(struct hrtimer *timer, clockid_t clockid,
+	   enum hrtimer_mode mode)
+{
+	debug_hrtimer_init(timer);
+	trace_hrtimer_init(timer, clockid, mode);
+}
 
 static inline void debug_activate(struct hrtimer *timer,
 				  enum hrtimer_mode mode)
@@ -1364,74 +1364,74 @@ EXPORT_SYMBOL_GPL(hrtimer_cancel);
 //	return expires;
 //}
 //#endif
-//
-//static inline int hrtimer_clockid_to_base(clockid_t clock_id)
-//{
-//	if (likely(clock_id < MAX_CLOCKS)) {
-//		int base = hrtimer_clock_to_base_table[clock_id];
-//
-//		if (likely(base != HRTIMER_MAX_CLOCK_BASES))
-//			return base;
-//	}
-//	WARN(1, "Invalid clockid %d. Using MONOTONIC\n", clock_id);
-//	return HRTIMER_BASE_MONOTONIC;
-//}
-//
-//static void __hrtimer_init(struct hrtimer *timer, clockid_t clock_id,
-//			   enum hrtimer_mode mode)
-//{
-//	bool softtimer = !!(mode & HRTIMER_MODE_SOFT);
-//	struct hrtimer_cpu_base *cpu_base;
-//	int base;
-//
-//	/*
-//	 * On PREEMPT_RT enabled kernels hrtimers which are not explicitely
-//	 * marked for hard interrupt expiry mode are moved into soft
-//	 * interrupt context for latency reasons and because the callbacks
-//	 * can invoke functions which might sleep on RT, e.g. spin_lock().
-//	 */
-//	if (IS_ENABLED(CONFIG_PREEMPT_RT) && !(mode & HRTIMER_MODE_HARD))
-//		softtimer = true;
-//
-//	memset(timer, 0, sizeof(struct hrtimer));
-//
-//	cpu_base = raw_cpu_ptr(&hrtimer_bases);
-//
-//	/*
-//	 * POSIX magic: Relative CLOCK_REALTIME timers are not affected by
-//	 * clock modifications, so they needs to become CLOCK_MONOTONIC to
-//	 * ensure POSIX compliance.
-//	 */
-//	if (clock_id == CLOCK_REALTIME && mode & HRTIMER_MODE_REL)
-//		clock_id = CLOCK_MONOTONIC;
-//
-//	base = softtimer ? HRTIMER_MAX_CLOCK_BASES / 2 : 0;
-//	base += hrtimer_clockid_to_base(clock_id);
-//	timer->is_soft = softtimer;
-//	timer->is_hard = !!(mode & HRTIMER_MODE_HARD);
-//	timer->base = &cpu_base->clock_base[base];
-//	timerqueue_init(&timer->node);
-//}
-//
-///**
-// * hrtimer_init - initialize a timer to the given clock
-// * @timer:	the timer to be initialized
-// * @clock_id:	the clock to be used
-// * @mode:       The modes which are relevant for intitialization:
-// *              HRTIMER_MODE_ABS, HRTIMER_MODE_REL, HRTIMER_MODE_ABS_SOFT,
-// *              HRTIMER_MODE_REL_SOFT
-// *
-// *              The PINNED variants of the above can be handed in,
-// *              but the PINNED bit is ignored as pinning happens
-// *              when the hrtimer is started
-// */
-//void hrtimer_init(struct hrtimer *timer, clockid_t clock_id,
-//		  enum hrtimer_mode mode)
-//{
-//	debug_init(timer, clock_id, mode);
-//	__hrtimer_init(timer, clock_id, mode);
-//}
-//EXPORT_SYMBOL_GPL(hrtimer_init);
+
+static inline int hrtimer_clockid_to_base(clockid_t clock_id)
+{
+	if (likely(clock_id < MAX_CLOCKS)) {
+		int base = hrtimer_clock_to_base_table[clock_id];
+
+		if (likely(base != HRTIMER_MAX_CLOCK_BASES))
+			return base;
+	}
+	WARN(1, "Invalid clockid %d. Using MONOTONIC\n", clock_id);
+	return HRTIMER_BASE_MONOTONIC;
+}
+
+static void __hrtimer_init(struct hrtimer *timer, clockid_t clock_id,
+			   enum hrtimer_mode mode)
+{
+	bool softtimer = !!(mode & HRTIMER_MODE_SOFT);
+	struct hrtimer_cpu_base *cpu_base;
+	int base;
+
+	/*
+	 * On PREEMPT_RT enabled kernels hrtimers which are not explicitely
+	 * marked for hard interrupt expiry mode are moved into soft
+	 * interrupt context for latency reasons and because the callbacks
+	 * can invoke functions which might sleep on RT, e.g. spin_lock().
+	 */
+	if (IS_ENABLED(CONFIG_PREEMPT_RT) && !(mode & HRTIMER_MODE_HARD))
+		softtimer = true;
+
+	memset(timer, 0, sizeof(struct hrtimer));
+
+	cpu_base = raw_cpu_ptr(&hrtimer_bases);
+
+	/*
+	 * POSIX magic: Relative CLOCK_REALTIME timers are not affected by
+	 * clock modifications, so they needs to become CLOCK_MONOTONIC to
+	 * ensure POSIX compliance.
+	 */
+	if (clock_id == CLOCK_REALTIME && mode & HRTIMER_MODE_REL)
+		clock_id = CLOCK_MONOTONIC;
+
+	base = softtimer ? HRTIMER_MAX_CLOCK_BASES / 2 : 0;
+	base += hrtimer_clockid_to_base(clock_id);
+	timer->is_soft = softtimer;
+	timer->is_hard = !!(mode & HRTIMER_MODE_HARD);
+	timer->base = &cpu_base->clock_base[base];
+	timerqueue_init(&timer->node);
+}
+
+/**
+ * hrtimer_init - initialize a timer to the given clock
+ * @timer:	the timer to be initialized
+ * @clock_id:	the clock to be used
+ * @mode:       The modes which are relevant for intitialization:
+ *              HRTIMER_MODE_ABS, HRTIMER_MODE_REL, HRTIMER_MODE_ABS_SOFT,
+ *              HRTIMER_MODE_REL_SOFT
+ *
+ *              The PINNED variants of the above can be handed in,
+ *              but the PINNED bit is ignored as pinning happens
+ *              when the hrtimer is started
+ */
+void hrtimer_init(struct hrtimer *timer, clockid_t clock_id,
+		  enum hrtimer_mode mode)
+{
+	debug_init(timer, clock_id, mode);
+	__hrtimer_init(timer, clock_id, mode);
+}
+EXPORT_SYMBOL_GPL(hrtimer_init);
 
 /*
  * A timer is active, when it is enqueued into the rbtree or the

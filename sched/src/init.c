@@ -29,12 +29,6 @@ void __put_task_struct(struct task_struct *tsk)
     booter_panic("No impl 'sched'.");
 }
 
-void hrtimer_init(struct hrtimer *timer, clockid_t clock_id,
-          enum hrtimer_mode mode)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 void __init generic_sched_clock_init(void)
 {
     booter_panic("No impl 'sched'.");
