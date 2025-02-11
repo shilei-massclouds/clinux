@@ -54,7 +54,7 @@ $(TARGET_DIR)/$(obj).ko: $(obj_y)
 
 $(TARGET_DIR)/%.o: $(obj)/src/%.c
 	@printf "CC\t$<\n"
-	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) -DKBUILD_MODNAME='"$(obj)"' $(INCLUDES) -c -o $@ $<
+	@$(CC) $(CFLAGS) $(CFLAGS_$(@F)) -DKBUILD_MODFILE='"$(obj)"' -DKBUILD_MODNAME='"$(obj)"' $(INCLUDES) -c -o $@ $<
 
 $(TARGET_DIR)/%.o: $(obj)/src/%.S
 	@printf "AS\t$<\n"

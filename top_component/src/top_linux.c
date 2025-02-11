@@ -12,6 +12,7 @@
 #include <linux/initrd.h>
 #include <linux/extable.h>
 #include <linux/kmemleak.h>
+#include <linux/pti.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
