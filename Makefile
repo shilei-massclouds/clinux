@@ -39,6 +39,7 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter lib math \
+	radix_tree \
 	sbi \
 	mm_util \
 	cpu task cgroup \
