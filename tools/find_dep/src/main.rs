@@ -243,7 +243,7 @@ fn export_symbols(
         debug!("sec: {:?} {}", sec, sec.get_name(&elf).unwrap());
         let data = sec.raw_data(&elf);
         let data = std::str::from_utf8(data)?;
-        for symbol in data.split("\0\0") {
+        for symbol in data.split("\0") {
             let symbol = symbol.trim();
             if !symbol.is_empty() {
                 debug!("export symbol: {}", symbol);

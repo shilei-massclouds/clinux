@@ -46,17 +46,17 @@ components := \
 	jump_label \
 	kobject driver_base \
 	early_fdt params of_fdt \
-	early_sched wait \
+	early_sched sched wait \
 	resource dma \
 	percpu \
 	workqueue \
 	memblock bootmem paging \
 	page_alloc slub vmalloc \
-	spinlock semaphore mutex \
+	spinlock semaphore mutex rwsem \
 	traps extable \
 	inode dcache \
 	dump_stack \
-	early_printk printk
+	early_printk printk panic
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init

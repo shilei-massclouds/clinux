@@ -34,6 +34,7 @@ ktime_t ktime_get(void)
 {
     booter_panic("No impl 'ktime_get'.");
 }
+EXPORT_SYMBOL(ktime_get);
 
 ktime_t ktime_get_with_offset(enum tk_offsets offs)
 {

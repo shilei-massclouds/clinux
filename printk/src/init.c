@@ -20,18 +20,15 @@ bool irq_work_queue(struct irq_work *work)
     booter_panic("No impl 'irq_work_queue'.");
 }
 
+/*
 void __wake_up(struct wait_queue_head *wq_head, unsigned int mode,
             int nr_exclusive, void *key)
 {
     booter_panic("No impl '__wake_up'.");
 }
+*/
 
 unsigned long long notrace sched_clock(void)
 {
     booter_panic("No impl 'sched_clock'.");
-}
-
-notrace void touch_softlockup_watchdog(void)
-{
-    booter_panic("No impl 'touch_softlockup_watchdog'.");
 }

@@ -9,6 +9,7 @@ obj_y += siphash.o
 obj_y += hexdump.o
 obj_y += uaccess.o
 obj_y += usercopy.o
+obj_y += tishift.o
 obj_y += kstrtox.o
 obj_y += time.o
 obj_y += debug_locks.o

@@ -837,73 +837,75 @@ static void wake_up_worker(struct worker_pool *pool)
 		wake_up_process(worker->task);
 }
 
-///**
-// * wq_worker_running - a worker is running again
-// * @task: task waking up
-// *
-// * This function is called when a worker returns from schedule()
-// */
-//void wq_worker_running(struct task_struct *task)
-//{
-//	struct worker *worker = kthread_data(task);
-//
-//	if (!worker->sleeping)
-//		return;
-//	if (!(worker->flags & WORKER_NOT_RUNNING))
-//		atomic_inc(&worker->pool->nr_running);
-//	worker->sleeping = 0;
-//}
-//
-///**
-// * wq_worker_sleeping - a worker is going to sleep
-// * @task: task going to sleep
-// *
-// * This function is called from schedule() when a busy worker is
-// * going to sleep. Preemption needs to be disabled to protect ->sleeping
-// * assignment.
-// */
-//void wq_worker_sleeping(struct task_struct *task)
-//{
-//	struct worker *next, *worker = kthread_data(task);
-//	struct worker_pool *pool;
-//
-//	/*
-//	 * Rescuers, which may not have all the fields set up like normal
-//	 * workers, also reach here, let's not access anything before
-//	 * checking NOT_RUNNING.
-//	 */
-//	if (worker->flags & WORKER_NOT_RUNNING)
-//		return;
-//
-//	pool = worker->pool;
-//
-//	/* Return if preempted before wq_worker_running() was reached */
-//	if (worker->sleeping)
-//		return;
-//
-//	worker->sleeping = 1;
-//	raw_spin_lock_irq(&pool->lock);
-//
-//	/*
-//	 * The counterpart of the following dec_and_test, implied mb,
-//	 * worklist not empty test sequence is in insert_work().
-//	 * Please read comment there.
-//	 *
-//	 * NOT_RUNNING is clear.  This means that we're bound to and
-//	 * running on the local cpu w/ rq lock held and preemption
-//	 * disabled, which in turn means that none else could be
-//	 * manipulating idle_list, so dereferencing idle_list without pool
-//	 * lock is safe.
-//	 */
-//	if (atomic_dec_and_test(&pool->nr_running) &&
-//	    !list_empty(&pool->worklist)) {
-//		next = first_idle_worker(pool);
-//		if (next)
-//			wake_up_process(next->task);
-//	}
-//	raw_spin_unlock_irq(&pool->lock);
-//}
-//
+/**
+ * wq_worker_running - a worker is running again
+ * @task: task waking up
+ *
+ * This function is called when a worker returns from schedule()
+ */
+void wq_worker_running(struct task_struct *task)
+{
+	struct worker *worker = kthread_data(task);
+
+	if (!worker->sleeping)
+		return;
+	if (!(worker->flags & WORKER_NOT_RUNNING))
+		atomic_inc(&worker->pool->nr_running);
+	worker->sleeping = 0;
+}
+EXPORT_SYMBOL(wq_worker_running);
+
+/**
+ * wq_worker_sleeping - a worker is going to sleep
+ * @task: task going to sleep
+ *
+ * This function is called from schedule() when a busy worker is
+ * going to sleep. Preemption needs to be disabled to protect ->sleeping
+ * assignment.
+ */
+void wq_worker_sleeping(struct task_struct *task)
+{
+	struct worker *next, *worker = kthread_data(task);
+	struct worker_pool *pool;
+
+	/*
+	 * Rescuers, which may not have all the fields set up like normal
+	 * workers, also reach here, let's not access anything before
+	 * checking NOT_RUNNING.
+	 */
+	if (worker->flags & WORKER_NOT_RUNNING)
+		return;
+
+	pool = worker->pool;
+
+	/* Return if preempted before wq_worker_running() was reached */
+	if (worker->sleeping)
+		return;
+
+	worker->sleeping = 1;
+	raw_spin_lock_irq(&pool->lock);
+
+	/*
+	 * The counterpart of the following dec_and_test, implied mb,
+	 * worklist not empty test sequence is in insert_work().
+	 * Please read comment there.
+	 *
+	 * NOT_RUNNING is clear.  This means that we're bound to and
+	 * running on the local cpu w/ rq lock held and preemption
+	 * disabled, which in turn means that none else could be
+	 * manipulating idle_list, so dereferencing idle_list without pool
+	 * lock is safe.
+	 */
+	if (atomic_dec_and_test(&pool->nr_running) &&
+	    !list_empty(&pool->worklist)) {
+		next = first_idle_worker(pool);
+		if (next)
+			wake_up_process(next->task);
+	}
+	raw_spin_unlock_irq(&pool->lock);
+}
+EXPORT_SYMBOL(wq_worker_sleeping);
+
 ///**
 // * wq_worker_last_func - retrieve worker's last work function
 // * @task: Task to retrieve last work function of.

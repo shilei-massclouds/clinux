@@ -20,6 +20,7 @@ static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;
 
 #ifdef CONFIG_FPU
 bool has_fpu __read_mostly;
+EXPORT_SYMBOL(has_fpu);
 #endif
 
 /**

@@ -5,11 +5,6 @@
 #include <linux/sched/debug.h>
 #include "../../booter/src/booter.h"
 
-signed long __sched schedule_timeout(signed long timeout)
-{
-    booter_panic("No impl 'schedule_timeout'.");
-}
-
 int
 cl_semaphore_init(void)
 {

@@ -18,10 +18,12 @@ cl_page_alloc_init(void)
 }
 EXPORT_SYMBOL(cl_page_alloc_init);
 
+/*
 void print_modules(void)
 {
     booter_panic("No impl 'page_alloc'.");
 }
+*/
 
 void lru_add_drain_cpu(int cpu)
 {

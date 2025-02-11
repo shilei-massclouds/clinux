@@ -66,9 +66,10 @@ struct fs_struct init_fs = {
 struct task_group root_task_group;
 EXPORT_SYMBOL(root_task_group);
 LIST_HEAD(task_groups);
+EXPORT_SYMBOL(task_groups);
 
 /* Cacheline aligned slab cache for task_group */
-static struct kmem_cache *task_group_cache __read_mostly;
+//static struct kmem_cache *task_group_cache __read_mostly;
 #endif
 
 struct pid init_struct_pid = {

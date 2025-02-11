@@ -13,6 +13,8 @@
 #include <linux/extable.h>
 #include <linux/kmemleak.h>
 #include <linux/pti.h>
+#include <linux/ftrace.h>
+#include <linux/sched/init.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -430,7 +432,6 @@ static void __init mm_init(void)
     report_meminit();
     mem_init();
     kmem_cache_init();
-    sbi_puts("==========> mm_init\n");
     kmemleak_init();
     pgtable_init();
     debug_objects_mem_init();
@@ -512,6 +513,18 @@ cl_top_linux_init(void)
     sort_main_extable();
     trap_init();
     mm_init();
+
+    ftrace_init();
+
+    /* trace_printk can be enabled here */
+    early_trace_init();
+
+    /*
+     * Set up the scheduler prior starting any interrupts (such as the
+     * timer interrupt). Full topology setup happens at smp_init()
+     * time - but meanwhile we still have a functioning scheduler.
+     */
+    sched_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
