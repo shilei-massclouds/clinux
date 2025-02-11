@@ -33,10 +33,11 @@ void __dump_page(struct page *page, const char *reason)
     booter_panic("No impl 'page_alloc'.");
 }
 
-void *__vmalloc(unsigned long size, gfp_t gfp_mask)
+void* __weak __vmalloc(unsigned long size, gfp_t gfp_mask)
 {
     booter_panic("No impl 'page_alloc'.");
 }
+EXPORT_SYMBOL(__vmalloc);
 
 unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
                 gfp_t gfp_mask, nodemask_t *nodemask)

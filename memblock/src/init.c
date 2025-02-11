@@ -26,15 +26,17 @@ cl_memblock_init(void)
 }
 EXPORT_SYMBOL(cl_memblock_init);
 
-bool slab_is_available(void)
+bool __weak slab_is_available(void)
 {
     return false;
 }
+EXPORT_SYMBOL(slab_is_available);
 
-void *__kmalloc(size_t size, gfp_t flags)
+void* __weak __kmalloc(size_t size, gfp_t flags)
 {
     booter_panic("No impl '__kmalloc'.");
 }
+EXPORT_SYMBOL(__kmalloc);
 
 void __weak kfree(const void *objp)
 {
