@@ -42,15 +42,3 @@ void on_each_cpu_cond(smp_cond_func_t cond_func, smp_call_func_t func,
 {
     booter_panic("No impl 'slub'.");
 }
-
-void free_percpu(void __percpu *ptr)
-{
-    booter_panic("No impl 'slub'.");
-}
-
-/*
-void __percpu *__alloc_percpu(size_t size, size_t align)
-{
-    booter_panic("No impl 'slub'.");
-}
-*/

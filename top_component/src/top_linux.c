@@ -426,6 +426,7 @@ static void __init mm_init(void)
     report_meminit();
     mem_init();
     kmem_cache_init();
+    sbi_puts("==========> mm_init\n");
 //    kmemleak_init();
 //    pgtable_init();
 //    debug_objects_mem_init();

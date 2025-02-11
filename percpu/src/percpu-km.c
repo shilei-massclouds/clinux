@@ -94,10 +94,10 @@ void pcpu_destroy_chunk(struct pcpu_chunk *chunk)
 	pcpu_free_chunk(chunk);
 }
 
-//static struct page *pcpu_addr_to_page(void *addr)
-//{
-//	return virt_to_page(addr);
-//}
+struct page *pcpu_addr_to_page(void *addr)
+{
+	return virt_to_page(addr);
+}
 
 static int __init pcpu_verify_alloc_info(const struct pcpu_alloc_info *ai)
 {
