@@ -2,3 +2,4 @@
 
 obj_y := init.o
 obj_y += core.o
+obj_y += wait.o

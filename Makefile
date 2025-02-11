@@ -46,7 +46,7 @@ components := \
 	jump_label \
 	kobject driver_base \
 	early_fdt params of_fdt \
-	early_sched sched wait \
+	early_sched sched \
 	resource dma \
 	percpu \
 	workqueue \
