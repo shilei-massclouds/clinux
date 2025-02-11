@@ -1507,12 +1507,12 @@ static inline unsigned long node_nr_slabs(struct kmem_cache_node *n)
 //	kmemleak_alloc(ptr, size, 1, flags);
 //	return ptr;
 //}
-//
-//static __always_inline void kfree_hook(void *x)
-//{
-//	kmemleak_free(x);
-//	kasan_kfree_large(x, _RET_IP_);
-//}
+
+static __always_inline void kfree_hook(void *x)
+{
+	kmemleak_free(x);
+	kasan_kfree_large(x, _RET_IP_);
+}
 
 static __always_inline bool slab_free_hook(struct kmem_cache *s, void *x)
 {
@@ -4094,31 +4094,31 @@ error:
 //	return slab_ksize(page->slab_cache);
 //}
 //EXPORT_SYMBOL(__ksize);
-//
-//void kfree(const void *x)
-//{
-//	struct page *page;
-//	void *object = (void *)x;
-//
-//	trace_kfree(_RET_IP_, x);
-//
-//	if (unlikely(ZERO_OR_NULL_PTR(x)))
-//		return;
-//
-//	page = virt_to_head_page(x);
-//	if (unlikely(!PageSlab(page))) {
-//		unsigned int order = compound_order(page);
-//
-//		BUG_ON(!PageCompound(page));
-//		kfree_hook(object);
-//		mod_node_page_state(page_pgdat(page), NR_SLAB_UNRECLAIMABLE_B,
-//				    -(PAGE_SIZE << order));
-//		__free_pages(page, order);
-//		return;
-//	}
-//	slab_free(page->slab_cache, page, object, NULL, 1, _RET_IP_);
-//}
-//EXPORT_SYMBOL(kfree);
+
+void kfree(const void *x)
+{
+	struct page *page;
+	void *object = (void *)x;
+
+	trace_kfree(_RET_IP_, x);
+
+	if (unlikely(ZERO_OR_NULL_PTR(x)))
+		return;
+
+	page = virt_to_head_page(x);
+	if (unlikely(!PageSlab(page))) {
+		unsigned int order = compound_order(page);
+
+		BUG_ON(!PageCompound(page));
+		kfree_hook(object);
+		mod_node_page_state(page_pgdat(page), NR_SLAB_UNRECLAIMABLE_B,
+				    -(PAGE_SIZE << order));
+		__free_pages(page, order);
+		return;
+	}
+	slab_free(page->slab_cache, page, object, NULL, 1, _RET_IP_);
+}
+EXPORT_SYMBOL(kfree);
 
 #define SHRINK_PROMOTE_MAX 32
 
