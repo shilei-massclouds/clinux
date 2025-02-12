@@ -18,27 +18,14 @@ void *__vmalloc(unsigned long size, gfp_t gfp_mask)
     booter_panic("No impl 'percpu'.");
 }
 
-/*
-bool slab_is_available(void)
-{
-    booter_panic("No impl 'percpu'.");
-}
-*/
-
-/*
-void __bitmap_clear(unsigned long *map, unsigned int start, int len)
-{
-    booter_panic("No impl 'percpu'.");
-}
-*/
-
 void kvfree(const void *addr)
 {
     booter_panic("No impl 'percpu'.");
 }
 EXPORT_SYMBOL(kvfree);
 
-void *__kmalloc(size_t size, gfp_t flags)
+void* __weak __kmalloc(size_t size, gfp_t flags)
 {
-    booter_panic("No impl 'percpu'.");
+    booter_panic("No impl in 'percpu'.");
 }
+EXPORT_SYMBOL(__kmalloc);

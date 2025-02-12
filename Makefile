@@ -7,7 +7,7 @@ export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 TOP ?= linux
 export TOP_COMPONENT := top_$(TOP)
 
-DEP_LOG ?= err
+DEP ?= err
 
 DEBUG ?= n
 ifeq ($(DEBUG),y)
@@ -91,7 +91,7 @@ $(CL_INIT).o: $(CL_INIT).c
 $(CL_INIT).c: necessities
 
 necessities: $(components) top_component
-	@ RUST_LOG=$(DEP_LOG) ./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP_COMPONENT)
+	@ RUST_LOG=$(DEP) ./tools/find_dep/target/release/find_dep $(KMODULE_DIR) $(TOP_COMPONENT)
 
 tools:
 	$(MAKE) -C ./tools
