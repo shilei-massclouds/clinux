@@ -24,9 +24,3 @@ inline void raise_softirq_irqoff(unsigned int nr)
     booter_panic("No impl in 'rcu'.");
 }
 EXPORT_SYMBOL(raise_softirq_irqoff);
-
-void open_softirq(int nr, void (*action)(struct softirq_action *))
-{
-    booter_panic("No impl in 'rcu'.");
-}
-EXPORT_SYMBOL(open_softirq);

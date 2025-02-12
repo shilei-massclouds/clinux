@@ -484,12 +484,13 @@ const char * const softirq_to_name[NR_SOFTIRQS] = {
 //	trace_softirq_raise(nr);
 //	or_softirq_pending(1UL << nr);
 //}
-//
-//void open_softirq(int nr, void (*action)(struct softirq_action *))
-//{
-//	softirq_vec[nr].action = action;
-//}
-//
+
+void open_softirq(int nr, void (*action)(struct softirq_action *))
+{
+	softirq_vec[nr].action = action;
+}
+EXPORT_SYMBOL(open_softirq);
+
 ///*
 // * Tasklets
 // */
