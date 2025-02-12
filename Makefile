@@ -40,12 +40,11 @@ QEMU_ARGS += \
 components := \
 	prebuilt booter lib math \
 	radix_tree idr xarray \
-	kasprintf \
-	sbi \
+	kasprintf random \
+	sbi time softirq \
 	mm_util \
 	cpu task cgroup \
 	riscv_cpu \
-	hrtimer \
 	jump_label \
 	kobject driver_base \
 	early_fdt params of_fdt \

@@ -341,18 +341,18 @@ static struct workqueue_attrs *ordered_wq_attrs[NR_STD_WORKER_POOLS];
 
 //struct workqueue_struct *system_wq __read_mostly;
 //EXPORT_SYMBOL(system_wq);
-struct workqueue_struct *system_highpri_wq __read_mostly;
-EXPORT_SYMBOL_GPL(system_highpri_wq);
-struct workqueue_struct *system_long_wq __read_mostly;
-EXPORT_SYMBOL_GPL(system_long_wq);
-struct workqueue_struct *system_unbound_wq __read_mostly;
-EXPORT_SYMBOL_GPL(system_unbound_wq);
-struct workqueue_struct *system_freezable_wq __read_mostly;
-EXPORT_SYMBOL_GPL(system_freezable_wq);
-struct workqueue_struct *system_power_efficient_wq __read_mostly;
-EXPORT_SYMBOL_GPL(system_power_efficient_wq);
-struct workqueue_struct *system_freezable_power_efficient_wq __read_mostly;
-EXPORT_SYMBOL_GPL(system_freezable_power_efficient_wq);
+//struct workqueue_struct *system_highpri_wq __read_mostly;
+//EXPORT_SYMBOL_GPL(system_highpri_wq);
+//struct workqueue_struct *system_long_wq __read_mostly;
+//EXPORT_SYMBOL_GPL(system_long_wq);
+//struct workqueue_struct *system_unbound_wq __read_mostly;
+//EXPORT_SYMBOL_GPL(system_unbound_wq);
+//struct workqueue_struct *system_freezable_wq __read_mostly;
+//EXPORT_SYMBOL_GPL(system_freezable_wq);
+//struct workqueue_struct *system_power_efficient_wq __read_mostly;
+//EXPORT_SYMBOL_GPL(system_power_efficient_wq);
+//struct workqueue_struct *system_freezable_power_efficient_wq __read_mostly;
+//EXPORT_SYMBOL_GPL(system_freezable_power_efficient_wq);
 
 static int worker_thread(void *__worker);
 static void workqueue_sysfs_unregister(struct workqueue_struct *wq);
@@ -1616,7 +1616,6 @@ void delayed_work_timer_fn(struct timer_list *t)
 	/* should have been called from irqsafe timer with irq already off */
 	__queue_work(dwork->cpu, dwork->wq, &dwork->work);
 }
-EXPORT_SYMBOL(delayed_work_timer_fn);
 
 static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
 				struct delayed_work *dwork, unsigned long delay)

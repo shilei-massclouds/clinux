@@ -22,6 +22,7 @@ void *kthread_data(struct task_struct *task)
     booter_panic("No impl in 'workqueue'.");
 }
 
+/*
 void add_timer(struct timer_list *timer)
 {
     booter_panic("No impl in 'workqueue'.");
@@ -32,21 +33,18 @@ void add_timer_on(struct timer_list *timer, int cpu)
     booter_panic("No impl in 'workqueue'.");
 }
 
-signed long __sched schedule_timeout_interruptible(signed long timeout)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
-
 int mod_timer(struct timer_list *timer, unsigned long expires)
 {
     booter_panic("No impl in 'workqueue'.");
 }
+*/
 
 int kthread_stop(struct task_struct *k)
 {
     booter_panic("No impl in 'workqueue'.");
 }
 
+/*
 unsigned int jiffies_to_msecs(const unsigned long j)
 {
     booter_panic("No impl in 'workqueue'.");
@@ -56,6 +54,7 @@ int device_register(struct device *dev)
 {
     booter_panic("No impl in 'workqueue'.");
 }
+*/
 
 void kthread_bind_mask(struct task_struct *p, const struct cpumask *mask)
 {
@@ -70,12 +69,14 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
     booter_panic("No impl in 'workqueue'.");
 }
 
+/*
 void init_timer_key(struct timer_list *timer,
             void (*func)(struct timer_list *), unsigned int flags,
             const char *name, struct lock_class_key *key)
 {
     booter_panic("No impl in 'workqueue'.");
 }
+*/
 
 int bitmap_parse(const char *start, unsigned int buflen,
         unsigned long *maskp, int nmaskbits)
@@ -93,8 +94,10 @@ void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
     booter_panic("No impl in 'workqueue'.");
 }
 
+/*
 int del_timer(struct timer_list *timer)
 {
     booter_panic("No impl in 'workqueue'.");
 }
+*/
 

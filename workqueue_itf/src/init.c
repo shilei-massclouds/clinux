@@ -16,17 +16,35 @@ EXPORT_SYMBOL(cl_workqueue_itf_init);
 
 struct workqueue_struct *system_wq __read_mostly;
 EXPORT_SYMBOL(system_wq);
+struct workqueue_struct *system_highpri_wq __read_mostly;
+EXPORT_SYMBOL_GPL(system_highpri_wq);
+struct workqueue_struct *system_long_wq __read_mostly;
+EXPORT_SYMBOL_GPL(system_long_wq);
+struct workqueue_struct *system_unbound_wq __read_mostly;
+EXPORT_SYMBOL_GPL(system_unbound_wq);
+struct workqueue_struct *system_freezable_wq __read_mostly;
+EXPORT_SYMBOL_GPL(system_freezable_wq);
+struct workqueue_struct *system_power_efficient_wq __read_mostly;
+EXPORT_SYMBOL_GPL(system_power_efficient_wq);
+struct workqueue_struct *system_freezable_power_efficient_wq __read_mostly;
+EXPORT_SYMBOL_GPL(system_freezable_power_efficient_wq);
 
 bool __weak queue_work_on(int cpu, struct workqueue_struct *wq,
 		   struct work_struct *work)
 {
-    booter_panic("No impl 'page_alloc'.");
+    booter_panic("No impl in 'workqueue_itf'.");
 }
 EXPORT_SYMBOL(queue_work_on);
 
 bool __weak queue_delayed_work_on(int cpu, struct workqueue_struct *wq,
 			   struct delayed_work *dwork, unsigned long delay)
 {
-    booter_panic("No impl 'page_alloc'.");
+    booter_panic("No impl in 'workqueue_itf'.");
 }
 EXPORT_SYMBOL(queue_delayed_work_on);
+
+void __weak delayed_work_timer_fn(struct timer_list *t)
+{
+    booter_panic("No impl in 'workqueue_itf'.");
+}
+EXPORT_SYMBOL(delayed_work_timer_fn);

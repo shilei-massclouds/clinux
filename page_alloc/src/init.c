@@ -97,11 +97,6 @@ long congestion_wait(int sync, long timeout)
     booter_panic("No impl 'page_init_poison'.");
 }
 
-signed long __sched schedule_timeout_uninterruptible(signed long timeout)
-{
-    booter_panic("No impl 'page_init_poison'.");
-}
-
 bool node_dirty_ok(struct pglist_data *pgdat)
 {
     booter_panic("No impl 'page_init_poison'.");

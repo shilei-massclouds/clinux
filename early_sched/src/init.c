@@ -139,3 +139,27 @@ bool kthread_should_stop(void)
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(kthread_should_stop);
+
+signed long __sched __weak schedule_timeout_uninterruptible(signed long timeout)
+{
+    booter_panic("No impl 'page_init_poison'.");
+}
+EXPORT_SYMBOL(schedule_timeout_uninterruptible);
+
+void __weak calc_global_load(void)
+{
+    booter_panic("No impl in 'early_sched'.");
+}
+EXPORT_SYMBOL(calc_global_load);
+
+void __weak calc_load_nohz_start(void)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(calc_load_nohz_start);
+
+void __weak calc_load_nohz_stop(void)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(calc_load_nohz_stop);

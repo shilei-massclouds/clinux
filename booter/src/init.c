@@ -4,6 +4,7 @@
 #include <linux/cache.h>
 #include <linux/jiffies.h>
 #include <linux/kobject.h>
+#include <linux/device.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -90,6 +91,11 @@ void __warn_printk(const char *fmt, ...)
 }
 EXPORT_SYMBOL(__warn_printk);
 
+//
+// NOTE ************************
+// Remove below definitions in future.
+//
+
 /**
  *  panic - halt the system
  *  @fmt: The text string to print
@@ -107,11 +113,6 @@ void __weak panic(const char *fmt, ...)
 }
 EXPORT_SYMBOL(panic);
 
-//
-// NOTE ************************
-// Remove below definitions in future.
-//
-
 void sysfs_remove_link(struct kobject *kobj, const char *name)
 {
     booter_panic("No impl 'slub'.");
@@ -123,3 +124,17 @@ int kobject_uevent(struct kobject *kobj, enum kobject_action action)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(kobject_uevent);
+
+void dev_printk(const char *level, const struct device *dev,
+        const char *fmt, ...)
+{
+    sbi_puts("[RAW_DEV_PRINTK]:");
+    sbi_puts(level);
+    sbi_puts(" - ");
+    sbi_puts(fmt);
+    sbi_puts("\n");
+}
+EXPORT_SYMBOL(dev_printk);
+
+unsigned long lpj_fine;
+EXPORT_SYMBOL(lpj_fine);
