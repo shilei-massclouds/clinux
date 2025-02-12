@@ -5,6 +5,7 @@
 #include <linux/kernel.h>
 #include <linux/sched/debug.h>
 #include <linux/sched/wake_q.h>
+#include "sched.h"
 #include "../../booter/src/booter.h"
 
 int
@@ -15,6 +16,22 @@ cl_early_sched_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_early_sched_init);
+
+void __weak set_user_nice(struct task_struct *p, long nice)
+{
+    if (system_state != SYSTEM_BOOTING) {
+        booter_panic("set_user_nice");
+    }
+}
+EXPORT_SYMBOL(set_user_nice);
+
+void __sched __weak wait_for_completion(struct completion *x)
+{
+    if (system_state != SYSTEM_BOOTING) {
+        booter_panic("wait_for_completion");
+    }
+}
+EXPORT_SYMBOL(wait_for_completion);
 
 #ifndef CONFIG_PREEMPTION
 int __sched _cond_resched(void)
@@ -92,14 +109,33 @@ signed long __sched __weak schedule_timeout(signed long timeout)
 }
 EXPORT_SYMBOL(schedule_timeout);
 
+void __weak __init_swait_queue_head(struct swait_queue_head *q, const char *name,
+			     struct lock_class_key *key)
+{
+    booter_panic("No impl in 'early_sched'.");
+}
+EXPORT_SYMBOL(__init_swait_queue_head);
+
 notrace void touch_softlockup_watchdog(void)
 {
     booter_panic("No impl 'touch_softlockup_watchdog'.");
 }
 EXPORT_SYMBOL(touch_softlockup_watchdog);
 
+void __weak complete(struct completion *x)
+{
+    booter_panic("No impl 'touch_softlockup_watchdog'.");
+}
+EXPORT_SYMBOL(complete);
+
 int __weak printk_deferred(const char *s, ...)
 {
     booter_panic("No impl 'sched'.");
 }
 EXPORT_SYMBOL(printk_deferred);
+
+bool kthread_should_stop(void)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(kthread_should_stop);

@@ -15,6 +15,7 @@
 #include <linux/pti.h>
 #include <linux/ftrace.h>
 #include <linux/sched/init.h>
+#include <linux/sched/isolation.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -535,6 +536,24 @@ cl_top_linux_init(void)
          "Interrupts were enabled *very* early, fixing it\n"))
         local_irq_disable();
     radix_tree_init();
+
+    /*
+     * Set up housekeeping before setting up workqueues to allow the unbound
+     * workqueue to take non-housekeeping into account.
+     */
+    housekeeping_init();
+
+    /*
+     * Allow workqueue creation and work item queueing/cancelling
+     * early.  Work item execution depends on kthreads and starts after
+     * workqueue_init().
+     */
+    workqueue_init_early();
+
+    //rcu_init();
+
+    /* Trace events are available after this */
+    trace_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

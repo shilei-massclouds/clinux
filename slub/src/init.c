@@ -51,11 +51,6 @@ int sysfs_create_link(struct kobject *kobj, struct kobject *target,
     booter_panic("No impl 'slub'.");
 }
 
-void sysfs_remove_link(struct kobject *kobj, const char *name)
-{
-    booter_panic("No impl 'slub'.");
-}
-
 /*
 const char *kstrdup_const(const char *s, gfp_t gfp)
 {

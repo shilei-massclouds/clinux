@@ -38,11 +38,6 @@ int set_direct_map_default_noflush(struct page *page)
     booter_panic("No impl 'slub'.");
 }
 
-void *xa_erase(struct xarray *xa, unsigned long index)
-{
-    booter_panic("No impl 'slub'.");
-}
-
 void pmd_clear_bad(pmd_t *pmd)
 {
     booter_panic("No impl 'slub'.");

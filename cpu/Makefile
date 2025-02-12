@@ -2,5 +2,3 @@
 
 obj_y := init.o
 obj_y += cpu.o
-obj_y += cpufeature.o
-obj_y += riscv_cpu.o

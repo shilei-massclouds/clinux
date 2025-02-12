@@ -1604,54 +1604,54 @@ void deactivate_task(struct rq *rq, struct task_struct *p, int flags)
 	dequeue_task(rq, p, flags);
 }
 
-///*
-// * __normal_prio - return the priority that is based on the static prio
-// */
-//static inline int __normal_prio(struct task_struct *p)
-//{
-//	return p->static_prio;
-//}
-//
-///*
-// * Calculate the expected normal priority: i.e. priority
-// * without taking RT-inheritance into account. Might be
-// * boosted by interactivity modifiers. Changes upon fork,
-// * setprio syscalls, and whenever the interactivity
-// * estimator recalculates.
-// */
-//static inline int normal_prio(struct task_struct *p)
-//{
-//	int prio;
-//
-//	if (task_has_dl_policy(p))
-//		prio = MAX_DL_PRIO-1;
-//	else if (task_has_rt_policy(p))
-//		prio = MAX_RT_PRIO-1 - p->rt_priority;
-//	else
-//		prio = __normal_prio(p);
-//	return prio;
-//}
-//
-///*
-// * Calculate the current priority, i.e. the priority
-// * taken into account by the scheduler. This value might
-// * be boosted by RT tasks, or might be boosted by
-// * interactivity modifiers. Will be RT if the task got
-// * RT-boosted. If not then it returns p->normal_prio.
-// */
-//static int effective_prio(struct task_struct *p)
-//{
-//	p->normal_prio = normal_prio(p);
-//	/*
-//	 * If we are RT tasks or we were boosted to RT priority,
-//	 * keep the priority unchanged. Otherwise, update priority
-//	 * to the normal priority:
-//	 */
-//	if (!rt_prio(p->prio))
-//		return p->normal_prio;
-//	return p->prio;
-//}
-//
+/*
+ * __normal_prio - return the priority that is based on the static prio
+ */
+static inline int __normal_prio(struct task_struct *p)
+{
+	return p->static_prio;
+}
+
+/*
+ * Calculate the expected normal priority: i.e. priority
+ * without taking RT-inheritance into account. Might be
+ * boosted by interactivity modifiers. Changes upon fork,
+ * setprio syscalls, and whenever the interactivity
+ * estimator recalculates.
+ */
+static inline int normal_prio(struct task_struct *p)
+{
+	int prio;
+
+	if (task_has_dl_policy(p))
+		prio = MAX_DL_PRIO-1;
+	else if (task_has_rt_policy(p))
+		prio = MAX_RT_PRIO-1 - p->rt_priority;
+	else
+		prio = __normal_prio(p);
+	return prio;
+}
+
+/*
+ * Calculate the current priority, i.e. the priority
+ * taken into account by the scheduler. This value might
+ * be boosted by RT tasks, or might be boosted by
+ * interactivity modifiers. Will be RT if the task got
+ * RT-boosted. If not then it returns p->normal_prio.
+ */
+static int effective_prio(struct task_struct *p)
+{
+	p->normal_prio = normal_prio(p);
+	/*
+	 * If we are RT tasks or we were boosted to RT priority,
+	 * keep the priority unchanged. Otherwise, update priority
+	 * to the normal priority:
+	 */
+	if (!rt_prio(p->prio))
+		return p->normal_prio;
+	return p->prio;
+}
+
 ///**
 // * task_curr - is this task currently executing on a CPU?
 // * @p: the task in question.
@@ -3048,11 +3048,11 @@ out:
 //	return try_to_wake_up(p, TASK_NORMAL, 0);
 //}
 //EXPORT_SYMBOL(wake_up_process);
-//
-//int wake_up_state(struct task_struct *p, unsigned int state)
-//{
-//	return try_to_wake_up(p, state, 0);
-//}
+
+int wake_up_state(struct task_struct *p, unsigned int state)
+{
+	return try_to_wake_up(p, state, 0);
+}
 
 /*
  * Perform scheduler related setup for a newly forked process p.
@@ -4948,61 +4948,60 @@ EXPORT_SYMBOL(default_wake_function);
 //	return prio;
 //}
 //#endif
-//
-//void set_user_nice(struct task_struct *p, long nice)
-//{
-//	bool queued, running;
-//	int old_prio;
-//	struct rq_flags rf;
-//	struct rq *rq;
-//
-//	if (task_nice(p) == nice || nice < MIN_NICE || nice > MAX_NICE)
-//		return;
-//	/*
-//	 * We have to be careful, if called from sys_setpriority(),
-//	 * the task might be in the middle of scheduling on another CPU.
-//	 */
-//	rq = task_rq_lock(p, &rf);
-//	update_rq_clock(rq);
-//
-//	/*
-//	 * The RT priorities are set via sched_setscheduler(), but we still
-//	 * allow the 'normal' nice value to be set - but as expected
-//	 * it wont have any effect on scheduling until the task is
-//	 * SCHED_DEADLINE, SCHED_FIFO or SCHED_RR:
-//	 */
-//	if (task_has_dl_policy(p) || task_has_rt_policy(p)) {
-//		p->static_prio = NICE_TO_PRIO(nice);
-//		goto out_unlock;
-//	}
-//	queued = task_on_rq_queued(p);
-//	running = task_current(rq, p);
-//	if (queued)
-//		dequeue_task(rq, p, DEQUEUE_SAVE | DEQUEUE_NOCLOCK);
-//	if (running)
-//		put_prev_task(rq, p);
-//
-//	p->static_prio = NICE_TO_PRIO(nice);
-//	set_load_weight(p, true);
-//	old_prio = p->prio;
-//	p->prio = effective_prio(p);
-//
-//	if (queued)
-//		enqueue_task(rq, p, ENQUEUE_RESTORE | ENQUEUE_NOCLOCK);
-//	if (running)
-//		set_next_task(rq, p);
-//
-//	/*
-//	 * If the task increased its priority or is running and
-//	 * lowered its priority, then reschedule its CPU:
-//	 */
-//	p->sched_class->prio_changed(rq, p, old_prio);
-//
-//out_unlock:
-//	task_rq_unlock(rq, p, &rf);
-//}
-//EXPORT_SYMBOL(set_user_nice);
-//
+
+void set_user_nice(struct task_struct *p, long nice)
+{
+	bool queued, running;
+	int old_prio;
+	struct rq_flags rf;
+	struct rq *rq;
+
+	if (task_nice(p) == nice || nice < MIN_NICE || nice > MAX_NICE)
+		return;
+	/*
+	 * We have to be careful, if called from sys_setpriority(),
+	 * the task might be in the middle of scheduling on another CPU.
+	 */
+	rq = task_rq_lock(p, &rf);
+	update_rq_clock(rq);
+
+	/*
+	 * The RT priorities are set via sched_setscheduler(), but we still
+	 * allow the 'normal' nice value to be set - but as expected
+	 * it wont have any effect on scheduling until the task is
+	 * SCHED_DEADLINE, SCHED_FIFO or SCHED_RR:
+	 */
+	if (task_has_dl_policy(p) || task_has_rt_policy(p)) {
+		p->static_prio = NICE_TO_PRIO(nice);
+		goto out_unlock;
+	}
+	queued = task_on_rq_queued(p);
+	running = task_current(rq, p);
+	if (queued)
+		dequeue_task(rq, p, DEQUEUE_SAVE | DEQUEUE_NOCLOCK);
+	if (running)
+		put_prev_task(rq, p);
+
+	p->static_prio = NICE_TO_PRIO(nice);
+	set_load_weight(p, true);
+	old_prio = p->prio;
+	p->prio = effective_prio(p);
+
+	if (queued)
+		enqueue_task(rq, p, ENQUEUE_RESTORE | ENQUEUE_NOCLOCK);
+	if (running)
+		set_next_task(rq, p);
+
+	/*
+	 * If the task increased its priority or is running and
+	 * lowered its priority, then reschedule its CPU:
+	 */
+	p->sched_class->prio_changed(rq, p, old_prio);
+
+out_unlock:
+	task_rq_unlock(rq, p, &rf);
+}
+
 ///*
 // * can_nice - check if a task can reduce its nice value
 // * @p: task

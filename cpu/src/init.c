@@ -13,8 +13,3 @@ cl_cpu_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_cpu_init);
-
-void __init __weak smp_setup_processor_id(void)
-{
-}
-EXPORT_SYMBOL(smp_setup_processor_id);

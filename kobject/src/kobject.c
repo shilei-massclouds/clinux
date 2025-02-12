@@ -271,47 +271,48 @@ static void kobject_init_internal(struct kobject *kobj)
 //
 //	return error;
 //}
-//
-///**
-// * kobject_set_name_vargs() - Set the name of a kobject.
-// * @kobj: struct kobject to set the name of
-// * @fmt: format string used to build the name
-// * @vargs: vargs to format the string.
-// */
-//int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
-//				  va_list vargs)
-//{
-//	const char *s;
-//
-//	if (kobj->name && !fmt)
-//		return 0;
-//
-//	s = kvasprintf_const(GFP_KERNEL, fmt, vargs);
-//	if (!s)
-//		return -ENOMEM;
-//
-//	/*
-//	 * ewww... some of these buggers have '/' in the name ... If
-//	 * that's the case, we need to make sure we have an actual
-//	 * allocated copy to modify, since kvasprintf_const may have
-//	 * returned something from .rodata.
-//	 */
-//	if (strchr(s, '/')) {
-//		char *t;
-//
-//		t = kstrdup(s, GFP_KERNEL);
-//		kfree_const(s);
-//		if (!t)
-//			return -ENOMEM;
-//		strreplace(t, '/', '!');
-//		s = t;
-//	}
-//	kfree_const(kobj->name);
-//	kobj->name = s;
-//
-//	return 0;
-//}
-//
+
+/**
+ * kobject_set_name_vargs() - Set the name of a kobject.
+ * @kobj: struct kobject to set the name of
+ * @fmt: format string used to build the name
+ * @vargs: vargs to format the string.
+ */
+int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
+				  va_list vargs)
+{
+	const char *s;
+
+	if (kobj->name && !fmt)
+		return 0;
+
+	s = kvasprintf_const(GFP_KERNEL, fmt, vargs);
+	if (!s)
+		return -ENOMEM;
+
+	/*
+	 * ewww... some of these buggers have '/' in the name ... If
+	 * that's the case, we need to make sure we have an actual
+	 * allocated copy to modify, since kvasprintf_const may have
+	 * returned something from .rodata.
+	 */
+	if (strchr(s, '/')) {
+		char *t;
+
+		t = kstrdup(s, GFP_KERNEL);
+		kfree_const(s);
+		if (!t)
+			return -ENOMEM;
+		strreplace(t, '/', '!');
+		s = t;
+	}
+	kfree_const(kobj->name);
+	kobj->name = s;
+
+	return 0;
+}
+EXPORT_SYMBOL(kobject_set_name_vargs);
+
 ///**
 // * kobject_set_name() - Set the name of a kobject.
 // * @kobj: struct kobject to set the name of

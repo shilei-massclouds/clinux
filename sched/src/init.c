@@ -72,18 +72,6 @@ void put_task_struct_rcu_user(struct task_struct *task)
     booter_panic("No impl 'sched'.");
 }
 
-/*
-void print_modules(void)
-{
-    booter_panic("No impl 'sched'.");
-}
-*/
-
-bool kthread_should_stop(void)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 struct task_struct *__switch_to(struct task_struct *,
                        struct task_struct *)
 {

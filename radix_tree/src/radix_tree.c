@@ -32,6 +32,7 @@
  * Radix tree node cache.
  */
 struct kmem_cache *radix_tree_node_cachep;
+EXPORT_SYMBOL(radix_tree_node_cachep);
 
 /*
  * The radix tree is variable-height, so an insert operation not only has
@@ -302,6 +303,7 @@ void radix_tree_node_rcu_free(struct rcu_head *head)
 
 	kmem_cache_free(radix_tree_node_cachep, node);
 }
+EXPORT_SYMBOL(radix_tree_node_rcu_free);
 
 static inline void
 radix_tree_node_free(struct radix_tree_node *node)
@@ -776,6 +778,7 @@ void *__radix_tree_lookup(const struct radix_tree_root *root,
 		*slotp = slot;
 	return node;
 }
+EXPORT_SYMBOL(__radix_tree_lookup);
 
 /**
  *	radix_tree_lookup_slot    -    lookup a slot in a radix tree
@@ -893,6 +896,7 @@ void __radix_tree_replace(struct radix_tree_root *root,
 
 	delete_node(root, node);
 }
+EXPORT_SYMBOL(__radix_tree_replace);
 
 /**
  * radix_tree_replace_slot	- replace item in a slot
@@ -932,6 +936,7 @@ void radix_tree_iter_replace(struct radix_tree_root *root,
 {
 	__radix_tree_replace(root, iter->node, slot, item);
 }
+EXPORT_SYMBOL(radix_tree_iter_replace);
 
 static void node_tag_set(struct radix_tree_root *root,
 				struct radix_tree_node *node,
@@ -1060,6 +1065,7 @@ void radix_tree_iter_tag_clear(struct radix_tree_root *root,
 {
 	node_tag_clear(root, iter->node, tag, iter_offset(iter));
 }
+EXPORT_SYMBOL(radix_tree_iter_tag_clear);
 
 /**
  * radix_tree_tag_get - get a tag on a radix tree node
@@ -1543,6 +1549,7 @@ void __rcu **idr_get_free(struct radix_tree_root *root,
 
 	return slot;
 }
+EXPORT_SYMBOL(idr_get_free);
 
 /**
  * idr_destroy - release all internal memory from an IDR

@@ -29,7 +29,7 @@
 #include <linux/sysfs.h>
 
 #include "base.h"
-//#include "power/power.h"
+#include "power/power.h"
 
 //#ifdef CONFIG_SYSFS_DEPRECATED
 //#ifdef CONFIG_SYSFS_DEPRECATED_V2
@@ -44,75 +44,75 @@
 //early_param("sysfs.deprecated", sysfs_deprecated_setup);
 //#endif
 //
-///* Device links support. */
+/* Device links support. */
 //static LIST_HEAD(wait_for_suppliers);
-//static DEFINE_MUTEX(wfs_lock);
+static DEFINE_MUTEX(wfs_lock);
 //static LIST_HEAD(deferred_sync);
 //static unsigned int defer_sync_state_count = 1;
 //static unsigned int defer_fw_devlink_count;
 //static LIST_HEAD(deferred_fw_devlink);
 //static DEFINE_MUTEX(defer_fw_devlink_lock);
 //static bool fw_devlink_is_permissive(void);
-//
-//#ifdef CONFIG_SRCU
-//static DEFINE_MUTEX(device_links_lock);
-//DEFINE_STATIC_SRCU(device_links_srcu);
-//
-//static inline void device_links_write_lock(void)
-//{
-//	mutex_lock(&device_links_lock);
-//}
-//
-//static inline void device_links_write_unlock(void)
-//{
-//	mutex_unlock(&device_links_lock);
-//}
-//
-//int device_links_read_lock(void) __acquires(&device_links_srcu)
-//{
-//	return srcu_read_lock(&device_links_srcu);
-//}
-//
-//void device_links_read_unlock(int idx) __releases(&device_links_srcu)
-//{
-//	srcu_read_unlock(&device_links_srcu, idx);
-//}
-//
-//int device_links_read_lock_held(void)
-//{
-//	return srcu_read_lock_held(&device_links_srcu);
-//}
-//#else /* !CONFIG_SRCU */
-//static DECLARE_RWSEM(device_links_lock);
-//
-//static inline void device_links_write_lock(void)
-//{
-//	down_write(&device_links_lock);
-//}
-//
-//static inline void device_links_write_unlock(void)
-//{
-//	up_write(&device_links_lock);
-//}
-//
-//int device_links_read_lock(void)
-//{
-//	down_read(&device_links_lock);
-//	return 0;
-//}
-//
-//void device_links_read_unlock(int not_used)
-//{
-//	up_read(&device_links_lock);
-//}
-//
-//#ifdef CONFIG_DEBUG_LOCK_ALLOC
-//int device_links_read_lock_held(void)
-//{
-//	return lockdep_is_held(&device_links_lock);
-//}
-//#endif
-//#endif /* !CONFIG_SRCU */
+
+#ifdef CONFIG_SRCU
+static DEFINE_MUTEX(device_links_lock);
+DEFINE_STATIC_SRCU(device_links_srcu);
+
+static inline void device_links_write_lock(void)
+{
+	mutex_lock(&device_links_lock);
+}
+
+static inline void device_links_write_unlock(void)
+{
+	mutex_unlock(&device_links_lock);
+}
+
+int device_links_read_lock(void) __acquires(&device_links_srcu)
+{
+	return srcu_read_lock(&device_links_srcu);
+}
+
+void device_links_read_unlock(int idx) __releases(&device_links_srcu)
+{
+	srcu_read_unlock(&device_links_srcu, idx);
+}
+
+int device_links_read_lock_held(void)
+{
+	return srcu_read_lock_held(&device_links_srcu);
+}
+#else /* !CONFIG_SRCU */
+static DECLARE_RWSEM(device_links_lock);
+
+static inline void device_links_write_lock(void)
+{
+	down_write(&device_links_lock);
+}
+
+static inline void device_links_write_unlock(void)
+{
+	up_write(&device_links_lock);
+}
+
+int device_links_read_lock(void)
+{
+	down_read(&device_links_lock);
+	return 0;
+}
+
+void device_links_read_unlock(int not_used)
+{
+	up_read(&device_links_lock);
+}
+
+#ifdef CONFIG_DEBUG_LOCK_ALLOC
+int device_links_read_lock_held(void)
+{
+	return lockdep_is_held(&device_links_lock);
+}
+#endif
+#endif /* !CONFIG_SRCU */
 
 /**
  * device_is_dependent - Check if one device depends on another one
@@ -236,114 +236,114 @@ EXPORT_SYMBOL(device_is_dependent);
 //	device_pm_unlock();
 //	device_links_read_unlock(idx);
 //}
-//
-//#define to_devlink(dev)	container_of((dev), struct device_link, link_dev)
-//
-//static ssize_t status_show(struct device *dev,
-//			  struct device_attribute *attr, char *buf)
-//{
-//	char *status;
-//
-//	switch (to_devlink(dev)->status) {
-//	case DL_STATE_NONE:
-//		status = "not tracked"; break;
-//	case DL_STATE_DORMANT:
-//		status = "dormant"; break;
-//	case DL_STATE_AVAILABLE:
-//		status = "available"; break;
-//	case DL_STATE_CONSUMER_PROBE:
-//		status = "consumer probing"; break;
-//	case DL_STATE_ACTIVE:
-//		status = "active"; break;
-//	case DL_STATE_SUPPLIER_UNBIND:
-//		status = "supplier unbinding"; break;
-//	default:
-//		status = "unknown"; break;
-//	}
-//	return sprintf(buf, "%s\n", status);
-//}
-//static DEVICE_ATTR_RO(status);
-//
-//static ssize_t auto_remove_on_show(struct device *dev,
-//				   struct device_attribute *attr, char *buf)
-//{
-//	struct device_link *link = to_devlink(dev);
-//	char *str;
-//
-//	if (link->flags & DL_FLAG_AUTOREMOVE_SUPPLIER)
-//		str = "supplier unbind";
-//	else if (link->flags & DL_FLAG_AUTOREMOVE_CONSUMER)
-//		str = "consumer unbind";
-//	else
-//		str = "never";
-//
-//	return sprintf(buf, "%s\n", str);
-//}
-//static DEVICE_ATTR_RO(auto_remove_on);
-//
-//static ssize_t runtime_pm_show(struct device *dev,
-//			       struct device_attribute *attr, char *buf)
-//{
-//	struct device_link *link = to_devlink(dev);
-//
-//	return sprintf(buf, "%d\n", !!(link->flags & DL_FLAG_PM_RUNTIME));
-//}
-//static DEVICE_ATTR_RO(runtime_pm);
-//
-//static ssize_t sync_state_only_show(struct device *dev,
-//				    struct device_attribute *attr, char *buf)
-//{
-//	struct device_link *link = to_devlink(dev);
-//
-//	return sprintf(buf, "%d\n", !!(link->flags & DL_FLAG_SYNC_STATE_ONLY));
-//}
-//static DEVICE_ATTR_RO(sync_state_only);
-//
-//static struct attribute *devlink_attrs[] = {
-//	&dev_attr_status.attr,
-//	&dev_attr_auto_remove_on.attr,
-//	&dev_attr_runtime_pm.attr,
-//	&dev_attr_sync_state_only.attr,
-//	NULL,
-//};
-//ATTRIBUTE_GROUPS(devlink);
-//
-//static void device_link_free(struct device_link *link)
-//{
-//	while (refcount_dec_not_one(&link->rpm_active))
-//		pm_runtime_put(link->supplier);
-//
-//	put_device(link->consumer);
-//	put_device(link->supplier);
-//	kfree(link);
-//}
-//
-//#ifdef CONFIG_SRCU
-//static void __device_link_free_srcu(struct rcu_head *rhead)
-//{
-//	device_link_free(container_of(rhead, struct device_link, rcu_head));
-//}
-//
-//static void devlink_dev_release(struct device *dev)
-//{
-//	struct device_link *link = to_devlink(dev);
-//
-//	call_srcu(&device_links_srcu, &link->rcu_head, __device_link_free_srcu);
-//}
-//#else
-//static void devlink_dev_release(struct device *dev)
-//{
-//	device_link_free(to_devlink(dev));
-//}
-//#endif
-//
-//static struct class devlink_class = {
-//	.name = "devlink",
-//	.owner = THIS_MODULE,
-//	.dev_groups = devlink_groups,
-//	.dev_release = devlink_dev_release,
-//};
-//
+
+#define to_devlink(dev)	container_of((dev), struct device_link, link_dev)
+
+static ssize_t status_show(struct device *dev,
+			  struct device_attribute *attr, char *buf)
+{
+	char *status;
+
+	switch (to_devlink(dev)->status) {
+	case DL_STATE_NONE:
+		status = "not tracked"; break;
+	case DL_STATE_DORMANT:
+		status = "dormant"; break;
+	case DL_STATE_AVAILABLE:
+		status = "available"; break;
+	case DL_STATE_CONSUMER_PROBE:
+		status = "consumer probing"; break;
+	case DL_STATE_ACTIVE:
+		status = "active"; break;
+	case DL_STATE_SUPPLIER_UNBIND:
+		status = "supplier unbinding"; break;
+	default:
+		status = "unknown"; break;
+	}
+	return sprintf(buf, "%s\n", status);
+}
+static DEVICE_ATTR_RO(status);
+
+static ssize_t auto_remove_on_show(struct device *dev,
+				   struct device_attribute *attr, char *buf)
+{
+	struct device_link *link = to_devlink(dev);
+	char *str;
+
+	if (link->flags & DL_FLAG_AUTOREMOVE_SUPPLIER)
+		str = "supplier unbind";
+	else if (link->flags & DL_FLAG_AUTOREMOVE_CONSUMER)
+		str = "consumer unbind";
+	else
+		str = "never";
+
+	return sprintf(buf, "%s\n", str);
+}
+static DEVICE_ATTR_RO(auto_remove_on);
+
+static ssize_t runtime_pm_show(struct device *dev,
+			       struct device_attribute *attr, char *buf)
+{
+	struct device_link *link = to_devlink(dev);
+
+	return sprintf(buf, "%d\n", !!(link->flags & DL_FLAG_PM_RUNTIME));
+}
+static DEVICE_ATTR_RO(runtime_pm);
+
+static ssize_t sync_state_only_show(struct device *dev,
+				    struct device_attribute *attr, char *buf)
+{
+	struct device_link *link = to_devlink(dev);
+
+	return sprintf(buf, "%d\n", !!(link->flags & DL_FLAG_SYNC_STATE_ONLY));
+}
+static DEVICE_ATTR_RO(sync_state_only);
+
+static struct attribute *devlink_attrs[] = {
+	&dev_attr_status.attr,
+	&dev_attr_auto_remove_on.attr,
+	&dev_attr_runtime_pm.attr,
+	&dev_attr_sync_state_only.attr,
+	NULL,
+};
+ATTRIBUTE_GROUPS(devlink);
+
+static void device_link_free(struct device_link *link)
+{
+	while (refcount_dec_not_one(&link->rpm_active))
+		pm_runtime_put(link->supplier);
+
+	put_device(link->consumer);
+	put_device(link->supplier);
+	kfree(link);
+}
+
+#ifdef CONFIG_SRCU
+static void __device_link_free_srcu(struct rcu_head *rhead)
+{
+	device_link_free(container_of(rhead, struct device_link, rcu_head));
+}
+
+static void devlink_dev_release(struct device *dev)
+{
+	struct device_link *link = to_devlink(dev);
+
+	call_srcu(&device_links_srcu, &link->rcu_head, __device_link_free_srcu);
+}
+#else
+static void devlink_dev_release(struct device *dev)
+{
+	device_link_free(to_devlink(dev));
+}
+#endif
+
+static struct class devlink_class = {
+	.name = "devlink",
+	.owner = THIS_MODULE,
+	.dev_groups = devlink_groups,
+	.dev_release = devlink_dev_release,
+};
+
 //static int devlink_add_symlinks(struct device *dev,
 //				struct class_interface *class_intf)
 //{
@@ -755,39 +755,39 @@ EXPORT_SYMBOL(device_is_dependent);
 //	}
 //	mutex_unlock(&wfs_lock);
 //}
-//
-//#ifdef CONFIG_SRCU
-//static void __device_link_del(struct kref *kref)
-//{
-//	struct device_link *link = container_of(kref, struct device_link, kref);
-//
-//	dev_dbg(link->consumer, "Dropping the link to %s\n",
-//		dev_name(link->supplier));
-//
-//	if (link->flags & DL_FLAG_PM_RUNTIME)
-//		pm_runtime_drop_link(link->consumer);
-//
-//	list_del_rcu(&link->s_node);
-//	list_del_rcu(&link->c_node);
-//	device_unregister(&link->link_dev);
-//}
-//#else /* !CONFIG_SRCU */
-//static void __device_link_del(struct kref *kref)
-//{
-//	struct device_link *link = container_of(kref, struct device_link, kref);
-//
-//	dev_info(link->consumer, "Dropping the link to %s\n",
-//		 dev_name(link->supplier));
-//
-//	if (link->flags & DL_FLAG_PM_RUNTIME)
-//		pm_runtime_drop_link(link->consumer);
-//
-//	list_del(&link->s_node);
-//	list_del(&link->c_node);
-//	device_unregister(&link->link_dev);
-//}
-//#endif /* !CONFIG_SRCU */
-//
+
+#ifdef CONFIG_SRCU
+static void __device_link_del(struct kref *kref)
+{
+	struct device_link *link = container_of(kref, struct device_link, kref);
+
+	dev_dbg(link->consumer, "Dropping the link to %s\n",
+		dev_name(link->supplier));
+
+	if (link->flags & DL_FLAG_PM_RUNTIME)
+		pm_runtime_drop_link(link->consumer);
+
+	list_del_rcu(&link->s_node);
+	list_del_rcu(&link->c_node);
+	device_unregister(&link->link_dev);
+}
+#else /* !CONFIG_SRCU */
+static void __device_link_del(struct kref *kref)
+{
+	struct device_link *link = container_of(kref, struct device_link, kref);
+
+	dev_info(link->consumer, "Dropping the link to %s\n",
+		 dev_name(link->supplier));
+
+	if (link->flags & DL_FLAG_PM_RUNTIME)
+		pm_runtime_drop_link(link->consumer);
+
+	list_del(&link->s_node);
+	list_del(&link->c_node);
+	device_unregister(&link->link_dev);
+}
+#endif /* !CONFIG_SRCU */
+
 //static void device_link_put_kref(struct device_link *link)
 //{
 //	if (link->flags & DL_FLAG_STATELESS)
@@ -1047,23 +1047,23 @@ EXPORT_SYMBOL(device_is_dependent);
 //	WRITE_ONCE(link->status, DL_STATE_NONE);
 //	kref_put(&link->kref, __device_link_del);
 //}
-//
-//static ssize_t waiting_for_supplier_show(struct device *dev,
-//					 struct device_attribute *attr,
-//					 char *buf)
-//{
-//	bool val;
-//
-//	device_lock(dev);
-//	mutex_lock(&wfs_lock);
-//	val = !list_empty(&dev->links.needs_suppliers)
-//	      && dev->links.need_for_probe;
-//	mutex_unlock(&wfs_lock);
-//	device_unlock(dev);
-//	return sprintf(buf, "%u\n", val);
-//}
-//static DEVICE_ATTR_RO(waiting_for_supplier);
-//
+
+static ssize_t waiting_for_supplier_show(struct device *dev,
+					 struct device_attribute *attr,
+					 char *buf)
+{
+	bool val;
+
+	device_lock(dev);
+	mutex_lock(&wfs_lock);
+	val = !list_empty(&dev->links.needs_suppliers)
+	      && dev->links.need_for_probe;
+	mutex_unlock(&wfs_lock);
+	device_unlock(dev);
+	return sprintf(buf, "%u\n", val);
+}
+static DEVICE_ATTR_RO(waiting_for_supplier);
+
 ///**
 // * device_links_driver_bound - Update device links after probing its driver.
 // * @dev: Device to update the links for.
@@ -1366,41 +1366,41 @@ EXPORT_SYMBOL(device_is_dependent);
 //
 //	device_links_write_unlock();
 //}
-//
-///**
-// * device_links_purge - Delete existing links to other devices.
-// * @dev: Target device.
-// */
-//static void device_links_purge(struct device *dev)
-//{
-//	struct device_link *link, *ln;
-//
-//	if (dev->class == &devlink_class)
-//		return;
-//
-//	mutex_lock(&wfs_lock);
-//	list_del(&dev->links.needs_suppliers);
-//	mutex_unlock(&wfs_lock);
-//
-//	/*
-//	 * Delete all of the remaining links from this device to any other
-//	 * devices (either consumers or suppliers).
-//	 */
-//	device_links_write_lock();
-//
-//	list_for_each_entry_safe_reverse(link, ln, &dev->links.suppliers, c_node) {
-//		WARN_ON(link->status == DL_STATE_ACTIVE);
-//		__device_link_del(&link->kref);
-//	}
-//
-//	list_for_each_entry_safe_reverse(link, ln, &dev->links.consumers, s_node) {
-//		WARN_ON(link->status != DL_STATE_DORMANT &&
-//			link->status != DL_STATE_NONE);
-//		__device_link_del(&link->kref);
-//	}
-//
-//	device_links_write_unlock();
-//}
+
+/**
+ * device_links_purge - Delete existing links to other devices.
+ * @dev: Target device.
+ */
+static void device_links_purge(struct device *dev)
+{
+	struct device_link *link, *ln;
+
+	if (dev->class == &devlink_class)
+		return;
+
+	mutex_lock(&wfs_lock);
+	list_del(&dev->links.needs_suppliers);
+	mutex_unlock(&wfs_lock);
+
+	/*
+	 * Delete all of the remaining links from this device to any other
+	 * devices (either consumers or suppliers).
+	 */
+	device_links_write_lock();
+
+	list_for_each_entry_safe_reverse(link, ln, &dev->links.suppliers, c_node) {
+		WARN_ON(link->status == DL_STATE_ACTIVE);
+		__device_link_del(&link->kref);
+	}
+
+	list_for_each_entry_safe_reverse(link, ln, &dev->links.consumers, s_node) {
+		WARN_ON(link->status != DL_STATE_DORMANT &&
+			link->status != DL_STATE_NONE);
+		__device_link_del(&link->kref);
+	}
+
+	device_links_write_unlock();
+}
 
 static u32 fw_devlink_flags = DL_FLAG_SYNC_STATE_ONLY;
 //static int __init fw_devlink_setup(char *arg)
@@ -1569,9 +1569,9 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 ///* Device links support end. */
 //
 //int (*platform_notify)(struct device *dev) = NULL;
-//int (*platform_notify_remove)(struct device *dev) = NULL;
+int (*platform_notify_remove)(struct device *dev) = NULL;
 //static struct kobject *dev_kobj;
-//struct kobject *sysfs_dev_char_kobj;
+struct kobject *sysfs_dev_char_kobj;
 //struct kobject *sysfs_dev_block_kobj;
 //
 //static DEFINE_MUTEX(device_hotplug_lock);
@@ -1595,39 +1595,39 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //	msleep(5);
 //	return restart_syscall();
 //}
-//
-//#ifdef CONFIG_BLOCK
-//static inline int device_is_not_partition(struct device *dev)
-//{
-//	return !(dev->type == &part_type);
-//}
-//#else
-//static inline int device_is_not_partition(struct device *dev)
-//{
-//	return 1;
-//}
-//#endif
-//
-//static int
-//device_platform_notify(struct device *dev, enum kobject_action action)
-//{
-//	int ret;
-//
-//	ret = acpi_platform_notify(dev, action);
-//	if (ret)
-//		return ret;
-//
-//	ret = software_node_notify(dev, action);
-//	if (ret)
-//		return ret;
-//
-//	if (platform_notify && action == KOBJ_ADD)
-//		platform_notify(dev);
-//	else if (platform_notify_remove && action == KOBJ_REMOVE)
-//		platform_notify_remove(dev);
-//	return 0;
-//}
-//
+
+#ifdef CONFIG_BLOCK
+static inline int device_is_not_partition(struct device *dev)
+{
+	return !(dev->type == &part_type);
+}
+#else
+static inline int device_is_not_partition(struct device *dev)
+{
+	return 1;
+}
+#endif
+
+static int
+device_platform_notify(struct device *dev, enum kobject_action action)
+{
+	int ret;
+
+	ret = acpi_platform_notify(dev, action);
+	if (ret)
+		return ret;
+
+	ret = software_node_notify(dev, action);
+	if (ret)
+		return ret;
+
+	if (platform_notify && action == KOBJ_ADD)
+		platform_notify(dev);
+	else if (platform_notify_remove && action == KOBJ_REMOVE)
+		platform_notify_remove(dev);
+	return 0;
+}
+
 ///**
 // * dev_driver_string - Return a device's driver name, if at all possible
 // * @dev: struct device to get the name of
@@ -1926,97 +1926,97 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //	.name =		dev_uevent_name,
 //	.uevent =	dev_uevent,
 //};
-//
-//static ssize_t uevent_show(struct device *dev, struct device_attribute *attr,
-//			   char *buf)
-//{
-//	struct kobject *top_kobj;
-//	struct kset *kset;
-//	struct kobj_uevent_env *env = NULL;
-//	int i;
-//	size_t count = 0;
-//	int retval;
-//
-//	/* search the kset, the device belongs to */
-//	top_kobj = &dev->kobj;
-//	while (!top_kobj->kset && top_kobj->parent)
-//		top_kobj = top_kobj->parent;
-//	if (!top_kobj->kset)
-//		goto out;
-//
-//	kset = top_kobj->kset;
-//	if (!kset->uevent_ops || !kset->uevent_ops->uevent)
-//		goto out;
-//
-//	/* respect filter */
-//	if (kset->uevent_ops && kset->uevent_ops->filter)
-//		if (!kset->uevent_ops->filter(kset, &dev->kobj))
-//			goto out;
-//
-//	env = kzalloc(sizeof(struct kobj_uevent_env), GFP_KERNEL);
-//	if (!env)
-//		return -ENOMEM;
-//
-//	/* let the kset specific function add its keys */
-//	retval = kset->uevent_ops->uevent(kset, &dev->kobj, env);
-//	if (retval)
-//		goto out;
-//
-//	/* copy keys to file */
-//	for (i = 0; i < env->envp_idx; i++)
-//		count += sprintf(&buf[count], "%s\n", env->envp[i]);
-//out:
-//	kfree(env);
-//	return count;
-//}
-//
-//static ssize_t uevent_store(struct device *dev, struct device_attribute *attr,
-//			    const char *buf, size_t count)
-//{
-//	int rc;
-//
-//	rc = kobject_synth_uevent(&dev->kobj, buf, count);
-//
-//	if (rc) {
-//		dev_err(dev, "uevent: failed to send synthetic uevent\n");
-//		return rc;
-//	}
-//
-//	return count;
-//}
-//static DEVICE_ATTR_RW(uevent);
-//
-//static ssize_t online_show(struct device *dev, struct device_attribute *attr,
-//			   char *buf)
-//{
-//	bool val;
-//
-//	device_lock(dev);
-//	val = !dev->offline;
-//	device_unlock(dev);
-//	return sprintf(buf, "%u\n", val);
-//}
-//
-//static ssize_t online_store(struct device *dev, struct device_attribute *attr,
-//			    const char *buf, size_t count)
-//{
-//	bool val;
-//	int ret;
-//
-//	ret = strtobool(buf, &val);
-//	if (ret < 0)
-//		return ret;
-//
-//	ret = lock_device_hotplug_sysfs();
-//	if (ret)
-//		return ret;
-//
-//	ret = val ? device_online(dev) : device_offline(dev);
-//	unlock_device_hotplug();
-//	return ret < 0 ? ret : count;
-//}
-//static DEVICE_ATTR_RW(online);
-//
+
+static ssize_t uevent_show(struct device *dev, struct device_attribute *attr,
+			   char *buf)
+{
+	struct kobject *top_kobj;
+	struct kset *kset;
+	struct kobj_uevent_env *env = NULL;
+	int i;
+	size_t count = 0;
+	int retval;
+
+	/* search the kset, the device belongs to */
+	top_kobj = &dev->kobj;
+	while (!top_kobj->kset && top_kobj->parent)
+		top_kobj = top_kobj->parent;
+	if (!top_kobj->kset)
+		goto out;
+
+	kset = top_kobj->kset;
+	if (!kset->uevent_ops || !kset->uevent_ops->uevent)
+		goto out;
+
+	/* respect filter */
+	if (kset->uevent_ops && kset->uevent_ops->filter)
+		if (!kset->uevent_ops->filter(kset, &dev->kobj))
+			goto out;
+
+	env = kzalloc(sizeof(struct kobj_uevent_env), GFP_KERNEL);
+	if (!env)
+		return -ENOMEM;
+
+	/* let the kset specific function add its keys */
+	retval = kset->uevent_ops->uevent(kset, &dev->kobj, env);
+	if (retval)
+		goto out;
+
+	/* copy keys to file */
+	for (i = 0; i < env->envp_idx; i++)
+		count += sprintf(&buf[count], "%s\n", env->envp[i]);
+out:
+	kfree(env);
+	return count;
+}
+
+static ssize_t uevent_store(struct device *dev, struct device_attribute *attr,
+			    const char *buf, size_t count)
+{
+	int rc;
+
+	rc = kobject_synth_uevent(&dev->kobj, buf, count);
+
+	if (rc) {
+		dev_err(dev, "uevent: failed to send synthetic uevent\n");
+		return rc;
+	}
+
+	return count;
+}
+static DEVICE_ATTR_RW(uevent);
+
+static ssize_t online_show(struct device *dev, struct device_attribute *attr,
+			   char *buf)
+{
+	bool val;
+
+	device_lock(dev);
+	val = !dev->offline;
+	device_unlock(dev);
+	return sprintf(buf, "%u\n", val);
+}
+
+static ssize_t online_store(struct device *dev, struct device_attribute *attr,
+			    const char *buf, size_t count)
+{
+	bool val;
+	int ret;
+
+	ret = strtobool(buf, &val);
+	if (ret < 0)
+		return ret;
+
+	ret = lock_device_hotplug_sysfs();
+	if (ret)
+		return ret;
+
+	ret = val ? device_online(dev) : device_offline(dev);
+	unlock_device_hotplug();
+	return ret < 0 ? ret : count;
+}
+static DEVICE_ATTR_RW(online);
+
 //int device_add_groups(struct device *dev, const struct attribute_group **groups)
 //{
 //	return sysfs_create_groups(&dev->kobj, groups);
@@ -2209,30 +2209,30 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //
 //	return error;
 //}
-//
-//static void device_remove_attrs(struct device *dev)
-//{
-//	struct class *class = dev->class;
-//	const struct device_type *type = dev->type;
-//
-//	device_remove_file(dev, &dev_attr_waiting_for_supplier);
-//	device_remove_file(dev, &dev_attr_online);
-//	device_remove_groups(dev, dev->groups);
-//
-//	if (type)
-//		device_remove_groups(dev, type->groups);
-//
-//	if (class)
-//		device_remove_groups(dev, class->dev_groups);
-//}
-//
-//static ssize_t dev_show(struct device *dev, struct device_attribute *attr,
-//			char *buf)
-//{
-//	return print_dev_t(buf, dev->devt);
-//}
-//static DEVICE_ATTR_RO(dev);
-//
+
+static void device_remove_attrs(struct device *dev)
+{
+	struct class *class = dev->class;
+	const struct device_type *type = dev->type;
+
+	device_remove_file(dev, &dev_attr_waiting_for_supplier);
+	device_remove_file(dev, &dev_attr_online);
+	device_remove_groups(dev, dev->groups);
+
+	if (type)
+		device_remove_groups(dev, type->groups);
+
+	if (class)
+		device_remove_groups(dev, class->dev_groups);
+}
+
+static ssize_t dev_show(struct device *dev, struct device_attribute *attr,
+			char *buf)
+{
+	return print_dev_t(buf, dev->devt);
+}
+static DEVICE_ATTR_RO(dev);
+
 ///* /sys/devices/ */
 //struct kset *devices_kset;
 //
@@ -2281,31 +2281,31 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //	list_move_tail(&dev->kobj.entry, &devices_kset->list);
 //	spin_unlock(&devices_kset->list_lock);
 //}
-//
-///**
-// * device_create_file - create sysfs attribute file for device.
-// * @dev: device.
-// * @attr: device attribute descriptor.
-// */
-//int device_create_file(struct device *dev,
-//		       const struct device_attribute *attr)
-//{
-//	int error = 0;
-//
-//	if (dev) {
-//		WARN(((attr->attr.mode & S_IWUGO) && !attr->store),
-//			"Attribute %s: write permission without 'store'\n",
-//			attr->attr.name);
-//		WARN(((attr->attr.mode & S_IRUGO) && !attr->show),
-//			"Attribute %s: read permission without 'show'\n",
-//			attr->attr.name);
-//		error = sysfs_create_file(&dev->kobj, &attr->attr);
-//	}
-//
-//	return error;
-//}
-//EXPORT_SYMBOL_GPL(device_create_file);
-//
+
+/**
+ * device_create_file - create sysfs attribute file for device.
+ * @dev: device.
+ * @attr: device attribute descriptor.
+ */
+int device_create_file(struct device *dev,
+		       const struct device_attribute *attr)
+{
+	int error = 0;
+
+	if (dev) {
+		WARN(((attr->attr.mode & S_IWUGO) && !attr->store),
+			"Attribute %s: write permission without 'store'\n",
+			attr->attr.name);
+		WARN(((attr->attr.mode & S_IRUGO) && !attr->show),
+			"Attribute %s: read permission without 'show'\n",
+			attr->attr.name);
+		error = sysfs_create_file(&dev->kobj, &attr->attr);
+	}
+
+	return error;
+}
+EXPORT_SYMBOL_GPL(device_create_file);
+
 ///**
 // * device_remove_file - remove sysfs attribute file.
 // * @dev: device.
@@ -2484,9 +2484,9 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //	}
 //	return &dir->kobj;
 //}
-//
-//static DEFINE_MUTEX(gdp_mutex);
-//
+
+static DEFINE_MUTEX(gdp_mutex);
+
 //static struct kobject *get_device_parent(struct device *dev,
 //					 struct device *parent)
 //{
@@ -2546,90 +2546,90 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //		return &parent->kobj;
 //	return NULL;
 //}
-//
-//static inline bool live_in_glue_dir(struct kobject *kobj,
-//				    struct device *dev)
-//{
-//	if (!kobj || !dev->class ||
-//	    kobj->kset != &dev->class->p->glue_dirs)
-//		return false;
-//	return true;
-//}
-//
-//static inline struct kobject *get_glue_dir(struct device *dev)
-//{
-//	return dev->kobj.parent;
-//}
-//
-///*
-// * make sure cleaning up dir as the last step, we need to make
-// * sure .release handler of kobject is run with holding the
-// * global lock
-// */
-//static void cleanup_glue_dir(struct device *dev, struct kobject *glue_dir)
-//{
-//	unsigned int ref;
-//
-//	/* see if we live in a "glue" directory */
-//	if (!live_in_glue_dir(glue_dir, dev))
-//		return;
-//
-//	mutex_lock(&gdp_mutex);
-//	/**
-//	 * There is a race condition between removing glue directory
-//	 * and adding a new device under the glue directory.
-//	 *
-//	 * CPU1:                                         CPU2:
-//	 *
-//	 * device_add()
-//	 *   get_device_parent()
-//	 *     class_dir_create_and_add()
-//	 *       kobject_add_internal()
-//	 *         create_dir()    // create glue_dir
-//	 *
-//	 *                                               device_add()
-//	 *                                                 get_device_parent()
-//	 *                                                   kobject_get() // get glue_dir
-//	 *
-//	 * device_del()
-//	 *   cleanup_glue_dir()
-//	 *     kobject_del(glue_dir)
-//	 *
-//	 *                                               kobject_add()
-//	 *                                                 kobject_add_internal()
-//	 *                                                   create_dir() // in glue_dir
-//	 *                                                     sysfs_create_dir_ns()
-//	 *                                                       kernfs_create_dir_ns(sd)
-//	 *
-//	 *       sysfs_remove_dir() // glue_dir->sd=NULL
-//	 *       sysfs_put()        // free glue_dir->sd
-//	 *
-//	 *                                                         // sd is freed
-//	 *                                                         kernfs_new_node(sd)
-//	 *                                                           kernfs_get(glue_dir)
-//	 *                                                           kernfs_add_one()
-//	 *                                                           kernfs_put()
-//	 *
-//	 * Before CPU1 remove last child device under glue dir, if CPU2 add
-//	 * a new device under glue dir, the glue_dir kobject reference count
-//	 * will be increase to 2 in kobject_get(k). And CPU2 has been called
-//	 * kernfs_create_dir_ns(). Meanwhile, CPU1 call sysfs_remove_dir()
-//	 * and sysfs_put(). This result in glue_dir->sd is freed.
-//	 *
-//	 * Then the CPU2 will see a stale "empty" but still potentially used
-//	 * glue dir around in kernfs_new_node().
-//	 *
-//	 * In order to avoid this happening, we also should make sure that
-//	 * kernfs_node for glue_dir is released in CPU1 only when refcount
-//	 * for glue_dir kobj is 1.
-//	 */
-//	ref = kref_read(&glue_dir->kref);
-//	if (!kobject_has_children(glue_dir) && !--ref)
-//		kobject_del(glue_dir);
-//	kobject_put(glue_dir);
-//	mutex_unlock(&gdp_mutex);
-//}
-//
+
+static inline bool live_in_glue_dir(struct kobject *kobj,
+				    struct device *dev)
+{
+	if (!kobj || !dev->class ||
+	    kobj->kset != &dev->class->p->glue_dirs)
+		return false;
+	return true;
+}
+
+static inline struct kobject *get_glue_dir(struct device *dev)
+{
+	return dev->kobj.parent;
+}
+
+/*
+ * make sure cleaning up dir as the last step, we need to make
+ * sure .release handler of kobject is run with holding the
+ * global lock
+ */
+static void cleanup_glue_dir(struct device *dev, struct kobject *glue_dir)
+{
+	unsigned int ref;
+
+	/* see if we live in a "glue" directory */
+	if (!live_in_glue_dir(glue_dir, dev))
+		return;
+
+	mutex_lock(&gdp_mutex);
+	/**
+	 * There is a race condition between removing glue directory
+	 * and adding a new device under the glue directory.
+	 *
+	 * CPU1:                                         CPU2:
+	 *
+	 * device_add()
+	 *   get_device_parent()
+	 *     class_dir_create_and_add()
+	 *       kobject_add_internal()
+	 *         create_dir()    // create glue_dir
+	 *
+	 *                                               device_add()
+	 *                                                 get_device_parent()
+	 *                                                   kobject_get() // get glue_dir
+	 *
+	 * device_del()
+	 *   cleanup_glue_dir()
+	 *     kobject_del(glue_dir)
+	 *
+	 *                                               kobject_add()
+	 *                                                 kobject_add_internal()
+	 *                                                   create_dir() // in glue_dir
+	 *                                                     sysfs_create_dir_ns()
+	 *                                                       kernfs_create_dir_ns(sd)
+	 *
+	 *       sysfs_remove_dir() // glue_dir->sd=NULL
+	 *       sysfs_put()        // free glue_dir->sd
+	 *
+	 *                                                         // sd is freed
+	 *                                                         kernfs_new_node(sd)
+	 *                                                           kernfs_get(glue_dir)
+	 *                                                           kernfs_add_one()
+	 *                                                           kernfs_put()
+	 *
+	 * Before CPU1 remove last child device under glue dir, if CPU2 add
+	 * a new device under glue dir, the glue_dir kobject reference count
+	 * will be increase to 2 in kobject_get(k). And CPU2 has been called
+	 * kernfs_create_dir_ns(). Meanwhile, CPU1 call sysfs_remove_dir()
+	 * and sysfs_put(). This result in glue_dir->sd is freed.
+	 *
+	 * Then the CPU2 will see a stale "empty" but still potentially used
+	 * glue dir around in kernfs_new_node().
+	 *
+	 * In order to avoid this happening, we also should make sure that
+	 * kernfs_node for glue_dir is released in CPU1 only when refcount
+	 * for glue_dir kobj is 1.
+	 */
+	ref = kref_read(&glue_dir->kref);
+	if (!kobject_has_children(glue_dir) && !--ref)
+		kobject_del(glue_dir);
+	kobject_put(glue_dir);
+	mutex_unlock(&gdp_mutex);
+}
+
 //static int device_add_class_symlinks(struct device *dev)
 //{
 //	struct device_node *of_node = dev_of_node(dev);
@@ -2681,65 +2681,65 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //	sysfs_remove_link(&dev->kobj, "of_node");
 //	return error;
 //}
-//
-//static void device_remove_class_symlinks(struct device *dev)
-//{
-//	if (dev_of_node(dev))
-//		sysfs_remove_link(&dev->kobj, "of_node");
-//
-//	if (!dev->class)
-//		return;
-//
-//	if (dev->parent && device_is_not_partition(dev))
-//		sysfs_remove_link(&dev->kobj, "device");
-//	sysfs_remove_link(&dev->kobj, "subsystem");
-//#ifdef CONFIG_BLOCK
-//	if (sysfs_deprecated && dev->class == &block_class)
-//		return;
-//#endif
-//	sysfs_delete_link(&dev->class->p->subsys.kobj, &dev->kobj, dev_name(dev));
-//}
-//
-///**
-// * dev_set_name - set a device name
-// * @dev: device
-// * @fmt: format string for the device's name
-// */
-//int dev_set_name(struct device *dev, const char *fmt, ...)
-//{
-//	va_list vargs;
-//	int err;
-//
-//	va_start(vargs, fmt);
-//	err = kobject_set_name_vargs(&dev->kobj, fmt, vargs);
-//	va_end(vargs);
-//	return err;
-//}
-//EXPORT_SYMBOL_GPL(dev_set_name);
-//
-///**
-// * device_to_dev_kobj - select a /sys/dev/ directory for the device
-// * @dev: device
-// *
-// * By default we select char/ for new entries.  Setting class->dev_obj
-// * to NULL prevents an entry from being created.  class->dev_kobj must
-// * be set (or cleared) before any devices are registered to the class
-// * otherwise device_create_sys_dev_entry() and
-// * device_remove_sys_dev_entry() will disagree about the presence of
-// * the link.
-// */
-//static struct kobject *device_to_dev_kobj(struct device *dev)
-//{
-//	struct kobject *kobj;
-//
-//	if (dev->class)
-//		kobj = dev->class->dev_kobj;
-//	else
-//		kobj = sysfs_dev_char_kobj;
-//
-//	return kobj;
-//}
-//
+
+static void device_remove_class_symlinks(struct device *dev)
+{
+	if (dev_of_node(dev))
+		sysfs_remove_link(&dev->kobj, "of_node");
+
+	if (!dev->class)
+		return;
+
+	if (dev->parent && device_is_not_partition(dev))
+		sysfs_remove_link(&dev->kobj, "device");
+	sysfs_remove_link(&dev->kobj, "subsystem");
+#ifdef CONFIG_BLOCK
+	if (sysfs_deprecated && dev->class == &block_class)
+		return;
+#endif
+	sysfs_delete_link(&dev->class->p->subsys.kobj, &dev->kobj, dev_name(dev));
+}
+
+/**
+ * dev_set_name - set a device name
+ * @dev: device
+ * @fmt: format string for the device's name
+ */
+int dev_set_name(struct device *dev, const char *fmt, ...)
+{
+	va_list vargs;
+	int err;
+
+	va_start(vargs, fmt);
+	err = kobject_set_name_vargs(&dev->kobj, fmt, vargs);
+	va_end(vargs);
+	return err;
+}
+EXPORT_SYMBOL_GPL(dev_set_name);
+
+/**
+ * device_to_dev_kobj - select a /sys/dev/ directory for the device
+ * @dev: device
+ *
+ * By default we select char/ for new entries.  Setting class->dev_obj
+ * to NULL prevents an entry from being created.  class->dev_kobj must
+ * be set (or cleared) before any devices are registered to the class
+ * otherwise device_create_sys_dev_entry() and
+ * device_remove_sys_dev_entry() will disagree about the presence of
+ * the link.
+ */
+static struct kobject *device_to_dev_kobj(struct device *dev)
+{
+	struct kobject *kobj;
+
+	if (dev->class)
+		kobj = dev->class->dev_kobj;
+	else
+		kobj = sysfs_dev_char_kobj;
+
+	return kobj;
+}
+
 //static int device_create_sys_dev_entry(struct device *dev)
 //{
 //	struct kobject *kobj = device_to_dev_kobj(dev);
@@ -2753,18 +2753,18 @@ EXPORT_SYMBOL(fw_devlink_get_flags);
 //
 //	return error;
 //}
-//
-//static void device_remove_sys_dev_entry(struct device *dev)
-//{
-//	struct kobject *kobj = device_to_dev_kobj(dev);
-//	char devt_str[15];
-//
-//	if (kobj) {
-//		format_dev_t(devt_str, dev->devt);
-//		sysfs_remove_link(kobj, devt_str);
-//	}
-//}
-//
+
+static void device_remove_sys_dev_entry(struct device *dev)
+{
+	struct kobject *kobj = device_to_dev_kobj(dev);
+	char devt_str[15];
+
+	if (kobj) {
+		format_dev_t(devt_str, dev->devt);
+		sysfs_remove_link(kobj, devt_str);
+	}
+}
+
 //static int device_private_init(struct device *dev)
 //{
 //	dev->p = kzalloc(sizeof(*dev->p), GFP_KERNEL);
@@ -3045,99 +3045,99 @@ EXPORT_SYMBOL_GPL(put_device);
 //	return true;
 //}
 //EXPORT_SYMBOL_GPL(kill_device);
-//
-///**
-// * device_del - delete device from system.
-// * @dev: device.
-// *
-// * This is the first part of the device unregistration
-// * sequence. This removes the device from the lists we control
-// * from here, has it removed from the other driver model
-// * subsystems it was added to in device_add(), and removes it
-// * from the kobject hierarchy.
-// *
-// * NOTE: this should be called manually _iff_ device_add() was
-// * also called manually.
-// */
-//void device_del(struct device *dev)
-//{
-//	struct device *parent = dev->parent;
-//	struct kobject *glue_dir = NULL;
-//	struct class_interface *class_intf;
-//
-//	device_lock(dev);
-//	kill_device(dev);
-//	device_unlock(dev);
-//
-//	if (dev->fwnode && dev->fwnode->dev == dev)
-//		dev->fwnode->dev = NULL;
-//
-//	/* Notify clients of device removal.  This call must come
-//	 * before dpm_sysfs_remove().
-//	 */
-//	if (dev->bus)
-//		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
-//					     BUS_NOTIFY_DEL_DEVICE, dev);
-//
-//	dpm_sysfs_remove(dev);
-//	if (parent)
-//		klist_del(&dev->p->knode_parent);
-//	if (MAJOR(dev->devt)) {
-//		devtmpfs_delete_node(dev);
-//		device_remove_sys_dev_entry(dev);
-//		device_remove_file(dev, &dev_attr_dev);
-//	}
-//	if (dev->class) {
-//		device_remove_class_symlinks(dev);
-//
-//		mutex_lock(&dev->class->p->mutex);
-//		/* notify any interfaces that the device is now gone */
-//		list_for_each_entry(class_intf,
-//				    &dev->class->p->interfaces, node)
-//			if (class_intf->remove_dev)
-//				class_intf->remove_dev(dev, class_intf);
-//		/* remove the device from the class list */
-//		klist_del(&dev->p->knode_class);
-//		mutex_unlock(&dev->class->p->mutex);
-//	}
-//	device_remove_file(dev, &dev_attr_uevent);
-//	device_remove_attrs(dev);
-//	bus_remove_device(dev);
-//	device_pm_remove(dev);
-//	driver_deferred_probe_del(dev);
-//	device_platform_notify(dev, KOBJ_REMOVE);
-//	device_remove_properties(dev);
-//	device_links_purge(dev);
-//
-//	if (dev->bus)
-//		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
-//					     BUS_NOTIFY_REMOVED_DEVICE, dev);
-//	kobject_uevent(&dev->kobj, KOBJ_REMOVE);
-//	glue_dir = get_glue_dir(dev);
-//	kobject_del(&dev->kobj);
-//	cleanup_glue_dir(dev, glue_dir);
-//	put_device(parent);
-//}
-//EXPORT_SYMBOL_GPL(device_del);
-//
-///**
-// * device_unregister - unregister device from system.
-// * @dev: device going away.
-// *
-// * We do this in two parts, like we do device_register(). First,
-// * we remove it from all the subsystems with device_del(), then
-// * we decrement the reference count via put_device(). If that
-// * is the final reference count, the device will be cleaned up
-// * via device_release() above. Otherwise, the structure will
-// * stick around until the final reference to the device is dropped.
-// */
-//void device_unregister(struct device *dev)
-//{
-//	pr_debug("device: '%s': %s\n", dev_name(dev), __func__);
-//	device_del(dev);
-//	put_device(dev);
-//}
-//EXPORT_SYMBOL_GPL(device_unregister);
+
+/**
+ * device_del - delete device from system.
+ * @dev: device.
+ *
+ * This is the first part of the device unregistration
+ * sequence. This removes the device from the lists we control
+ * from here, has it removed from the other driver model
+ * subsystems it was added to in device_add(), and removes it
+ * from the kobject hierarchy.
+ *
+ * NOTE: this should be called manually _iff_ device_add() was
+ * also called manually.
+ */
+void device_del(struct device *dev)
+{
+	struct device *parent = dev->parent;
+	struct kobject *glue_dir = NULL;
+	struct class_interface *class_intf;
+
+	device_lock(dev);
+	kill_device(dev);
+	device_unlock(dev);
+
+	if (dev->fwnode && dev->fwnode->dev == dev)
+		dev->fwnode->dev = NULL;
+
+	/* Notify clients of device removal.  This call must come
+	 * before dpm_sysfs_remove().
+	 */
+	if (dev->bus)
+		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
+					     BUS_NOTIFY_DEL_DEVICE, dev);
+
+	dpm_sysfs_remove(dev);
+	if (parent)
+		klist_del(&dev->p->knode_parent);
+	if (MAJOR(dev->devt)) {
+		devtmpfs_delete_node(dev);
+		device_remove_sys_dev_entry(dev);
+		device_remove_file(dev, &dev_attr_dev);
+	}
+	if (dev->class) {
+		device_remove_class_symlinks(dev);
+
+		mutex_lock(&dev->class->p->mutex);
+		/* notify any interfaces that the device is now gone */
+		list_for_each_entry(class_intf,
+				    &dev->class->p->interfaces, node)
+			if (class_intf->remove_dev)
+				class_intf->remove_dev(dev, class_intf);
+		/* remove the device from the class list */
+		klist_del(&dev->p->knode_class);
+		mutex_unlock(&dev->class->p->mutex);
+	}
+	device_remove_file(dev, &dev_attr_uevent);
+	device_remove_attrs(dev);
+	bus_remove_device(dev);
+	device_pm_remove(dev);
+	driver_deferred_probe_del(dev);
+	device_platform_notify(dev, KOBJ_REMOVE);
+	device_remove_properties(dev);
+	device_links_purge(dev);
+
+	if (dev->bus)
+		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
+					     BUS_NOTIFY_REMOVED_DEVICE, dev);
+	kobject_uevent(&dev->kobj, KOBJ_REMOVE);
+	glue_dir = get_glue_dir(dev);
+	kobject_del(&dev->kobj);
+	cleanup_glue_dir(dev, glue_dir);
+	put_device(parent);
+}
+EXPORT_SYMBOL_GPL(device_del);
+
+/**
+ * device_unregister - unregister device from system.
+ * @dev: device going away.
+ *
+ * We do this in two parts, like we do device_register(). First,
+ * we remove it from all the subsystems with device_del(), then
+ * we decrement the reference count via put_device(). If that
+ * is the final reference count, the device will be cleaned up
+ * via device_release() above. Otherwise, the structure will
+ * stick around until the final reference to the device is dropped.
+ */
+void device_unregister(struct device *dev)
+{
+	pr_debug("device: '%s': %s\n", dev_name(dev), __func__);
+	device_del(dev);
+	put_device(dev);
+}
+EXPORT_SYMBOL_GPL(device_unregister);
 
 static struct device *prev_device(struct klist_iter *i)
 {

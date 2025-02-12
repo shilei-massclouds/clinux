@@ -32,11 +32,6 @@ void kernfs_put(struct kernfs_node *kn)
     booter_panic("No impl in 'kobject'.");
 }
 
-int kobject_uevent(struct kobject *kobj, enum kobject_action action)
-{
-    booter_panic("No impl in 'kobject'.");
-}
-
 void sysfs_remove_dir(struct kobject *kobj)
 {
     booter_panic("No impl in 'kobject'.");

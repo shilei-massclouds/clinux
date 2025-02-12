@@ -39,10 +39,12 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter lib math \
-	radix_tree \
+	radix_tree idr xarray \
+	kasprintf \
 	sbi \
 	mm_util \
 	cpu task cgroup \
+	riscv_cpu \
 	hrtimer \
 	jump_label \
 	kobject driver_base \
@@ -50,7 +52,7 @@ components := \
 	early_sched sched \
 	resource dma \
 	percpu \
-	workqueue \
+	workqueue_itf workqueue \
 	memblock bootmem paging \
 	page_alloc slub vmalloc \
 	spinlock semaphore mutex rwsem \
@@ -58,6 +60,7 @@ components := \
 	inode dcache \
 	dump_stack \
 	early_printk printk panic
+	#partitions \
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init

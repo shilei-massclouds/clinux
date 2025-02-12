@@ -45,7 +45,7 @@ type ModuleRef = Arc<Module>;
 
 struct Payload {
     names: Vec<String>,
-    last_msg: String,
+    route: Vec<String>,
     json: json::JsonValue,
 }
 
@@ -53,7 +53,7 @@ impl Payload {
     pub fn new() -> Self {
         Self {
             names: vec![],
-            last_msg: String::new(),
+            route: vec![],
             json: json::JsonValue::new_object(),
         }
     }
@@ -74,6 +74,7 @@ fn main() -> Result<()> {
     build_dependency(&top_kmod, &sym_map)?;
 
     let mut payload = Payload::new();
+    payload.route.push(top_kmod.name.clone());
     traverse(top_kmod, &mut payload)?;
     assert_eq!(payload.names.remove(0), "lds");
     debug!("Selected: {}", payload.names.join(" "));
@@ -130,17 +131,18 @@ fn traverse(kmod: ModuleRef, payload: &mut Payload) -> Result<()> {
         if status.contains(ModuleStatus::DONE) {
             return Ok(());
         }
-        panic!("Cyclic chain: {}", payload.last_msg);
+        panic!("Cyclic chain: {}", payload.route.join(" -> "));
     }
 
     let mut json_array = json::JsonValue::new_array();
     for depend in kmod.dependencies.borrow().iter() {
-        payload.last_msg = format!("{} -> {}", kmod.name, depend.name);
+        payload.route.push(depend.name.clone());
         traverse(depend.clone(), payload)?;
-        payload.last_msg = String::new();
+        payload.route.pop();
         json_array.push(depend.name.clone())?;
         debug!("{} -> {}", kmod.name, depend.name);
     }
+
     kmod.status.fetch_or(ModuleStatus::DONE.bits(), Ordering::SeqCst);
     payload.names.push(kmod.name.clone());
     payload.json[kmod.name.clone()] = json_array;

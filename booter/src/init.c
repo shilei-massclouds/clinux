@@ -3,6 +3,7 @@
 #include <linux/export.h>
 #include <linux/cache.h>
 #include <linux/jiffies.h>
+#include <linux/kobject.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -105,3 +106,20 @@ void __weak panic(const char *fmt, ...)
     do {} while (1);
 }
 EXPORT_SYMBOL(panic);
+
+//
+// NOTE ************************
+// Remove below definitions in future.
+//
+
+void sysfs_remove_link(struct kobject *kobj, const char *name)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(sysfs_remove_link);
+
+int kobject_uevent(struct kobject *kobj, enum kobject_action action)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(kobject_uevent);
