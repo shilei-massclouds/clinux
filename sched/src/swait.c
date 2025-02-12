@@ -52,7 +52,6 @@ void swake_up_one(struct swait_queue_head *q)
 	swake_up_locked(q);
 	raw_spin_unlock_irqrestore(&q->lock, flags);
 }
-EXPORT_SYMBOL(swake_up_one);
 
 /*
  * Does not allow usage from IRQ disabled, since we must be able to
@@ -120,7 +119,6 @@ long prepare_to_swait_event(struct swait_queue_head *q, struct swait_queue *wait
 
 	return ret;
 }
-EXPORT_SYMBOL(prepare_to_swait_event);
 
 void __finish_swait(struct swait_queue_head *q, struct swait_queue *wait)
 {
@@ -141,4 +139,3 @@ void finish_swait(struct swait_queue_head *q, struct swait_queue *wait)
 		raw_spin_unlock_irqrestore(&q->lock, flags);
 	}
 }
-EXPORT_SYMBOL(finish_swait);

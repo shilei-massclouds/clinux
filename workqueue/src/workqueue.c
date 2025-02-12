@@ -2622,69 +2622,69 @@ static void wq_barrier_func(struct work_struct *work)
 	complete(&barr->done);
 }
 
-///**
-// * insert_wq_barrier - insert a barrier work
-// * @pwq: pwq to insert barrier into
-// * @barr: wq_barrier to insert
-// * @target: target work to attach @barr to
-// * @worker: worker currently executing @target, NULL if @target is not executing
-// *
-// * @barr is linked to @target such that @barr is completed only after
-// * @target finishes execution.  Please note that the ordering
-// * guarantee is observed only with respect to @target and on the local
-// * cpu.
-// *
-// * Currently, a queued barrier can't be canceled.  This is because
-// * try_to_grab_pending() can't determine whether the work to be
-// * grabbed is at the head of the queue and thus can't clear LINKED
-// * flag of the previous work while there must be a valid next work
-// * after a work with LINKED flag set.
-// *
-// * Note that when @worker is non-NULL, @target may be modified
-// * underneath us, so we can't reliably determine pwq from @target.
-// *
-// * CONTEXT:
-// * raw_spin_lock_irq(pool->lock).
-// */
-//static void insert_wq_barrier(struct pool_workqueue *pwq,
-//			      struct wq_barrier *barr,
-//			      struct work_struct *target, struct worker *worker)
-//{
-//	struct list_head *head;
-//	unsigned int linked = 0;
-//
-//	/*
-//	 * debugobject calls are safe here even with pool->lock locked
-//	 * as we know for sure that this will not trigger any of the
-//	 * checks and call back into the fixup functions where we
-//	 * might deadlock.
-//	 */
-//	INIT_WORK_ONSTACK(&barr->work, wq_barrier_func);
-//	__set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&barr->work));
-//
-//	init_completion_map(&barr->done, &target->lockdep_map);
-//
-//	barr->task = current;
-//
-//	/*
-//	 * If @target is currently being executed, schedule the
-//	 * barrier to the worker; otherwise, put it after @target.
-//	 */
-//	if (worker)
-//		head = worker->scheduled.next;
-//	else {
-//		unsigned long *bits = work_data_bits(target);
-//
-//		head = target->entry.next;
-//		/* there can already be other linked works, inherit and set */
-//		linked = *bits & WORK_STRUCT_LINKED;
-//		__set_bit(WORK_STRUCT_LINKED_BIT, bits);
-//	}
-//
-//	debug_work_activate(&barr->work);
-//	insert_work(pwq, &barr->work, head,
-//		    work_color_to_flags(WORK_NO_COLOR) | linked);
-//}
+/**
+ * insert_wq_barrier - insert a barrier work
+ * @pwq: pwq to insert barrier into
+ * @barr: wq_barrier to insert
+ * @target: target work to attach @barr to
+ * @worker: worker currently executing @target, NULL if @target is not executing
+ *
+ * @barr is linked to @target such that @barr is completed only after
+ * @target finishes execution.  Please note that the ordering
+ * guarantee is observed only with respect to @target and on the local
+ * cpu.
+ *
+ * Currently, a queued barrier can't be canceled.  This is because
+ * try_to_grab_pending() can't determine whether the work to be
+ * grabbed is at the head of the queue and thus can't clear LINKED
+ * flag of the previous work while there must be a valid next work
+ * after a work with LINKED flag set.
+ *
+ * Note that when @worker is non-NULL, @target may be modified
+ * underneath us, so we can't reliably determine pwq from @target.
+ *
+ * CONTEXT:
+ * raw_spin_lock_irq(pool->lock).
+ */
+static void insert_wq_barrier(struct pool_workqueue *pwq,
+			      struct wq_barrier *barr,
+			      struct work_struct *target, struct worker *worker)
+{
+	struct list_head *head;
+	unsigned int linked = 0;
+
+	/*
+	 * debugobject calls are safe here even with pool->lock locked
+	 * as we know for sure that this will not trigger any of the
+	 * checks and call back into the fixup functions where we
+	 * might deadlock.
+	 */
+	INIT_WORK_ONSTACK(&barr->work, wq_barrier_func);
+	__set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&barr->work));
+
+	init_completion_map(&barr->done, &target->lockdep_map);
+
+	barr->task = current;
+
+	/*
+	 * If @target is currently being executed, schedule the
+	 * barrier to the worker; otherwise, put it after @target.
+	 */
+	if (worker)
+		head = worker->scheduled.next;
+	else {
+		unsigned long *bits = work_data_bits(target);
+
+		head = target->entry.next;
+		/* there can already be other linked works, inherit and set */
+		linked = *bits & WORK_STRUCT_LINKED;
+		__set_bit(WORK_STRUCT_LINKED_BIT, bits);
+	}
+
+	debug_work_activate(&barr->work);
+	insert_work(pwq, &barr->work, head,
+		    work_color_to_flags(WORK_NO_COLOR) | linked);
+}
 
 /**
  * flush_workqueue_prep_pwqs - prepare pwqs for workqueue flushing
@@ -2970,103 +2970,103 @@ reflush:
 }
 EXPORT_SYMBOL_GPL(drain_workqueue);
 
-//static bool start_flush_work(struct work_struct *work, struct wq_barrier *barr,
-//			     bool from_cancel)
-//{
-//	struct worker *worker = NULL;
-//	struct worker_pool *pool;
-//	struct pool_workqueue *pwq;
-//
-//	might_sleep();
-//
-//	rcu_read_lock();
-//	pool = get_work_pool(work);
-//	if (!pool) {
-//		rcu_read_unlock();
-//		return false;
-//	}
-//
-//	raw_spin_lock_irq(&pool->lock);
-//	/* see the comment in try_to_grab_pending() with the same code */
-//	pwq = get_work_pwq(work);
-//	if (pwq) {
-//		if (unlikely(pwq->pool != pool))
-//			goto already_gone;
-//	} else {
-//		worker = find_worker_executing_work(pool, work);
-//		if (!worker)
-//			goto already_gone;
-//		pwq = worker->current_pwq;
-//	}
-//
-//	check_flush_dependency(pwq->wq, work);
-//
-//	insert_wq_barrier(pwq, barr, work, worker);
-//	raw_spin_unlock_irq(&pool->lock);
-//
-//	/*
-//	 * Force a lock recursion deadlock when using flush_work() inside a
-//	 * single-threaded or rescuer equipped workqueue.
-//	 *
-//	 * For single threaded workqueues the deadlock happens when the work
-//	 * is after the work issuing the flush_work(). For rescuer equipped
-//	 * workqueues the deadlock happens when the rescuer stalls, blocking
-//	 * forward progress.
-//	 */
-//	if (!from_cancel &&
-//	    (pwq->wq->saved_max_active == 1 || pwq->wq->rescuer)) {
-//		lock_map_acquire(&pwq->wq->lockdep_map);
-//		lock_map_release(&pwq->wq->lockdep_map);
-//	}
-//	rcu_read_unlock();
-//	return true;
-//already_gone:
-//	raw_spin_unlock_irq(&pool->lock);
-//	rcu_read_unlock();
-//	return false;
-//}
-//
-//static bool __flush_work(struct work_struct *work, bool from_cancel)
-//{
-//	struct wq_barrier barr;
-//
-//	if (WARN_ON(!wq_online))
-//		return false;
-//
-//	if (WARN_ON(!work->func))
-//		return false;
-//
-//	if (!from_cancel) {
-//		lock_map_acquire(&work->lockdep_map);
-//		lock_map_release(&work->lockdep_map);
-//	}
-//
-//	if (start_flush_work(work, &barr, from_cancel)) {
-//		wait_for_completion(&barr.done);
-//		destroy_work_on_stack(&barr.work);
-//		return true;
-//	} else {
-//		return false;
-//	}
-//}
-//
-///**
-// * flush_work - wait for a work to finish executing the last queueing instance
-// * @work: the work to flush
-// *
-// * Wait until @work has finished execution.  @work is guaranteed to be idle
-// * on return if it hasn't been requeued since flush started.
-// *
-// * Return:
-// * %true if flush_work() waited for the work to finish execution,
-// * %false if it was already idle.
-// */
-//bool flush_work(struct work_struct *work)
-//{
-//	return __flush_work(work, false);
-//}
-//EXPORT_SYMBOL_GPL(flush_work);
-//
+static bool start_flush_work(struct work_struct *work, struct wq_barrier *barr,
+			     bool from_cancel)
+{
+	struct worker *worker = NULL;
+	struct worker_pool *pool;
+	struct pool_workqueue *pwq;
+
+	might_sleep();
+
+	rcu_read_lock();
+	pool = get_work_pool(work);
+	if (!pool) {
+		rcu_read_unlock();
+		return false;
+	}
+
+	raw_spin_lock_irq(&pool->lock);
+	/* see the comment in try_to_grab_pending() with the same code */
+	pwq = get_work_pwq(work);
+	if (pwq) {
+		if (unlikely(pwq->pool != pool))
+			goto already_gone;
+	} else {
+		worker = find_worker_executing_work(pool, work);
+		if (!worker)
+			goto already_gone;
+		pwq = worker->current_pwq;
+	}
+
+	check_flush_dependency(pwq->wq, work);
+
+	insert_wq_barrier(pwq, barr, work, worker);
+	raw_spin_unlock_irq(&pool->lock);
+
+	/*
+	 * Force a lock recursion deadlock when using flush_work() inside a
+	 * single-threaded or rescuer equipped workqueue.
+	 *
+	 * For single threaded workqueues the deadlock happens when the work
+	 * is after the work issuing the flush_work(). For rescuer equipped
+	 * workqueues the deadlock happens when the rescuer stalls, blocking
+	 * forward progress.
+	 */
+	if (!from_cancel &&
+	    (pwq->wq->saved_max_active == 1 || pwq->wq->rescuer)) {
+		lock_map_acquire(&pwq->wq->lockdep_map);
+		lock_map_release(&pwq->wq->lockdep_map);
+	}
+	rcu_read_unlock();
+	return true;
+already_gone:
+	raw_spin_unlock_irq(&pool->lock);
+	rcu_read_unlock();
+	return false;
+}
+
+static bool __flush_work(struct work_struct *work, bool from_cancel)
+{
+	struct wq_barrier barr;
+
+	if (WARN_ON(!wq_online))
+		return false;
+
+	if (WARN_ON(!work->func))
+		return false;
+
+	if (!from_cancel) {
+		lock_map_acquire(&work->lockdep_map);
+		lock_map_release(&work->lockdep_map);
+	}
+
+	if (start_flush_work(work, &barr, from_cancel)) {
+		wait_for_completion(&barr.done);
+		destroy_work_on_stack(&barr.work);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * flush_work - wait for a work to finish executing the last queueing instance
+ * @work: the work to flush
+ *
+ * Wait until @work has finished execution.  @work is guaranteed to be idle
+ * on return if it hasn't been requeued since flush started.
+ *
+ * Return:
+ * %true if flush_work() waited for the work to finish execution,
+ * %false if it was already idle.
+ */
+bool flush_work(struct work_struct *work)
+{
+	return __flush_work(work, false);
+}
+EXPORT_SYMBOL_GPL(flush_work);
+
 //struct cwt_wait {
 //	wait_queue_entry_t		wait;
 //	struct work_struct	*work;

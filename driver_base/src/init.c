@@ -20,12 +20,12 @@ void dpm_sysfs_remove(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
 }
-*/
 
 void srcu_drive_gp(struct work_struct *wp)
 {
     booter_panic("No impl 'driver_base'.");
 }
+*/
 
 int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *attr,
              const void *ns)
@@ -44,11 +44,13 @@ void device_remove_groups(struct device *dev,
     booter_panic("No impl 'driver_base'.");
 }
 
+/*
 void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
            rcu_callback_t func)
 {
     booter_panic("No impl 'driver_base'.");
 }
+*/
 
 int software_node_notify(struct device *dev, unsigned long action)
 {
@@ -111,10 +113,12 @@ int lock_device_hotplug_sysfs(void)
 {
     booter_panic("No impl 'driver_base'.");
 }
+/*
 void __srcu_read_unlock(struct srcu_struct *ssp, int idx)
 {
     booter_panic("No impl 'driver_base'.");
 }
+*/
 int kobject_synth_uevent(struct kobject *kobj, const char *buf, size_t count)
 {
     booter_panic("No impl 'driver_base'.");

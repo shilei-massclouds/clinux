@@ -48,3 +48,9 @@ void __weak delayed_work_timer_fn(struct timer_list *t)
     booter_panic("No impl in 'workqueue_itf'.");
 }
 EXPORT_SYMBOL(delayed_work_timer_fn);
+
+bool __weak flush_work(struct work_struct *work)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(flush_work);

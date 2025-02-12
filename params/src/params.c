@@ -217,34 +217,34 @@ char *parse_args(const char *doing,
 }
 EXPORT_SYMBOL(parse_args);
 
-///* Lazy bastard, eh? */
-//#define STANDARD_PARAM_DEF(name, type, format, strtolfn)      		\
-//	int param_set_##name(const char *val, const struct kernel_param *kp) \
-//	{								\
-//		return strtolfn(val, 0, (type *)kp->arg);		\
-//	}								\
-//	int param_get_##name(char *buffer, const struct kernel_param *kp) \
-//	{								\
-//		return scnprintf(buffer, PAGE_SIZE, format "\n",	\
-//				*((type *)kp->arg));			\
-//	}								\
-//	const struct kernel_param_ops param_ops_##name = {			\
-//		.set = param_set_##name,				\
-//		.get = param_get_##name,				\
-//	};								\
-//	EXPORT_SYMBOL(param_set_##name);				\
-//	EXPORT_SYMBOL(param_get_##name);				\
-//	EXPORT_SYMBOL(param_ops_##name)
-//
-//
-//STANDARD_PARAM_DEF(byte,	unsigned char,		"%hhu", kstrtou8);
-//STANDARD_PARAM_DEF(short,	short,			"%hi",  kstrtos16);
-//STANDARD_PARAM_DEF(ushort,	unsigned short,		"%hu",  kstrtou16);
-//STANDARD_PARAM_DEF(int,		int,			"%i",   kstrtoint);
-//STANDARD_PARAM_DEF(uint,	unsigned int,		"%u",   kstrtouint);
-//STANDARD_PARAM_DEF(long,	long,			"%li",  kstrtol);
-//STANDARD_PARAM_DEF(ulong,	unsigned long,		"%lu",  kstrtoul);
-//STANDARD_PARAM_DEF(ullong,	unsigned long long,	"%llu", kstrtoull);
+/* Lazy bastard, eh? */
+#define STANDARD_PARAM_DEF(name, type, format, strtolfn)      		\
+	int param_set_##name(const char *val, const struct kernel_param *kp) \
+	{								\
+		return strtolfn(val, 0, (type *)kp->arg);		\
+	}								\
+	int param_get_##name(char *buffer, const struct kernel_param *kp) \
+	{								\
+		return scnprintf(buffer, PAGE_SIZE, format "\n",	\
+				*((type *)kp->arg));			\
+	}								\
+	const struct kernel_param_ops param_ops_##name = {			\
+		.set = param_set_##name,				\
+		.get = param_get_##name,				\
+	};								\
+	EXPORT_SYMBOL(param_set_##name);				\
+	EXPORT_SYMBOL(param_get_##name);				\
+	EXPORT_SYMBOL(param_ops_##name)
+
+
+STANDARD_PARAM_DEF(byte,	unsigned char,		"%hhu", kstrtou8);
+STANDARD_PARAM_DEF(short,	short,			"%hi",  kstrtos16);
+STANDARD_PARAM_DEF(ushort,	unsigned short,		"%hu",  kstrtou16);
+STANDARD_PARAM_DEF(int,		int,			"%i",   kstrtoint);
+STANDARD_PARAM_DEF(uint,	unsigned int,		"%u",   kstrtouint);
+STANDARD_PARAM_DEF(long,	long,			"%li",  kstrtol);
+STANDARD_PARAM_DEF(ulong,	unsigned long,		"%lu",  kstrtoul);
+STANDARD_PARAM_DEF(ullong,	unsigned long long,	"%llu", kstrtoull);
 
 int param_set_charp(const char *val, const struct kernel_param *kp)
 {

@@ -4,11 +4,6 @@
 #include <linux/export.h>
 #include "../../booter/src/booter.h"
 
-void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
-{
-    booter_panic("No impl '__local_bh_enable_ip'.");
-}
-
 int
 cl_spinlock_init(void)
 {

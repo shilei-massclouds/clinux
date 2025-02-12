@@ -104,10 +104,12 @@ int proc_dointvec(struct ctl_table *table, int write, void *buffer,
     booter_panic("No impl 'sched'.");
 }
 
+/*
 void rcu_qs(void)
 {
     booter_panic("No impl 'sched'.");
 }
+*/
 
 struct proc_dir_entry *proc_create_seq_private(const char *name, umode_t mode,
         struct proc_dir_entry *parent, const struct seq_operations *ops,

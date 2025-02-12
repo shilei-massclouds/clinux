@@ -150,10 +150,12 @@ int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
 {
     booter_panic("No impl in 'time'.");
 }
+/*
 void rcu_sched_clock_irq(int user)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 
 int device_register(struct device *dev)
 {
@@ -185,14 +187,7 @@ struct dentry *debugfs_create_file(const char *name, umode_t mode,
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(debugfs_create_file);
-void raise_softirq_irqoff(unsigned int nr)
-{
-    booter_panic("No impl in 'time'.");
-}
-void open_softirq(int nr, void (*action)(struct softirq_action *))
-{
-    booter_panic("No impl in 'time'.");
-}
+
 void scheduler_tick(void)
 {
     booter_panic("No impl in 'time'.");

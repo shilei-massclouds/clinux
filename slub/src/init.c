@@ -33,11 +33,13 @@ unsigned int stack_trace_save(unsigned long *store, unsigned int size,
     booter_panic("No impl 'slub'.");
 }
 
+/*
 void call_rcu(struct rcu_head *head, rcu_callback_t func)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(call_rcu);
+*/
 
 void on_each_cpu_cond(smp_cond_func_t cond_func, smp_call_func_t func,
               void *info, bool wait)

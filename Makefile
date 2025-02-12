@@ -54,7 +54,7 @@ components := \
 	workqueue_itf workqueue \
 	memblock bootmem paging \
 	page_alloc slub vmalloc \
-	spinlock semaphore mutex rwsem \
+	spinlock semaphore mutex rwsem rcu \
 	traps extable \
 	inode dcache \
 	dump_stack \

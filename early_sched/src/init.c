@@ -163,3 +163,21 @@ void __weak calc_load_nohz_stop(void)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(calc_load_nohz_stop);
+
+void __weak swake_up_one(struct swait_queue_head *q)
+{
+    booter_panic("No impl in 'early_sched'.");
+}
+EXPORT_SYMBOL(swake_up_one);
+
+long __weak prepare_to_swait_event(struct swait_queue_head *q, struct swait_queue *wait, int state)
+{
+    booter_panic("No impl in 'early_sched'.");
+}
+EXPORT_SYMBOL(prepare_to_swait_event);
+
+void __weak finish_swait(struct swait_queue_head *q, struct swait_queue *wait)
+{
+    booter_panic("No impl in 'early_sched'.");
+}
+EXPORT_SYMBOL(finish_swait);

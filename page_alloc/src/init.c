@@ -102,18 +102,6 @@ bool node_dirty_ok(struct pglist_data *pgdat)
     booter_panic("No impl 'page_init_poison'.");
 }
 
-bool flush_work(struct work_struct *work)
-{
-    booter_panic("No impl 'page_init_poison'.");
-}
-
-/*
-void dump_stack(void)
-{
-    booter_panic("No impl 'dump_stack'.");
-}
-*/
-
 /*
  * Serializes oom killer invocations (out_of_memory()) from all contexts to
  * prevent from over eager oom killing (e.g. when the oom killer is invoked

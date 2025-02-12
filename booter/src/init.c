@@ -138,3 +138,9 @@ EXPORT_SYMBOL(dev_printk);
 
 unsigned long lpj_fine;
 EXPORT_SYMBOL(lpj_fine);
+
+void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
+{
+    booter_panic("No impl '__local_bh_enable_ip'.");
+}
+EXPORT_SYMBOL(__local_bh_enable_ip);

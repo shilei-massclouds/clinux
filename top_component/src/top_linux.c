@@ -550,7 +550,7 @@ cl_top_linux_init(void)
      */
     workqueue_init_early();
 
-    //rcu_init();
+    rcu_init();
 
     /* Trace events are available after this */
     trace_init();
