@@ -1225,17 +1225,18 @@ struct device_node *of_find_node_by_phandle(phandle handle)
 }
 EXPORT_SYMBOL(of_find_node_by_phandle);
 
-//void of_print_phandle_args(const char *msg, const struct of_phandle_args *args)
-//{
-//	int i;
-//	printk("%s %pOF", msg, args->np);
-//	for (i = 0; i < args->args_count; i++) {
-//		const char delim = i ? ',' : ':';
-//
-//		pr_cont("%c%08x", delim, args->args[i]);
-//	}
-//	pr_cont("\n");
-//}
+void of_print_phandle_args(const char *msg, const struct of_phandle_args *args)
+{
+	int i;
+	printk("%s %pOF", msg, args->np);
+	for (i = 0; i < args->args_count; i++) {
+		const char delim = i ? ',' : ':';
+
+		pr_cont("%c%08x", delim, args->args[i]);
+	}
+	pr_cont("\n");
+}
+EXPORT_SYMBOL(of_print_phandle_args);
 
 int of_phandle_iterator_init(struct of_phandle_iterator *it,
 		const struct device_node *np,

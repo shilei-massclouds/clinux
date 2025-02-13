@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
+#ifndef DEBUG
 #define DEBUG       /* Enable initcall_debug */
+#endif
 
 #include <linux/types.h>
 #include <linux/export.h>
