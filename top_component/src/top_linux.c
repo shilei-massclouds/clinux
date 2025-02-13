@@ -21,6 +21,8 @@
 #include <linux/sched/init.h>
 #include <linux/sched/isolation.h>
 #include <linux/context_tracking.h>
+#include <linux/random.h>
+#include <linux/stackprotector.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -587,6 +589,19 @@ cl_top_linux_init(void)
     hrtimers_init();
     softirq_init();
     timekeeping_init();
+
+    /*
+     * For best initial stack canary entropy, prepare it after:
+     * - setup_arch() for any UEFI RNG entropy and boot cmdline access
+     * - timekeeping_init() for ktime entropy used in rand_initialize()
+     * - rand_initialize() to get any arch-specific entropy like RDRAND
+     * - add_latent_entropy() to get any latent entropy
+     * - adding command line entropy
+     */
+    rand_initialize();
+    add_latent_entropy();
+    add_device_randomness(command_line, strlen(command_line));
+    boot_init_stack_canary();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

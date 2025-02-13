@@ -210,3 +210,9 @@ EXPORT_SYMBOL(sysfs_create_link);
 
 const struct sysfs_ops kobj_sysfs_ops;
 EXPORT_SYMBOL(kobj_sysfs_ops);
+
+#ifdef CONFIG_STACKPROTECTOR
+#include <linux/stackprotector.h>
+unsigned long __stack_chk_guard __read_mostly;
+EXPORT_SYMBOL(__stack_chk_guard);
+#endif
