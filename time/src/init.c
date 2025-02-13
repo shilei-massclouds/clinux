@@ -35,13 +35,6 @@ unsigned long long __weak sched_clock(void)
 }
 EXPORT_SYMBOL_GPL(sched_clock);
 
-/*
-int tick_program_event(ktime_t expires, int force)
-{
-    booter_panic("No impl 'tick_program_event'.");
-}
-*/
-
 bool timerqueue_del(struct timerqueue_head *head, struct timerqueue_node *node)
 {
     booter_panic("No impl 'timerqueue_del'.");
@@ -51,19 +44,6 @@ struct timerqueue_node *timerqueue_iterate_next(struct timerqueue_node *node)
 {
     booter_panic("No impl 'timerqueue_iterate_next'.");
 }
-
-/*
-ktime_t ktime_get(void)
-{
-    booter_panic("No impl 'ktime_get'.");
-}
-EXPORT_SYMBOL(ktime_get);
-
-ktime_t ktime_get_with_offset(enum tk_offsets offs)
-{
-    booter_panic("No impl 'ktime_get_with_offset'.");
-}
-*/
 
 bool timerqueue_add(struct timerqueue_head *head, struct timerqueue_node *node)
 {
@@ -81,31 +61,11 @@ int smp_call_function_single(int cpu, void (*func) (void *info), void *info,
     booter_panic("No impl in 'time'.");
 }
 
-/*
-*/
-
 void account_process_tick(struct task_struct *p, int user_tick)
 {
     booter_panic("No impl in 'time'.");
 }
 bool irq_work_needs_cpu(void)
-{
-    booter_panic("No impl in 'time'.");
-}
-
-/*
-void calc_global_load(void)
-{
-    booter_panic("No impl in 'time'.");
-}
-*/
-int raw_notifier_chain_unregister(struct raw_notifier_head *nh,
-        struct notifier_block *n)
-{
-    booter_panic("No impl in 'time'.");
-}
-int raw_notifier_call_chain(struct raw_notifier_head *nh,
-        unsigned long val, void *v)
 {
     booter_panic("No impl in 'time'.");
 }
@@ -121,11 +81,6 @@ loff_t seq_lseek(struct file *file, loff_t offset, int whence)
 }
 EXPORT_SYMBOL(seq_lseek);
 
-int raw_notifier_chain_register(struct raw_notifier_head *nh,
-        struct notifier_block *n)
-{
-    booter_panic("No impl in 'time'.");
-}
 bool capable(int cap)
 {
     booter_panic("No impl in 'time'.");
@@ -139,12 +94,6 @@ int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
 {
     booter_panic("No impl in 'time'.");
 }
-/*
-void rcu_sched_clock_irq(int user)
-{
-    booter_panic("No impl in 'time'.");
-}
-*/
 
 int device_register(struct device *dev)
 {
@@ -152,10 +101,6 @@ int device_register(struct device *dev)
 }
 EXPORT_SYMBOL(device_register);
 
-void update_vsyscall_tz(void)
-{
-    booter_panic("No impl in 'time'.");
-}
 void register_syscore_ops(struct syscore_ops *ops)
 {
     booter_panic("No impl in 'time'.");
@@ -202,10 +147,7 @@ int single_open(struct file *file, int (*show)(struct seq_file *, void *),
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(single_open);
-void update_vsyscall(struct timekeeper *tk)
-{
-    booter_panic("No impl in 'time'.");
-}
+
 void run_posix_cpu_timers(void)
 {
     booter_panic("No impl in 'time'.");

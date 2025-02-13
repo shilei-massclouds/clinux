@@ -58,11 +58,13 @@ void klist_del(struct klist_node *n)
     booter_panic("No impl 'driver_base'.");
 }
 
+/*
 int blocking_notifier_call_chain(struct blocking_notifier_head *nh,
         unsigned long val, void *v)
 {
     booter_panic("No impl 'driver_base'.");
 }
+*/
 
 int device_online(struct device *dev)
 {

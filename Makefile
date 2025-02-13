@@ -46,9 +46,9 @@ components := \
 	sbi time irqchip riscv_cpu \
 	early_fdt params \
 	cpu task cgroup resource dma \
-	jump_label extable \
+	jump_label extable vdso \
 	early_sched sched \
-	percpu workqueue_itf workqueue \
+	percpu workqueue_itf workqueue notifier \
 	memblock bootmem paging \
 	page_alloc slub vmalloc mm_util \
 	spinlock semaphore mutex rwsem rcu \

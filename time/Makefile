@@ -15,3 +15,4 @@ obj_y += ntp.o
 obj_y += riscv_time.o
 obj_y += time.o
 obj_y += delay.o
+obj_y += vsyscall.o
