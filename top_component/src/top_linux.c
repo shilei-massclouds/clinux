@@ -23,6 +23,8 @@
 #include <linux/context_tracking.h>
 #include <linux/random.h>
 #include <linux/stackprotector.h>
+#include <linux/perf_event.h>
+#include <linux/profile.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -60,6 +62,7 @@ core_param(initcall_debug, initcall_debug, bool, 0644);
 extern void setup_vm_final(void);
 extern void free_area_init(unsigned long *max_zone_pfn);
 extern void init_IRQ(void);
+extern void time_init(void);
 
 static void setup_zero_page(void)
 {
@@ -602,6 +605,12 @@ cl_top_linux_init(void)
     add_latent_entropy();
     add_device_randomness(command_line, strlen(command_line));
     boot_init_stack_canary();
+
+    time_init();
+    perf_event_init();
+    profile_init();
+    call_function_init();
+    WARN(!irqs_disabled(), "Interrupts were enabled early\n");
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

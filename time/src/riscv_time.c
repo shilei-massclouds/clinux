@@ -26,6 +26,7 @@ void __init time_init(void)
 	lpj_fine = riscv_timebase / HZ;
 	timer_probe();
 }
+EXPORT_SYMBOL_GPL(time_init);
 
 void clocksource_arch_init(struct clocksource *cs)
 {
