@@ -102,14 +102,15 @@ struct of_reconfig_data {
 
 /* initialize a node */
 extern struct kobj_type of_node_ktype;
-extern const struct fwnode_operations of_fwnode_ops;
-static inline void of_node_init(struct device_node *node)
-{
-#if defined(CONFIG_OF_KOBJ)
-	kobject_init(&node->kobj, &of_node_ktype);
-#endif
-	node->fwnode.ops = &of_fwnode_ops;
-}
+//extern const struct fwnode_operations of_fwnode_ops;
+//static inline void of_node_init(struct device_node *node)
+//{
+//#if defined(CONFIG_OF_KOBJ)
+//	kobject_init(&node->kobj, &of_node_ktype);
+//#endif
+//	node->fwnode.ops = &of_fwnode_ops;
+//}
+extern void of_node_init(struct device_node *node);
 
 #if defined(CONFIG_OF_KOBJ)
 #define of_node_kobj(n) (&(n)->kobj)
@@ -152,10 +153,11 @@ extern raw_spinlock_t devtree_lock;
 #ifdef CONFIG_OF
 void of_core_init(void);
 
-static inline bool is_of_node(const struct fwnode_handle *fwnode)
-{
-	return !IS_ERR_OR_NULL(fwnode) && fwnode->ops == &of_fwnode_ops;
-}
+//static inline bool is_of_node(const struct fwnode_handle *fwnode)
+//{
+//	return !IS_ERR_OR_NULL(fwnode) && fwnode->ops == &of_fwnode_ops;
+//}
+extern bool is_of_node(const struct fwnode_handle *fwnode);
 
 #define to_of_node(__fwnode)						\
 	({								\

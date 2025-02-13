@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/device.h>
+#include <linux/fwnode.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -158,10 +159,12 @@ struct kset *kset_create_and_add(const char *name,
     booter_panic("No impl 'driver_base'.");
 }
 
-#include <linux/fwnode.h>
-const struct fwnode_operations of_fwnode_ops __weak;
-
 int __weak of_irq_get(struct device_node *dev, int index)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+
+bool __weak is_of_node(const struct fwnode_handle *fwnode)
 {
     booter_panic("No impl 'driver_base'.");
 }

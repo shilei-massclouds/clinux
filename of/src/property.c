@@ -1447,3 +1447,18 @@ const struct fwnode_operations of_fwnode_ops = {
 	.add_links = of_fwnode_add_links,
 };
 EXPORT_SYMBOL_GPL(of_fwnode_ops);
+
+bool is_of_node(const struct fwnode_handle *fwnode)
+{
+	return !IS_ERR_OR_NULL(fwnode) && fwnode->ops == &of_fwnode_ops;
+}
+EXPORT_SYMBOL_GPL(is_of_node);
+
+void of_node_init(struct device_node *node)
+{
+#if defined(CONFIG_OF_KOBJ)
+	kobject_init(&node->kobj, &of_node_ktype);
+#endif
+	node->fwnode.ops = &of_fwnode_ops;
+}
+EXPORT_SYMBOL_GPL(of_node_init);
