@@ -1575,6 +1575,7 @@ void __init timekeeping_init(void)
 	write_seqcount_end(&tk_core.seq);
 	raw_spin_unlock_irqrestore(&timekeeper_lock, flags);
 }
+EXPORT_SYMBOL(timekeeping_init);
 
 /* time in seconds when suspend began for persistent clock */
 static struct timespec64 timekeeping_suspend_time;

@@ -482,29 +482,29 @@ EXPORT_SYMBOL(irq_exit);
 //	raise_softirq_irqoff(nr);
 //	local_irq_restore(flags);
 //}
-//
-//void __raise_softirq_irqoff(unsigned int nr)
-//{
-//	trace_softirq_raise(nr);
-//	or_softirq_pending(1UL << nr);
-//}
+
+void __raise_softirq_irqoff(unsigned int nr)
+{
+	trace_softirq_raise(nr);
+	or_softirq_pending(1UL << nr);
+}
 
 void open_softirq(int nr, void (*action)(struct softirq_action *))
 {
 	softirq_vec[nr].action = action;
 }
 
-///*
-// * Tasklets
-// */
-//struct tasklet_head {
-//	struct tasklet_struct *head;
-//	struct tasklet_struct **tail;
-//};
-//
-//static DEFINE_PER_CPU(struct tasklet_head, tasklet_vec);
-//static DEFINE_PER_CPU(struct tasklet_head, tasklet_hi_vec);
-//
+/*
+ * Tasklets
+ */
+struct tasklet_head {
+	struct tasklet_struct *head;
+	struct tasklet_struct **tail;
+};
+
+static DEFINE_PER_CPU(struct tasklet_head, tasklet_vec);
+static DEFINE_PER_CPU(struct tasklet_head, tasklet_hi_vec);
+
 //static void __tasklet_schedule_common(struct tasklet_struct *t,
 //				      struct tasklet_head __percpu *headp,
 //				      unsigned int softirq_nr)
@@ -534,58 +534,58 @@ void open_softirq(int nr, void (*action)(struct softirq_action *))
 //				  HI_SOFTIRQ);
 //}
 //EXPORT_SYMBOL(__tasklet_hi_schedule);
-//
-//static void tasklet_action_common(struct softirq_action *a,
-//				  struct tasklet_head *tl_head,
-//				  unsigned int softirq_nr)
-//{
-//	struct tasklet_struct *list;
-//
-//	local_irq_disable();
-//	list = tl_head->head;
-//	tl_head->head = NULL;
-//	tl_head->tail = &tl_head->head;
-//	local_irq_enable();
-//
-//	while (list) {
-//		struct tasklet_struct *t = list;
-//
-//		list = list->next;
-//
-//		if (tasklet_trylock(t)) {
-//			if (!atomic_read(&t->count)) {
-//				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
-//							&t->state))
-//					BUG();
-//				if (t->use_callback)
-//					t->callback(t);
-//				else
-//					t->func(t->data);
-//				tasklet_unlock(t);
-//				continue;
-//			}
-//			tasklet_unlock(t);
-//		}
-//
-//		local_irq_disable();
-//		t->next = NULL;
-//		*tl_head->tail = t;
-//		tl_head->tail = &t->next;
-//		__raise_softirq_irqoff(softirq_nr);
-//		local_irq_enable();
-//	}
-//}
-//
-//static __latent_entropy void tasklet_action(struct softirq_action *a)
-//{
-//	tasklet_action_common(a, this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
-//}
-//
-//static __latent_entropy void tasklet_hi_action(struct softirq_action *a)
-//{
-//	tasklet_action_common(a, this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
-//}
-//
+
+static void tasklet_action_common(struct softirq_action *a,
+				  struct tasklet_head *tl_head,
+				  unsigned int softirq_nr)
+{
+	struct tasklet_struct *list;
+
+	local_irq_disable();
+	list = tl_head->head;
+	tl_head->head = NULL;
+	tl_head->tail = &tl_head->head;
+	local_irq_enable();
+
+	while (list) {
+		struct tasklet_struct *t = list;
+
+		list = list->next;
+
+		if (tasklet_trylock(t)) {
+			if (!atomic_read(&t->count)) {
+				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
+							&t->state))
+					BUG();
+				if (t->use_callback)
+					t->callback(t);
+				else
+					t->func(t->data);
+				tasklet_unlock(t);
+				continue;
+			}
+			tasklet_unlock(t);
+		}
+
+		local_irq_disable();
+		t->next = NULL;
+		*tl_head->tail = t;
+		tl_head->tail = &t->next;
+		__raise_softirq_irqoff(softirq_nr);
+		local_irq_enable();
+	}
+}
+
+static __latent_entropy void tasklet_action(struct softirq_action *a)
+{
+	tasklet_action_common(a, this_cpu_ptr(&tasklet_vec), TASKLET_SOFTIRQ);
+}
+
+static __latent_entropy void tasklet_hi_action(struct softirq_action *a)
+{
+	tasklet_action_common(a, this_cpu_ptr(&tasklet_hi_vec), HI_SOFTIRQ);
+}
+
 //void tasklet_setup(struct tasklet_struct *t,
 //		   void (*callback)(struct tasklet_struct *))
 //{
@@ -624,22 +624,23 @@ void open_softirq(int nr, void (*action)(struct softirq_action *))
 //	clear_bit(TASKLET_STATE_SCHED, &t->state);
 //}
 //EXPORT_SYMBOL(tasklet_kill);
-//
-//void __init softirq_init(void)
-//{
-//	int cpu;
-//
-//	for_each_possible_cpu(cpu) {
-//		per_cpu(tasklet_vec, cpu).tail =
-//			&per_cpu(tasklet_vec, cpu).head;
-//		per_cpu(tasklet_hi_vec, cpu).tail =
-//			&per_cpu(tasklet_hi_vec, cpu).head;
-//	}
-//
-//	open_softirq(TASKLET_SOFTIRQ, tasklet_action);
-//	open_softirq(HI_SOFTIRQ, tasklet_hi_action);
-//}
-//
+
+void __init softirq_init(void)
+{
+	int cpu;
+
+	for_each_possible_cpu(cpu) {
+		per_cpu(tasklet_vec, cpu).tail =
+			&per_cpu(tasklet_vec, cpu).head;
+		per_cpu(tasklet_hi_vec, cpu).tail =
+			&per_cpu(tasklet_hi_vec, cpu).head;
+	}
+
+	open_softirq(TASKLET_SOFTIRQ, tasklet_action);
+	open_softirq(HI_SOFTIRQ, tasklet_hi_action);
+}
+EXPORT_SYMBOL(softirq_init);
+
 //static int ksoftirqd_should_run(unsigned int cpu)
 //{
 //	return local_softirq_pending();
