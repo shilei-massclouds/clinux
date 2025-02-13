@@ -41,11 +41,12 @@ components := \
 	prebuilt booter lib math radix_tree idr xarray \
 	kasprintf random \
 	traps irq softirq \
+	kobject driver_base \
+	of_fdt of_irq \
 	sbi time irqchip riscv_cpu \
-	early_fdt params of_fdt of_irq \
+	early_fdt params \
 	cpu task cgroup resource dma \
 	jump_label extable \
-	kobject driver_base \
 	early_sched sched \
 	percpu workqueue_itf workqueue \
 	memblock bootmem paging \

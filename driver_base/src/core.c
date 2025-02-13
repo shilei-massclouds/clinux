@@ -4246,12 +4246,12 @@ EXPORT_SYMBOL_GPL(device_for_each_child);
 //	return err;
 //}
 //EXPORT_SYMBOL_GPL(dev_err_probe);
-//
-//static inline bool fwnode_is_primary(struct fwnode_handle *fwnode)
-//{
-//	return fwnode && !IS_ERR(fwnode->secondary);
-//}
-//
+
+static inline bool fwnode_is_primary(struct fwnode_handle *fwnode)
+{
+	return fwnode && !IS_ERR(fwnode->secondary);
+}
+
 ///**
 // * set_primary_fwnode - Change the primary firmware node of a given device.
 // * @dev: Device to handle.
@@ -4283,28 +4283,28 @@ EXPORT_SYMBOL_GPL(device_for_each_child);
 //	}
 //}
 //EXPORT_SYMBOL_GPL(set_primary_fwnode);
-//
-///**
-// * set_secondary_fwnode - Change the secondary firmware node of a given device.
-// * @dev: Device to handle.
-// * @fwnode: New secondary firmware node of the device.
-// *
-// * If a primary firmware node of the device is present, set its secondary
-// * pointer to @fwnode.  Otherwise, set the device's firmware node pointer to
-// * @fwnode.
-// */
-//void set_secondary_fwnode(struct device *dev, struct fwnode_handle *fwnode)
-//{
-//	if (fwnode)
-//		fwnode->secondary = ERR_PTR(-ENODEV);
-//
-//	if (fwnode_is_primary(dev->fwnode))
-//		dev->fwnode->secondary = fwnode;
-//	else
-//		dev->fwnode = fwnode;
-//}
-//EXPORT_SYMBOL_GPL(set_secondary_fwnode);
-//
+
+/**
+ * set_secondary_fwnode - Change the secondary firmware node of a given device.
+ * @dev: Device to handle.
+ * @fwnode: New secondary firmware node of the device.
+ *
+ * If a primary firmware node of the device is present, set its secondary
+ * pointer to @fwnode.  Otherwise, set the device's firmware node pointer to
+ * @fwnode.
+ */
+void set_secondary_fwnode(struct device *dev, struct fwnode_handle *fwnode)
+{
+	if (fwnode)
+		fwnode->secondary = ERR_PTR(-ENODEV);
+
+	if (fwnode_is_primary(dev->fwnode))
+		dev->fwnode->secondary = fwnode;
+	else
+		dev->fwnode = fwnode;
+}
+EXPORT_SYMBOL_GPL(set_secondary_fwnode);
+
 ///**
 // * device_set_of_node_from_dev - reuse device-tree node of another device
 // * @dev: device whose device-tree node is being set

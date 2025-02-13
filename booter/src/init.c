@@ -6,6 +6,7 @@
 #include <linux/kobject.h>
 #include <linux/device.h>
 #include <linux/irq.h>
+#include <linux/module.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -184,3 +185,28 @@ void kobject_del(struct kobject *kobj)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(kobject_del);
+
+struct kobject *kernel_kobj;
+EXPORT_SYMBOL_GPL(kernel_kobj);
+
+bool try_module_get(struct module *module)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL_GPL(try_module_get);
+
+void module_put(struct module *module)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(module_put);
+
+int sysfs_create_link(struct kobject *kobj, struct kobject *target,
+              const char *name)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(sysfs_create_link);
+
+const struct sysfs_ops kobj_sysfs_ops;
+EXPORT_SYMBOL(kobj_sysfs_ops);

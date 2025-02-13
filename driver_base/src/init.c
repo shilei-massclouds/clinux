@@ -52,11 +52,6 @@ void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
 }
 */
 
-int software_node_notify(struct device *dev, unsigned long action)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-
 void klist_del(struct klist_node *n)
 {
     booter_panic("No impl 'driver_base'.");
@@ -81,10 +76,6 @@ void bus_remove_device(struct device *dev)
     booter_panic("No impl 'driver_base'.");
 }
 void driver_deferred_probe_del(struct device *dev)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-void device_remove_properties(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
 }
@@ -138,3 +129,39 @@ void device_remove_file(struct device *dev,
     booter_panic("No impl 'driver_base'.");
 }
 
+//const struct sysfs_ops kobj_sysfs_ops;
+
+void kset_unregister(struct kset *k)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+bool of_dma_is_coherent(struct device_node *np)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+/*
+int sysfs_create_link(struct kobject *kobj, struct kobject *target,
+              const char *name)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+*/
+int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
+             struct kobject *parent, const char *fmt, ...)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+struct kset *kset_create_and_add(const char *name,
+                 const struct kset_uevent_ops *uevent_ops,
+                 struct kobject *parent_kobj)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+
+#include <linux/fwnode.h>
+const struct fwnode_operations of_fwnode_ops __weak;
+
+int __weak of_irq_get(struct device_node *dev, int index)
+{
+    booter_panic("No impl 'driver_base'.");
+}

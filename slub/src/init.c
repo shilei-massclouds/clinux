@@ -47,13 +47,13 @@ void on_each_cpu_cond(smp_cond_func_t cond_func, smp_call_func_t func,
     booter_panic("No impl 'slub'.");
 }
 
+/*
 int sysfs_create_link(struct kobject *kobj, struct kobject *target,
               const char *name)
 {
     booter_panic("No impl 'slub'.");
 }
 
-/*
 const char *kstrdup_const(const char *s, gfp_t gfp)
 {
     booter_panic("No impl 'slub'.");

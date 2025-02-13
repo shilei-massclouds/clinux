@@ -4,7 +4,6 @@
 #include <linux/export.h>
 #include <linux/ktime.h>
 #include <linux/timerqueue.h>
-#include <linux/module.h>
 #include <linux/device.h>
 #include <linux/interrupt.h>
 #include <linux/timekeeper_internal.h>
@@ -76,12 +75,6 @@ void account_idle_ticks(unsigned long ticks)
     booter_panic("No impl in 'time'.");
 }
 
-bool try_module_get(struct module *module)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL_GPL(try_module_get);
-
 int smp_call_function_single(int cpu, void (*func) (void *info), void *info,
                 int wait)
 {
@@ -137,12 +130,6 @@ bool capable(int cap)
 {
     booter_panic("No impl in 'time'.");
 }
-void module_put(struct module *module)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(module_put);
-
 void __init timer_probe(void)
 {
     booter_panic("No impl in 'time'.");

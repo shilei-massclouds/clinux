@@ -22,9 +22,6 @@ void __weak __init irqchip_init(void)
 }
 EXPORT_SYMBOL(irqchip_init);
 
-struct kobject *kernel_kobj;
-EXPORT_SYMBOL_GPL(kernel_kobj);
-
 /*
 bool try_module_get(struct module *module)
 {
@@ -35,11 +32,11 @@ void __put_task_struct(struct task_struct *tsk)
 {
     booter_panic("No impl in 'irq'.");
 }
-*/
 bool is_software_node(const struct fwnode_handle *fwnode)
 {
     booter_panic("No impl in 'irq'.");
 }
+*/
 void add_interrupt_randomness(int irq, int irq_flags)
 {
     booter_panic("No impl in 'irq'.");
@@ -50,8 +47,6 @@ void *kthread_data(struct task_struct *task)
     booter_panic("No impl in 'irq'.");
 }
 */
-
-const struct sysfs_ops kobj_sysfs_ops;
 
 /*
 void module_put(struct module *module)
@@ -84,10 +79,12 @@ struct proc_dir_entry *proc_mkdir(const char *name,
 {
     booter_panic("No impl in 'irq'.");
 }
+/*
 struct fwnode_handle *fwnode_handle_get(struct fwnode_handle *fwnode)
 {
     booter_panic("No impl in 'irq'.");
 }
+*/
 struct kobject *kobject_create_and_add(const char *name, struct kobject *parent)
 {
     booter_panic("No impl in 'irq'.");
@@ -119,10 +116,12 @@ struct proc_dir_entry *proc_create_single_data(const char *name, umode_t mode,
 {
     booter_panic("No impl in 'irq'.");
 }
+/*
 void fwnode_handle_put(struct fwnode_handle *fwnode)
 {
     booter_panic("No impl in 'irq'.");
 }
+*/
 void proc_remove(struct proc_dir_entry *de)
 {
     booter_panic("No impl in 'irq'.");
