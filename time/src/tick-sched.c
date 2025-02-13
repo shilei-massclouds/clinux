@@ -1054,6 +1054,7 @@ void tick_nohz_irq_exit(void)
 	else
 		tick_nohz_full_update_tick(ts);
 }
+EXPORT_SYMBOL(tick_nohz_irq_exit);
 
 /**
  * tick_nohz_idle_got_tick - Check whether or not the tick handler has run
@@ -1306,6 +1307,7 @@ void tick_irq_enter(void)
 	tick_check_oneshot_broadcast_this_cpu();
 	tick_nohz_irq_enter();
 }
+EXPORT_SYMBOL(tick_irq_enter);
 
 /*
  * High resolution timer specific code

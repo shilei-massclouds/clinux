@@ -24,10 +24,12 @@ int kernfs_path_from_node(struct kernfs_node *to, struct kernfs_node *from,
     booter_panic("No impl 'sched'.");
 }
 
+/*
 void __put_task_struct(struct task_struct *tsk)
 {
     booter_panic("No impl 'sched'.");
 }
+*/
 
 void __init generic_sched_clock_init(void)
 {
@@ -116,4 +118,9 @@ struct proc_dir_entry *proc_create_seq_private(const char *name, umode_t mode,
         unsigned int state_size, void *data)
 {
     booter_panic("No impl 'sched'.");
+}
+
+void rt_mutex_adjust_pi(struct task_struct *task)
+{
+    booter_panic("No impl in 'sched'.");
 }

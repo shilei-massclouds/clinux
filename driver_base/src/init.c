@@ -93,10 +93,12 @@ bool kill_device(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
 }
+/*
 void kobject_del(struct kobject *kobj)
 {
     booter_panic("No impl 'driver_base'.");
 }
+*/
 int devtmpfs_delete_node(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");

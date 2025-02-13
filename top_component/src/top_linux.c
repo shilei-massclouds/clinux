@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
+#define DEBUG       /* Enable initcall_debug */
+
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/sched/task.h>
@@ -16,6 +18,7 @@
 #include <linux/ftrace.h>
 #include <linux/sched/init.h>
 #include <linux/sched/isolation.h>
+#include <linux/context_tracking.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -46,6 +49,9 @@ static bool initargs_found;
 # define bootconfig_found false
 # define initargs_found false
 #endif
+
+bool initcall_debug;
+core_param(initcall_debug, initcall_debug, bool, 0644);
 
 extern void setup_vm_final(void);
 extern void free_area_init(unsigned long *max_zone_pfn);
@@ -444,6 +450,14 @@ static void __init mm_init(void)
     pti_init();
 }
 
+#ifdef TRACEPOINTS_ENABLED
+static void __init initcall_debug_enable(void);
+#else
+static inline void initcall_debug_enable(void)
+{
+}
+#endif
+
 int
 cl_top_linux_init(void)
 {
@@ -554,6 +568,20 @@ cl_top_linux_init(void)
 
     /* Trace events are available after this */
     trace_init();
+
+    if (initcall_debug)
+        initcall_debug_enable();
+
+    context_tracking_init();
+    /* init some links before init_ISA_irqs() */
+    early_irq_init();
+    //init_IRQ();
+    //tick_init();
+    //rcu_init_nohz();
+    //init_timers();
+    //hrtimers_init();
+    //softirq_init();
+    //timekeeping_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

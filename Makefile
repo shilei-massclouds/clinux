@@ -43,7 +43,7 @@ components := \
 	kasprintf random \
 	sbi time softirq \
 	mm_util \
-	cpu task cgroup \
+	cpu irq task cgroup \
 	riscv_cpu \
 	jump_label \
 	kobject driver_base \

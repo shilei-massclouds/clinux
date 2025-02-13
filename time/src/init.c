@@ -80,6 +80,7 @@ bool try_module_get(struct module *module)
 {
     booter_panic("No impl in 'time'.");
 }
+EXPORT_SYMBOL_GPL(try_module_get);
 
 int smp_call_function_single(int cpu, void (*func) (void *info), void *info,
                 int wait)
@@ -140,6 +141,7 @@ void module_put(struct module *module)
 {
     booter_panic("No impl in 'time'.");
 }
+EXPORT_SYMBOL(module_put);
 
 void __init timer_probe(void)
 {

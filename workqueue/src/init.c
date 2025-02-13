@@ -17,10 +17,12 @@ cl_workqueue_init(void)
 }
 EXPORT_SYMBOL(cl_workqueue_init);
 
+/*
 void *kthread_data(struct task_struct *task)
 {
     booter_panic("No impl in 'workqueue'.");
 }
+*/
 
 /*
 void add_timer(struct timer_list *timer)
@@ -37,12 +39,12 @@ int mod_timer(struct timer_list *timer, unsigned long expires)
 {
     booter_panic("No impl in 'workqueue'.");
 }
-*/
 
 int kthread_stop(struct task_struct *k)
 {
     booter_panic("No impl in 'workqueue'.");
 }
+*/
 
 /*
 unsigned int jiffies_to_msecs(const unsigned long j)
@@ -61,6 +63,7 @@ void kthread_bind_mask(struct task_struct *p, const struct cpumask *mask)
     booter_panic("No impl in 'workqueue'.");
 }
 
+/*
 struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
                        void *data, int node,
                        const char namefmt[],
@@ -68,6 +71,7 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 {
     booter_panic("No impl in 'workqueue'.");
 }
+*/
 
 /*
 void init_timer_key(struct timer_list *timer,

@@ -5,6 +5,7 @@
 #include <linux/jiffies.h>
 #include <linux/kobject.h>
 #include <linux/device.h>
+#include <linux/irq.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -144,3 +145,41 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
     booter_panic("No impl '__local_bh_enable_ip'.");
 }
 EXPORT_SYMBOL(__local_bh_enable_ip);
+
+#ifndef __ARCH_IRQ_STAT
+DEFINE_PER_CPU_ALIGNED(irq_cpustat_t, irq_stat);
+EXPORT_PER_CPU_SYMBOL(irq_stat);
+#endif
+
+void *kthread_data(struct task_struct *task)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(kthread_data);
+
+int kthread_stop(struct task_struct *k)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(kthread_stop);
+
+struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
+                       void *data, int node,
+                       const char namefmt[],
+                       ...)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(kthread_create_on_node);
+
+void __put_task_struct(struct task_struct *tsk)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(__put_task_struct);
+
+void kobject_del(struct kobject *kobj)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(kobject_del);
