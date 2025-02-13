@@ -153,7 +153,8 @@ EXPORT_SYMBOL(va_pa_offset);
 unsigned long pfn_base;
 EXPORT_SYMBOL(pfn_base);
 
-//pgd_t swapper_pg_dir[PTRS_PER_PGD] __page_aligned_bss;
+pgd_t swapper_pg_dir[PTRS_PER_PGD] __page_aligned_bss;
+EXPORT_SYMBOL(swapper_pg_dir);
 pgd_t trampoline_pg_dir[PTRS_PER_PGD] __page_aligned_bss;
 pte_t fixmap_pte[PTRS_PER_PTE] __page_aligned_bss;
 EXPORT_SYMBOL(fixmap_pte);

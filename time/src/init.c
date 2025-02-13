@@ -65,10 +65,12 @@ void account_process_tick(struct task_struct *p, int user_tick)
 {
     booter_panic("No impl in 'time'.");
 }
+/*
 bool irq_work_needs_cpu(void)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 
 int rtc_set_ntp_time(struct timespec64 now, unsigned long *target_nsec)
 {
@@ -81,10 +83,12 @@ loff_t seq_lseek(struct file *file, loff_t offset, int whence)
 }
 EXPORT_SYMBOL(seq_lseek);
 
+/*
 bool capable(int cap)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 void __init timer_probe(void)
 {
     booter_panic("No impl in 'time'.");
@@ -105,10 +109,12 @@ void register_syscore_ops(struct syscore_ops *ops)
 {
     booter_panic("No impl in 'time'.");
 }
+/*
 void irq_work_tick(void)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 ssize_t seq_read(struct file *file, char __user *buf, size_t size, loff_t *ppos)
 {
     booter_panic("No impl in 'time'.");

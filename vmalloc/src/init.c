@@ -43,11 +43,13 @@ void pmd_clear_bad(pmd_t *pmd)
     booter_panic("No impl 'slub'.");
 }
 
+/*
 bool llist_add_batch(struct llist_node *new_first, struct llist_node *new_last,
              struct llist_head *head)
 {
     booter_panic("No impl 'slub'.");
 }
+*/
 
 /*
 void kvfree(const void *addr)

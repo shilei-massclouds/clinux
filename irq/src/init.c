@@ -37,10 +37,12 @@ bool is_software_node(const struct fwnode_handle *fwnode)
     booter_panic("No impl in 'irq'.");
 }
 */
+/*
 void add_interrupt_randomness(int irq, int irq_flags)
 {
     booter_panic("No impl in 'irq'.");
 }
+*/
 /*
 void *kthread_data(struct task_struct *task)
 {

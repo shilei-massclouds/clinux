@@ -216,3 +216,28 @@ EXPORT_SYMBOL(kobj_sysfs_ops);
 unsigned long __stack_chk_guard __read_mostly;
 EXPORT_SYMBOL(__stack_chk_guard);
 #endif
+
+bool capable(int cap)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(capable);
+
+int proc_dointvec(struct ctl_table *table, int write, void *buffer,
+          size_t *lenp, loff_t *ppos)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(proc_dointvec);
+
+bool __weak irq_work_needs_cpu(void)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(irq_work_needs_cpu);
+
+void __weak irq_work_tick(void)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(irq_work_tick);

@@ -506,6 +506,7 @@ bool tick_nohz_tick_stopped(void)
 
 	return ts->tick_stopped;
 }
+EXPORT_SYMBOL(tick_nohz_tick_stopped);
 
 bool tick_nohz_tick_stopped_cpu(int cpu)
 {

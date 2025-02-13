@@ -39,10 +39,10 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter lib math radix_tree idr xarray \
-	kasprintf random \
+	kasprintf random crypto \
 	traps irq softirq \
 	kobject driver_base \
-	of of_irq \
+	of of_irq irq_work \
 	sbi time irqchip riscv_cpu \
 	early_fdt params \
 	cpu task cgroup resource dma \

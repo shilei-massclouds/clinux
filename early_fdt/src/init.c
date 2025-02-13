@@ -44,7 +44,8 @@ void parse_dtb(void)
 }
 EXPORT_SYMBOL(parse_dtb);
 
-void add_bootloader_randomness(const void *buf, unsigned int size)
+void __weak add_bootloader_randomness(const void *buf, unsigned int size)
 {
-    booter_panic("No impl 'add_bootloader_randomness'.");
+    booter_panic("Need random driver take effect!\n");
 }
+EXPORT_SYMBOL_GPL(add_bootloader_randomness);

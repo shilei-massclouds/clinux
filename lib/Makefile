@@ -26,3 +26,5 @@ obj_y += bitmap.o
 obj_y += bsearch.o
 obj_y += rbtree.o
 obj_y += irq_regs.o
+obj_y += sha1.o
+obj_y += llist.o
