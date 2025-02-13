@@ -583,7 +583,7 @@ cl_top_linux_init(void)
     rcu_init_nohz();
     init_timers();
     hrtimers_init();
-    //softirq_init();
+    softirq_init();
     //timekeeping_init();
 
     sbi_puts("module[top_linux]: init end!\n");

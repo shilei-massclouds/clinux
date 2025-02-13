@@ -1060,30 +1060,30 @@ static inline ktime_t hrtimer_update_lowres(struct hrtimer *timer, ktime_t tim,
 	return tim;
 }
 
-//static void
-//hrtimer_update_softirq_timer(struct hrtimer_cpu_base *cpu_base, bool reprogram)
-//{
-//	ktime_t expires;
-//
-//	/*
-//	 * Find the next SOFT expiration.
-//	 */
-//	expires = __hrtimer_get_next_event(cpu_base, HRTIMER_ACTIVE_SOFT);
-//
-//	/*
-//	 * reprogramming needs to be triggered, even if the next soft
-//	 * hrtimer expires at the same time than the next hard
-//	 * hrtimer. cpu_base->softirq_expires_next needs to be updated!
-//	 */
-//	if (expires == KTIME_MAX)
-//		return;
-//
-//	/*
-//	 * cpu_base->*next_timer is recomputed by __hrtimer_get_next_event()
-//	 * cpu_base->*expires_next is only set by hrtimer_reprogram()
-//	 */
-//	hrtimer_reprogram(cpu_base->softirq_next_timer, reprogram);
-//}
+static void
+hrtimer_update_softirq_timer(struct hrtimer_cpu_base *cpu_base, bool reprogram)
+{
+	ktime_t expires;
+
+	/*
+	 * Find the next SOFT expiration.
+	 */
+	expires = __hrtimer_get_next_event(cpu_base, HRTIMER_ACTIVE_SOFT);
+
+	/*
+	 * reprogramming needs to be triggered, even if the next soft
+	 * hrtimer expires at the same time than the next hard
+	 * hrtimer. cpu_base->softirq_expires_next needs to be updated!
+	 */
+	if (expires == KTIME_MAX)
+		return;
+
+	/*
+	 * cpu_base->*next_timer is recomputed by __hrtimer_get_next_event()
+	 * cpu_base->*expires_next is only set by hrtimer_reprogram()
+	 */
+	hrtimer_reprogram(cpu_base->softirq_next_timer, reprogram);
+}
 
 static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
 				    u64 delta_ns, const enum hrtimer_mode mode,
@@ -1592,25 +1592,25 @@ static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
 	}
 }
 
-//static __latent_entropy void hrtimer_run_softirq(struct softirq_action *h)
-//{
-//	struct hrtimer_cpu_base *cpu_base = this_cpu_ptr(&hrtimer_bases);
-//	unsigned long flags;
-//	ktime_t now;
-//
-//	hrtimer_cpu_base_lock_expiry(cpu_base);
-//	raw_spin_lock_irqsave(&cpu_base->lock, flags);
-//
-//	now = hrtimer_update_base(cpu_base);
-//	__hrtimer_run_queues(cpu_base, now, flags, HRTIMER_ACTIVE_SOFT);
-//
-//	cpu_base->softirq_activated = 0;
-//	hrtimer_update_softirq_timer(cpu_base, true);
-//
-//	raw_spin_unlock_irqrestore(&cpu_base->lock, flags);
-//	hrtimer_cpu_base_unlock_expiry(cpu_base);
-//}
-//
+static __latent_entropy void hrtimer_run_softirq(struct softirq_action *h)
+{
+	struct hrtimer_cpu_base *cpu_base = this_cpu_ptr(&hrtimer_bases);
+	unsigned long flags;
+	ktime_t now;
+
+	hrtimer_cpu_base_lock_expiry(cpu_base);
+	raw_spin_lock_irqsave(&cpu_base->lock, flags);
+
+	now = hrtimer_update_base(cpu_base);
+	__hrtimer_run_queues(cpu_base, now, flags, HRTIMER_ACTIVE_SOFT);
+
+	cpu_base->softirq_activated = 0;
+	hrtimer_update_softirq_timer(cpu_base, true);
+
+	raw_spin_unlock_irqrestore(&cpu_base->lock, flags);
+	hrtimer_cpu_base_unlock_expiry(cpu_base);
+}
+
 #ifdef CONFIG_HIGH_RES_TIMERS
 
 /*
@@ -1992,35 +1992,35 @@ EXPORT_SYMBOL_GPL(hrtimer_init_sleeper);
 //				 CLOCK_MONOTONIC);
 //}
 //#endif
-//
-///*
-// * Functions related to boot-time initialization:
-// */
-//int hrtimers_prepare_cpu(unsigned int cpu)
-//{
-//	struct hrtimer_cpu_base *cpu_base = &per_cpu(hrtimer_bases, cpu);
-//	int i;
-//
-//	for (i = 0; i < HRTIMER_MAX_CLOCK_BASES; i++) {
-//		struct hrtimer_clock_base *clock_b = &cpu_base->clock_base[i];
-//
-//		clock_b->cpu_base = cpu_base;
-//		seqcount_raw_spinlock_init(&clock_b->seq, &cpu_base->lock);
-//		timerqueue_init_head(&clock_b->active);
-//	}
-//
-//	cpu_base->cpu = cpu;
-//	cpu_base->active_bases = 0;
-//	cpu_base->hres_active = 0;
-//	cpu_base->hang_detected = 0;
-//	cpu_base->next_timer = NULL;
-//	cpu_base->softirq_next_timer = NULL;
-//	cpu_base->expires_next = KTIME_MAX;
-//	cpu_base->softirq_expires_next = KTIME_MAX;
-//	hrtimer_cpu_base_init_expiry_lock(cpu_base);
-//	return 0;
-//}
-//
+
+/*
+ * Functions related to boot-time initialization:
+ */
+int hrtimers_prepare_cpu(unsigned int cpu)
+{
+	struct hrtimer_cpu_base *cpu_base = &per_cpu(hrtimer_bases, cpu);
+	int i;
+
+	for (i = 0; i < HRTIMER_MAX_CLOCK_BASES; i++) {
+		struct hrtimer_clock_base *clock_b = &cpu_base->clock_base[i];
+
+		clock_b->cpu_base = cpu_base;
+		seqcount_raw_spinlock_init(&clock_b->seq, &cpu_base->lock);
+		timerqueue_init_head(&clock_b->active);
+	}
+
+	cpu_base->cpu = cpu;
+	cpu_base->active_bases = 0;
+	cpu_base->hres_active = 0;
+	cpu_base->hang_detected = 0;
+	cpu_base->next_timer = NULL;
+	cpu_base->softirq_next_timer = NULL;
+	cpu_base->expires_next = KTIME_MAX;
+	cpu_base->softirq_expires_next = KTIME_MAX;
+	hrtimer_cpu_base_init_expiry_lock(cpu_base);
+	return 0;
+}
+
 //#ifdef CONFIG_HOTPLUG_CPU
 //
 //static void migrate_hrtimer_list(struct hrtimer_clock_base *old_base,
@@ -2099,12 +2099,13 @@ EXPORT_SYMBOL_GPL(hrtimer_init_sleeper);
 //}
 //
 //#endif /* CONFIG_HOTPLUG_CPU */
-//
-//void __init hrtimers_init(void)
-//{
-//	hrtimers_prepare_cpu(smp_processor_id());
-//	open_softirq(HRTIMER_SOFTIRQ, hrtimer_run_softirq);
-//}
+
+void __init hrtimers_init(void)
+{
+	hrtimers_prepare_cpu(smp_processor_id());
+	open_softirq(HRTIMER_SOFTIRQ, hrtimer_run_softirq);
+}
+EXPORT_SYMBOL(hrtimers_init);
 
 /**
  * schedule_hrtimeout_range_clock - sleep until timeout
