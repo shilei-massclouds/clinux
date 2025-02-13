@@ -42,7 +42,7 @@ components := \
 	kasprintf random \
 	traps irq softirq \
 	kobject driver_base \
-	of_fdt of_irq \
+	of of_irq \
 	sbi time irqchip riscv_cpu \
 	early_fdt params \
 	cpu task cgroup resource dma \
