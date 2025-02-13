@@ -579,3 +579,4 @@ void __init tick_init(void)
 	tick_broadcast_init();
 	tick_nohz_init();
 }
+EXPORT_SYMBOL(tick_init);

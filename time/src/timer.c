@@ -2019,6 +2019,7 @@ void __init init_timers(void)
 	posix_cputimers_init_work();
 	open_softirq(TIMER_SOFTIRQ, run_timer_softirq);
 }
+EXPORT_SYMBOL(init_timers);
 
 /**
  * msleep - sleep safely even with waitqueue interruptions

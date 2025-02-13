@@ -579,10 +579,10 @@ cl_top_linux_init(void)
     /* init some links before init_ISA_irqs() */
     early_irq_init();
     init_IRQ();
-    //tick_init();
-    //rcu_init_nohz();
-    //init_timers();
-    //hrtimers_init();
+    tick_init();
+    rcu_init_nohz();
+    init_timers();
+    hrtimers_init();
     //softirq_init();
     //timekeeping_init();
 
