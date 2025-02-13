@@ -692,6 +692,7 @@ int __handle_domain_irq(struct irq_domain *domain, unsigned int hwirq,
 	set_irq_regs(old_regs);
 	return ret;
 }
+EXPORT_SYMBOL(__handle_domain_irq);
 
 #ifdef CONFIG_IRQ_DOMAIN
 /**
@@ -934,6 +935,7 @@ int irq_set_percpu_devid(unsigned int irq)
 {
 	return irq_set_percpu_devid_partition(irq, NULL);
 }
+EXPORT_SYMBOL(irq_set_percpu_devid);
 
 int irq_get_percpu_devid_partition(unsigned int irq, struct cpumask *affinity)
 {

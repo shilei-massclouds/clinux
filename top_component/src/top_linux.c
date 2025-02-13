@@ -468,6 +468,7 @@ cl_top_linux_init(void)
     sbi_puts("module[top_linux]: init begin ...\n");
     REQUIRE_COMPONENT(early_printk);
     REQUIRE_COMPONENT(of_irq);
+    REQUIRE_COMPONENT(irqchip);
 
     //
     // start_kernel (init/main.c)

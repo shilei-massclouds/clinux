@@ -943,6 +943,7 @@ void handle_percpu_devid_irq(struct irq_desc *desc)
 	if (chip->irq_eoi)
 		chip->irq_eoi(&desc->irq_data);
 }
+EXPORT_SYMBOL(handle_percpu_devid_irq);
 
 /**
  * handle_percpu_devid_fasteoi_nmi - Per CPU local NMI handler with per cpu

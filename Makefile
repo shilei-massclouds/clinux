@@ -38,27 +38,21 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter lib math \
-	radix_tree idr xarray \
+	prebuilt booter lib math radix_tree idr xarray \
 	kasprintf random \
-	sbi time softirq \
-	mm_util \
-	cpu irq task cgroup \
-	riscv_cpu \
-	jump_label \
-	kobject driver_base \
+	traps irq softirq \
+	sbi time irqchip riscv_cpu \
 	early_fdt params of_fdt of_irq \
+	cpu task cgroup resource dma \
+	jump_label extable \
+	kobject driver_base \
 	early_sched sched \
-	resource dma \
-	percpu \
-	workqueue_itf workqueue \
+	percpu workqueue_itf workqueue \
 	memblock bootmem paging \
-	page_alloc slub vmalloc \
+	page_alloc slub vmalloc mm_util \
 	spinlock semaphore mutex rwsem rcu \
-	traps extable \
 	inode dcache \
-	dump_stack \
-	early_printk printk panic
+	early_printk printk panic dump_stack
 	#partitions \
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
