@@ -47,7 +47,7 @@ components := \
 	riscv_cpu \
 	jump_label \
 	kobject driver_base \
-	early_fdt params of_fdt \
+	early_fdt params of_fdt of_irq \
 	early_sched sched \
 	resource dma \
 	percpu \

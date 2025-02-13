@@ -1120,45 +1120,45 @@ const struct of_device_id *of_match_node(const struct of_device_id *matches,
 }
 EXPORT_SYMBOL(of_match_node);
 
-///**
-// *	of_find_matching_node_and_match - Find a node based on an of_device_id
-// *					  match table.
-// *	@from:		The node to start searching from or NULL, the node
-// *			you pass will not be searched, only the next one
-// *			will; typically, you pass what the previous call
-// *			returned. of_node_put() will be called on it
-// *	@matches:	array of of device match structures to search in
-// *	@match		Updated to point at the matches entry which matched
-// *
-// *	Returns a node pointer with refcount incremented, use
-// *	of_node_put() on it when done.
-// */
-//struct device_node *of_find_matching_node_and_match(struct device_node *from,
-//					const struct of_device_id *matches,
-//					const struct of_device_id **match)
-//{
-//	struct device_node *np;
-//	const struct of_device_id *m;
-//	unsigned long flags;
-//
-//	if (match)
-//		*match = NULL;
-//
-//	raw_spin_lock_irqsave(&devtree_lock, flags);
-//	for_each_of_allnodes_from(from, np) {
-//		m = __of_match_node(matches, np);
-//		if (m && of_node_get(np)) {
-//			if (match)
-//				*match = m;
-//			break;
-//		}
-//	}
-//	of_node_put(from);
-//	raw_spin_unlock_irqrestore(&devtree_lock, flags);
-//	return np;
-//}
-//EXPORT_SYMBOL(of_find_matching_node_and_match);
-//
+/**
+ *	of_find_matching_node_and_match - Find a node based on an of_device_id
+ *					  match table.
+ *	@from:		The node to start searching from or NULL, the node
+ *			you pass will not be searched, only the next one
+ *			will; typically, you pass what the previous call
+ *			returned. of_node_put() will be called on it
+ *	@matches:	array of of device match structures to search in
+ *	@match		Updated to point at the matches entry which matched
+ *
+ *	Returns a node pointer with refcount incremented, use
+ *	of_node_put() on it when done.
+ */
+struct device_node *of_find_matching_node_and_match(struct device_node *from,
+					const struct of_device_id *matches,
+					const struct of_device_id **match)
+{
+	struct device_node *np;
+	const struct of_device_id *m;
+	unsigned long flags;
+
+	if (match)
+		*match = NULL;
+
+	raw_spin_lock_irqsave(&devtree_lock, flags);
+	for_each_of_allnodes_from(from, np) {
+		m = __of_match_node(matches, np);
+		if (m && of_node_get(np)) {
+			if (match)
+				*match = m;
+			break;
+		}
+	}
+	of_node_put(from);
+	raw_spin_unlock_irqrestore(&devtree_lock, flags);
+	return np;
+}
+EXPORT_SYMBOL(of_find_matching_node_and_match);
+
 ///**
 // * of_modalias_node - Lookup appropriate modalias for a device node
 // * @node:	pointer to a device tree node
@@ -2199,109 +2199,109 @@ void of_alias_scan(void * (*dt_alloc)(u64 size, u64 align))
 //
 //	return cache_level;
 //}
-//
-///**
-// * of_map_id - Translate an ID through a downstream mapping.
-// * @np: root complex device node.
-// * @id: device ID to map.
-// * @map_name: property name of the map to use.
-// * @map_mask_name: optional property name of the mask to use.
-// * @target: optional pointer to a target device node.
-// * @id_out: optional pointer to receive the translated ID.
-// *
-// * Given a device ID, look up the appropriate implementation-defined
-// * platform ID and/or the target device which receives transactions on that
-// * ID, as per the "iommu-map" and "msi-map" bindings. Either of @target or
-// * @id_out may be NULL if only the other is required. If @target points to
-// * a non-NULL device node pointer, only entries targeting that node will be
-// * matched; if it points to a NULL value, it will receive the device node of
-// * the first matching target phandle, with a reference held.
-// *
-// * Return: 0 on success or a standard error code on failure.
-// */
-//int of_map_id(struct device_node *np, u32 id,
-//	       const char *map_name, const char *map_mask_name,
-//	       struct device_node **target, u32 *id_out)
-//{
-//	u32 map_mask, masked_id;
-//	int map_len;
-//	const __be32 *map = NULL;
-//
-//	if (!np || !map_name || (!target && !id_out))
-//		return -EINVAL;
-//
-//	map = of_get_property(np, map_name, &map_len);
-//	if (!map) {
-//		if (target)
-//			return -ENODEV;
-//		/* Otherwise, no map implies no translation */
-//		*id_out = id;
-//		return 0;
-//	}
-//
-//	if (!map_len || map_len % (4 * sizeof(*map))) {
-//		pr_err("%pOF: Error: Bad %s length: %d\n", np,
-//			map_name, map_len);
-//		return -EINVAL;
-//	}
-//
-//	/* The default is to select all bits. */
-//	map_mask = 0xffffffff;
-//
-//	/*
-//	 * Can be overridden by "{iommu,msi}-map-mask" property.
-//	 * If of_property_read_u32() fails, the default is used.
-//	 */
-//	if (map_mask_name)
-//		of_property_read_u32(np, map_mask_name, &map_mask);
-//
-//	masked_id = map_mask & id;
-//	for ( ; map_len > 0; map_len -= 4 * sizeof(*map), map += 4) {
-//		struct device_node *phandle_node;
-//		u32 id_base = be32_to_cpup(map + 0);
-//		u32 phandle = be32_to_cpup(map + 1);
-//		u32 out_base = be32_to_cpup(map + 2);
-//		u32 id_len = be32_to_cpup(map + 3);
-//
-//		if (id_base & ~map_mask) {
-//			pr_err("%pOF: Invalid %s translation - %s-mask (0x%x) ignores id-base (0x%x)\n",
-//				np, map_name, map_name,
-//				map_mask, id_base);
-//			return -EFAULT;
-//		}
-//
-//		if (masked_id < id_base || masked_id >= id_base + id_len)
-//			continue;
-//
-//		phandle_node = of_find_node_by_phandle(phandle);
-//		if (!phandle_node)
-//			return -ENODEV;
-//
-//		if (target) {
-//			if (*target)
-//				of_node_put(phandle_node);
-//			else
-//				*target = phandle_node;
-//
-//			if (*target != phandle_node)
-//				continue;
-//		}
-//
-//		if (id_out)
-//			*id_out = masked_id - id_base + out_base;
-//
-//		pr_debug("%pOF: %s, using mask %08x, id-base: %08x, out-base: %08x, length: %08x, id: %08x -> %08x\n",
-//			np, map_name, map_mask, id_base, out_base,
-//			id_len, id, masked_id - id_base + out_base);
-//		return 0;
-//	}
-//
-//	pr_info("%pOF: no %s translation for id 0x%x on %pOF\n", np, map_name,
-//		id, target && *target ? *target : NULL);
-//
-//	/* Bypasses translation */
-//	if (id_out)
-//		*id_out = id;
-//	return 0;
-//}
-//EXPORT_SYMBOL_GPL(of_map_id);
+
+/**
+ * of_map_id - Translate an ID through a downstream mapping.
+ * @np: root complex device node.
+ * @id: device ID to map.
+ * @map_name: property name of the map to use.
+ * @map_mask_name: optional property name of the mask to use.
+ * @target: optional pointer to a target device node.
+ * @id_out: optional pointer to receive the translated ID.
+ *
+ * Given a device ID, look up the appropriate implementation-defined
+ * platform ID and/or the target device which receives transactions on that
+ * ID, as per the "iommu-map" and "msi-map" bindings. Either of @target or
+ * @id_out may be NULL if only the other is required. If @target points to
+ * a non-NULL device node pointer, only entries targeting that node will be
+ * matched; if it points to a NULL value, it will receive the device node of
+ * the first matching target phandle, with a reference held.
+ *
+ * Return: 0 on success or a standard error code on failure.
+ */
+int of_map_id(struct device_node *np, u32 id,
+	       const char *map_name, const char *map_mask_name,
+	       struct device_node **target, u32 *id_out)
+{
+	u32 map_mask, masked_id;
+	int map_len;
+	const __be32 *map = NULL;
+
+	if (!np || !map_name || (!target && !id_out))
+		return -EINVAL;
+
+	map = of_get_property(np, map_name, &map_len);
+	if (!map) {
+		if (target)
+			return -ENODEV;
+		/* Otherwise, no map implies no translation */
+		*id_out = id;
+		return 0;
+	}
+
+	if (!map_len || map_len % (4 * sizeof(*map))) {
+		pr_err("%pOF: Error: Bad %s length: %d\n", np,
+			map_name, map_len);
+		return -EINVAL;
+	}
+
+	/* The default is to select all bits. */
+	map_mask = 0xffffffff;
+
+	/*
+	 * Can be overridden by "{iommu,msi}-map-mask" property.
+	 * If of_property_read_u32() fails, the default is used.
+	 */
+	if (map_mask_name)
+		of_property_read_u32(np, map_mask_name, &map_mask);
+
+	masked_id = map_mask & id;
+	for ( ; map_len > 0; map_len -= 4 * sizeof(*map), map += 4) {
+		struct device_node *phandle_node;
+		u32 id_base = be32_to_cpup(map + 0);
+		u32 phandle = be32_to_cpup(map + 1);
+		u32 out_base = be32_to_cpup(map + 2);
+		u32 id_len = be32_to_cpup(map + 3);
+
+		if (id_base & ~map_mask) {
+			pr_err("%pOF: Invalid %s translation - %s-mask (0x%x) ignores id-base (0x%x)\n",
+				np, map_name, map_name,
+				map_mask, id_base);
+			return -EFAULT;
+		}
+
+		if (masked_id < id_base || masked_id >= id_base + id_len)
+			continue;
+
+		phandle_node = of_find_node_by_phandle(phandle);
+		if (!phandle_node)
+			return -ENODEV;
+
+		if (target) {
+			if (*target)
+				of_node_put(phandle_node);
+			else
+				*target = phandle_node;
+
+			if (*target != phandle_node)
+				continue;
+		}
+
+		if (id_out)
+			*id_out = masked_id - id_base + out_base;
+
+		pr_debug("%pOF: %s, using mask %08x, id-base: %08x, out-base: %08x, length: %08x, id: %08x -> %08x\n",
+			np, map_name, map_mask, id_base, out_base,
+			id_len, id, masked_id - id_base + out_base);
+		return 0;
+	}
+
+	pr_info("%pOF: no %s translation for id 0x%x on %pOF\n", np, map_name,
+		id, target && *target ? *target : NULL);
+
+	/* Bypasses translation */
+	if (id_out)
+		*id_out = id;
+	return 0;
+}
+EXPORT_SYMBOL_GPL(of_map_id);

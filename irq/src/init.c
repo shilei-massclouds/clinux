@@ -16,6 +16,12 @@ cl_irq_init(void)
 }
 EXPORT_SYMBOL(cl_irq_init);
 
+void __weak __init irqchip_init(void)
+{
+    booter_panic("No impl in 'irq'.");
+}
+EXPORT_SYMBOL(irqchip_init);
+
 struct kobject *kernel_kobj;
 EXPORT_SYMBOL_GPL(kernel_kobj);
 

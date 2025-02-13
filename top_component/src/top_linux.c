@@ -55,6 +55,7 @@ core_param(initcall_debug, initcall_debug, bool, 0644);
 
 extern void setup_vm_final(void);
 extern void free_area_init(unsigned long *max_zone_pfn);
+extern void init_IRQ(void);
 
 static void setup_zero_page(void)
 {
@@ -466,6 +467,7 @@ cl_top_linux_init(void)
 
     sbi_puts("module[top_linux]: init begin ...\n");
     REQUIRE_COMPONENT(early_printk);
+    REQUIRE_COMPONENT(of_irq);
 
     //
     // start_kernel (init/main.c)
@@ -575,7 +577,7 @@ cl_top_linux_init(void)
     context_tracking_init();
     /* init some links before init_ISA_irqs() */
     early_irq_init();
-    //init_IRQ();
+    init_IRQ();
     //tick_init();
     //rcu_init_nohz();
     //init_timers();

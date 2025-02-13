@@ -109,6 +109,7 @@ void __weak panic(const char *fmt, ...)
 {
     sbi_puts("[RAW_PANIC] ");
     sbi_puts(fmt);
+    sbi_puts("\n");
     sbi_shutdown();
     do {} while (1);
 }

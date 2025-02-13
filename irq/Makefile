@@ -10,3 +10,4 @@ obj_y += manage.o
 obj_y += handle.o
 obj_y += resend.o
 obj_y += spurious.o
+obj_y += riscv_irq.o
