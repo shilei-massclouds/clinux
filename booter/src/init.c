@@ -189,12 +189,6 @@ EXPORT_SYMBOL(kobject_del);
 struct kobject *kernel_kobj;
 EXPORT_SYMBOL_GPL(kernel_kobj);
 
-bool try_module_get(struct module *module)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL_GPL(try_module_get);
-
 void module_put(struct module *module)
 {
     booter_panic("No impl in 'time'.");

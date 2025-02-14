@@ -44,7 +44,7 @@ components := \
 	kobject driver_base \
 	of of_irq irq_work \
 	sbi time irqchip riscv_cpu timer_riscv \
-	early_fdt params \
+	early_fdt params module \
 	clocksource \
 	cpu task cgroup resource dma \
 	jump_label extable vdso \
