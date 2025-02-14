@@ -613,6 +613,11 @@ cl_top_linux_init(void)
     call_function_init();
     WARN(!irqs_disabled(), "Interrupts were enabled early\n");
 
+    early_boot_irqs_disabled = false;
+    local_irq_enable();
+
+    kmem_cache_init_late();
+
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
 }

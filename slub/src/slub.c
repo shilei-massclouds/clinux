@@ -4394,9 +4394,10 @@ void __init kmem_cache_init(void)
 }
 EXPORT_SYMBOL(kmem_cache_init);
 
-//void __init kmem_cache_init_late(void)
-//{
-//}
+void __init kmem_cache_init_late(void)
+{
+}
+EXPORT_SYMBOL(kmem_cache_init_late);
 
 struct kmem_cache *
 __kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
