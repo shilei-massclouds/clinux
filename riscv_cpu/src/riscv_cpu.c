@@ -43,6 +43,7 @@ int riscv_of_processor_hartid(struct device_node *node)
 
 	return hart;
 }
+EXPORT_SYMBOL(riscv_of_processor_hartid);
 
 /*
  * Find hart ID of the CPU DT node under which given DT node falls.

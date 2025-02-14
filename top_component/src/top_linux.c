@@ -476,6 +476,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(early_printk);
     REQUIRE_COMPONENT(of_irq);
     REQUIRE_COMPONENT(irqchip);
+    REQUIRE_COMPONENT(timer_riscv);
 
     //
     // start_kernel (init/main.c)

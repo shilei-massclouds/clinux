@@ -43,8 +43,9 @@ components := \
 	traps irq softirq \
 	kobject driver_base \
 	of of_irq irq_work \
-	sbi time irqchip riscv_cpu \
+	sbi time irqchip riscv_cpu timer_riscv \
 	early_fdt params \
+	clocksource \
 	cpu task cgroup resource dma \
 	jump_label extable vdso \
 	early_sched sched \

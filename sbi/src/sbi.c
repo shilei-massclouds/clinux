@@ -308,6 +308,7 @@ void sbi_set_timer(uint64_t stime_value)
 {
 	__sbi_set_timer(stime_value);
 }
+EXPORT_SYMBOL(sbi_set_timer);
 
 /**
  * sbi_send_ipi() - Send an IPI to any hart.

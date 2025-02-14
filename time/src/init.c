@@ -88,11 +88,11 @@ bool capable(int cap)
 {
     booter_panic("No impl in 'time'.");
 }
-*/
 void __init timer_probe(void)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 
 int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
 {

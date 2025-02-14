@@ -29,12 +29,12 @@ void __put_task_struct(struct task_struct *tsk)
 {
     booter_panic("No impl 'sched'.");
 }
-*/
 
 void __init generic_sched_clock_init(void)
 {
     booter_panic("No impl 'sched'.");
 }
+*/
 
 void touch_all_softlockup_watchdogs(void)
 {
