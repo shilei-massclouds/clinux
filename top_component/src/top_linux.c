@@ -480,10 +480,6 @@ void __init anon_vma_init(void)
 {
     pr_warn("No impl.anon_vma_init\n");
 }
-void __init pid_idr_init(void)
-{
-    pr_warn("No impl.pid_idr_init\n");
-}
 
 int
 cl_top_linux_init(void)

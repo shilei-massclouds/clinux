@@ -184,6 +184,7 @@ int nanosleep_copyout(struct restart_block *restart, struct timespec64 *ts)
     booter_panic("No impl in 'time'.");
 }
 
+/*
 pid_t __task_pid_nr_ns(struct task_struct *task, enum pid_type type,
             struct pid_namespace *ns)
 {
@@ -196,6 +197,7 @@ struct task_struct *pid_task(struct pid *pid, enum pid_type type)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(pid_task);
+*/
 
 int
 __group_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
@@ -221,6 +223,7 @@ struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
     booter_panic("No impl in 'time'.");
 }
 
+/*
 struct pid *find_vpid(int nr)
 {
     booter_panic("No impl in 'time'.");
@@ -232,4 +235,4 @@ void put_pid(struct pid *pid)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(put_pid);
-
+*/

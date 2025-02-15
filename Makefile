@@ -45,7 +45,7 @@ components := \
 	of of_irq irq_work tty vt earlycon \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess \
-	clocksource \
+	clocksource pid \
 	cpu task cgroup resource dma \
 	jump_label extable vdso \
 	early_sched sched \
