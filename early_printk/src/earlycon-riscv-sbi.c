@@ -28,7 +28,7 @@ int __init early_sbi_setup(struct earlycon_device *device,
 	device->con->write = sbi_console_write;
 	return 0;
 }
-//EARLYCON_DECLARE(sbi, early_sbi_setup);
+EARLYCON_DECLARE(sbi, early_sbi_setup);
 
 // From drivers/tty/serial/serial_core.c
 /**

@@ -3479,6 +3479,7 @@ void console_sysfs_notify(void)
 	if (consdev)
 		sysfs_notify(&consdev->kobj, NULL, "active");
 }
+EXPORT_SYMBOL(console_sysfs_notify);
 
 /*
  * Ok, now we can initialize the rest of the tty devices and can count

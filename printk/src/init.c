@@ -14,10 +14,3 @@ cl_printk_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_printk_init);
-
-/*
-bool irq_work_queue(struct irq_work *work)
-{
-    booter_panic("No impl 'irq_work_queue'.");
-}
-*/

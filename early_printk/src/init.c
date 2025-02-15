@@ -96,6 +96,17 @@ asmlinkage __visible __weak int printk(const char *fmt, ...)
 }
 EXPORT_SYMBOL(printk);
 
+asmlinkage __visible int cl_printk(const char *fmt, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, fmt);
+    ret = early_vprintk(printk_skip_level(fmt), args);
+    va_end(args);
+    return ret;
+}
+EXPORT_SYMBOL(cl_printk);
+
 void __weak __warn_printk(const char *fmt, ...)
 {
     int ret;

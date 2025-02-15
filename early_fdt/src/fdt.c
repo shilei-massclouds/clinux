@@ -463,7 +463,9 @@ static bool of_fdt_device_is_available(const void *blob, unsigned long node)
 
 /* Everything below here references initial_boot_params directly. */
 int __initdata dt_root_addr_cells;
+EXPORT_SYMBOL(dt_root_addr_cells);
 int __initdata dt_root_size_cells;
+EXPORT_SYMBOL(dt_root_size_cells);
 
 void *initial_boot_params __ro_after_init;
 EXPORT_SYMBOL(initial_boot_params);
@@ -711,6 +713,7 @@ const void *__init of_get_flat_dt_prop(unsigned long node, const char *name,
 {
 	return fdt_getprop(initial_boot_params, node, name, size);
 }
+EXPORT_SYMBOL(of_get_flat_dt_prop);
 
 /**
  * of_fdt_is_compatible - Return true if given node from the given blob has
@@ -901,57 +904,58 @@ static inline void early_init_dt_check_for_initrd(unsigned long node)
 {
 }
 #endif /* CONFIG_BLK_DEV_INITRD */
-//
-//#ifdef CONFIG_SERIAL_EARLYCON
-//
-//int __init early_init_dt_scan_chosen_stdout(void)
-//{
-//	int offset;
-//	const char *p, *q, *options = NULL;
-//	int l;
-//	const struct earlycon_id **p_match;
-//	const void *fdt = initial_boot_params;
-//
-//	offset = fdt_path_offset(fdt, "/chosen");
-//	if (offset < 0)
-//		offset = fdt_path_offset(fdt, "/chosen@0");
-//	if (offset < 0)
-//		return -ENOENT;
-//
-//	p = fdt_getprop(fdt, offset, "stdout-path", &l);
-//	if (!p)
-//		p = fdt_getprop(fdt, offset, "linux,stdout-path", &l);
-//	if (!p || !l)
-//		return -ENOENT;
-//
-//	q = strchrnul(p, ':');
-//	if (*q != '\0')
-//		options = q + 1;
-//	l = q - p;
-//
-//	/* Get the node specified by stdout-path */
-//	offset = fdt_path_offset_namelen(fdt, p, l);
-//	if (offset < 0) {
-//		pr_warn("earlycon: stdout-path %.*s not found\n", l, p);
-//		return 0;
-//	}
-//
-//	for (p_match = __earlycon_table; p_match < __earlycon_table_end;
-//	     p_match++) {
-//		const struct earlycon_id *match = *p_match;
-//
-//		if (!match->compatible[0])
-//			continue;
-//
-//		if (fdt_node_check_compatible(fdt, offset, match->compatible))
-//			continue;
-//
-//		if (of_setup_earlycon(match, offset, options) == 0)
-//			return 0;
-//	}
-//	return -ENODEV;
-//}
-//#endif
+
+#ifdef CONFIG_SERIAL_EARLYCON
+
+int __init early_init_dt_scan_chosen_stdout(void)
+{
+	int offset;
+	const char *p, *q, *options = NULL;
+	int l;
+	const struct earlycon_id **p_match;
+	const void *fdt = initial_boot_params;
+
+	offset = fdt_path_offset(fdt, "/chosen");
+	if (offset < 0)
+		offset = fdt_path_offset(fdt, "/chosen@0");
+	if (offset < 0)
+		return -ENOENT;
+
+	p = fdt_getprop(fdt, offset, "stdout-path", &l);
+	if (!p)
+		p = fdt_getprop(fdt, offset, "linux,stdout-path", &l);
+	if (!p || !l)
+		return -ENOENT;
+
+	q = strchrnul(p, ':');
+	if (*q != '\0')
+		options = q + 1;
+	l = q - p;
+
+	/* Get the node specified by stdout-path */
+	offset = fdt_path_offset_namelen(fdt, p, l);
+	if (offset < 0) {
+		pr_warn("earlycon: stdout-path %.*s not found\n", l, p);
+		return 0;
+	}
+
+	for (p_match = __earlycon_table; p_match < __earlycon_table_end;
+	     p_match++) {
+		const struct earlycon_id *match = *p_match;
+
+		if (!match->compatible[0])
+			continue;
+
+		if (fdt_node_check_compatible(fdt, offset, match->compatible))
+			continue;
+
+		if (of_setup_earlycon(match, offset, options) == 0)
+			return 0;
+	}
+	return -ENODEV;
+}
+EXPORT_SYMBOL(early_init_dt_scan_chosen_stdout);
+#endif
 
 /**
  * early_init_dt_scan_root - fetch the top level address and size cells

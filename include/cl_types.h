@@ -16,4 +16,6 @@ extern void setup_bootmem(void);
 
 extern void set_task_stack_end_magic(struct task_struct *tsk);
 
+extern asmlinkage __visible int cl_printk(const char *fmt, ...);
+
 #endif /* _CL_TYPES_H_ */

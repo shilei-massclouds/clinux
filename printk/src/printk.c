@@ -270,16 +270,16 @@ static int console_locked, console_suspended;
  */
 static struct console *exclusive_console;
 
-///*
-// *	Array of consoles built from command line options (console=)
-// */
-//
-//#define MAX_CMDLINECONSOLES 8
-//
-//static struct console_cmdline console_cmdline[MAX_CMDLINECONSOLES];
-//
-//static int preferred_console = -1;
-//static bool has_preferred_console;
+/*
+ *	Array of consoles built from command line options (console=)
+ */
+
+#define MAX_CMDLINECONSOLES 8
+
+static struct console_cmdline console_cmdline[MAX_CMDLINECONSOLES];
+
+static int preferred_console = -1;
+static bool has_preferred_console;
 //int console_set_on_cmdline;
 //EXPORT_SYMBOL(console_set_on_cmdline);
 
@@ -419,9 +419,9 @@ DEFINE_RAW_SPINLOCK(logbuf_lock);
 
 #ifdef CONFIG_PRINTK
 DECLARE_WAIT_QUEUE_HEAD(log_wait);
-///* the next printk record to read by syslog(READ) or /proc/kmsg */
-//static u64 syslog_seq;
-//static u32 syslog_idx;
+/* the next printk record to read by syslog(READ) or /proc/kmsg */
+static u64 syslog_seq;
+static u32 syslog_idx;
 //static size_t syslog_partial;
 //static bool syslog_time;
 
@@ -2639,9 +2639,9 @@ skip:
 //	console_unlock();
 //}
 //EXPORT_SYMBOL(console_start);
-//
-//static int __read_mostly keep_bootcon;
-//
+
+static int __read_mostly keep_bootcon;
+
 //static int __init keep_bootcon_setup(char *str)
 //{
 //	keep_bootcon = 1;
@@ -2651,279 +2651,279 @@ skip:
 //}
 //
 //early_param("keep_bootcon", keep_bootcon_setup);
-//
-///*
-// * This is called by register_console() to try to match
-// * the newly registered console with any of the ones selected
-// * by either the command line or add_preferred_console() and
-// * setup/enable it.
-// *
-// * Care need to be taken with consoles that are statically
-// * enabled such as netconsole
-// */
-//static int try_enable_new_console(struct console *newcon, bool user_specified)
-//{
-//	struct console_cmdline *c;
-//	int i, err;
-//
-//	for (i = 0, c = console_cmdline;
-//	     i < MAX_CMDLINECONSOLES && c->name[0];
-//	     i++, c++) {
-//		if (c->user_specified != user_specified)
-//			continue;
-//		if (!newcon->match ||
-//		    newcon->match(newcon, c->name, c->index, c->options) != 0) {
-//			/* default matching */
-//			BUILD_BUG_ON(sizeof(c->name) != sizeof(newcon->name));
-//			if (strcmp(c->name, newcon->name) != 0)
-//				continue;
-//			if (newcon->index >= 0 &&
-//			    newcon->index != c->index)
-//				continue;
-//			if (newcon->index < 0)
-//				newcon->index = c->index;
-//
-//			if (_braille_register_console(newcon, c))
-//				return 0;
-//
-//			if (newcon->setup &&
-//			    (err = newcon->setup(newcon, c->options)) != 0)
-//				return err;
-//		}
-//		newcon->flags |= CON_ENABLED;
-//		if (i == preferred_console) {
-//			newcon->flags |= CON_CONSDEV;
-//			has_preferred_console = true;
-//		}
-//		return 0;
-//	}
-//
-//	/*
-//	 * Some consoles, such as pstore and netconsole, can be enabled even
-//	 * without matching. Accept the pre-enabled consoles only when match()
-//	 * and setup() had a chance to be called.
-//	 */
-//	if (newcon->flags & CON_ENABLED && c->user_specified ==	user_specified)
-//		return 0;
-//
-//	return -ENOENT;
-//}
-//
-///*
-// * The console driver calls this routine during kernel initialization
-// * to register the console printing procedure with printk() and to
-// * print any messages that were printed by the kernel before the
-// * console driver was initialized.
-// *
-// * This can happen pretty early during the boot process (because of
-// * early_printk) - sometimes before setup_arch() completes - be careful
-// * of what kernel features are used - they may not be initialised yet.
-// *
-// * There are two types of consoles - bootconsoles (early_printk) and
-// * "real" consoles (everything which is not a bootconsole) which are
-// * handled differently.
-// *  - Any number of bootconsoles can be registered at any time.
-// *  - As soon as a "real" console is registered, all bootconsoles
-// *    will be unregistered automatically.
-// *  - Once a "real" console is registered, any attempt to register a
-// *    bootconsoles will be rejected
-// */
-//void register_console(struct console *newcon)
-//{
-//	unsigned long flags;
-//	struct console *bcon = NULL;
-//	int err;
-//
-//	for_each_console(bcon) {
-//		if (WARN(bcon == newcon, "console '%s%d' already registered\n",
-//					 bcon->name, bcon->index))
-//			return;
-//	}
-//
-//	/*
-//	 * before we register a new CON_BOOT console, make sure we don't
-//	 * already have a valid console
-//	 */
-//	if (newcon->flags & CON_BOOT) {
-//		for_each_console(bcon) {
-//			if (!(bcon->flags & CON_BOOT)) {
-//				pr_info("Too late to register bootconsole %s%d\n",
-//					newcon->name, newcon->index);
-//				return;
-//			}
-//		}
-//	}
-//
-//	if (console_drivers && console_drivers->flags & CON_BOOT)
-//		bcon = console_drivers;
-//
-//	if (!has_preferred_console || bcon || !console_drivers)
-//		has_preferred_console = preferred_console >= 0;
-//
-//	/*
-//	 *	See if we want to use this console driver. If we
-//	 *	didn't select a console we take the first one
-//	 *	that registers here.
-//	 */
-//	if (!has_preferred_console) {
-//		if (newcon->index < 0)
-//			newcon->index = 0;
-//		if (newcon->setup == NULL ||
-//		    newcon->setup(newcon, NULL) == 0) {
-//			newcon->flags |= CON_ENABLED;
-//			if (newcon->device) {
-//				newcon->flags |= CON_CONSDEV;
-//				has_preferred_console = true;
-//			}
-//		}
-//	}
-//
-//	/* See if this console matches one we selected on the command line */
-//	err = try_enable_new_console(newcon, true);
-//
-//	/* If not, try to match against the platform default(s) */
-//	if (err == -ENOENT)
-//		err = try_enable_new_console(newcon, false);
-//
-//	/* printk() messages are not printed to the Braille console. */
-//	if (err || newcon->flags & CON_BRL)
-//		return;
-//
-//	/*
-//	 * If we have a bootconsole, and are switching to a real console,
-//	 * don't print everything out again, since when the boot console, and
-//	 * the real console are the same physical device, it's annoying to
-//	 * see the beginning boot messages twice
-//	 */
-//	if (bcon && ((newcon->flags & (CON_CONSDEV | CON_BOOT)) == CON_CONSDEV))
-//		newcon->flags &= ~CON_PRINTBUFFER;
-//
-//	/*
-//	 *	Put this console in the list - keep the
-//	 *	preferred driver at the head of the list.
-//	 */
-//	console_lock();
-//	if ((newcon->flags & CON_CONSDEV) || console_drivers == NULL) {
-//		newcon->next = console_drivers;
-//		console_drivers = newcon;
-//		if (newcon->next)
-//			newcon->next->flags &= ~CON_CONSDEV;
-//		/* Ensure this flag is always set for the head of the list */
-//		newcon->flags |= CON_CONSDEV;
-//	} else {
-//		newcon->next = console_drivers->next;
-//		console_drivers->next = newcon;
-//	}
-//
-//	if (newcon->flags & CON_EXTENDED)
-//		nr_ext_console_drivers++;
-//
-//	if (newcon->flags & CON_PRINTBUFFER) {
-//		/*
-//		 * console_unlock(); will print out the buffered messages
-//		 * for us.
-//		 */
-//		logbuf_lock_irqsave(flags);
-//		/*
-//		 * We're about to replay the log buffer.  Only do this to the
-//		 * just-registered console to avoid excessive message spam to
-//		 * the already-registered consoles.
-//		 *
-//		 * Set exclusive_console with disabled interrupts to reduce
-//		 * race window with eventual console_flush_on_panic() that
-//		 * ignores console_lock.
-//		 */
-//		exclusive_console = newcon;
-//		exclusive_console_stop_seq = console_seq;
-//		console_seq = syslog_seq;
-//		console_idx = syslog_idx;
-//		logbuf_unlock_irqrestore(flags);
-//	}
-//	console_unlock();
-//	console_sysfs_notify();
-//
-//	/*
-//	 * By unregistering the bootconsoles after we enable the real console
-//	 * we get the "console xxx enabled" message on all the consoles -
-//	 * boot consoles, real consoles, etc - this is to ensure that end
-//	 * users know there might be something in the kernel's log buffer that
-//	 * went to the bootconsole (that they do not see on the real console)
-//	 */
-//	pr_info("%sconsole [%s%d] enabled\n",
-//		(newcon->flags & CON_BOOT) ? "boot" : "" ,
-//		newcon->name, newcon->index);
-//	if (bcon &&
-//	    ((newcon->flags & (CON_CONSDEV | CON_BOOT)) == CON_CONSDEV) &&
-//	    !keep_bootcon) {
-//		/* We need to iterate through all boot consoles, to make
-//		 * sure we print everything out, before we unregister them.
-//		 */
-//		for_each_console(bcon)
-//			if (bcon->flags & CON_BOOT)
-//				unregister_console(bcon);
-//	}
-//}
-//EXPORT_SYMBOL(register_console);
-//
-//int unregister_console(struct console *console)
-//{
-//	struct console *con;
-//	int res;
-//
-//	pr_info("%sconsole [%s%d] disabled\n",
-//		(console->flags & CON_BOOT) ? "boot" : "" ,
-//		console->name, console->index);
-//
-//	res = _braille_unregister_console(console);
-//	if (res < 0)
-//		return res;
-//	if (res > 0)
-//		return 0;
-//
-//	res = -ENODEV;
-//	console_lock();
-//	if (console_drivers == console) {
-//		console_drivers=console->next;
-//		res = 0;
-//	} else {
-//		for_each_console(con) {
-//			if (con->next == console) {
-//				con->next = console->next;
-//				res = 0;
-//				break;
-//			}
-//		}
-//	}
-//
-//	if (res)
-//		goto out_disable_unlock;
-//
-//	if (console->flags & CON_EXTENDED)
-//		nr_ext_console_drivers--;
-//
-//	/*
-//	 * If this isn't the last console and it has CON_CONSDEV set, we
-//	 * need to set it on the next preferred console.
-//	 */
-//	if (console_drivers != NULL && console->flags & CON_CONSDEV)
-//		console_drivers->flags |= CON_CONSDEV;
-//
-//	console->flags &= ~CON_ENABLED;
-//	console_unlock();
-//	console_sysfs_notify();
-//
-//	if (console->exit)
-//		res = console->exit(console);
-//
-//	return res;
-//
-//out_disable_unlock:
-//	console->flags &= ~CON_ENABLED;
-//	console_unlock();
-//
-//	return res;
-//}
-//EXPORT_SYMBOL(unregister_console);
+
+/*
+ * This is called by register_console() to try to match
+ * the newly registered console with any of the ones selected
+ * by either the command line or add_preferred_console() and
+ * setup/enable it.
+ *
+ * Care need to be taken with consoles that are statically
+ * enabled such as netconsole
+ */
+static int try_enable_new_console(struct console *newcon, bool user_specified)
+{
+	struct console_cmdline *c;
+	int i, err;
+
+	for (i = 0, c = console_cmdline;
+	     i < MAX_CMDLINECONSOLES && c->name[0];
+	     i++, c++) {
+		if (c->user_specified != user_specified)
+			continue;
+		if (!newcon->match ||
+		    newcon->match(newcon, c->name, c->index, c->options) != 0) {
+			/* default matching */
+			BUILD_BUG_ON(sizeof(c->name) != sizeof(newcon->name));
+			if (strcmp(c->name, newcon->name) != 0)
+				continue;
+			if (newcon->index >= 0 &&
+			    newcon->index != c->index)
+				continue;
+			if (newcon->index < 0)
+				newcon->index = c->index;
+
+			if (_braille_register_console(newcon, c))
+				return 0;
+
+			if (newcon->setup &&
+			    (err = newcon->setup(newcon, c->options)) != 0)
+				return err;
+		}
+		newcon->flags |= CON_ENABLED;
+		if (i == preferred_console) {
+			newcon->flags |= CON_CONSDEV;
+			has_preferred_console = true;
+		}
+		return 0;
+	}
+
+	/*
+	 * Some consoles, such as pstore and netconsole, can be enabled even
+	 * without matching. Accept the pre-enabled consoles only when match()
+	 * and setup() had a chance to be called.
+	 */
+	if (newcon->flags & CON_ENABLED && c->user_specified ==	user_specified)
+		return 0;
+
+	return -ENOENT;
+}
+
+/*
+ * The console driver calls this routine during kernel initialization
+ * to register the console printing procedure with printk() and to
+ * print any messages that were printed by the kernel before the
+ * console driver was initialized.
+ *
+ * This can happen pretty early during the boot process (because of
+ * early_printk) - sometimes before setup_arch() completes - be careful
+ * of what kernel features are used - they may not be initialised yet.
+ *
+ * There are two types of consoles - bootconsoles (early_printk) and
+ * "real" consoles (everything which is not a bootconsole) which are
+ * handled differently.
+ *  - Any number of bootconsoles can be registered at any time.
+ *  - As soon as a "real" console is registered, all bootconsoles
+ *    will be unregistered automatically.
+ *  - Once a "real" console is registered, any attempt to register a
+ *    bootconsoles will be rejected
+ */
+void register_console(struct console *newcon)
+{
+	unsigned long flags;
+	struct console *bcon = NULL;
+	int err;
+
+	for_each_console(bcon) {
+		if (WARN(bcon == newcon, "console '%s%d' already registered\n",
+					 bcon->name, bcon->index))
+			return;
+	}
+
+	/*
+	 * before we register a new CON_BOOT console, make sure we don't
+	 * already have a valid console
+	 */
+	if (newcon->flags & CON_BOOT) {
+		for_each_console(bcon) {
+			if (!(bcon->flags & CON_BOOT)) {
+				pr_info("Too late to register bootconsole %s%d\n",
+					newcon->name, newcon->index);
+				return;
+			}
+		}
+	}
+
+	if (console_drivers && console_drivers->flags & CON_BOOT)
+		bcon = console_drivers;
+
+	if (!has_preferred_console || bcon || !console_drivers)
+		has_preferred_console = preferred_console >= 0;
+
+	/*
+	 *	See if we want to use this console driver. If we
+	 *	didn't select a console we take the first one
+	 *	that registers here.
+	 */
+	if (!has_preferred_console) {
+		if (newcon->index < 0)
+			newcon->index = 0;
+		if (newcon->setup == NULL ||
+		    newcon->setup(newcon, NULL) == 0) {
+			newcon->flags |= CON_ENABLED;
+			if (newcon->device) {
+				newcon->flags |= CON_CONSDEV;
+				has_preferred_console = true;
+			}
+		}
+	}
+
+	/* See if this console matches one we selected on the command line */
+	err = try_enable_new_console(newcon, true);
+
+	/* If not, try to match against the platform default(s) */
+	if (err == -ENOENT)
+		err = try_enable_new_console(newcon, false);
+
+	/* printk() messages are not printed to the Braille console. */
+	if (err || newcon->flags & CON_BRL)
+		return;
+
+	/*
+	 * If we have a bootconsole, and are switching to a real console,
+	 * don't print everything out again, since when the boot console, and
+	 * the real console are the same physical device, it's annoying to
+	 * see the beginning boot messages twice
+	 */
+	if (bcon && ((newcon->flags & (CON_CONSDEV | CON_BOOT)) == CON_CONSDEV))
+		newcon->flags &= ~CON_PRINTBUFFER;
+
+	/*
+	 *	Put this console in the list - keep the
+	 *	preferred driver at the head of the list.
+	 */
+	console_lock();
+	if ((newcon->flags & CON_CONSDEV) || console_drivers == NULL) {
+		newcon->next = console_drivers;
+		console_drivers = newcon;
+		if (newcon->next)
+			newcon->next->flags &= ~CON_CONSDEV;
+		/* Ensure this flag is always set for the head of the list */
+		newcon->flags |= CON_CONSDEV;
+	} else {
+		newcon->next = console_drivers->next;
+		console_drivers->next = newcon;
+	}
+
+	if (newcon->flags & CON_EXTENDED)
+		nr_ext_console_drivers++;
+
+	if (newcon->flags & CON_PRINTBUFFER) {
+		/*
+		 * console_unlock(); will print out the buffered messages
+		 * for us.
+		 */
+		logbuf_lock_irqsave(flags);
+		/*
+		 * We're about to replay the log buffer.  Only do this to the
+		 * just-registered console to avoid excessive message spam to
+		 * the already-registered consoles.
+		 *
+		 * Set exclusive_console with disabled interrupts to reduce
+		 * race window with eventual console_flush_on_panic() that
+		 * ignores console_lock.
+		 */
+		exclusive_console = newcon;
+		exclusive_console_stop_seq = console_seq;
+		console_seq = syslog_seq;
+		console_idx = syslog_idx;
+		logbuf_unlock_irqrestore(flags);
+	}
+	console_unlock();
+	console_sysfs_notify();
+
+	/*
+	 * By unregistering the bootconsoles after we enable the real console
+	 * we get the "console xxx enabled" message on all the consoles -
+	 * boot consoles, real consoles, etc - this is to ensure that end
+	 * users know there might be something in the kernel's log buffer that
+	 * went to the bootconsole (that they do not see on the real console)
+	 */
+	pr_info("%sconsole [%s%d] enabled\n",
+		(newcon->flags & CON_BOOT) ? "boot" : "" ,
+		newcon->name, newcon->index);
+	if (bcon &&
+	    ((newcon->flags & (CON_CONSDEV | CON_BOOT)) == CON_CONSDEV) &&
+	    !keep_bootcon) {
+		/* We need to iterate through all boot consoles, to make
+		 * sure we print everything out, before we unregister them.
+		 */
+		for_each_console(bcon)
+			if (bcon->flags & CON_BOOT)
+				unregister_console(bcon);
+	}
+}
+EXPORT_SYMBOL(register_console);
+
+int unregister_console(struct console *console)
+{
+	struct console *con;
+	int res;
+
+	pr_info("%sconsole [%s%d] disabled\n",
+		(console->flags & CON_BOOT) ? "boot" : "" ,
+		console->name, console->index);
+
+	res = _braille_unregister_console(console);
+	if (res < 0)
+		return res;
+	if (res > 0)
+		return 0;
+
+	res = -ENODEV;
+	console_lock();
+	if (console_drivers == console) {
+		console_drivers=console->next;
+		res = 0;
+	} else {
+		for_each_console(con) {
+			if (con->next == console) {
+				con->next = console->next;
+				res = 0;
+				break;
+			}
+		}
+	}
+
+	if (res)
+		goto out_disable_unlock;
+
+	if (console->flags & CON_EXTENDED)
+		nr_ext_console_drivers--;
+
+	/*
+	 * If this isn't the last console and it has CON_CONSDEV set, we
+	 * need to set it on the next preferred console.
+	 */
+	if (console_drivers != NULL && console->flags & CON_CONSDEV)
+		console_drivers->flags |= CON_CONSDEV;
+
+	console->flags &= ~CON_ENABLED;
+	console_unlock();
+	console_sysfs_notify();
+
+	if (console->exit)
+		res = console->exit(console);
+
+	return res;
+
+out_disable_unlock:
+	console->flags &= ~CON_ENABLED;
+	console_unlock();
+
+	return res;
+}
+EXPORT_SYMBOL(unregister_console);
 
 /*
  * Initialize the console device. This is called *early*, so

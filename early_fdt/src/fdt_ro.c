@@ -508,6 +508,7 @@ const void *fdt_getprop(const void *fdt, int nodeoffset,
 {
 	return fdt_getprop_namelen(fdt, nodeoffset, name, strlen(name), lenp);
 }
+EXPORT_SYMBOL(fdt_getprop);
 
 uint32_t fdt_get_phandle(const void *fdt, int nodeoffset)
 {
@@ -654,6 +655,7 @@ int fdt_parent_offset(const void *fdt, int nodeoffset)
 	return fdt_supernode_atdepth_offset(fdt, nodeoffset,
 					    nodedepth - 1, NULL);
 }
+EXPORT_SYMBOL(fdt_parent_offset);
 
 int fdt_node_offset_by_prop_value(const void *fdt, int startoffset,
 				  const char *propname,

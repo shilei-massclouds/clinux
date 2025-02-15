@@ -19,3 +19,4 @@ struct device_link *device_link_add(struct device *consumer,
 {
     booter_panic("No impl in 'of_fdt'.");
 }
+
