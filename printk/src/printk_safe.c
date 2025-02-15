@@ -49,64 +49,64 @@ static DEFINE_PER_CPU(int, printk_context);
 static DEFINE_PER_CPU(struct printk_safe_seq_buf, nmi_print_seq);
 #endif
 
-///* Get flushed in a more safe context. */
-//static void queue_flush_work(struct printk_safe_seq_buf *s)
-//{
-//	if (printk_percpu_data_ready())
-//		irq_work_queue(&s->work);
-//}
-//
-///*
-// * Add a message to per-CPU context-dependent buffer. NMI and printk-safe
-// * have dedicated buffers, because otherwise printk-safe preempted by
-// * NMI-printk would have overwritten the NMI messages.
-// *
-// * The messages are flushed from irq work (or from panic()), possibly,
-// * from other CPU, concurrently with printk_safe_log_store(). Should this
-// * happen, printk_safe_log_store() will notice the buffer->len mismatch
-// * and repeat the write.
-// */
-//static __printf(2, 0) int printk_safe_log_store(struct printk_safe_seq_buf *s,
-//						const char *fmt, va_list args)
-//{
-//	int add;
-//	size_t len;
-//	va_list ap;
-//
-//again:
-//	len = atomic_read(&s->len);
-//
-//	/* The trailing '\0' is not counted into len. */
-//	if (len >= sizeof(s->buffer) - 1) {
-//		atomic_inc(&s->message_lost);
-//		queue_flush_work(s);
-//		return 0;
-//	}
-//
-//	/*
-//	 * Make sure that all old data have been read before the buffer
-//	 * was reset. This is not needed when we just append data.
-//	 */
-//	if (!len)
-//		smp_rmb();
-//
-//	va_copy(ap, args);
-//	add = vscnprintf(s->buffer + len, sizeof(s->buffer) - len, fmt, ap);
-//	va_end(ap);
-//	if (!add)
-//		return 0;
-//
-//	/*
-//	 * Do it once again if the buffer has been flushed in the meantime.
-//	 * Note that atomic_cmpxchg() is an implicit memory barrier that
-//	 * makes sure that the data were written before updating s->len.
-//	 */
-//	if (atomic_cmpxchg(&s->len, len, len + add) != len)
-//		goto again;
-//
-//	queue_flush_work(s);
-//	return add;
-//}
+/* Get flushed in a more safe context. */
+static void queue_flush_work(struct printk_safe_seq_buf *s)
+{
+	if (printk_percpu_data_ready())
+		irq_work_queue(&s->work);
+}
+
+/*
+ * Add a message to per-CPU context-dependent buffer. NMI and printk-safe
+ * have dedicated buffers, because otherwise printk-safe preempted by
+ * NMI-printk would have overwritten the NMI messages.
+ *
+ * The messages are flushed from irq work (or from panic()), possibly,
+ * from other CPU, concurrently with printk_safe_log_store(). Should this
+ * happen, printk_safe_log_store() will notice the buffer->len mismatch
+ * and repeat the write.
+ */
+static __printf(2, 0) int printk_safe_log_store(struct printk_safe_seq_buf *s,
+						const char *fmt, va_list args)
+{
+	int add;
+	size_t len;
+	va_list ap;
+
+again:
+	len = atomic_read(&s->len);
+
+	/* The trailing '\0' is not counted into len. */
+	if (len >= sizeof(s->buffer) - 1) {
+		atomic_inc(&s->message_lost);
+		queue_flush_work(s);
+		return 0;
+	}
+
+	/*
+	 * Make sure that all old data have been read before the buffer
+	 * was reset. This is not needed when we just append data.
+	 */
+	if (!len)
+		smp_rmb();
+
+	va_copy(ap, args);
+	add = vscnprintf(s->buffer + len, sizeof(s->buffer) - len, fmt, ap);
+	va_end(ap);
+	if (!add)
+		return 0;
+
+	/*
+	 * Do it once again if the buffer has been flushed in the meantime.
+	 * Note that atomic_cmpxchg() is an implicit memory barrier that
+	 * makes sure that the data were written before updating s->len.
+	 */
+	if (atomic_cmpxchg(&s->len, len, len + add) != len)
+		goto again;
+
+	queue_flush_work(s);
+	return add;
+}
 
 static inline void printk_safe_flush_line(const char *text, int len)
 {
@@ -281,71 +281,71 @@ void printk_safe_flush(void)
 //	printk_safe_flush();
 //}
 //
-//#ifdef CONFIG_PRINTK_NMI
-///*
-// * Safe printk() for NMI context. It uses a per-CPU buffer to
-// * store the message. NMIs are not nested, so there is always only
-// * one writer running. But the buffer might get flushed from another
-// * CPU, so we need to be careful.
-// */
-//static __printf(1, 0) int vprintk_nmi(const char *fmt, va_list args)
-//{
-//	struct printk_safe_seq_buf *s = this_cpu_ptr(&nmi_print_seq);
-//
-//	return printk_safe_log_store(s, fmt, args);
-//}
-//
-//void noinstr printk_nmi_enter(void)
-//{
-//	this_cpu_add(printk_context, PRINTK_NMI_CONTEXT_OFFSET);
-//}
-//
-//void noinstr printk_nmi_exit(void)
-//{
-//	this_cpu_sub(printk_context, PRINTK_NMI_CONTEXT_OFFSET);
-//}
-//
-///*
-// * Marks a code that might produce many messages in NMI context
-// * and the risk of losing them is more critical than eventual
-// * reordering.
-// *
-// * It has effect only when called in NMI context. Then printk()
-// * will try to store the messages into the main logbuf directly
-// * and use the per-CPU buffers only as a fallback when the lock
-// * is not available.
-// */
-//void printk_nmi_direct_enter(void)
-//{
-//	if (this_cpu_read(printk_context) & PRINTK_NMI_CONTEXT_MASK)
-//		this_cpu_or(printk_context, PRINTK_NMI_DIRECT_CONTEXT_MASK);
-//}
-//
-//void printk_nmi_direct_exit(void)
-//{
-//	this_cpu_and(printk_context, ~PRINTK_NMI_DIRECT_CONTEXT_MASK);
-//}
-//
-//#else
-//
-//static __printf(1, 0) int vprintk_nmi(const char *fmt, va_list args)
-//{
-//	return 0;
-//}
-//
-//#endif /* CONFIG_PRINTK_NMI */
-//
-///*
-// * Lock-less printk(), to avoid deadlocks should the printk() recurse
-// * into itself. It uses a per-CPU buffer to store the message, just like
-// * NMI.
-// */
-//static __printf(1, 0) int vprintk_safe(const char *fmt, va_list args)
-//{
-//	struct printk_safe_seq_buf *s = this_cpu_ptr(&safe_print_seq);
-//
-//	return printk_safe_log_store(s, fmt, args);
-//}
+#ifdef CONFIG_PRINTK_NMI
+/*
+ * Safe printk() for NMI context. It uses a per-CPU buffer to
+ * store the message. NMIs are not nested, so there is always only
+ * one writer running. But the buffer might get flushed from another
+ * CPU, so we need to be careful.
+ */
+static __printf(1, 0) int vprintk_nmi(const char *fmt, va_list args)
+{
+	struct printk_safe_seq_buf *s = this_cpu_ptr(&nmi_print_seq);
+
+	return printk_safe_log_store(s, fmt, args);
+}
+
+void noinstr printk_nmi_enter(void)
+{
+	this_cpu_add(printk_context, PRINTK_NMI_CONTEXT_OFFSET);
+}
+
+void noinstr printk_nmi_exit(void)
+{
+	this_cpu_sub(printk_context, PRINTK_NMI_CONTEXT_OFFSET);
+}
+
+/*
+ * Marks a code that might produce many messages in NMI context
+ * and the risk of losing them is more critical than eventual
+ * reordering.
+ *
+ * It has effect only when called in NMI context. Then printk()
+ * will try to store the messages into the main logbuf directly
+ * and use the per-CPU buffers only as a fallback when the lock
+ * is not available.
+ */
+void printk_nmi_direct_enter(void)
+{
+	if (this_cpu_read(printk_context) & PRINTK_NMI_CONTEXT_MASK)
+		this_cpu_or(printk_context, PRINTK_NMI_DIRECT_CONTEXT_MASK);
+}
+
+void printk_nmi_direct_exit(void)
+{
+	this_cpu_and(printk_context, ~PRINTK_NMI_DIRECT_CONTEXT_MASK);
+}
+
+#else
+
+static __printf(1, 0) int vprintk_nmi(const char *fmt, va_list args)
+{
+	return 0;
+}
+
+#endif /* CONFIG_PRINTK_NMI */
+
+/*
+ * Lock-less printk(), to avoid deadlocks should the printk() recurse
+ * into itself. It uses a per-CPU buffer to store the message, just like
+ * NMI.
+ */
+static __printf(1, 0) int vprintk_safe(const char *fmt, va_list args)
+{
+	struct printk_safe_seq_buf *s = this_cpu_ptr(&safe_print_seq);
+
+	return printk_safe_log_store(s, fmt, args);
+}
 
 /* Can be preempted by NMI. */
 void __printk_safe_enter(void)
@@ -359,39 +359,39 @@ void __printk_safe_exit(void)
 	this_cpu_dec(printk_context);
 }
 
-//__printf(1, 0) int vprintk_func(const char *fmt, va_list args)
-//{
-//#ifdef CONFIG_KGDB_KDB
-//	/* Allow to pass printk() to kdb but avoid a recursion. */
-//	if (unlikely(kdb_trap_printk && kdb_printf_cpu < 0))
-//		return vkdb_printf(KDB_MSGSRC_PRINTK, fmt, args);
-//#endif
-//
-//	/*
-//	 * Try to use the main logbuf even in NMI. But avoid calling console
-//	 * drivers that might have their own locks.
-//	 */
-//	if ((this_cpu_read(printk_context) & PRINTK_NMI_DIRECT_CONTEXT_MASK) &&
-//	    raw_spin_trylock(&logbuf_lock)) {
-//		int len;
-//
-//		len = vprintk_store(0, LOGLEVEL_DEFAULT, NULL, 0, fmt, args);
-//		raw_spin_unlock(&logbuf_lock);
-//		defer_console_output();
-//		return len;
-//	}
-//
-//	/* Use extra buffer in NMI when logbuf_lock is taken or in safe mode. */
-//	if (this_cpu_read(printk_context) & PRINTK_NMI_CONTEXT_MASK)
-//		return vprintk_nmi(fmt, args);
-//
-//	/* Use extra buffer to prevent a recursion deadlock in safe mode. */
-//	if (this_cpu_read(printk_context) & PRINTK_SAFE_CONTEXT_MASK)
-//		return vprintk_safe(fmt, args);
-//
-//	/* No obstacles. */
-//	return vprintk_default(fmt, args);
-//}
+__printf(1, 0) int vprintk_func(const char *fmt, va_list args)
+{
+#ifdef CONFIG_KGDB_KDB
+	/* Allow to pass printk() to kdb but avoid a recursion. */
+	if (unlikely(kdb_trap_printk && kdb_printf_cpu < 0))
+		return vkdb_printf(KDB_MSGSRC_PRINTK, fmt, args);
+#endif
+
+	/*
+	 * Try to use the main logbuf even in NMI. But avoid calling console
+	 * drivers that might have their own locks.
+	 */
+	if ((this_cpu_read(printk_context) & PRINTK_NMI_DIRECT_CONTEXT_MASK) &&
+	    raw_spin_trylock(&logbuf_lock)) {
+		int len;
+
+		len = vprintk_store(0, LOGLEVEL_DEFAULT, NULL, 0, fmt, args);
+		raw_spin_unlock(&logbuf_lock);
+		defer_console_output();
+		return len;
+	}
+
+	/* Use extra buffer in NMI when logbuf_lock is taken or in safe mode. */
+	if (this_cpu_read(printk_context) & PRINTK_NMI_CONTEXT_MASK)
+		return vprintk_nmi(fmt, args);
+
+	/* Use extra buffer to prevent a recursion deadlock in safe mode. */
+	if (this_cpu_read(printk_context) & PRINTK_SAFE_CONTEXT_MASK)
+		return vprintk_safe(fmt, args);
+
+	/* No obstacles. */
+	return vprintk_default(fmt, args);
+}
 
 void __init printk_safe_init(void)
 {

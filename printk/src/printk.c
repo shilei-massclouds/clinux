@@ -2042,47 +2042,46 @@ EXPORT_SYMBOL(vprintk_emit);
 //	return vprintk_func(fmt, args);
 //}
 //EXPORT_SYMBOL(vprintk);
-//
-//int vprintk_default(const char *fmt, va_list args)
-//{
-//	return vprintk_emit(0, LOGLEVEL_DEFAULT, NULL, 0, fmt, args);
-//}
-//EXPORT_SYMBOL_GPL(vprintk_default);
-//
-///**
-// * printk - print a kernel message
-// * @fmt: format string
-// *
-// * This is printk(). It can be called from any context. We want it to work.
-// *
-// * We try to grab the console_lock. If we succeed, it's easy - we log the
-// * output and call the console drivers.  If we fail to get the semaphore, we
-// * place the output into the log buffer and return. The current holder of
-// * the console_sem will notice the new output in console_unlock(); and will
-// * send it to the consoles before releasing the lock.
-// *
-// * One effect of this deferred printing is that code which calls printk() and
-// * then changes console_loglevel may break. This is because console_loglevel
-// * is inspected when the actual printing occurs.
-// *
-// * See also:
-// * printf(3)
-// *
-// * See the vsnprintf() documentation for format string extensions over C99.
-// */
-//asmlinkage __visible int printk(const char *fmt, ...)
-//{
-//	va_list args;
-//	int r;
-//
-//	va_start(args, fmt);
-//	r = vprintk_func(fmt, args);
-//	va_end(args);
-//
-//	return r;
-//}
-//EXPORT_SYMBOL(printk);
-//
+
+int vprintk_default(const char *fmt, va_list args)
+{
+	return vprintk_emit(0, LOGLEVEL_DEFAULT, NULL, 0, fmt, args);
+}
+EXPORT_SYMBOL_GPL(vprintk_default);
+
+/**
+ * printk - print a kernel message
+ * @fmt: format string
+ *
+ * This is printk(). It can be called from any context. We want it to work.
+ *
+ * We try to grab the console_lock. If we succeed, it's easy - we log the
+ * output and call the console drivers.  If we fail to get the semaphore, we
+ * place the output into the log buffer and return. The current holder of
+ * the console_sem will notice the new output in console_unlock(); and will
+ * send it to the consoles before releasing the lock.
+ *
+ * One effect of this deferred printing is that code which calls printk() and
+ * then changes console_loglevel may break. This is because console_loglevel
+ * is inspected when the actual printing occurs.
+ *
+ * See also:
+ * printf(3)
+ *
+ * See the vsnprintf() documentation for format string extensions over C99.
+ */
+asmlinkage __visible int printk(const char *fmt, ...)
+{
+	va_list args;
+	int r;
+
+	va_start(args, fmt);
+	r = vprintk_func(fmt, args);
+	va_end(args);
+
+	return r;
+}
+
 #else /* CONFIG_PRINTK */
 //
 //#define LOG_LINE_MAX		0

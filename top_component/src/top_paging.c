@@ -12,7 +12,6 @@ int
 cl_top_paging_init(void)
 {
     sbi_puts("module[top_paging]: init begin ...\n");
-    REQUIRE_COMPONENT(early_printk);
 
     //
     // start_kernel (init/main.c)
