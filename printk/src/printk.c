@@ -213,14 +213,14 @@ int __read_mostly suppress_printk;
 /* Number of registered extended console drivers. */
 static int nr_ext_console_drivers;
 
-///*
-// * Helper macros to handle lockdep when locking/unlocking console_sem. We use
-// * macros instead of functions so that _RET_IP_ contains useful information.
-// */
-//#define down_console_sem() do { \
-//	down(&console_sem);\
-//	mutex_acquire(&console_lock_dep_map, 0, 0, _RET_IP_);\
-//} while (0)
+/*
+ * Helper macros to handle lockdep when locking/unlocking console_sem. We use
+ * macros instead of functions so that _RET_IP_ contains useful information.
+ */
+#define down_console_sem() do { \
+	down(&console_sem);\
+	mutex_acquire(&console_lock_dep_map, 0, 0, _RET_IP_);\
+} while (0)
 
 static int __down_trylock_console_sem(unsigned long ip)
 {
@@ -2302,26 +2302,25 @@ __setup("console_msg_format=", console_msg_format_setup);
 //	}
 //	return 0;
 //}
-//
-///**
-// * console_lock - lock the console system for exclusive use.
-// *
-// * Acquires a lock which guarantees that the caller has
-// * exclusive access to the console system and the console_drivers list.
-// *
-// * Can sleep, returns nothing.
-// */
-//void console_lock(void)
-//{
-//	might_sleep();
-//
-//	down_console_sem();
-//	if (console_suspended)
-//		return;
-//	console_locked = 1;
-//	console_may_schedule = 1;
-//}
-//EXPORT_SYMBOL(console_lock);
+
+/**
+ * console_lock - lock the console system for exclusive use.
+ *
+ * Acquires a lock which guarantees that the caller has
+ * exclusive access to the console system and the console_drivers list.
+ *
+ * Can sleep, returns nothing.
+ */
+void console_lock(void)
+{
+	might_sleep();
+
+	down_console_sem();
+	if (console_suspended)
+		return;
+	console_locked = 1;
+	console_may_schedule = 1;
+}
 
 /**
  * console_trylock - try to lock the console system for exclusive use.
@@ -2533,7 +2532,6 @@ skip:
 	if (retry && console_trylock())
 		goto again;
 }
-EXPORT_SYMBOL(console_unlock);
 
 ///**
 // * console_conditional_schedule - yield the CPU if required

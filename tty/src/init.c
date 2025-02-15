@@ -226,12 +226,14 @@ struct tty_driver *console_driver;
 struct console *console_drivers;
 EXPORT_SYMBOL_GPL(console_drivers);
 
-void console_lock(void)
+void __weak console_lock(void)
 {
     booter_panic("No impl.\n");
 }
+EXPORT_SYMBOL(console_lock);
 
 void __weak console_unlock(void)
 {
     booter_panic("No impl.\n");
 }
+EXPORT_SYMBOL(console_unlock);
