@@ -15,10 +15,12 @@ cl_slub_init(void)
 }
 EXPORT_SYMBOL(cl_slub_init);
 
+/*
 long copy_from_kernel_nofault(void *dst, const void *src, size_t size)
 {
     booter_panic("No impl 'slub'.");
 }
+*/
 
 void print_hex_dump(const char *level, const char *prefix_str, int prefix_type,
             int rowsize, int groupsize,

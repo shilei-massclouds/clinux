@@ -94,7 +94,7 @@ static LIST_HEAD(modules);
 static struct work_struct init_free_wq;
 static struct llist_head init_free_list;
 
-//#ifdef CONFIG_MODULES_TREE_LOOKUP
+#ifdef CONFIG_MODULES_TREE_LOOKUP
 //
 ///*
 // * Use a latched RB-tree for __module_address(); this allows us to use
@@ -146,18 +146,18 @@ static struct llist_head init_free_list;
 //	.less = mod_tree_less,
 //	.comp = mod_tree_comp,
 //};
-//
-//static struct mod_tree_root {
-//	struct latch_tree_root root;
-//	unsigned long addr_min;
-//	unsigned long addr_max;
-//} mod_tree __cacheline_aligned = {
-//	.addr_min = -1UL,
-//};
-//
-//#define module_addr_min mod_tree.addr_min
-//#define module_addr_max mod_tree.addr_max
-//
+
+static struct mod_tree_root {
+	struct latch_tree_root root;
+	unsigned long addr_min;
+	unsigned long addr_max;
+} mod_tree __cacheline_aligned = {
+	.addr_min = -1UL,
+};
+
+#define module_addr_min mod_tree.addr_min
+#define module_addr_max mod_tree.addr_max
+
 //static noinline void __mod_tree_insert(struct mod_tree_node *node)
 //{
 //	latch_tree_insert(&node->node, &mod_tree.root, &mod_tree_ops);
@@ -193,40 +193,40 @@ static struct llist_head init_free_list;
 //	__mod_tree_remove(&mod->core_layout.mtn);
 //	mod_tree_remove_init(mod);
 //}
-//
-//static struct module *mod_find(unsigned long addr)
-//{
-//	struct latch_tree_node *ltn;
-//
-//	ltn = latch_tree_find((void *)addr, &mod_tree.root, &mod_tree_ops);
-//	if (!ltn)
-//		return NULL;
-//
-//	return container_of(ltn, struct mod_tree_node, node)->mod;
-//}
-//
-//#else /* MODULES_TREE_LOOKUP */
-//
-//static unsigned long module_addr_min = -1UL, module_addr_max = 0;
-//
+
+static struct module *mod_find(unsigned long addr)
+{
+	struct latch_tree_node *ltn;
+
+	ltn = latch_tree_find((void *)addr, &mod_tree.root, &mod_tree_ops);
+	if (!ltn)
+		return NULL;
+
+	return container_of(ltn, struct mod_tree_node, node)->mod;
+}
+
+#else /* MODULES_TREE_LOOKUP */
+
+static unsigned long module_addr_min = -1UL, module_addr_max = 0;
+
 //static void mod_tree_insert(struct module *mod) { }
 //static void mod_tree_remove_init(struct module *mod) { }
 //static void mod_tree_remove(struct module *mod) { }
-//
-//static struct module *mod_find(unsigned long addr)
-//{
-//	struct module *mod;
-//
-//	list_for_each_entry_rcu(mod, &modules, list,
-//				lockdep_is_held(&module_mutex)) {
-//		if (within_module(addr, mod))
-//			return mod;
-//	}
-//
-//	return NULL;
-//}
-//
-//#endif /* MODULES_TREE_LOOKUP */
+
+static struct module *mod_find(unsigned long addr)
+{
+	struct module *mod;
+
+	list_for_each_entry_rcu(mod, &modules, list,
+				lockdep_is_held(&module_mutex)) {
+		if (within_module(addr, mod))
+			return mod;
+	}
+
+	return NULL;
+}
+
+#endif /* MODULES_TREE_LOOKUP */
 //
 ///*
 // * Bounds of module text, for speeding up __module_address.
@@ -258,18 +258,18 @@ static struct llist_head init_free_list;
 //{
 //	lockdep_assert_held(&module_mutex);
 //}
-//
-//static void module_assert_mutex_or_preempt(void)
-//{
-//#ifdef CONFIG_LOCKDEP
-//	if (unlikely(!debug_locks))
-//		return;
-//
-//	WARN_ON_ONCE(!rcu_read_lock_sched_held() &&
-//		!lockdep_is_held(&module_mutex));
-//#endif
-//}
-//
+
+static void module_assert_mutex_or_preempt(void)
+{
+#ifdef CONFIG_LOCKDEP
+	if (unlikely(!debug_locks))
+		return;
+
+	WARN_ON_ONCE(!rcu_read_lock_sched_held() &&
+		!lockdep_is_held(&module_mutex));
+#endif
+}
+
 //static bool sig_enforce = IS_ENABLED(CONFIG_MODULE_SIG_FORCE);
 //module_param(sig_enforce, bool_enable_only, 0644);
 //
@@ -4492,32 +4492,33 @@ EXPORT_SYMBOL(try_module_get);
 //
 //	return ret;
 //}
-//
-///*
-// * __module_address - get the module which contains an address.
-// * @addr: the address.
-// *
-// * Must be called with preempt disabled or module mutex held so that
-// * module doesn't get freed during this.
-// */
-//struct module *__module_address(unsigned long addr)
-//{
-//	struct module *mod;
-//
-//	if (addr < module_addr_min || addr > module_addr_max)
-//		return NULL;
-//
-//	module_assert_mutex_or_preempt();
-//
-//	mod = mod_find(addr);
-//	if (mod) {
-//		BUG_ON(!within_module(addr, mod));
-//		if (mod->state == MODULE_STATE_UNFORMED)
-//			mod = NULL;
-//	}
-//	return mod;
-//}
-//
+
+/*
+ * __module_address - get the module which contains an address.
+ * @addr: the address.
+ *
+ * Must be called with preempt disabled or module mutex held so that
+ * module doesn't get freed during this.
+ */
+struct module *__module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	if (addr < module_addr_min || addr > module_addr_max)
+		return NULL;
+
+	module_assert_mutex_or_preempt();
+
+	mod = mod_find(addr);
+	if (mod) {
+		BUG_ON(!within_module(addr, mod));
+		if (mod->state == MODULE_STATE_UNFORMED)
+			mod = NULL;
+	}
+	return mod;
+}
+EXPORT_SYMBOL(__module_address);
+
 ///*
 // * is_module_text_address - is this address inside module code?
 // * @addr: the address to check.

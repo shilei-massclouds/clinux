@@ -18,6 +18,13 @@ cl_sched_init(void)
 }
 EXPORT_SYMBOL(cl_sched_init);
 
+__weak struct task_struct *__switch_to(struct task_struct *,
+                       struct task_struct *)
+{
+    booter_panic("No impl in 'sched'.");
+}
+EXPORT_SYMBOL(__switch_to);
+
 int kernfs_path_from_node(struct kernfs_node *to, struct kernfs_node *from,
               char *buf, size_t buflen)
 {
@@ -65,12 +72,6 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 }
 
 void put_task_struct_rcu_user(struct task_struct *task)
-{
-    booter_panic("No impl 'sched'.");
-}
-
-struct task_struct *__switch_to(struct task_struct *,
-                       struct task_struct *)
 {
     booter_panic("No impl 'sched'.");
 }

@@ -23,3 +23,17 @@ void dump_page(struct page *page, const char *reason)
     booter_panic("No impl 'dump_page'.");
 }
 EXPORT_SYMBOL(dump_page);
+
+void __weak __free_pages(struct page *page, unsigned int order)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__free_pages);
+
+struct page * __weak
+__alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, int preferred_nid,
+							nodemask_t *nodemask)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__alloc_pages_nodemask);

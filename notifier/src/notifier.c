@@ -516,6 +516,7 @@ int notrace notify_die(enum die_val val, const char *str,
 	return atomic_notifier_call_chain(&die_chain, val, &args);
 }
 NOKPROBE_SYMBOL(notify_die);
+EXPORT_SYMBOL_GPL(notify_die);
 
 int register_die_notifier(struct notifier_block *nb)
 {

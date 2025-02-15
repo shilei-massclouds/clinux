@@ -34,7 +34,7 @@ QEMU_ARGS += \
 	-netdev user,id=net0,hostfwd=tcp::5555-:5555 \
 	-nographic \
     -append "earlycon=sbi root=/dev/vda rw console=ttyS0" \
-    -d in_asm -D /tmp/insturction.log
+    -d in_asm,int -D /tmp/qemu.log
 
 # All component subdir
 components := \
@@ -43,8 +43,8 @@ components := \
 	traps irq softirq \
 	kobject driver_base \
 	of of_irq irq_work tty vt earlycon \
-	sbi time irqchip riscv_cpu timer_riscv \
-	early_fdt params module \
+	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
+	early_fdt params module patch maccess \
 	clocksource \
 	cpu task cgroup resource dma \
 	jump_label extable vdso \

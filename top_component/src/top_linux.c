@@ -20,12 +20,17 @@
 #include <linux/ftrace.h>
 #include <linux/sched/init.h>
 #include <linux/sched/isolation.h>
+#include <linux/sched/clock.h>
 #include <linux/context_tracking.h>
 #include <linux/random.h>
 #include <linux/stackprotector.h>
 #include <linux/perf_event.h>
 #include <linux/profile.h>
 #include <linux/console.h>
+#include <linux/mempolicy.h>
+#include <linux/acpi.h>
+#include <linux/delay.h>
+#include <linux/rmap.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -64,6 +69,8 @@ extern void setup_vm_final(void);
 extern void free_area_init(unsigned long *max_zone_pfn);
 extern void init_IRQ(void);
 extern void time_init(void);
+/* Default late time init is NULL. archs can override this later. */
+void (*__initdata late_time_init)(void);
 
 void __init __weak mem_encrypt_init(void) { }
 
@@ -469,6 +476,15 @@ static inline void initcall_debug_enable(void)
 }
 #endif
 
+void __init anon_vma_init(void)
+{
+    pr_warn("No impl.anon_vma_init\n");
+}
+void __init pid_idr_init(void)
+{
+    pr_warn("No impl.pid_idr_init\n");
+}
+
 int
 cl_top_linux_init(void)
 {
@@ -647,6 +663,25 @@ cl_top_linux_init(void)
      * not cause "plain-text" data to be decrypted when accessed.
      */
     mem_encrypt_init();
+
+#ifdef CONFIG_BLK_DEV_INITRD
+    if (initrd_start && !initrd_below_start_ok &&
+        page_to_pfn(virt_to_page((void *)initrd_start)) < min_low_pfn) {
+        pr_crit("initrd overwritten (0x%08lx < 0x%08lx) - disabling it.\n",
+            page_to_pfn(virt_to_page((void *)initrd_start)),
+            min_low_pfn);
+        initrd_start = 0;
+    }
+#endif
+    setup_per_cpu_pageset();
+    numa_policy_init();
+    acpi_early_init();
+    if (late_time_init)
+        late_time_init();
+    sched_clock_init();
+    calibrate_delay();
+    pid_idr_init();
+    anon_vma_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

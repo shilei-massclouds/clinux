@@ -248,8 +248,13 @@ clear_bss_done:
 	call relocate
 #endif /* CONFIG_MMU */
 
+    /*
+     * Set sup0 scratch register to 0, indicating to exception vector that
+     * we are presently executing in kernel.
+     */
+    csrw CSR_SCRATCH, zero
 	/*
-     * Move 'call setup_trap_vector' to trap_init().
+     * Move 'setup_trap_vector' to trap_init().
      */
 
     /*

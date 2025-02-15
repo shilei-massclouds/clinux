@@ -4953,7 +4953,6 @@ void __free_pages(struct page *page, unsigned int order)
 	if (put_page_testzero(page))
 		free_the_page(page, order);
 }
-EXPORT_SYMBOL(__free_pages);
 
 void free_pages(unsigned long addr, unsigned int order)
 {
@@ -6146,180 +6145,181 @@ EXPORT_SYMBOL(alloc_pages_exact);
 //		}
 //	}
 //}
-//
-//static int zone_batchsize(struct zone *zone)
-//{
-//#ifdef CONFIG_MMU
-//	int batch;
-//
-//	/*
-//	 * The per-cpu-pages pools are set to around 1000th of the
-//	 * size of the zone.
-//	 */
-//	batch = zone_managed_pages(zone) / 1024;
-//	/* But no more than a meg. */
-//	if (batch * PAGE_SIZE > 1024 * 1024)
-//		batch = (1024 * 1024) / PAGE_SIZE;
-//	batch /= 4;		/* We effectively *= 4 below */
-//	if (batch < 1)
-//		batch = 1;
-//
-//	/*
-//	 * Clamp the batch to a 2^n - 1 value. Having a power
-//	 * of 2 value was found to be more likely to have
-//	 * suboptimal cache aliasing properties in some cases.
-//	 *
-//	 * For example if 2 tasks are alternately allocating
-//	 * batches of pages, one task can end up with a lot
-//	 * of pages of one half of the possible page colors
-//	 * and the other with pages of the other colors.
-//	 */
-//	batch = rounddown_pow_of_two(batch + batch/2) - 1;
-//
-//	return batch;
-//
-//#else
-//	/* The deferral and batching of frees should be suppressed under NOMMU
-//	 * conditions.
-//	 *
-//	 * The problem is that NOMMU needs to be able to allocate large chunks
-//	 * of contiguous memory as there's no hardware page translation to
-//	 * assemble apparent contiguous memory from discontiguous pages.
-//	 *
-//	 * Queueing large contiguous runs of pages for batching, however,
-//	 * causes the pages to actually be freed in smaller chunks.  As there
-//	 * can be a significant delay between the individual batches being
-//	 * recycled, this leads to the once large chunks of space being
-//	 * fragmented and becoming unavailable for high-order allocations.
-//	 */
-//	return 0;
-//#endif
-//}
-//
-///*
-// * pcp->high and pcp->batch values are related and dependent on one another:
-// * ->batch must never be higher then ->high.
-// * The following function updates them in a safe manner without read side
-// * locking.
-// *
-// * Any new users of pcp->batch and pcp->high should ensure they can cope with
-// * those fields changing asynchronously (acording to the above rule).
-// *
-// * mutex_is_locked(&pcp_batch_high_lock) required when calling this function
-// * outside of boot time (or some other assurance that no concurrent updaters
-// * exist).
-// */
-//static void pageset_update(struct per_cpu_pages *pcp, unsigned long high,
-//		unsigned long batch)
-//{
-//       /* start with a fail safe value for batch */
-//	pcp->batch = 1;
-//	smp_wmb();
-//
-//       /* Update high, then batch, in order */
-//	pcp->high = high;
-//	smp_wmb();
-//
-//	pcp->batch = batch;
-//}
-//
-///* a companion to pageset_set_high() */
-//static void pageset_set_batch(struct per_cpu_pageset *p, unsigned long batch)
-//{
-//	pageset_update(&p->pcp, 6 * batch, max(1UL, 1 * batch));
-//}
-//
-//static void pageset_init(struct per_cpu_pageset *p)
-//{
-//	struct per_cpu_pages *pcp;
-//	int migratetype;
-//
-//	memset(p, 0, sizeof(*p));
-//
-//	pcp = &p->pcp;
-//	for (migratetype = 0; migratetype < MIGRATE_PCPTYPES; migratetype++)
-//		INIT_LIST_HEAD(&pcp->lists[migratetype]);
-//}
-//
+
+static int zone_batchsize(struct zone *zone)
+{
+#ifdef CONFIG_MMU
+	int batch;
+
+	/*
+	 * The per-cpu-pages pools are set to around 1000th of the
+	 * size of the zone.
+	 */
+	batch = zone_managed_pages(zone) / 1024;
+	/* But no more than a meg. */
+	if (batch * PAGE_SIZE > 1024 * 1024)
+		batch = (1024 * 1024) / PAGE_SIZE;
+	batch /= 4;		/* We effectively *= 4 below */
+	if (batch < 1)
+		batch = 1;
+
+	/*
+	 * Clamp the batch to a 2^n - 1 value. Having a power
+	 * of 2 value was found to be more likely to have
+	 * suboptimal cache aliasing properties in some cases.
+	 *
+	 * For example if 2 tasks are alternately allocating
+	 * batches of pages, one task can end up with a lot
+	 * of pages of one half of the possible page colors
+	 * and the other with pages of the other colors.
+	 */
+	batch = rounddown_pow_of_two(batch + batch/2) - 1;
+
+	return batch;
+
+#else
+	/* The deferral and batching of frees should be suppressed under NOMMU
+	 * conditions.
+	 *
+	 * The problem is that NOMMU needs to be able to allocate large chunks
+	 * of contiguous memory as there's no hardware page translation to
+	 * assemble apparent contiguous memory from discontiguous pages.
+	 *
+	 * Queueing large contiguous runs of pages for batching, however,
+	 * causes the pages to actually be freed in smaller chunks.  As there
+	 * can be a significant delay between the individual batches being
+	 * recycled, this leads to the once large chunks of space being
+	 * fragmented and becoming unavailable for high-order allocations.
+	 */
+	return 0;
+#endif
+}
+
+/*
+ * pcp->high and pcp->batch values are related and dependent on one another:
+ * ->batch must never be higher then ->high.
+ * The following function updates them in a safe manner without read side
+ * locking.
+ *
+ * Any new users of pcp->batch and pcp->high should ensure they can cope with
+ * those fields changing asynchronously (acording to the above rule).
+ *
+ * mutex_is_locked(&pcp_batch_high_lock) required when calling this function
+ * outside of boot time (or some other assurance that no concurrent updaters
+ * exist).
+ */
+static void pageset_update(struct per_cpu_pages *pcp, unsigned long high,
+		unsigned long batch)
+{
+       /* start with a fail safe value for batch */
+	pcp->batch = 1;
+	smp_wmb();
+
+       /* Update high, then batch, in order */
+	pcp->high = high;
+	smp_wmb();
+
+	pcp->batch = batch;
+}
+
+/* a companion to pageset_set_high() */
+static void pageset_set_batch(struct per_cpu_pageset *p, unsigned long batch)
+{
+	pageset_update(&p->pcp, 6 * batch, max(1UL, 1 * batch));
+}
+
+static void pageset_init(struct per_cpu_pageset *p)
+{
+	struct per_cpu_pages *pcp;
+	int migratetype;
+
+	memset(p, 0, sizeof(*p));
+
+	pcp = &p->pcp;
+	for (migratetype = 0; migratetype < MIGRATE_PCPTYPES; migratetype++)
+		INIT_LIST_HEAD(&pcp->lists[migratetype]);
+}
+
 //static void setup_pageset(struct per_cpu_pageset *p, unsigned long batch)
 //{
 //	pageset_init(p);
 //	pageset_set_batch(p, batch);
 //}
-//
-///*
-// * pageset_set_high() sets the high water mark for hot per_cpu_pagelist
-// * to the value high for the pageset p.
-// */
-//static void pageset_set_high(struct per_cpu_pageset *p,
-//				unsigned long high)
-//{
-//	unsigned long batch = max(1UL, high / 4);
-//	if ((high / 4) > (PAGE_SHIFT * 8))
-//		batch = PAGE_SHIFT * 8;
-//
-//	pageset_update(&p->pcp, high, batch);
-//}
-//
-//static void pageset_set_high_and_batch(struct zone *zone,
-//				       struct per_cpu_pageset *pcp)
-//{
-//	if (percpu_pagelist_fraction)
-//		pageset_set_high(pcp,
-//			(zone_managed_pages(zone) /
-//				percpu_pagelist_fraction));
-//	else
-//		pageset_set_batch(pcp, zone_batchsize(zone));
-//}
-//
-//static void __meminit zone_pageset_init(struct zone *zone, int cpu)
-//{
-//	struct per_cpu_pageset *pcp = per_cpu_ptr(zone->pageset, cpu);
-//
-//	pageset_init(pcp);
-//	pageset_set_high_and_batch(zone, pcp);
-//}
-//
-//void __meminit setup_zone_pageset(struct zone *zone)
-//{
-//	int cpu;
-//	zone->pageset = alloc_percpu(struct per_cpu_pageset);
-//	for_each_possible_cpu(cpu)
-//		zone_pageset_init(zone, cpu);
-//}
-//
-///*
-// * Allocate per cpu pagesets and initialize them.
-// * Before this call only boot pagesets were available.
-// */
-//void __init setup_per_cpu_pageset(void)
-//{
-//	struct pglist_data *pgdat;
-//	struct zone *zone;
-//	int __maybe_unused cpu;
-//
-//	for_each_populated_zone(zone)
-//		setup_zone_pageset(zone);
-//
-//#ifdef CONFIG_NUMA
-//	/*
-//	 * Unpopulated zones continue using the boot pagesets.
-//	 * The numa stats for these pagesets need to be reset.
-//	 * Otherwise, they will end up skewing the stats of
-//	 * the nodes these zones are associated with.
-//	 */
-//	for_each_possible_cpu(cpu) {
-//		struct per_cpu_pageset *pcp = &per_cpu(boot_pageset, cpu);
-//		memset(pcp->vm_numa_stat_diff, 0,
-//		       sizeof(pcp->vm_numa_stat_diff));
-//	}
-//#endif
-//
-//	for_each_online_pgdat(pgdat)
-//		pgdat->per_cpu_nodestats =
-//			alloc_percpu(struct per_cpu_nodestat);
-//}
-//
+
+/*
+ * pageset_set_high() sets the high water mark for hot per_cpu_pagelist
+ * to the value high for the pageset p.
+ */
+static void pageset_set_high(struct per_cpu_pageset *p,
+				unsigned long high)
+{
+	unsigned long batch = max(1UL, high / 4);
+	if ((high / 4) > (PAGE_SHIFT * 8))
+		batch = PAGE_SHIFT * 8;
+
+	pageset_update(&p->pcp, high, batch);
+}
+
+static void pageset_set_high_and_batch(struct zone *zone,
+				       struct per_cpu_pageset *pcp)
+{
+	if (percpu_pagelist_fraction)
+		pageset_set_high(pcp,
+			(zone_managed_pages(zone) /
+				percpu_pagelist_fraction));
+	else
+		pageset_set_batch(pcp, zone_batchsize(zone));
+}
+
+static void __meminit zone_pageset_init(struct zone *zone, int cpu)
+{
+	struct per_cpu_pageset *pcp = per_cpu_ptr(zone->pageset, cpu);
+
+	pageset_init(pcp);
+	pageset_set_high_and_batch(zone, pcp);
+}
+
+void __meminit setup_zone_pageset(struct zone *zone)
+{
+	int cpu;
+	zone->pageset = alloc_percpu(struct per_cpu_pageset);
+	for_each_possible_cpu(cpu)
+		zone_pageset_init(zone, cpu);
+}
+
+/*
+ * Allocate per cpu pagesets and initialize them.
+ * Before this call only boot pagesets were available.
+ */
+void __init setup_per_cpu_pageset(void)
+{
+	struct pglist_data *pgdat;
+	struct zone *zone;
+	int __maybe_unused cpu;
+
+	for_each_populated_zone(zone)
+		setup_zone_pageset(zone);
+
+#ifdef CONFIG_NUMA
+	/*
+	 * Unpopulated zones continue using the boot pagesets.
+	 * The numa stats for these pagesets need to be reset.
+	 * Otherwise, they will end up skewing the stats of
+	 * the nodes these zones are associated with.
+	 */
+	for_each_possible_cpu(cpu) {
+		struct per_cpu_pageset *pcp = &per_cpu(boot_pageset, cpu);
+		memset(pcp->vm_numa_stat_diff, 0,
+		       sizeof(pcp->vm_numa_stat_diff));
+	}
+#endif
+
+	for_each_online_pgdat(pgdat)
+		pgdat->per_cpu_nodestats =
+			alloc_percpu(struct per_cpu_nodestat);
+}
+EXPORT_SYMBOL(setup_per_cpu_pageset);
+
 //static __meminit void zone_pcp_init(struct zone *zone)
 //{
 //	/*

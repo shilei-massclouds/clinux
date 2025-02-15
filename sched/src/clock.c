@@ -207,6 +207,8 @@ void __init sched_clock_init(void)
 
 	static_branch_inc(&sched_clock_running);
 }
+EXPORT_SYMBOL(sched_clock_init);
+
 /*
  * We run this as late_initcall() such that it runs after all built-in drivers,
  * notably: acpi_processor and intel_idle, which can mark the TSC as unstable.
@@ -445,6 +447,7 @@ void __init sched_clock_init(void)
 	generic_sched_clock_init();
 	local_irq_enable();
 }
+EXPORT_SYMBOL(sched_clock_init);
 
 u64 sched_clock_cpu(int cpu)
 {

@@ -35,21 +35,6 @@ unsigned long long __weak sched_clock(void)
 }
 EXPORT_SYMBOL_GPL(sched_clock);
 
-bool timerqueue_del(struct timerqueue_head *head, struct timerqueue_node *node)
-{
-    booter_panic("No impl 'timerqueue_del'.");
-}
-
-struct timerqueue_node *timerqueue_iterate_next(struct timerqueue_node *node)
-{
-    booter_panic("No impl 'timerqueue_iterate_next'.");
-}
-
-bool timerqueue_add(struct timerqueue_head *head, struct timerqueue_node *node)
-{
-    booter_panic("No impl 'timerqueue_add'.");
-}
-
 void account_idle_ticks(unsigned long ticks)
 {
     booter_panic("No impl in 'time'.");
