@@ -67,3 +67,9 @@ void key_put(struct key *key)
 {
     booter_panic("No impl 'key_put'.");
 }
+
+void __warn_printk(const char *fmt, ...)
+{
+    sbi_puts("[RAW_WARN] ");
+    sbi_puts(printk_skip_level(fmt));
+}

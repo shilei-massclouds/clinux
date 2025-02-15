@@ -3,6 +3,7 @@
 #ifndef _CL_HOOK_H_
 #define _CL_HOOK_H_
 
+/*
 #define DECLARE_HOOK(rtype, name, args...)  \
     extern rtype (*cl_##name##_hook)(args);
 
@@ -41,6 +42,7 @@
             HOOK_PANIC(name); \
         } \
     } while (0)
+*/
 
 #define DEFINE_ENABLE_FUNC(name) \
     void enable_##name(void) {} \

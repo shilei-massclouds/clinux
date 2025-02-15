@@ -53,47 +53,6 @@ void sbi_put_dec(unsigned long n)
 }
 EXPORT_SYMBOL(sbi_put_dec);
 
-DEFINE_HOOK(int, vprintk_func, const char *fmt, va_list args);
-
-//
-// Hook for printk
-//
-asmlinkage __visible __weak int printk(const char *fmt, ...)
-{
-    if (HAS_HOOK(vprintk_func)) {
-        int ret;
-        va_list args;
-        va_start(args, fmt);
-        INVOKE_HOOK_RET(ret, vprintk_func, printk_skip_level(fmt), args);
-        va_end(args);
-        return ret;
-    }
-
-    // Fallthrough
-    sbi_puts("[RAW] ");
-    sbi_puts(printk_skip_level(fmt));
-    return 0;
-}
-EXPORT_SYMBOL(printk);
-
-void __warn_printk(const char *fmt, ...)
-{
-    if (HAS_HOOK(vprintk_func)) {
-        int ret;
-        va_list args;
-        pr_warn(CUT_HERE);
-        va_start(args, fmt);
-        INVOKE_HOOK_RET(ret, vprintk_func, printk_skip_level(fmt), args);
-        va_end(args);
-        return;
-    }
-
-    // Fallthrough
-    sbi_puts("[RAW_WARN] ");
-    sbi_puts(printk_skip_level(fmt));
-}
-EXPORT_SYMBOL(__warn_printk);
-
 //
 // NOTE ************************
 // Remove below definitions in future.

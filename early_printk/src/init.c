@@ -9,8 +9,6 @@
 
 #define EARLYCON_NAME "sbi"
 
-DECLARE_HOOK(int, vprintk_func, const char *fmt, va_list args);
-
 extern int early_sbi_setup(struct earlycon_device *device, const char *opt);
 extern int early_vprintk(const char *fmt, va_list args);
 
@@ -81,9 +79,30 @@ cl_early_printk_init(void)
     }
 
     early_console = early_console_dev.con;
-    REGISTER_HOOK(early_vprintk, vprintk_func);
 
     sbi_puts("module[early_printk]: init end!\n");
     return 0;
 }
 EXPORT_SYMBOL(cl_early_printk_init);
+
+asmlinkage __visible __weak int printk(const char *fmt, ...)
+{
+    int ret;
+    va_list args;
+    va_start(args, fmt);
+    ret = early_vprintk(printk_skip_level(fmt), args);
+    va_end(args);
+    return ret;
+}
+EXPORT_SYMBOL(printk);
+
+void __weak __warn_printk(const char *fmt, ...)
+{
+    int ret;
+    va_list args;
+    pr_warn(CUT_HERE);
+    va_start(args, fmt);
+    early_vprintk(printk_skip_level(fmt), args);
+    va_end(args);
+}
+EXPORT_SYMBOL(__warn_printk);
