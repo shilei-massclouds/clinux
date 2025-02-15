@@ -50,7 +50,7 @@ components := \
 	jump_label extable vdso \
 	early_sched sched \
 	percpu workqueue_itf workqueue notifier \
-	memblock bootmem paging \
+	memblock bootmem paging rmap \
 	page_alloc slub vmalloc mm_util \
 	spinlock semaphore mutex rwsem rcu \
 	inode dcache \

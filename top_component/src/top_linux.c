@@ -476,11 +476,6 @@ static inline void initcall_debug_enable(void)
 }
 #endif
 
-void __init anon_vma_init(void)
-{
-    pr_warn("No impl.anon_vma_init\n");
-}
-
 int
 cl_top_linux_init(void)
 {
