@@ -9,18 +9,10 @@
 #include <asm/unistd.h>
 #include "../../booter/src/booter.h"
 
-static asmlinkage void riscv_intc_irq(struct pt_regs *regs)
-{
-    booter_panic("No impl!\n");
-}
-
 int
 cl_traps_init(void)
 {
     sbi_puts("module[traps]: init begin ...\n");
-    // Move it to ./drivers/irqchip/irq-riscv-intc.c
-    //set_handle_irq(&riscv_intc_irq);
-    handle_arch_irq = &riscv_intc_irq;
     sbi_puts("module[traps]: init end!\n");
     return 0;
 }

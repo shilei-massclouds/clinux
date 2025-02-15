@@ -13,3 +13,4 @@ obj_y += wait_bit.o
 obj_y += wait.o
 obj_y += swait.o
 obj_y += completion.o
+obj_y += cputime.o

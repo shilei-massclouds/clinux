@@ -69,10 +69,12 @@ void fput(struct file *file)
     booter_panic("No impl.\n");
 }
 
+/*
 struct task_struct *pid_task(struct pid *pid, enum pid_type type)
 {
     booter_panic("No impl.\n");
 }
+*/
 struct device *device_create(struct class *class, struct device *parent,
                  dev_t devt, void *drvdata, const char *fmt, ...)
 {
@@ -86,11 +88,15 @@ void proc_tty_unregister_driver(struct tty_driver *driver)
 {
     booter_panic("No impl.\n");
 }
+
+/*
 int
 __group_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
 {
     booter_panic("No impl.\n");
 }
+*/
+
 int __sched ldsem_down_read(struct ld_semaphore *sem, long timeout)
 {
     booter_panic("No impl.\n");
@@ -157,10 +163,12 @@ int ldsem_down_read_trylock(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");
 }
+/*
 struct pid *find_vpid(int nr)
 {
     booter_panic("No impl.\n");
 }
+*/
 pid_t pid_vnr(struct pid *pid)
 {
     booter_panic("No impl.\n");
@@ -177,10 +185,12 @@ struct ctl_table_header *register_sysctl_table(struct ctl_table *table)
 {
     booter_panic("No impl.\n");
 }
+/*
 void put_pid(struct pid *pid)
 {
     booter_panic("No impl.\n");
 }
+*/
 int __init vty_init(const struct file_operations *console_fops)
 {
     booter_panic("No impl.\n");

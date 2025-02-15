@@ -3975,41 +3975,41 @@ EXPORT_PER_CPU_SYMBOL(kernel_cpustat);
 //
 //	return ns;
 //}
-//
-///*
-// * This function gets called by the timer code, with HZ frequency.
-// * We call it with interrupts disabled.
-// */
-//void scheduler_tick(void)
-//{
-//	int cpu = smp_processor_id();
-//	struct rq *rq = cpu_rq(cpu);
-//	struct task_struct *curr = rq->curr;
-//	struct rq_flags rf;
-//	unsigned long thermal_pressure;
-//
-//	arch_scale_freq_tick();
-//	sched_clock_tick();
-//
-//	rq_lock(rq, &rf);
-//
-//	update_rq_clock(rq);
-//	thermal_pressure = arch_scale_thermal_pressure(cpu_of(rq));
-//	update_thermal_load_avg(rq_clock_thermal(rq), rq, thermal_pressure);
-//	curr->sched_class->task_tick(rq, curr, 0);
-//	calc_global_load_tick(rq);
-//	psi_task_tick(rq);
-//
-//	rq_unlock(rq, &rf);
-//
-//	perf_event_task_tick();
-//
-//#ifdef CONFIG_SMP
-//	rq->idle_balance = idle_cpu(cpu);
-//	trigger_load_balance(rq);
-//#endif
-//}
-//
+
+/*
+ * This function gets called by the timer code, with HZ frequency.
+ * We call it with interrupts disabled.
+ */
+void scheduler_tick(void)
+{
+	int cpu = smp_processor_id();
+	struct rq *rq = cpu_rq(cpu);
+	struct task_struct *curr = rq->curr;
+	struct rq_flags rf;
+	unsigned long thermal_pressure;
+
+	arch_scale_freq_tick();
+	sched_clock_tick();
+
+	rq_lock(rq, &rf);
+
+	update_rq_clock(rq);
+	thermal_pressure = arch_scale_thermal_pressure(cpu_of(rq));
+	update_thermal_load_avg(rq_clock_thermal(rq), rq, thermal_pressure);
+	curr->sched_class->task_tick(rq, curr, 0);
+	calc_global_load_tick(rq);
+	psi_task_tick(rq);
+
+	rq_unlock(rq, &rf);
+
+	perf_event_task_tick();
+
+#ifdef CONFIG_SMP
+	rq->idle_balance = idle_cpu(cpu);
+	trigger_load_balance(rq);
+#endif
+}
+
 //#ifdef CONFIG_NO_HZ_FULL
 //
 //struct tick_work {
@@ -5063,31 +5063,32 @@ out_unlock:
 //{
 //	return p->prio - MAX_RT_PRIO;
 //}
-//
-///**
-// * idle_cpu - is a given CPU idle currently?
-// * @cpu: the processor in question.
-// *
-// * Return: 1 if the CPU is currently idle. 0 otherwise.
-// */
-//int idle_cpu(int cpu)
-//{
-//	struct rq *rq = cpu_rq(cpu);
-//
-//	if (rq->curr != rq->idle)
-//		return 0;
-//
-//	if (rq->nr_running)
-//		return 0;
-//
-//#ifdef CONFIG_SMP
-//	if (rq->ttwu_pending)
-//		return 0;
-//#endif
-//
-//	return 1;
-//}
-//
+
+/**
+ * idle_cpu - is a given CPU idle currently?
+ * @cpu: the processor in question.
+ *
+ * Return: 1 if the CPU is currently idle. 0 otherwise.
+ */
+int idle_cpu(int cpu)
+{
+	struct rq *rq = cpu_rq(cpu);
+
+	if (rq->curr != rq->idle)
+		return 0;
+
+	if (rq->nr_running)
+		return 0;
+
+#ifdef CONFIG_SMP
+	if (rq->ttwu_pending)
+		return 0;
+#endif
+
+	return 1;
+}
+EXPORT_SYMBOL(idle_cpu);
+
 ///**
 // * available_idle_cpu - is a given CPU idle for enqueuing work.
 // * @cpu: the CPU in question.

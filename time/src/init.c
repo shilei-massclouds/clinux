@@ -35,10 +35,11 @@ unsigned long long __weak sched_clock(void)
 }
 EXPORT_SYMBOL_GPL(sched_clock);
 
-void account_idle_ticks(unsigned long ticks)
+void __weak account_idle_ticks(unsigned long ticks)
 {
     booter_panic("No impl in 'time'.");
 }
+EXPORT_SYMBOL(account_idle_ticks);
 
 int smp_call_function_single(int cpu, void (*func) (void *info), void *info,
                 int wait)
@@ -46,16 +47,11 @@ int smp_call_function_single(int cpu, void (*func) (void *info), void *info,
     booter_panic("No impl in 'time'.");
 }
 
-void account_process_tick(struct task_struct *p, int user_tick)
+void __weak account_process_tick(struct task_struct *p, int user_tick)
 {
     booter_panic("No impl in 'time'.");
 }
-/*
-bool irq_work_needs_cpu(void)
-{
-    booter_panic("No impl in 'time'.");
-}
-*/
+EXPORT_SYMBOL(account_process_tick);
 
 int rtc_set_ntp_time(struct timespec64 now, unsigned long *target_nsec)
 {
@@ -67,17 +63,6 @@ loff_t seq_lseek(struct file *file, loff_t offset, int whence)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(seq_lseek);
-
-/*
-bool capable(int cap)
-{
-    booter_panic("No impl in 'time'.");
-}
-void __init timer_probe(void)
-{
-    booter_panic("No impl in 'time'.");
-}
-*/
 
 int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
 {
@@ -113,10 +98,12 @@ struct dentry *debugfs_create_file(const char *name, umode_t mode,
 }
 EXPORT_SYMBOL(debugfs_create_file);
 
-void scheduler_tick(void)
+void __weak scheduler_tick(void)
 {
     booter_panic("No impl in 'time'.");
 }
+EXPORT_SYMBOL(scheduler_tick);
+
 void seq_printf(struct seq_file *m, const char *f, ...)
 {
     booter_panic("No impl in 'time'.");
@@ -139,10 +126,13 @@ int single_open(struct file *file, int (*show)(struct seq_file *, void *),
 }
 EXPORT_SYMBOL(single_open);
 
+/*
 void run_posix_cpu_timers(void)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
+
 int subsys_system_register(struct bus_type *subsys,
                const struct attribute_group **groups)
 {
@@ -180,3 +170,66 @@ void touch_softlockup_watchdog_sched(void)
 {
     booter_panic("No impl in 'time'.");
 }
+
+void __weak thread_group_cputime(struct task_struct *tsk, struct task_cputime *times)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(thread_group_cputime);
+
+int print_fatal_signals __read_mostly;
+
+int nanosleep_copyout(struct restart_block *restart, struct timespec64 *ts)
+{
+    booter_panic("No impl in 'time'.");
+}
+
+pid_t __task_pid_nr_ns(struct task_struct *task, enum pid_type type,
+            struct pid_namespace *ns)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(__task_pid_nr_ns);
+
+struct task_struct *pid_task(struct pid *pid, enum pid_type type)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(pid_task);
+
+int
+__group_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(__group_send_sig_info);
+
+int posix_timer_event(struct k_itimer *timr, int si_private)
+{
+    booter_panic("No impl in 'time'.");
+}
+
+unsigned long long task_sched_runtime(struct task_struct *p)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(task_sched_runtime);
+
+struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
+                       unsigned long *flags)
+{
+    booter_panic("No impl in 'time'.");
+}
+
+struct pid *find_vpid(int nr)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(find_vpid);
+
+void put_pid(struct pid *pid)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(put_pid);
+

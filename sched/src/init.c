@@ -6,6 +6,7 @@
 #include <linux/hrtimer.h>
 #include <linux/pid_namespace.h>
 #include <linux/proc_fs.h>
+#include <linux/cgroup.h>
 #include <linux/sched/debug.h>
 #include "../../booter/src/booter.h"
 
@@ -44,12 +45,6 @@ void __init generic_sched_clock_init(void)
 */
 
 void touch_all_softlockup_watchdogs(void)
-{
-    booter_panic("No impl 'sched'.");
-}
-
-pid_t __task_pid_nr_ns(struct task_struct *task, enum pid_type type,
-            struct pid_namespace *ns)
 {
     booter_panic("No impl 'sched'.");
 }
@@ -127,3 +122,16 @@ void rt_mutex_adjust_pi(struct task_struct *task)
 {
     booter_panic("No impl in 'sched'.");
 }
+
+void __cgroup_account_cputime_field(struct cgroup *cgrp,
+                    enum cpu_usage_stat index, u64 delta_exec)
+{
+    booter_panic("No impl in 'sched'.");
+}
+
+/*
+unsigned long long task_sched_runtime(struct task_struct *p)
+{
+    booter_panic("No impl in 'sched'.");
+}
+*/
