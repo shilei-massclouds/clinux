@@ -42,7 +42,7 @@ components := \
 	kasprintf random crypto \
 	traps irq softirq \
 	kobject driver_base \
-	of of_irq irq_work \
+	of of_irq irq_work tty vt \
 	sbi time irqchip riscv_cpu timer_riscv \
 	early_fdt params module \
 	clocksource \

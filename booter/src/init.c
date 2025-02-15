@@ -7,6 +7,7 @@
 #include <linux/device.h>
 #include <linux/irq.h>
 #include <linux/module.h>
+#include <linux/fs.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -235,3 +236,15 @@ void __weak irq_work_tick(void)
     booter_panic("No impl in 'booter'.");
 }
 EXPORT_SYMBOL(irq_work_tick);
+
+void kill_fasync(struct fasync_struct **fp, int sig, int band)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(kill_fasync);
+
+int fasync_helper(int fd, struct file * filp, int on, struct fasync_struct **fapp)
+{
+    booter_panic("No impl in 'lib'.");
+}
+EXPORT_SYMBOL(fasync_helper);

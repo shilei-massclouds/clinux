@@ -25,6 +25,7 @@
 #include <linux/stackprotector.h>
 #include <linux/perf_event.h>
 #include <linux/profile.h>
+#include <linux/console.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -63,6 +64,8 @@ extern void setup_vm_final(void);
 extern void free_area_init(unsigned long *max_zone_pfn);
 extern void init_IRQ(void);
 extern void time_init(void);
+
+void __init __weak mem_encrypt_init(void) { }
 
 static void setup_zero_page(void)
 {
@@ -617,6 +620,33 @@ cl_top_linux_init(void)
     local_irq_enable();
 
     kmem_cache_init_late();
+
+    /*
+     * HACK ALERT! This is early. We're enabling the console before
+     * we've done PCI setups etc, and console_init() must be aware of
+     * this. But we do want output early, in case something goes wrong.
+     */
+    console_init();
+    if (panic_later)
+        panic("Too many boot %s vars at `%s'", panic_later,
+              panic_param);
+
+    lockdep_init();
+
+    /*
+     * Need to run this when irqs are enabled, because it wants
+     * to self-test [hard/soft]-irqs on/off lock inversion bugs
+     * too:
+     */
+    locking_selftest();
+
+    /*
+     * This needs to be called before any devices perform DMA
+     * operations that might use the SWIOTLB bounce buffers. It will
+     * mark the bounce buffers as decrypted so that their usage will
+     * not cause "plain-text" data to be decrypted when accessed.
+     */
+    mem_encrypt_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

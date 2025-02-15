@@ -83,8 +83,8 @@ EXPORT_SYMBOL_GPL(console_printk);
  * driver system.
  */
 static DEFINE_SEMAPHORE(console_sem);
-struct console *console_drivers;
-EXPORT_SYMBOL_GPL(console_drivers);
+//struct console *console_drivers;
+//EXPORT_SYMBOL_GPL(console_drivers);
 
 /*
  * System may need to suppress printk message under certain
@@ -2927,37 +2927,38 @@ EXPORT_SYMBOL(console_unlock);
 //	return res;
 //}
 //EXPORT_SYMBOL(unregister_console);
-//
-///*
-// * Initialize the console device. This is called *early*, so
-// * we can't necessarily depend on lots of kernel help here.
-// * Just do some early initializations, and do the complex setup
-// * later.
-// */
-//void __init console_init(void)
-//{
-//	int ret;
-//	initcall_t call;
-//	initcall_entry_t *ce;
-//
-//	/* Setup the default TTY line discipline. */
-//	n_tty_init();
-//
-//	/*
-//	 * set up the console device so that later boot sequences can
-//	 * inform about problems etc..
-//	 */
-//	ce = __con_initcall_start;
-//	trace_initcall_level("console");
-//	while (ce < __con_initcall_end) {
-//		call = initcall_from_entry(ce);
-//		trace_initcall_start(call);
-//		ret = call();
-//		trace_initcall_finish(call, ret);
-//		ce++;
-//	}
-//}
-//
+
+/*
+ * Initialize the console device. This is called *early*, so
+ * we can't necessarily depend on lots of kernel help here.
+ * Just do some early initializations, and do the complex setup
+ * later.
+ */
+void __init console_init(void)
+{
+	int ret;
+	initcall_t call;
+	initcall_entry_t *ce;
+
+	/* Setup the default TTY line discipline. */
+	n_tty_init();
+
+	/*
+	 * set up the console device so that later boot sequences can
+	 * inform about problems etc..
+	 */
+	ce = __con_initcall_start;
+	trace_initcall_level("console");
+	while (ce < __con_initcall_end) {
+		call = initcall_from_entry(ce);
+		trace_initcall_start(call);
+		ret = call();
+		trace_initcall_finish(call, ret);
+		ce++;
+	}
+}
+EXPORT_SYMBOL(console_init);
+
 ///*
 // * Some boot consoles access data that is in the init section and which will
 // * be discarded after the initcalls have been run. To make sure that no code
