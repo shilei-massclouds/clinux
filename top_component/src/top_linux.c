@@ -31,6 +31,7 @@
 #include <linux/acpi.h>
 #include <linux/delay.h>
 #include <linux/rmap.h>
+#include <linux/utsname.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -687,7 +688,7 @@ cl_top_linux_init(void)
     cred_init();
     fork_init();
     proc_caches_init();
-    //uts_ns_init();
+    uts_ns_init();
     //buffer_init();
     //key_init();
     //security_init();

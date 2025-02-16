@@ -47,7 +47,7 @@ components := \
 	early_fdt params module patch maccess \
 	clocksource pid \
 	cpu task cgroup resource dma \
-	jump_label extable vdso \
+	jump_label extable vdso utsname \
 	early_sched sched \
 	percpu workqueue_itf workqueue notifier \
 	memblock bootmem paging rmap \

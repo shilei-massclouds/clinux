@@ -23,10 +23,10 @@
 //	return inc_ucount(ns, current_euid(), UCOUNT_UTS_NAMESPACES);
 //}
 //
-static void dec_uts_namespaces(struct ucounts *ucounts)
-{
-	dec_ucount(ucounts, UCOUNT_UTS_NAMESPACES);
-}
+//static void dec_uts_namespaces(struct ucounts *ucounts)
+//{
+//	dec_ucount(ucounts, UCOUNT_UTS_NAMESPACES);
+//}
 
 //static struct uts_namespace *create_uts_ns(void)
 //{
@@ -104,19 +104,11 @@ static void dec_uts_namespaces(struct ucounts *ucounts)
 //	return new_ns;
 //}
 
-void free_uts_ns(struct kref *kref)
+void __weak free_uts_ns(struct kref *kref)
 {
-    /*
-	struct uts_namespace *ns;
-
-	ns = container_of(kref, struct uts_namespace, kref);
-	dec_uts_namespaces(ns->ucounts);
-	put_user_ns(ns->user_ns);
-	ns_free_inum(&ns->ns);
-	kmem_cache_free(uts_ns_cache, ns);
-    */
     booter_panic("No impl 'free_uts_ns'.");
 }
+EXPORT_SYMBOL(free_uts_ns);
 
 static inline struct uts_namespace *to_uts_ns(struct ns_common *ns)
 {
@@ -172,6 +164,7 @@ const struct proc_ns_operations utsns_operations = {
 	.install	= utsns_install,
 	.owner		= utsns_owner,
 };
+EXPORT_SYMBOL(utsns_operations);
 
 //void __init uts_ns_init(void)
 //{
