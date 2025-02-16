@@ -56,6 +56,7 @@ components := \
 	inode dcache \
 	cred nsproxy \
 	fork mmap \
+	buffer \
 	early_printk printk panic dump_stack
 	#partitions \
 

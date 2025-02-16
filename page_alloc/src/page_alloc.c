@@ -5159,54 +5159,54 @@ EXPORT_SYMBOL(alloc_pages_exact);
 //	}
 //}
 //EXPORT_SYMBOL(free_pages_exact);
-//
-///**
-// * nr_free_zone_pages - count number of pages beyond high watermark
-// * @offset: The zone index of the highest zone
-// *
-// * nr_free_zone_pages() counts the number of pages which are beyond the
-// * high watermark within all zones at or below a given zone index.  For each
-// * zone, the number of pages is calculated as:
-// *
-// *     nr_free_zone_pages = managed_pages - high_pages
-// *
-// * Return: number of pages beyond high watermark.
-// */
-//static unsigned long nr_free_zone_pages(int offset)
-//{
-//	struct zoneref *z;
-//	struct zone *zone;
-//
-//	/* Just pick one node, since fallback list is circular */
-//	unsigned long sum = 0;
-//
-//	struct zonelist *zonelist = node_zonelist(numa_node_id(), GFP_KERNEL);
-//
-//	for_each_zone_zonelist(zone, z, zonelist, offset) {
-//		unsigned long size = zone_managed_pages(zone);
-//		unsigned long high = high_wmark_pages(zone);
-//		if (size > high)
-//			sum += size - high;
-//	}
-//
-//	return sum;
-//}
-//
-///**
-// * nr_free_buffer_pages - count number of pages beyond high watermark
-// *
-// * nr_free_buffer_pages() counts the number of pages which are beyond the high
-// * watermark within ZONE_DMA and ZONE_NORMAL.
-// *
-// * Return: number of pages beyond high watermark within ZONE_DMA and
-// * ZONE_NORMAL.
-// */
-//unsigned long nr_free_buffer_pages(void)
-//{
-//	return nr_free_zone_pages(gfp_zone(GFP_USER));
-//}
-//EXPORT_SYMBOL_GPL(nr_free_buffer_pages);
-//
+
+/**
+ * nr_free_zone_pages - count number of pages beyond high watermark
+ * @offset: The zone index of the highest zone
+ *
+ * nr_free_zone_pages() counts the number of pages which are beyond the
+ * high watermark within all zones at or below a given zone index.  For each
+ * zone, the number of pages is calculated as:
+ *
+ *     nr_free_zone_pages = managed_pages - high_pages
+ *
+ * Return: number of pages beyond high watermark.
+ */
+static unsigned long nr_free_zone_pages(int offset)
+{
+	struct zoneref *z;
+	struct zone *zone;
+
+	/* Just pick one node, since fallback list is circular */
+	unsigned long sum = 0;
+
+	struct zonelist *zonelist = node_zonelist(numa_node_id(), GFP_KERNEL);
+
+	for_each_zone_zonelist(zone, z, zonelist, offset) {
+		unsigned long size = zone_managed_pages(zone);
+		unsigned long high = high_wmark_pages(zone);
+		if (size > high)
+			sum += size - high;
+	}
+
+	return sum;
+}
+
+/**
+ * nr_free_buffer_pages - count number of pages beyond high watermark
+ *
+ * nr_free_buffer_pages() counts the number of pages which are beyond the high
+ * watermark within ZONE_DMA and ZONE_NORMAL.
+ *
+ * Return: number of pages beyond high watermark within ZONE_DMA and
+ * ZONE_NORMAL.
+ */
+unsigned long nr_free_buffer_pages(void)
+{
+	return nr_free_zone_pages(gfp_zone(GFP_USER));
+}
+EXPORT_SYMBOL_GPL(nr_free_buffer_pages);
+
 //static inline void show_node(struct zone *zone)
 //{
 //	if (IS_ENABLED(CONFIG_NUMA))
