@@ -686,7 +686,7 @@ cl_top_linux_init(void)
     thread_stack_cache_init();
     cred_init();
     fork_init();
-    //proc_caches_init();
+    proc_caches_init();
     //uts_ns_init();
     //buffer_init();
     //key_init();

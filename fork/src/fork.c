@@ -321,25 +321,25 @@ static inline void free_task_struct(struct task_struct *tsk)
 //}
 //# endif
 //#endif
-//
-///* SLAB cache for signal_struct structures (tsk->signal) */
-//static struct kmem_cache *signal_cachep;
-//
-///* SLAB cache for sighand_struct structures (tsk->sighand) */
-//struct kmem_cache *sighand_cachep;
-//
-///* SLAB cache for files_struct structures (tsk->files) */
-//struct kmem_cache *files_cachep;
-//
-///* SLAB cache for fs_struct structures (tsk->fs) */
-//struct kmem_cache *fs_cachep;
-//
-///* SLAB cache for vm_area_struct structures */
-//static struct kmem_cache *vm_area_cachep;
-//
-///* SLAB cache for mm_struct structures (tsk->mm) */
-//static struct kmem_cache *mm_cachep;
-//
+
+/* SLAB cache for signal_struct structures (tsk->signal) */
+static struct kmem_cache *signal_cachep;
+
+/* SLAB cache for sighand_struct structures (tsk->sighand) */
+struct kmem_cache *sighand_cachep;
+
+/* SLAB cache for files_struct structures (tsk->files) */
+struct kmem_cache *files_cachep;
+
+/* SLAB cache for fs_struct structures (tsk->fs) */
+struct kmem_cache *fs_cachep;
+
+/* SLAB cache for vm_area_struct structures */
+static struct kmem_cache *vm_area_cachep;
+
+/* SLAB cache for mm_struct structures (tsk->mm) */
+static struct kmem_cache *mm_cachep;
+
 //struct vm_area_struct *vm_area_alloc(struct mm_struct *mm)
 //{
 //	struct vm_area_struct *vma;
@@ -2737,58 +2737,59 @@ EXPORT_SYMBOL_GPL(fork_init);
 //out:
 //	read_unlock(&tasklist_lock);
 //}
-//
-//#ifndef ARCH_MIN_MMSTRUCT_ALIGN
-//#define ARCH_MIN_MMSTRUCT_ALIGN 0
-//#endif
-//
-//static void sighand_ctor(void *data)
-//{
-//	struct sighand_struct *sighand = data;
-//
-//	spin_lock_init(&sighand->siglock);
-//	init_waitqueue_head(&sighand->signalfd_wqh);
-//}
-//
-//void __init proc_caches_init(void)
-//{
-//	unsigned int mm_size;
-//
-//	sighand_cachep = kmem_cache_create("sighand_cache",
-//			sizeof(struct sighand_struct), 0,
-//			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_TYPESAFE_BY_RCU|
-//			SLAB_ACCOUNT, sighand_ctor);
-//	signal_cachep = kmem_cache_create("signal_cache",
-//			sizeof(struct signal_struct), 0,
-//			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
-//			NULL);
-//	files_cachep = kmem_cache_create("files_cache",
-//			sizeof(struct files_struct), 0,
-//			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
-//			NULL);
-//	fs_cachep = kmem_cache_create("fs_cache",
-//			sizeof(struct fs_struct), 0,
-//			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
-//			NULL);
-//
-//	/*
-//	 * The mm_cpumask is located at the end of mm_struct, and is
-//	 * dynamically sized based on the maximum CPU number this system
-//	 * can have, taking hotplug into account (nr_cpu_ids).
-//	 */
-//	mm_size = sizeof(struct mm_struct) + cpumask_size();
-//
-//	mm_cachep = kmem_cache_create_usercopy("mm_struct",
-//			mm_size, ARCH_MIN_MMSTRUCT_ALIGN,
-//			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
-//			offsetof(struct mm_struct, saved_auxv),
-//			sizeof_field(struct mm_struct, saved_auxv),
-//			NULL);
-//	vm_area_cachep = KMEM_CACHE(vm_area_struct, SLAB_PANIC|SLAB_ACCOUNT);
-//	mmap_init();
-//	nsproxy_cache_init();
-//}
-//
+
+#ifndef ARCH_MIN_MMSTRUCT_ALIGN
+#define ARCH_MIN_MMSTRUCT_ALIGN 0
+#endif
+
+static void sighand_ctor(void *data)
+{
+	struct sighand_struct *sighand = data;
+
+	spin_lock_init(&sighand->siglock);
+	init_waitqueue_head(&sighand->signalfd_wqh);
+}
+
+void __init proc_caches_init(void)
+{
+	unsigned int mm_size;
+
+	sighand_cachep = kmem_cache_create("sighand_cache",
+			sizeof(struct sighand_struct), 0,
+			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_TYPESAFE_BY_RCU|
+			SLAB_ACCOUNT, sighand_ctor);
+	signal_cachep = kmem_cache_create("signal_cache",
+			sizeof(struct signal_struct), 0,
+			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
+			NULL);
+	files_cachep = kmem_cache_create("files_cache",
+			sizeof(struct files_struct), 0,
+			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
+			NULL);
+	fs_cachep = kmem_cache_create("fs_cache",
+			sizeof(struct fs_struct), 0,
+			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
+			NULL);
+
+	/*
+	 * The mm_cpumask is located at the end of mm_struct, and is
+	 * dynamically sized based on the maximum CPU number this system
+	 * can have, taking hotplug into account (nr_cpu_ids).
+	 */
+	mm_size = sizeof(struct mm_struct) + cpumask_size();
+
+	mm_cachep = kmem_cache_create_usercopy("mm_struct",
+			mm_size, ARCH_MIN_MMSTRUCT_ALIGN,
+			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
+			offsetof(struct mm_struct, saved_auxv),
+			sizeof_field(struct mm_struct, saved_auxv),
+			NULL);
+	vm_area_cachep = KMEM_CACHE(vm_area_struct, SLAB_PANIC|SLAB_ACCOUNT);
+	mmap_init();
+	nsproxy_cache_init();
+}
+EXPORT_SYMBOL(proc_caches_init);
+
 ///*
 // * Check constraints on flags passed to the unshare system call.
 // */

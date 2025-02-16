@@ -814,13 +814,14 @@ EXPORT_SYMBOL(kstrdup_const);
 //
 //	return allowed;
 //}
-//
-///*
-// * Make sure vm_committed_as in one cacheline and not cacheline shared with
-// * other variables. It can be updated by several CPUs frequently.
-// */
-//struct percpu_counter vm_committed_as ____cacheline_aligned_in_smp;
-//
+
+/*
+ * Make sure vm_committed_as in one cacheline and not cacheline shared with
+ * other variables. It can be updated by several CPUs frequently.
+ */
+struct percpu_counter vm_committed_as ____cacheline_aligned_in_smp;
+EXPORT_SYMBOL(vm_committed_as);
+
 ///*
 // * The global memory commitment made in the system can be a metric
 // * that can be used to drive ballooning decisions when Linux is hosted
