@@ -55,6 +55,7 @@ components := \
 	spinlock semaphore mutex rwsem rcu \
 	inode dcache \
 	cred \
+	fork \
 	early_printk printk panic dump_stack
 	#partitions \
 

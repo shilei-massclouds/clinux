@@ -253,3 +253,7 @@ struct user_struct root_user = {
     .ratelimit  = RATELIMIT_STATE_INIT(root_user.ratelimit, 0, 0),
 };
 EXPORT_SYMBOL(root_user);
+
+// From kernel/fork.c
+__cacheline_aligned DEFINE_RWLOCK(tasklist_lock);  /* outer */
+EXPORT_SYMBOL(tasklist_lock);

@@ -210,9 +210,6 @@ void __init_ldsem(struct ld_semaphore *sem, const char *name,
     booter_panic("No impl.\n");
 }
 
-// From kernel/fork.c
-__cacheline_aligned DEFINE_RWLOCK(tasklist_lock);  /* outer */
-
 // fs/proc/proc_sysctl.c
 const int sysctl_vals[] = { 0, 1, INT_MAX };
 
