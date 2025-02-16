@@ -213,6 +213,7 @@ struct files_struct init_files = {
 
 /* init to 2 - one for init_task, one to ensure it is never freed */
 struct group_info init_groups = { .usage = ATOMIC_INIT(2) };
+EXPORT_SYMBOL(init_groups);
 
 /*
  * The initial credentials for the initial task
@@ -240,6 +241,7 @@ struct cred init_cred = {
     .user_ns        = &init_user_ns,
     .group_info     = &init_groups,
 };
+EXPORT_SYMBOL(init_cred);
 
 /* root_user.__count is 1, for init task cred */
 struct user_struct root_user = {
@@ -250,4 +252,4 @@ struct user_struct root_user = {
     .uid        = GLOBAL_ROOT_UID,
     .ratelimit  = RATELIMIT_STATE_INIT(root_user.ratelimit, 0, 0),
 };
-
+EXPORT_SYMBOL(root_user);

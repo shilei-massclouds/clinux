@@ -476,6 +476,12 @@ static inline void initcall_debug_enable(void)
 }
 #endif
 
+# if THREAD_SIZE >= PAGE_SIZE
+void __init __weak thread_stack_cache_init(void)
+{
+}
+#endif
+
 int
 cl_top_linux_init(void)
 {
@@ -673,6 +679,29 @@ cl_top_linux_init(void)
     calibrate_delay();
     pid_idr_init();
     anon_vma_init();
+#ifdef CONFIG_X86
+    if (efi_enabled(EFI_RUNTIME_SERVICES))
+        efi_enter_virtual_mode();
+#endif
+    thread_stack_cache_init();
+    cred_init();
+    //fork_init();
+    //proc_caches_init();
+    //uts_ns_init();
+    //buffer_init();
+    //key_init();
+    //security_init();
+    //dbg_late_init();
+    //vfs_caches_init();
+    //pagecache_init();
+    //signals_init();
+    //seq_file_init();
+    //proc_root_init();
+    //nsfs_init();
+    //cpuset_init();
+    //cgroup_init();
+    //taskstats_init_early();
+    //delayacct_init();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

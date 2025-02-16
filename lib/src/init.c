@@ -67,6 +67,7 @@ void key_put(struct key *key)
 {
     booter_panic("No impl 'key_put'.");
 }
+EXPORT_SYMBOL(key_put);
 
 void __warn_printk(const char *fmt, ...)
 {

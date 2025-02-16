@@ -54,6 +54,7 @@ components := \
 	page_alloc slub vmalloc mm_util \
 	spinlock semaphore mutex rwsem rcu \
 	inode dcache \
+	cred \
 	early_printk printk panic dump_stack
 	#partitions \
 
