@@ -17,7 +17,7 @@ INCLUDES := -isystem /usr/lib/gcc-cross/riscv64-linux-gnu/11/include -I./arch/ri
 CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-asynchronous-unwind-tables -fno-unwind-tables \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__ \
-	-O2 -Wno-stringop-overflow -Wno-format-truncation \
+	-O2 -Wno-stringop-overflow -Wno-format-truncation -Wno-format-security \
 	-Werror=implicit-function-declaration
 
 AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \

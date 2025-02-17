@@ -1,4 +1,4 @@
 # SPDX-License-Identifier: GPL-2.0
 
 obj_y := init.o
-obj_y += backing-dev.o
+obj_y += file_table.o

@@ -33,6 +33,7 @@
 #include <linux/rmap.h>
 #include <linux/utsname.h>
 #include <linux/buffer_head.h>
+#include <linux/kgdb.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -692,9 +693,9 @@ cl_top_linux_init(void)
     uts_ns_init();
     buffer_init();
     key_init();
-    //security_init();
-    //dbg_late_init();
-    //vfs_caches_init();
+    security_init();
+    dbg_late_init();
+    vfs_caches_init();
     //pagecache_init();
     //signals_init();
     //seq_file_init();

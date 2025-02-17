@@ -77,9 +77,9 @@
 //__cacheline_aligned_in_smp DEFINE_SEQLOCK(rename_lock);
 //
 //EXPORT_SYMBOL(rename_lock);
-//
-//static struct kmem_cache *dentry_cache __read_mostly;
-//
+
+static struct kmem_cache *dentry_cache __read_mostly;
+
 //const struct qstr empty_name = QSTR_INIT("", 0);
 //EXPORT_SYMBOL(empty_name);
 //const struct qstr slash_name = QSTR_INIT("/", 1);
@@ -3179,37 +3179,37 @@ static void __init dcache_init_early(void)
 	d_hash_shift = 32 - d_hash_shift;
 }
 
-//static void __init dcache_init(void)
-//{
-//	/*
-//	 * A constructor could be added for stable state like the lists,
-//	 * but it is probably not worth it because of the cache nature
-//	 * of the dcache.
-//	 */
-//	dentry_cache = KMEM_CACHE_USERCOPY(dentry,
-//		SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|SLAB_MEM_SPREAD|SLAB_ACCOUNT,
-//		d_iname);
-//
-//	/* Hash may have been set up in dcache_init_early */
-//	if (!hashdist)
-//		return;
-//
-//	dentry_hashtable =
-//		alloc_large_system_hash("Dentry cache",
-//					sizeof(struct hlist_bl_head),
-//					dhash_entries,
-//					13,
-//					HASH_ZERO,
-//					&d_hash_shift,
-//					NULL,
-//					0,
-//					0);
-//	d_hash_shift = 32 - d_hash_shift;
-//}
-//
-///* SLAB cache for __getname() consumers */
-//struct kmem_cache *names_cachep __read_mostly;
-//EXPORT_SYMBOL(names_cachep);
+static void __init dcache_init(void)
+{
+	/*
+	 * A constructor could be added for stable state like the lists,
+	 * but it is probably not worth it because of the cache nature
+	 * of the dcache.
+	 */
+	dentry_cache = KMEM_CACHE_USERCOPY(dentry,
+		SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|SLAB_MEM_SPREAD|SLAB_ACCOUNT,
+		d_iname);
+
+	/* Hash may have been set up in dcache_init_early */
+	if (!hashdist)
+		return;
+
+	dentry_hashtable =
+		alloc_large_system_hash("Dentry cache",
+					sizeof(struct hlist_bl_head),
+					dhash_entries,
+					13,
+					HASH_ZERO,
+					&d_hash_shift,
+					NULL,
+					0,
+					0);
+	d_hash_shift = 32 - d_hash_shift;
+}
+
+/* SLAB cache for __getname() consumers */
+struct kmem_cache *names_cachep __read_mostly;
+EXPORT_SYMBOL(names_cachep);
 
 void __init vfs_caches_init_early(void)
 {
@@ -3223,16 +3223,18 @@ void __init vfs_caches_init_early(void)
 }
 EXPORT_SYMBOL(vfs_caches_init_early);
 
-//void __init vfs_caches_init(void)
-//{
-//	names_cachep = kmem_cache_create_usercopy("names_cache", PATH_MAX, 0,
-//			SLAB_HWCACHE_ALIGN|SLAB_PANIC, 0, PATH_MAX, NULL);
-//
-//	dcache_init();
-//	inode_init();
-//	files_init();
-//	files_maxfiles_init();
-//	mnt_init();
-//	bdev_cache_init();
-//	chrdev_init();
-//}
+void __init vfs_caches_init(void)
+{
+	names_cachep = kmem_cache_create_usercopy("names_cache", PATH_MAX, 0,
+			SLAB_HWCACHE_ALIGN|SLAB_PANIC, 0, PATH_MAX, NULL);
+
+	dcache_init();
+	inode_init();
+	files_init();
+	files_maxfiles_init();
+	//mnt_init();
+	//bdev_cache_init();
+	//chrdev_init();
+    printk("============> vfs_caches_init ======> \n");
+}
+EXPORT_SYMBOL(vfs_caches_init);

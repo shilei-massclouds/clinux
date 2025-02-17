@@ -75,9 +75,9 @@ static struct hlist_head *inode_hashtable __read_mostly;
 //
 //static DEFINE_PER_CPU(unsigned long, nr_inodes);
 //static DEFINE_PER_CPU(unsigned long, nr_unused);
-//
-//static struct kmem_cache *inode_cachep __read_mostly;
-//
+
+static struct kmem_cache *inode_cachep __read_mostly;
+
 //static long get_nr_inodes(void)
 //{
 //	int i;
@@ -364,48 +364,48 @@ static struct hlist_head *inode_hashtable __read_mostly;
 //	inode->__i_nlink++;
 //}
 //EXPORT_SYMBOL(inc_nlink);
-//
-//static void __address_space_init_once(struct address_space *mapping)
-//{
-//	xa_init_flags(&mapping->i_pages, XA_FLAGS_LOCK_IRQ | XA_FLAGS_ACCOUNT);
-//	init_rwsem(&mapping->i_mmap_rwsem);
-//	INIT_LIST_HEAD(&mapping->private_list);
-//	spin_lock_init(&mapping->private_lock);
-//	mapping->i_mmap = RB_ROOT_CACHED;
-//}
-//
+
+static void __address_space_init_once(struct address_space *mapping)
+{
+	xa_init_flags(&mapping->i_pages, XA_FLAGS_LOCK_IRQ | XA_FLAGS_ACCOUNT);
+	init_rwsem(&mapping->i_mmap_rwsem);
+	INIT_LIST_HEAD(&mapping->private_list);
+	spin_lock_init(&mapping->private_lock);
+	mapping->i_mmap = RB_ROOT_CACHED;
+}
+
 //void address_space_init_once(struct address_space *mapping)
 //{
 //	memset(mapping, 0, sizeof(*mapping));
 //	__address_space_init_once(mapping);
 //}
 //EXPORT_SYMBOL(address_space_init_once);
-//
-///*
-// * These are initializations that only need to be done
-// * once, because the fields are idempotent across use
-// * of the inode, so let the slab aware of that.
-// */
-//void inode_init_once(struct inode *inode)
-//{
-//	memset(inode, 0, sizeof(*inode));
-//	INIT_HLIST_NODE(&inode->i_hash);
-//	INIT_LIST_HEAD(&inode->i_devices);
-//	INIT_LIST_HEAD(&inode->i_io_list);
-//	INIT_LIST_HEAD(&inode->i_wb_list);
-//	INIT_LIST_HEAD(&inode->i_lru);
-//	__address_space_init_once(&inode->i_data);
-//	i_size_ordered_init(inode);
-//}
-//EXPORT_SYMBOL(inode_init_once);
-//
-//static void init_once(void *foo)
-//{
-//	struct inode *inode = (struct inode *) foo;
-//
-//	inode_init_once(inode);
-//}
-//
+
+/*
+ * These are initializations that only need to be done
+ * once, because the fields are idempotent across use
+ * of the inode, so let the slab aware of that.
+ */
+void inode_init_once(struct inode *inode)
+{
+	memset(inode, 0, sizeof(*inode));
+	INIT_HLIST_NODE(&inode->i_hash);
+	INIT_LIST_HEAD(&inode->i_devices);
+	INIT_LIST_HEAD(&inode->i_io_list);
+	INIT_LIST_HEAD(&inode->i_wb_list);
+	INIT_LIST_HEAD(&inode->i_lru);
+	__address_space_init_once(&inode->i_data);
+	i_size_ordered_init(inode);
+}
+EXPORT_SYMBOL(inode_init_once);
+
+static void init_once(void *foo)
+{
+	struct inode *inode = (struct inode *) foo;
+
+	inode_init_once(inode);
+}
+
 ///*
 // * inode->i_lock must be held
 // */
@@ -2082,32 +2082,33 @@ void __init inode_init_early(void)
 }
 EXPORT_SYMBOL(inode_init_early);
 
-//void __init inode_init(void)
-//{
-//	/* inode slab cache */
-//	inode_cachep = kmem_cache_create("inode_cache",
-//					 sizeof(struct inode),
-//					 0,
-//					 (SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|
-//					 SLAB_MEM_SPREAD|SLAB_ACCOUNT),
-//					 init_once);
-//
-//	/* Hash may have been set up in inode_init_early */
-//	if (!hashdist)
-//		return;
-//
-//	inode_hashtable =
-//		alloc_large_system_hash("Inode-cache",
-//					sizeof(struct hlist_head),
-//					ihash_entries,
-//					14,
-//					HASH_ZERO,
-//					&i_hash_shift,
-//					&i_hash_mask,
-//					0,
-//					0);
-//}
-//
+void __init inode_init(void)
+{
+	/* inode slab cache */
+	inode_cachep = kmem_cache_create("inode_cache",
+					 sizeof(struct inode),
+					 0,
+					 (SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|
+					 SLAB_MEM_SPREAD|SLAB_ACCOUNT),
+					 init_once);
+
+	/* Hash may have been set up in inode_init_early */
+	if (!hashdist)
+		return;
+
+	inode_hashtable =
+		alloc_large_system_hash("Inode-cache",
+					sizeof(struct hlist_head),
+					ihash_entries,
+					14,
+					HASH_ZERO,
+					&i_hash_shift,
+					&i_hash_mask,
+					0,
+					0);
+}
+EXPORT_SYMBOL(inode_init);
+
 //void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
 //{
 //	inode->i_mode = mode;
