@@ -38,7 +38,7 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter lib math radix_tree idr xarray \
+	prebuilt booter lib math radix_tree idr xarray assoc_array \
 	kasprintf random crypto \
 	traps irq softirq \
 	kobject driver_base \
@@ -47,7 +47,7 @@ components := \
 	early_fdt params module patch maccess \
 	clocksource pid \
 	cpu task cgroup resource dma \
-	jump_label extable vdso utsname \
+	jump_label extable vdso utsname keys \
 	early_sched sched \
 	percpu workqueue_itf workqueue notifier \
 	memblock bootmem paging rmap \

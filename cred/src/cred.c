@@ -149,7 +149,6 @@ void __put_cred(struct cred *cred)
 	else
 		call_rcu(&cred->rcu, put_cred_rcu);
 }
-EXPORT_SYMBOL(__put_cred);
 
 /*
  * Clean up a task's credentials when it exits
@@ -291,7 +290,6 @@ error:
 	abort_creds(new);
 	return NULL;
 }
-EXPORT_SYMBOL(prepare_creds);
 
 /*
  * Prepare credentials for current to perform an execve()
@@ -511,7 +509,6 @@ int commit_creds(struct cred *new)
 	put_cred(old);
 	return 0;
 }
-EXPORT_SYMBOL(commit_creds);
 
 /**
  * abort_creds - Discard a set of credentials and unlock the current task

@@ -691,7 +691,7 @@ cl_top_linux_init(void)
     proc_caches_init();
     uts_ns_init();
     buffer_init();
-    //key_init();
+    key_init();
     //security_init();
     //dbg_late_init();
     //vfs_caches_init();

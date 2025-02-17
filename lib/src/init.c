@@ -63,7 +63,7 @@ bool ns_capable(struct user_namespace *ns, int cap)
 }
 EXPORT_SYMBOL(ns_capable);
 
-void key_put(struct key *key)
+void __weak key_put(struct key *key)
 {
     booter_panic("No impl 'key_put'.");
 }

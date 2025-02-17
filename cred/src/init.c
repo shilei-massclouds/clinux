@@ -21,6 +21,7 @@ int create_user_ns(struct cred *new)
     booter_panic("No impl.\n");
 }
 
+/*
 void key_fsgid_changed(struct cred *new_cred)
 {
     booter_panic("No impl.\n");
@@ -29,16 +30,15 @@ void key_fsuid_changed(struct cred *new_cred)
 {
     booter_panic("No impl.\n");
 }
-/*
 void key_put(struct key *key)
 {
     booter_panic("No impl.\n");
 }
-*/
 int install_thread_keyring_to_cred(struct cred *new)
 {
     booter_panic("No impl.\n");
 }
+*/
 void set_dumpable(struct mm_struct *mm, int value)
 {
     booter_panic("No impl.\n");
