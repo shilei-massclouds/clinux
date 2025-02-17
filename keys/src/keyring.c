@@ -65,6 +65,7 @@ void key_free_user_ns(struct user_namespace *ns)
 	key_put(ns->persistent_keyring_register);
 #endif
 }
+EXPORT_SYMBOL(key_free_user_ns);
 
 /*
  * The keyring key type definition.  Keyrings are simply keys of this type and

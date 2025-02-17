@@ -54,7 +54,7 @@ components := \
 	page_alloc slub vmalloc mm_util \
 	spinlock semaphore mutex rwsem rcu \
 	inode dcache \
-	cred nsproxy \
+	cred user_namespace nsproxy \
 	fork mmap \
 	buffer \
 	early_printk printk panic dump_stack

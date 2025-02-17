@@ -8,6 +8,7 @@
 #include <linux/irq.h>
 #include <linux/module.h>
 #include <linux/fs.h>
+#include <linux/user_namespace.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -207,3 +208,25 @@ int fasync_helper(int fd, struct file * filp, int on, struct fasync_struct **fap
     booter_panic("No impl in 'lib'.");
 }
 EXPORT_SYMBOL(fasync_helper);
+
+struct ucounts *inc_ucount(struct user_namespace *ns, kuid_t uid,
+               enum ucount_type type)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(inc_ucount);
+void dec_ucount(struct ucounts *ucounts, enum ucount_type type)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(dec_ucount);
+void proc_free_inum(unsigned int inum)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(proc_free_inum);
+int proc_alloc_inum(unsigned int *inum)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(proc_alloc_inum);

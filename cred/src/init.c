@@ -16,10 +16,12 @@ EXPORT_SYMBOL(cl_cred_init);
 
 int suid_dumpable = 0;
 
+/*
 int create_user_ns(struct cred *new)
 {
     booter_panic("No impl.\n");
 }
+*/
 
 /*
 void key_fsgid_changed(struct cred *new_cred)

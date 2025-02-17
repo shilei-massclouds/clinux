@@ -38,6 +38,7 @@ struct subprocess_info *call_usermodehelper_setup(const char *path, char **argv,
 {
     booter_panic("No impl!\n");
 }
+/*
 gid_t from_kgid(struct user_namespace *to, kgid_t kgid)
 {
     booter_panic("No impl!\n");
@@ -46,10 +47,13 @@ uid_t from_kuid(struct user_namespace *to, kuid_t kuid)
 {
     booter_panic("No impl!\n");
 }
+*/
 void *kmemdup(const void *src, size_t len, gfp_t gfp)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(kmemdup);
+
 bool refcount_dec_and_lock(refcount_t *r, spinlock_t *lock)
 {
     booter_panic("No impl!\n");
