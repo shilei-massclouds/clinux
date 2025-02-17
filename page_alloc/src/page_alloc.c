@@ -317,8 +317,8 @@ int watermark_boost_factor __read_mostly = 15000;
 #endif
 int watermark_scale_factor = 10;
 
-static unsigned long nr_kernel_pages __initdata;
-static unsigned long nr_all_pages __initdata;
+extern unsigned long nr_kernel_pages __initdata;
+extern unsigned long nr_all_pages __initdata;
 //static unsigned long dma_reserve __initdata;
 //
 //static unsigned long arch_zone_lowest_possible_pfn[MAX_NR_ZONES] __initdata;
