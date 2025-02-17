@@ -257,3 +257,9 @@ EXPORT_SYMBOL(root_user);
 // From kernel/fork.c
 __cacheline_aligned DEFINE_RWLOCK(tasklist_lock);  /* outer */
 EXPORT_SYMBOL(tasklist_lock);
+
+void __weak key_put(struct key *key)
+{
+    booter_panic("No impl 'key_put'.");
+}
+EXPORT_SYMBOL(key_put);

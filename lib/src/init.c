@@ -63,12 +63,6 @@ bool ns_capable(struct user_namespace *ns, int cap)
 }
 EXPORT_SYMBOL(ns_capable);
 
-void __weak key_put(struct key *key)
-{
-    booter_panic("No impl 'key_put'.");
-}
-EXPORT_SYMBOL(key_put);
-
 void __warn_printk(const char *fmt, ...)
 {
     sbi_puts("[RAW_WARN] ");
