@@ -2539,58 +2539,60 @@ skip:
 //		cond_resched();
 //}
 //EXPORT_SYMBOL(console_conditional_schedule);
-//
-//void console_unblank(void)
-//{
-//	struct console *c;
-//
-//	/*
-//	 * console_unblank can no longer be called in interrupt context unless
-//	 * oops_in_progress is set to 1..
-//	 */
-//	if (oops_in_progress) {
-//		if (down_trylock_console_sem() != 0)
-//			return;
-//	} else
-//		console_lock();
-//
-//	console_locked = 1;
-//	console_may_schedule = 0;
-//	for_each_console(c)
-//		if ((c->flags & CON_ENABLED) && c->unblank)
-//			c->unblank();
-//	console_unlock();
-//}
-//
-///**
-// * console_flush_on_panic - flush console content on panic
-// * @mode: flush all messages in buffer or just the pending ones
-// *
-// * Immediately output all pending messages no matter what.
-// */
-//void console_flush_on_panic(enum con_flush_mode mode)
-//{
-//	/*
-//	 * If someone else is holding the console lock, trylock will fail
-//	 * and may_schedule may be set.  Ignore and proceed to unlock so
-//	 * that messages are flushed out.  As this can be called from any
-//	 * context and we don't want to get preempted while flushing,
-//	 * ensure may_schedule is cleared.
-//	 */
-//	console_trylock();
-//	console_may_schedule = 0;
-//
-//	if (mode == CONSOLE_REPLAY_ALL) {
-//		unsigned long flags;
-//
-//		logbuf_lock_irqsave(flags);
-//		console_seq = log_first_seq;
-//		console_idx = log_first_idx;
-//		logbuf_unlock_irqrestore(flags);
-//	}
-//	console_unlock();
-//}
-//
+
+void console_unblank(void)
+{
+	struct console *c;
+
+	/*
+	 * console_unblank can no longer be called in interrupt context unless
+	 * oops_in_progress is set to 1..
+	 */
+	if (oops_in_progress) {
+		if (down_trylock_console_sem() != 0)
+			return;
+	} else
+		console_lock();
+
+	console_locked = 1;
+	console_may_schedule = 0;
+	for_each_console(c)
+		if ((c->flags & CON_ENABLED) && c->unblank)
+			c->unblank();
+	console_unlock();
+}
+EXPORT_SYMBOL(console_unblank);
+
+/**
+ * console_flush_on_panic - flush console content on panic
+ * @mode: flush all messages in buffer or just the pending ones
+ *
+ * Immediately output all pending messages no matter what.
+ */
+void console_flush_on_panic(enum con_flush_mode mode)
+{
+	/*
+	 * If someone else is holding the console lock, trylock will fail
+	 * and may_schedule may be set.  Ignore and proceed to unlock so
+	 * that messages are flushed out.  As this can be called from any
+	 * context and we don't want to get preempted while flushing,
+	 * ensure may_schedule is cleared.
+	 */
+	console_trylock();
+	console_may_schedule = 0;
+
+	if (mode == CONSOLE_REPLAY_ALL) {
+		unsigned long flags;
+
+		logbuf_lock_irqsave(flags);
+		console_seq = log_first_seq;
+		console_idx = log_first_idx;
+		logbuf_unlock_irqrestore(flags);
+	}
+	console_unlock();
+}
+EXPORT_SYMBOL(console_flush_on_panic);
+
 ///*
 // * Return the console tty driver structure and its associated index
 // */

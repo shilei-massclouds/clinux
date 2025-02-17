@@ -45,25 +45,13 @@ void emergency_restart(void)
     booter_panic("No impl!\n");
 }
 
-void console_unblank(void)
-{
-    sbi_puts("========================== console_unblank\n");
-    //booter_panic("No impl!\n");
-}
-
 /*
-void unblank_screen(void)
-{
-    sbi_puts("========================== unblank_screen\n");
-    //booter_panic("No impl!\n");
-}
-*/
-
 void console_flush_on_panic(enum con_flush_mode mode)
 {
     sbi_puts("========================== console_flush_on_panic\n");
     //booter_panic("No impl!\n");
 }
+*/
 
 __weak void kmsg_dump(enum kmsg_dump_reason reason)
 {
