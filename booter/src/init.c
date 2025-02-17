@@ -77,6 +77,15 @@ void __weak panic(const char *fmt, ...)
 }
 EXPORT_SYMBOL(panic);
 
+__weak void __warn_printk(const char *fmt, ...)
+{
+    sbi_puts("[RAW_WARN_PRINTK] ");
+    sbi_puts(fmt);
+    sbi_puts("\n");
+    sbi_shutdown();
+}
+EXPORT_SYMBOL(__warn_printk);
+
 void sysfs_remove_link(struct kobject *kobj, const char *name)
 {
     booter_panic("No impl 'slub'.");
@@ -236,3 +245,9 @@ __weak void *__vmalloc(unsigned long size, gfp_t gfp_mask)
     booter_panic("No impl 'percpu'.");
 }
 EXPORT_SYMBOL(__vmalloc);
+
+__weak void show_mem(unsigned int filter, nodemask_t *nodemask)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(show_mem);

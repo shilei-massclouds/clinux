@@ -2,3 +2,4 @@
 
 obj_y := init.o
 obj_y += panic.o
+obj_y += bust_spinlocks.o

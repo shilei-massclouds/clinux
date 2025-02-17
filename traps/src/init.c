@@ -39,10 +39,12 @@ void *sys_call_table[__NR_syscalls];
 // NOTE: implement it!!!!!!!!!!!!!!!!
 int panic_on_oops = CONFIG_PANIC_ON_OOPS_VALUE;
 
+/*
 void bust_spinlocks(int yes)
 {
     booter_panic("No impl!\n");
 }
+*/
 void oops_enter(void)
 {
     booter_panic("No impl!\n");

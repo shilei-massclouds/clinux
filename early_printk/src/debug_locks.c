@@ -14,7 +14,6 @@
 #include <linux/export.h>
 #include <linux/spinlock.h>
 #include <linux/debug_locks.h>
-#include "../../booter/src/booter.h"
 
 /*
  * We want to turn all lock-debugging facilities on/off at once,
@@ -41,8 +40,7 @@ noinstr int debug_locks_off(void)
 {
 	if (debug_locks && __debug_locks_off()) {
 		if (!debug_locks_silent) {
-			//console_verbose();
-            booter_panic("debug_locks_off");
+			console_verbose();
 			return 1;
 		}
 	}

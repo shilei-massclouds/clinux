@@ -33,9 +33,9 @@
 #include <linux/debugfs.h>
 #include <asm/sections.h>
 
-//#define PANIC_TIMER_STEP 100
-//#define PANIC_BLINK_SPD 18
-//
+#define PANIC_TIMER_STEP 100
+#define PANIC_BLINK_SPD 18
+
 //#ifdef CONFIG_SMP
 ///*
 // * Should we dump all CPUs backtraces in an oops event?
@@ -50,45 +50,45 @@ static unsigned long tainted_mask =
 //static int pause_on_oops;
 //static int pause_on_oops_flag;
 //static DEFINE_SPINLOCK(pause_on_oops_lock);
-//bool crash_kexec_post_notifiers;
+bool crash_kexec_post_notifiers;
 int panic_on_warn __read_mostly;
 EXPORT_SYMBOL(panic_on_warn);
 //unsigned long panic_on_taint;
 //bool panic_on_taint_nousertaint = false;
-//
-//int panic_timeout = CONFIG_PANIC_TIMEOUT;
-//EXPORT_SYMBOL_GPL(panic_timeout);
-//
-//#define PANIC_PRINT_TASK_INFO		0x00000001
-//#define PANIC_PRINT_MEM_INFO		0x00000002
-//#define PANIC_PRINT_TIMER_INFO		0x00000004
-//#define PANIC_PRINT_LOCK_INFO		0x00000008
-//#define PANIC_PRINT_FTRACE_INFO		0x00000010
-//#define PANIC_PRINT_ALL_PRINTK_MSG	0x00000020
-//unsigned long panic_print;
-//
-//ATOMIC_NOTIFIER_HEAD(panic_notifier_list);
-//
-//EXPORT_SYMBOL(panic_notifier_list);
-//
-//static long no_blink(int state)
-//{
-//	return 0;
-//}
-//
-///* Returns how long it waited in ms */
-//long (*panic_blink)(int state);
-//EXPORT_SYMBOL(panic_blink);
-//
-///*
-// * Stop ourself in panic -- architecture code may override this
-// */
-//void __weak panic_smp_self_stop(void)
-//{
-//	while (1)
-//		cpu_relax();
-//}
-//
+
+int panic_timeout = CONFIG_PANIC_TIMEOUT;
+EXPORT_SYMBOL_GPL(panic_timeout);
+
+#define PANIC_PRINT_TASK_INFO		0x00000001
+#define PANIC_PRINT_MEM_INFO		0x00000002
+#define PANIC_PRINT_TIMER_INFO		0x00000004
+#define PANIC_PRINT_LOCK_INFO		0x00000008
+#define PANIC_PRINT_FTRACE_INFO		0x00000010
+#define PANIC_PRINT_ALL_PRINTK_MSG	0x00000020
+unsigned long panic_print;
+
+ATOMIC_NOTIFIER_HEAD(panic_notifier_list);
+
+EXPORT_SYMBOL(panic_notifier_list);
+
+static long no_blink(int state)
+{
+	return 0;
+}
+
+/* Returns how long it waited in ms */
+long (*panic_blink)(int state);
+EXPORT_SYMBOL(panic_blink);
+
+/*
+ * Stop ourself in panic -- architecture code may override this
+ */
+void __weak panic_smp_self_stop(void)
+{
+	while (1)
+		cpu_relax();
+}
+
 ///*
 // * Stop ourselves in NMI context if another CPU has already panicked. Arch code
 // * may override this to prepare for crash dumping, e.g. save regs info.
@@ -97,35 +97,35 @@ EXPORT_SYMBOL(panic_on_warn);
 //{
 //	panic_smp_self_stop();
 //}
-//
-///*
-// * Stop other CPUs in panic.  Architecture dependent code may override this
-// * with more suitable version.  For example, if the architecture supports
-// * crash dump, it should save registers of each stopped CPU and disable
-// * per-CPU features such as virtualization extensions.
-// */
-//void __weak crash_smp_send_stop(void)
-//{
-//	static int cpus_stopped;
-//
-//	/*
-//	 * This function can be called twice in panic path, but obviously
-//	 * we execute this only once.
-//	 */
-//	if (cpus_stopped)
-//		return;
-//
-//	/*
-//	 * Note smp_send_stop is the usual smp shutdown function, which
-//	 * unfortunately means it may not be hardened to work in a panic
-//	 * situation.
-//	 */
-//	smp_send_stop();
-//	cpus_stopped = 1;
-//}
-//
-//atomic_t panic_cpu = ATOMIC_INIT(PANIC_CPU_INVALID);
-//
+
+/*
+ * Stop other CPUs in panic.  Architecture dependent code may override this
+ * with more suitable version.  For example, if the architecture supports
+ * crash dump, it should save registers of each stopped CPU and disable
+ * per-CPU features such as virtualization extensions.
+ */
+void __weak crash_smp_send_stop(void)
+{
+	static int cpus_stopped;
+
+	/*
+	 * This function can be called twice in panic path, but obviously
+	 * we execute this only once.
+	 */
+	if (cpus_stopped)
+		return;
+
+	/*
+	 * Note smp_send_stop is the usual smp shutdown function, which
+	 * unfortunately means it may not be hardened to work in a panic
+	 * situation.
+	 */
+	smp_send_stop();
+	cpus_stopped = 1;
+}
+
+atomic_t panic_cpu = ATOMIC_INIT(PANIC_CPU_INVALID);
+
 ///*
 // * A variant of panic() called from NMI context. We return if we've already
 // * panicked on this CPU. If another CPU already panicked, loop in
@@ -145,249 +145,249 @@ EXPORT_SYMBOL(panic_on_warn);
 //		nmi_panic_self_stop(regs);
 //}
 //EXPORT_SYMBOL(nmi_panic);
-//
-//static void panic_print_sys_info(void)
-//{
-//	if (panic_print & PANIC_PRINT_ALL_PRINTK_MSG)
-//		console_flush_on_panic(CONSOLE_REPLAY_ALL);
-//
-//	if (panic_print & PANIC_PRINT_TASK_INFO)
-//		show_state();
-//
-//	if (panic_print & PANIC_PRINT_MEM_INFO)
-//		show_mem(0, NULL);
-//
-//	if (panic_print & PANIC_PRINT_TIMER_INFO)
-//		sysrq_timer_list_show();
-//
-//	if (panic_print & PANIC_PRINT_LOCK_INFO)
-//		debug_show_all_locks();
-//
-//	if (panic_print & PANIC_PRINT_FTRACE_INFO)
-//		ftrace_dump(DUMP_ALL);
-//}
-//
-///**
-// *	panic - halt the system
-// *	@fmt: The text string to print
-// *
-// *	Display a message, then perform cleanups.
-// *
-// *	This function never returns.
-// */
-//void panic(const char *fmt, ...)
-//{
-//	static char buf[1024];
-//	va_list args;
-//	long i, i_next = 0, len;
-//	int state = 0;
-//	int old_cpu, this_cpu;
-//	bool _crash_kexec_post_notifiers = crash_kexec_post_notifiers;
-//
-//	/*
-//	 * Disable local interrupts. This will prevent panic_smp_self_stop
-//	 * from deadlocking the first cpu that invokes the panic, since
-//	 * there is nothing to prevent an interrupt handler (that runs
-//	 * after setting panic_cpu) from invoking panic() again.
-//	 */
-//	local_irq_disable();
-//	preempt_disable_notrace();
-//
-//	/*
-//	 * It's possible to come here directly from a panic-assertion and
-//	 * not have preempt disabled. Some functions called from here want
-//	 * preempt to be disabled. No point enabling it later though...
-//	 *
-//	 * Only one CPU is allowed to execute the panic code from here. For
-//	 * multiple parallel invocations of panic, all other CPUs either
-//	 * stop themself or will wait until they are stopped by the 1st CPU
-//	 * with smp_send_stop().
-//	 *
-//	 * `old_cpu == PANIC_CPU_INVALID' means this is the 1st CPU which
-//	 * comes here, so go ahead.
-//	 * `old_cpu == this_cpu' means we came from nmi_panic() which sets
-//	 * panic_cpu to this CPU.  In this case, this is also the 1st CPU.
-//	 */
-//	this_cpu = raw_smp_processor_id();
-//	old_cpu  = atomic_cmpxchg(&panic_cpu, PANIC_CPU_INVALID, this_cpu);
-//
-//	if (old_cpu != PANIC_CPU_INVALID && old_cpu != this_cpu)
-//		panic_smp_self_stop();
-//
-//	console_verbose();
-//	bust_spinlocks(1);
-//	va_start(args, fmt);
-//	len = vscnprintf(buf, sizeof(buf), fmt, args);
-//	va_end(args);
-//
-//	if (len && buf[len - 1] == '\n')
-//		buf[len - 1] = '\0';
-//
-//	pr_emerg("Kernel panic - not syncing: %s\n", buf);
-//#ifdef CONFIG_DEBUG_BUGVERBOSE
-//	/*
-//	 * Avoid nested stack-dumping if a panic occurs during oops processing
-//	 */
-//	if (!test_taint(TAINT_DIE) && oops_in_progress <= 1)
-//		dump_stack();
-//#endif
-//
-//	/*
-//	 * If kgdb is enabled, give it a chance to run before we stop all
-//	 * the other CPUs or else we won't be able to debug processes left
-//	 * running on them.
-//	 */
-//	kgdb_panic(buf);
-//
-//	/*
-//	 * If we have crashed and we have a crash kernel loaded let it handle
-//	 * everything else.
-//	 * If we want to run this after calling panic_notifiers, pass
-//	 * the "crash_kexec_post_notifiers" option to the kernel.
-//	 *
-//	 * Bypass the panic_cpu check and call __crash_kexec directly.
-//	 */
-//	if (!_crash_kexec_post_notifiers) {
-//		printk_safe_flush_on_panic();
-//		__crash_kexec(NULL);
-//
-//		/*
-//		 * Note smp_send_stop is the usual smp shutdown function, which
-//		 * unfortunately means it may not be hardened to work in a
-//		 * panic situation.
-//		 */
-//		smp_send_stop();
-//	} else {
-//		/*
-//		 * If we want to do crash dump after notifier calls and
-//		 * kmsg_dump, we will need architecture dependent extra
-//		 * works in addition to stopping other CPUs.
-//		 */
-//		crash_smp_send_stop();
-//	}
-//
-//	/*
-//	 * Run any panic handlers, including those that might need to
-//	 * add information to the kmsg dump output.
-//	 */
-//	atomic_notifier_call_chain(&panic_notifier_list, 0, buf);
-//
-//	/* Call flush even twice. It tries harder with a single online CPU */
-//	printk_safe_flush_on_panic();
-//	kmsg_dump(KMSG_DUMP_PANIC);
-//
-//	/*
-//	 * If you doubt kdump always works fine in any situation,
-//	 * "crash_kexec_post_notifiers" offers you a chance to run
-//	 * panic_notifiers and dumping kmsg before kdump.
-//	 * Note: since some panic_notifiers can make crashed kernel
-//	 * more unstable, it can increase risks of the kdump failure too.
-//	 *
-//	 * Bypass the panic_cpu check and call __crash_kexec directly.
-//	 */
-//	if (_crash_kexec_post_notifiers)
-//		__crash_kexec(NULL);
-//
-//#ifdef CONFIG_VT
-//	unblank_screen();
-//#endif
-//	console_unblank();
-//
-//	/*
-//	 * We may have ended up stopping the CPU holding the lock (in
-//	 * smp_send_stop()) while still having some valuable data in the console
-//	 * buffer.  Try to acquire the lock then release it regardless of the
-//	 * result.  The release will also print the buffers out.  Locks debug
-//	 * should be disabled to avoid reporting bad unlock balance when
-//	 * panic() is not being callled from OOPS.
-//	 */
-//	debug_locks_off();
-//	console_flush_on_panic(CONSOLE_FLUSH_PENDING);
-//
-//	panic_print_sys_info();
-//
-//	if (!panic_blink)
-//		panic_blink = no_blink;
-//
-//	if (panic_timeout > 0) {
-//		/*
-//		 * Delay timeout seconds before rebooting the machine.
-//		 * We can't use the "normal" timers since we just panicked.
-//		 */
-//		pr_emerg("Rebooting in %d seconds..\n", panic_timeout);
-//
-//		for (i = 0; i < panic_timeout * 1000; i += PANIC_TIMER_STEP) {
-//			touch_nmi_watchdog();
-//			if (i >= i_next) {
-//				i += panic_blink(state ^= 1);
-//				i_next = i + 3600 / PANIC_BLINK_SPD;
-//			}
-//			mdelay(PANIC_TIMER_STEP);
-//		}
-//	}
-//	if (panic_timeout != 0) {
-//		/*
-//		 * This will not be a clean reboot, with everything
-//		 * shutting down.  But if there is a chance of
-//		 * rebooting the system it will be rebooted.
-//		 */
-//		if (panic_reboot_mode != REBOOT_UNDEFINED)
-//			reboot_mode = panic_reboot_mode;
-//		emergency_restart();
-//	}
-//#ifdef __sparc__
-//	{
-//		extern int stop_a_enabled;
-//		/* Make sure the user can actually press Stop-A (L1-A) */
-//		stop_a_enabled = 1;
-//		pr_emerg("Press Stop-A (L1-A) from sun keyboard or send break\n"
-//			 "twice on console to return to the boot prom\n");
-//	}
-//#endif
-//#if defined(CONFIG_S390)
-//	disabled_wait();
-//#endif
-//	pr_emerg("---[ end Kernel panic - not syncing: %s ]---\n", buf);
-//
-//	/* Do not scroll important messages printed above */
-//	suppress_printk = 1;
-//	local_irq_enable();
-//	for (i = 0; ; i += PANIC_TIMER_STEP) {
-//		touch_softlockup_watchdog();
-//		if (i >= i_next) {
-//			i += panic_blink(state ^= 1);
-//			i_next = i + 3600 / PANIC_BLINK_SPD;
-//		}
-//		mdelay(PANIC_TIMER_STEP);
-//	}
-//}
-//
+
+static void panic_print_sys_info(void)
+{
+	if (panic_print & PANIC_PRINT_ALL_PRINTK_MSG)
+		console_flush_on_panic(CONSOLE_REPLAY_ALL);
+
+	if (panic_print & PANIC_PRINT_TASK_INFO)
+		show_state();
+
+	if (panic_print & PANIC_PRINT_MEM_INFO)
+		show_mem(0, NULL);
+
+	if (panic_print & PANIC_PRINT_TIMER_INFO)
+		sysrq_timer_list_show();
+
+	if (panic_print & PANIC_PRINT_LOCK_INFO)
+		debug_show_all_locks();
+
+	if (panic_print & PANIC_PRINT_FTRACE_INFO)
+		ftrace_dump(DUMP_ALL);
+}
+
+/**
+ *	panic - halt the system
+ *	@fmt: The text string to print
+ *
+ *	Display a message, then perform cleanups.
+ *
+ *	This function never returns.
+ */
+void panic(const char *fmt, ...)
+{
+	static char buf[1024];
+	va_list args;
+	long i, i_next = 0, len;
+	int state = 0;
+	int old_cpu, this_cpu;
+	bool _crash_kexec_post_notifiers = crash_kexec_post_notifiers;
+
+	/*
+	 * Disable local interrupts. This will prevent panic_smp_self_stop
+	 * from deadlocking the first cpu that invokes the panic, since
+	 * there is nothing to prevent an interrupt handler (that runs
+	 * after setting panic_cpu) from invoking panic() again.
+	 */
+	local_irq_disable();
+	preempt_disable_notrace();
+
+	/*
+	 * It's possible to come here directly from a panic-assertion and
+	 * not have preempt disabled. Some functions called from here want
+	 * preempt to be disabled. No point enabling it later though...
+	 *
+	 * Only one CPU is allowed to execute the panic code from here. For
+	 * multiple parallel invocations of panic, all other CPUs either
+	 * stop themself or will wait until they are stopped by the 1st CPU
+	 * with smp_send_stop().
+	 *
+	 * `old_cpu == PANIC_CPU_INVALID' means this is the 1st CPU which
+	 * comes here, so go ahead.
+	 * `old_cpu == this_cpu' means we came from nmi_panic() which sets
+	 * panic_cpu to this CPU.  In this case, this is also the 1st CPU.
+	 */
+	this_cpu = raw_smp_processor_id();
+	old_cpu  = atomic_cmpxchg(&panic_cpu, PANIC_CPU_INVALID, this_cpu);
+
+	if (old_cpu != PANIC_CPU_INVALID && old_cpu != this_cpu)
+		panic_smp_self_stop();
+
+	console_verbose();
+	bust_spinlocks(1);
+	va_start(args, fmt);
+	len = vscnprintf(buf, sizeof(buf), fmt, args);
+	va_end(args);
+
+	if (len && buf[len - 1] == '\n')
+		buf[len - 1] = '\0';
+
+	pr_emerg("Kernel panic - not syncing: %s\n", buf);
+#ifdef CONFIG_DEBUG_BUGVERBOSE
+	/*
+	 * Avoid nested stack-dumping if a panic occurs during oops processing
+	 */
+	if (!test_taint(TAINT_DIE) && oops_in_progress <= 1)
+		dump_stack();
+#endif
+
+	/*
+	 * If kgdb is enabled, give it a chance to run before we stop all
+	 * the other CPUs or else we won't be able to debug processes left
+	 * running on them.
+	 */
+	kgdb_panic(buf);
+
+	/*
+	 * If we have crashed and we have a crash kernel loaded let it handle
+	 * everything else.
+	 * If we want to run this after calling panic_notifiers, pass
+	 * the "crash_kexec_post_notifiers" option to the kernel.
+	 *
+	 * Bypass the panic_cpu check and call __crash_kexec directly.
+	 */
+	if (!_crash_kexec_post_notifiers) {
+		printk_safe_flush_on_panic();
+		__crash_kexec(NULL);
+
+		/*
+		 * Note smp_send_stop is the usual smp shutdown function, which
+		 * unfortunately means it may not be hardened to work in a
+		 * panic situation.
+		 */
+		smp_send_stop();
+	} else {
+		/*
+		 * If we want to do crash dump after notifier calls and
+		 * kmsg_dump, we will need architecture dependent extra
+		 * works in addition to stopping other CPUs.
+		 */
+		crash_smp_send_stop();
+	}
+
+	/*
+	 * Run any panic handlers, including those that might need to
+	 * add information to the kmsg dump output.
+	 */
+	atomic_notifier_call_chain(&panic_notifier_list, 0, buf);
+
+	/* Call flush even twice. It tries harder with a single online CPU */
+	printk_safe_flush_on_panic();
+	kmsg_dump(KMSG_DUMP_PANIC);
+
+	/*
+	 * If you doubt kdump always works fine in any situation,
+	 * "crash_kexec_post_notifiers" offers you a chance to run
+	 * panic_notifiers and dumping kmsg before kdump.
+	 * Note: since some panic_notifiers can make crashed kernel
+	 * more unstable, it can increase risks of the kdump failure too.
+	 *
+	 * Bypass the panic_cpu check and call __crash_kexec directly.
+	 */
+	if (_crash_kexec_post_notifiers)
+		__crash_kexec(NULL);
+
+#ifdef CONFIG_VT
+	unblank_screen();
+#endif
+	console_unblank();
+
+	/*
+	 * We may have ended up stopping the CPU holding the lock (in
+	 * smp_send_stop()) while still having some valuable data in the console
+	 * buffer.  Try to acquire the lock then release it regardless of the
+	 * result.  The release will also print the buffers out.  Locks debug
+	 * should be disabled to avoid reporting bad unlock balance when
+	 * panic() is not being callled from OOPS.
+	 */
+	debug_locks_off();
+	console_flush_on_panic(CONSOLE_FLUSH_PENDING);
+
+	panic_print_sys_info();
+
+	if (!panic_blink)
+		panic_blink = no_blink;
+
+	if (panic_timeout > 0) {
+		/*
+		 * Delay timeout seconds before rebooting the machine.
+		 * We can't use the "normal" timers since we just panicked.
+		 */
+		pr_emerg("Rebooting in %d seconds..\n", panic_timeout);
+
+		for (i = 0; i < panic_timeout * 1000; i += PANIC_TIMER_STEP) {
+			touch_nmi_watchdog();
+			if (i >= i_next) {
+				i += panic_blink(state ^= 1);
+				i_next = i + 3600 / PANIC_BLINK_SPD;
+			}
+			mdelay(PANIC_TIMER_STEP);
+		}
+	}
+	if (panic_timeout != 0) {
+		/*
+		 * This will not be a clean reboot, with everything
+		 * shutting down.  But if there is a chance of
+		 * rebooting the system it will be rebooted.
+		 */
+		if (panic_reboot_mode != REBOOT_UNDEFINED)
+			reboot_mode = panic_reboot_mode;
+		emergency_restart();
+	}
+#ifdef __sparc__
+	{
+		extern int stop_a_enabled;
+		/* Make sure the user can actually press Stop-A (L1-A) */
+		stop_a_enabled = 1;
+		pr_emerg("Press Stop-A (L1-A) from sun keyboard or send break\n"
+			 "twice on console to return to the boot prom\n");
+	}
+#endif
+#if defined(CONFIG_S390)
+	disabled_wait();
+#endif
+	pr_emerg("---[ end Kernel panic - not syncing: %s ]---\n", buf);
+
+	/* Do not scroll important messages printed above */
+	suppress_printk = 1;
+	local_irq_enable();
+	for (i = 0; ; i += PANIC_TIMER_STEP) {
+		touch_softlockup_watchdog();
+		if (i >= i_next) {
+			i += panic_blink(state ^= 1);
+			i_next = i + 3600 / PANIC_BLINK_SPD;
+		}
+		mdelay(PANIC_TIMER_STEP);
+	}
+}
+
 //EXPORT_SYMBOL(panic);
-//
-///*
-// * TAINT_FORCED_RMMOD could be a per-module flag but the module
-// * is being removed anyway.
-// */
-//const struct taint_flag taint_flags[TAINT_FLAGS_COUNT] = {
-//	[ TAINT_PROPRIETARY_MODULE ]	= { 'P', 'G', true },
-//	[ TAINT_FORCED_MODULE ]		= { 'F', ' ', true },
-//	[ TAINT_CPU_OUT_OF_SPEC ]	= { 'S', ' ', false },
-//	[ TAINT_FORCED_RMMOD ]		= { 'R', ' ', false },
-//	[ TAINT_MACHINE_CHECK ]		= { 'M', ' ', false },
-//	[ TAINT_BAD_PAGE ]		= { 'B', ' ', false },
-//	[ TAINT_USER ]			= { 'U', ' ', false },
-//	[ TAINT_DIE ]			= { 'D', ' ', false },
-//	[ TAINT_OVERRIDDEN_ACPI_TABLE ]	= { 'A', ' ', false },
-//	[ TAINT_WARN ]			= { 'W', ' ', false },
-//	[ TAINT_CRAP ]			= { 'C', ' ', true },
-//	[ TAINT_FIRMWARE_WORKAROUND ]	= { 'I', ' ', false },
-//	[ TAINT_OOT_MODULE ]		= { 'O', ' ', true },
-//	[ TAINT_UNSIGNED_MODULE ]	= { 'E', ' ', true },
-//	[ TAINT_SOFTLOCKUP ]		= { 'L', ' ', false },
-//	[ TAINT_LIVEPATCH ]		= { 'K', ' ', true },
-//	[ TAINT_AUX ]			= { 'X', ' ', true },
-//	[ TAINT_RANDSTRUCT ]		= { 'T', ' ', true },
-//};
+
+/*
+ * TAINT_FORCED_RMMOD could be a per-module flag but the module
+ * is being removed anyway.
+ */
+const struct taint_flag taint_flags[TAINT_FLAGS_COUNT] = {
+	[ TAINT_PROPRIETARY_MODULE ]	= { 'P', 'G', true },
+	[ TAINT_FORCED_MODULE ]		= { 'F', ' ', true },
+	[ TAINT_CPU_OUT_OF_SPEC ]	= { 'S', ' ', false },
+	[ TAINT_FORCED_RMMOD ]		= { 'R', ' ', false },
+	[ TAINT_MACHINE_CHECK ]		= { 'M', ' ', false },
+	[ TAINT_BAD_PAGE ]		= { 'B', ' ', false },
+	[ TAINT_USER ]			= { 'U', ' ', false },
+	[ TAINT_DIE ]			= { 'D', ' ', false },
+	[ TAINT_OVERRIDDEN_ACPI_TABLE ]	= { 'A', ' ', false },
+	[ TAINT_WARN ]			= { 'W', ' ', false },
+	[ TAINT_CRAP ]			= { 'C', ' ', true },
+	[ TAINT_FIRMWARE_WORKAROUND ]	= { 'I', ' ', false },
+	[ TAINT_OOT_MODULE ]		= { 'O', ' ', true },
+	[ TAINT_UNSIGNED_MODULE ]	= { 'E', ' ', true },
+	[ TAINT_SOFTLOCKUP ]		= { 'L', ' ', false },
+	[ TAINT_LIVEPATCH ]		= { 'K', ' ', true },
+	[ TAINT_AUX ]			= { 'X', ' ', true },
+	[ TAINT_RANDSTRUCT ]		= { 'T', ' ', true },
+};
 
 /**
  * print_tainted - return a string to represent the kernel taint state.
@@ -420,12 +420,12 @@ const char *print_tainted(void)
 	return buf;
 }
 
-//int test_taint(unsigned flag)
-//{
-//	return test_bit(flag, &tainted_mask);
-//}
-//EXPORT_SYMBOL(test_taint);
-//
+int test_taint(unsigned flag)
+{
+	return test_bit(flag, &tainted_mask);
+}
+EXPORT_SYMBOL(test_taint);
+
 //unsigned long get_taint(void)
 //{
 //	return tainted_mask;
@@ -647,7 +647,6 @@ void __warn_printk(const char *fmt, ...)
 	vprintk(fmt, args);
 	va_end(args);
 }
-EXPORT_SYMBOL(__warn_printk);
 #endif
 //
 //#ifdef CONFIG_BUG

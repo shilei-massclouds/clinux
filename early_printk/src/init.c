@@ -9,6 +9,21 @@
 
 #define EARLYCON_NAME "sbi"
 
+int console_printk[4] = {
+	CONSOLE_LOGLEVEL_DEFAULT,	/* console_loglevel */
+	MESSAGE_LOGLEVEL_DEFAULT,	/* default_message_loglevel */
+	CONSOLE_LOGLEVEL_MIN,		/* minimum_console_loglevel */
+	CONSOLE_LOGLEVEL_DEFAULT,	/* default_console_loglevel */
+};
+EXPORT_SYMBOL_GPL(console_printk);
+
+/*
+ * System may need to suppress printk message under certain
+ * circumstances, like after kernel panic happens.
+ */
+int __read_mostly suppress_printk;
+EXPORT_SYMBOL(suppress_printk);
+
 extern int early_sbi_setup(struct earlycon_device *device, const char *opt);
 extern int early_vprintk(const char *fmt, va_list args);
 

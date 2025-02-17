@@ -254,33 +254,33 @@ void printk_safe_flush(void)
 	}
 }
 
-///**
-// * printk_safe_flush_on_panic - flush all per-cpu nmi buffers when the system
-// *	goes down.
-// *
-// * Similar to printk_safe_flush() but it can be called even in NMI context when
-// * the system goes down. It does the best effort to get NMI messages into
-// * the main ring buffer.
-// *
-// * Note that it could try harder when there is only one CPU online.
-// */
-//void printk_safe_flush_on_panic(void)
-//{
-//	/*
-//	 * Make sure that we could access the main ring buffer.
-//	 * Do not risk a double release when more CPUs are up.
-//	 */
-//	if (raw_spin_is_locked(&logbuf_lock)) {
-//		if (num_online_cpus() > 1)
-//			return;
-//
-//		debug_locks_off();
-//		raw_spin_lock_init(&logbuf_lock);
-//	}
-//
-//	printk_safe_flush();
-//}
-//
+/**
+ * printk_safe_flush_on_panic - flush all per-cpu nmi buffers when the system
+ *	goes down.
+ *
+ * Similar to printk_safe_flush() but it can be called even in NMI context when
+ * the system goes down. It does the best effort to get NMI messages into
+ * the main ring buffer.
+ *
+ * Note that it could try harder when there is only one CPU online.
+ */
+void printk_safe_flush_on_panic(void)
+{
+	/*
+	 * Make sure that we could access the main ring buffer.
+	 * Do not risk a double release when more CPUs are up.
+	 */
+	if (raw_spin_is_locked(&logbuf_lock)) {
+		if (num_online_cpus() > 1)
+			return;
+
+		debug_locks_off();
+		raw_spin_lock_init(&logbuf_lock);
+	}
+
+	printk_safe_flush();
+}
+
 #ifdef CONFIG_PRINTK_NMI
 /*
  * Safe printk() for NMI context. It uses a per-CPU buffer to

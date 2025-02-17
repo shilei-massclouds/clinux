@@ -59,13 +59,6 @@
 #include "braille.h"
 #include "internal.h"
 
-int console_printk[4] = {
-	CONSOLE_LOGLEVEL_DEFAULT,	/* console_loglevel */
-	MESSAGE_LOGLEVEL_DEFAULT,	/* default_message_loglevel */
-	CONSOLE_LOGLEVEL_MIN,		/* minimum_console_loglevel */
-	CONSOLE_LOGLEVEL_DEFAULT,	/* default_console_loglevel */
-};
-EXPORT_SYMBOL_GPL(console_printk);
 
 //atomic_t ignore_console_lock_warning __read_mostly = ATOMIC_INIT(0);
 //EXPORT_SYMBOL(ignore_console_lock_warning);
@@ -90,8 +83,8 @@ static DEFINE_SEMAPHORE(console_sem);
  * System may need to suppress printk message under certain
  * circumstances, like after kernel panic happens.
  */
-int __read_mostly suppress_printk;
-//
+//int __read_mostly suppress_printk;
+
 //#ifdef CONFIG_LOCKDEP
 //static struct lockdep_map console_lock_dep_map = {
 //	.name = "console_lock"
@@ -3115,7 +3108,7 @@ int printk_deferred(const char *fmt, ...)
 //EXPORT_SYMBOL(printk_timed_ratelimit);
 //
 //static DEFINE_SPINLOCK(dump_list_lock);
-//static LIST_HEAD(dump_list);
+static LIST_HEAD(dump_list);
 //
 ///**
 // * kmsg_dump_register - register a kernel log dumper.
@@ -3171,8 +3164,8 @@ int printk_deferred(const char *fmt, ...)
 //	return err;
 //}
 //EXPORT_SYMBOL_GPL(kmsg_dump_unregister);
-//
-//static bool always_kmsg_dump;
+
+static bool always_kmsg_dump;
 //module_param_named(always_kmsg_dump, always_kmsg_dump, bool, S_IRUGO | S_IWUSR);
 //
 //const char *kmsg_dump_reason_str(enum kmsg_dump_reason reason)
@@ -3191,54 +3184,54 @@ int printk_deferred(const char *fmt, ...)
 //	}
 //}
 //EXPORT_SYMBOL_GPL(kmsg_dump_reason_str);
-//
-///**
-// * kmsg_dump - dump kernel log to kernel message dumpers.
-// * @reason: the reason (oops, panic etc) for dumping
-// *
-// * Call each of the registered dumper's dump() callback, which can
-// * retrieve the kmsg records with kmsg_dump_get_line() or
-// * kmsg_dump_get_buffer().
-// */
-//void kmsg_dump(enum kmsg_dump_reason reason)
-//{
-//	struct kmsg_dumper *dumper;
-//	unsigned long flags;
-//
-//	rcu_read_lock();
-//	list_for_each_entry_rcu(dumper, &dump_list, list) {
-//		enum kmsg_dump_reason max_reason = dumper->max_reason;
-//
-//		/*
-//		 * If client has not provided a specific max_reason, default
-//		 * to KMSG_DUMP_OOPS, unless always_kmsg_dump was set.
-//		 */
-//		if (max_reason == KMSG_DUMP_UNDEF) {
-//			max_reason = always_kmsg_dump ? KMSG_DUMP_MAX :
-//							KMSG_DUMP_OOPS;
-//		}
-//		if (reason > max_reason)
-//			continue;
-//
-//		/* initialize iterator with data about the stored records */
-//		dumper->active = true;
-//
-//		logbuf_lock_irqsave(flags);
-//		dumper->cur_seq = clear_seq;
-//		dumper->cur_idx = clear_idx;
-//		dumper->next_seq = log_next_seq;
-//		dumper->next_idx = log_next_idx;
-//		logbuf_unlock_irqrestore(flags);
-//
-//		/* invoke dumper which will iterate over records */
-//		dumper->dump(dumper, reason);
-//
-//		/* reset iterator */
-//		dumper->active = false;
-//	}
-//	rcu_read_unlock();
-//}
-//
+
+/**
+ * kmsg_dump - dump kernel log to kernel message dumpers.
+ * @reason: the reason (oops, panic etc) for dumping
+ *
+ * Call each of the registered dumper's dump() callback, which can
+ * retrieve the kmsg records with kmsg_dump_get_line() or
+ * kmsg_dump_get_buffer().
+ */
+void kmsg_dump(enum kmsg_dump_reason reason)
+{
+	struct kmsg_dumper *dumper;
+	unsigned long flags;
+
+	rcu_read_lock();
+	list_for_each_entry_rcu(dumper, &dump_list, list) {
+		enum kmsg_dump_reason max_reason = dumper->max_reason;
+
+		/*
+		 * If client has not provided a specific max_reason, default
+		 * to KMSG_DUMP_OOPS, unless always_kmsg_dump was set.
+		 */
+		if (max_reason == KMSG_DUMP_UNDEF) {
+			max_reason = always_kmsg_dump ? KMSG_DUMP_MAX :
+							KMSG_DUMP_OOPS;
+		}
+		if (reason > max_reason)
+			continue;
+
+		/* initialize iterator with data about the stored records */
+		dumper->active = true;
+
+		logbuf_lock_irqsave(flags);
+		dumper->cur_seq = clear_seq;
+		dumper->cur_idx = clear_idx;
+		dumper->next_seq = log_next_seq;
+		dumper->next_idx = log_next_idx;
+		logbuf_unlock_irqrestore(flags);
+
+		/* invoke dumper which will iterate over records */
+		dumper->dump(dumper, reason);
+
+		/* reset iterator */
+		dumper->active = false;
+	}
+	rcu_read_unlock();
+}
+
 ///**
 // * kmsg_dump_get_line_nolock - retrieve one kmsg log line (unlocked version)
 // * @dumper: registered kmsg dumper
