@@ -54,12 +54,12 @@ int __printk_ratelimit(const char *func)
 {
     booter_panic("No impl!\n");
 }
-*/
 void
 show_regs(struct pt_regs *regs)
 {
     booter_panic("No impl!\n");
 }
+*/
 bool unhandled_signal(struct task_struct *tsk, int sig)
 {
     booter_panic("No impl!\n");

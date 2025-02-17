@@ -251,3 +251,12 @@ __weak void show_mem(unsigned int filter, nodemask_t *nodemask)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(show_mem);
+
+int panic_on_warn __read_mostly;
+EXPORT_SYMBOL(panic_on_warn);
+
+void show_state_filter(unsigned long state_filter)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(show_state_filter);

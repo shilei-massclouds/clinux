@@ -51,8 +51,8 @@ static unsigned long tainted_mask =
 //static int pause_on_oops_flag;
 //static DEFINE_SPINLOCK(pause_on_oops_lock);
 bool crash_kexec_post_notifiers;
-int panic_on_warn __read_mostly;
-EXPORT_SYMBOL(panic_on_warn);
+//int panic_on_warn __read_mostly;
+//EXPORT_SYMBOL(panic_on_warn);
 //unsigned long panic_on_taint;
 //bool panic_on_taint_nousertaint = false;
 

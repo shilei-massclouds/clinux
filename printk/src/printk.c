@@ -60,9 +60,9 @@
 #include "internal.h"
 
 
-//atomic_t ignore_console_lock_warning __read_mostly = ATOMIC_INIT(0);
-//EXPORT_SYMBOL(ignore_console_lock_warning);
-//
+atomic_t ignore_console_lock_warning __read_mostly = ATOMIC_INIT(0);
+EXPORT_SYMBOL(ignore_console_lock_warning);
+
 ///*
 // * Low level drivers may need that to know if they can schedule in
 // * their unblank() callback or not. So let's export it.

@@ -213,8 +213,10 @@ void __init_ldsem(struct ld_semaphore *sem, const char *name,
 // fs/proc/proc_sysctl.c
 const int sysctl_vals[] = { 0, 1, INT_MAX };
 
-int fg_console;
 struct tty_driver *console_driver;
+
+int fg_console;
+EXPORT_SYMBOL(fg_console);
 
 // From kernel/printk/printk.c
 struct console *console_drivers;
