@@ -57,7 +57,7 @@ components := \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs \
 	fork mmap \
-	buffer swap_state \
+	buffer swap \
 	early_printk printk panic dump_stack show_mem
 	#partitions \
 
