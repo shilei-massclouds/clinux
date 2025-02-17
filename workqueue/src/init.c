@@ -98,10 +98,7 @@ void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
     booter_panic("No impl in 'workqueue'.");
 }
 
-/*
-int del_timer(struct timer_list *timer)
+void *kthread_probe_data(struct task_struct *task)
 {
     booter_panic("No impl in 'workqueue'.");
 }
-*/
-

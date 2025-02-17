@@ -696,6 +696,7 @@ cl_top_linux_init(void)
     security_init();
     dbg_late_init();
     vfs_caches_init();
+    sbi_puts("=======================\n");
     //pagecache_init();
     //signals_init();
     //seq_file_init();

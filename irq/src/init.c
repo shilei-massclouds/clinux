@@ -91,6 +91,7 @@ struct kobject *kobject_create_and_add(const char *name, struct kobject *parent)
 {
     booter_panic("No impl in 'irq'.");
 }
+EXPORT_SYMBOL(kobject_create_and_add);
 int
 task_work_add(struct task_struct *task, struct callback_head *work, int notify)
 {

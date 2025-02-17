@@ -191,143 +191,143 @@ void unmap_kernel_range_noflush(unsigned long start, unsigned long size)
 		arch_sync_kernel_mappings(start, end);
 }
 
-//static int vmap_pte_range(pmd_t *pmd, unsigned long addr,
-//		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
-//		pgtbl_mod_mask *mask)
-//{
-//	pte_t *pte;
-//
-//	/*
-//	 * nr is a running index into the array which helps higher level
-//	 * callers keep track of where we're up to.
-//	 */
-//
-//	pte = pte_alloc_kernel_track(pmd, addr, mask);
-//	if (!pte)
-//		return -ENOMEM;
-//	do {
-//		struct page *page = pages[*nr];
-//
-//		if (WARN_ON(!pte_none(*pte)))
-//			return -EBUSY;
-//		if (WARN_ON(!page))
-//			return -ENOMEM;
-//		set_pte_at(&init_mm, addr, pte, mk_pte(page, prot));
-//		(*nr)++;
-//	} while (pte++, addr += PAGE_SIZE, addr != end);
-//	*mask |= PGTBL_PTE_MODIFIED;
-//	return 0;
-//}
-//
-//static int vmap_pmd_range(pud_t *pud, unsigned long addr,
-//		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
-//		pgtbl_mod_mask *mask)
-//{
-//	pmd_t *pmd;
-//	unsigned long next;
-//
-//	pmd = pmd_alloc_track(&init_mm, pud, addr, mask);
-//	if (!pmd)
-//		return -ENOMEM;
-//	do {
-//		next = pmd_addr_end(addr, end);
-//		if (vmap_pte_range(pmd, addr, next, prot, pages, nr, mask))
-//			return -ENOMEM;
-//	} while (pmd++, addr = next, addr != end);
-//	return 0;
-//}
-//
-//static int vmap_pud_range(p4d_t *p4d, unsigned long addr,
-//		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
-//		pgtbl_mod_mask *mask)
-//{
-//	pud_t *pud;
-//	unsigned long next;
-//
-//	pud = pud_alloc_track(&init_mm, p4d, addr, mask);
-//	if (!pud)
-//		return -ENOMEM;
-//	do {
-//		next = pud_addr_end(addr, end);
-//		if (vmap_pmd_range(pud, addr, next, prot, pages, nr, mask))
-//			return -ENOMEM;
-//	} while (pud++, addr = next, addr != end);
-//	return 0;
-//}
-//
-//static int vmap_p4d_range(pgd_t *pgd, unsigned long addr,
-//		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
-//		pgtbl_mod_mask *mask)
-//{
-//	p4d_t *p4d;
-//	unsigned long next;
-//
-//	p4d = p4d_alloc_track(&init_mm, pgd, addr, mask);
-//	if (!p4d)
-//		return -ENOMEM;
-//	do {
-//		next = p4d_addr_end(addr, end);
-//		if (vmap_pud_range(p4d, addr, next, prot, pages, nr, mask))
-//			return -ENOMEM;
-//	} while (p4d++, addr = next, addr != end);
-//	return 0;
-//}
-//
-///**
-// * map_kernel_range_noflush - map kernel VM area with the specified pages
-// * @addr: start of the VM area to map
-// * @size: size of the VM area to map
-// * @prot: page protection flags to use
-// * @pages: pages to map
-// *
-// * Map PFN_UP(@size) pages at @addr.  The VM area @addr and @size specify should
-// * have been allocated using get_vm_area() and its friends.
-// *
-// * NOTE:
-// * This function does NOT do any cache flushing.  The caller is responsible for
-// * calling flush_cache_vmap() on to-be-mapped areas before calling this
-// * function.
-// *
-// * RETURNS:
-// * 0 on success, -errno on failure.
-// */
-//int map_kernel_range_noflush(unsigned long addr, unsigned long size,
-//			     pgprot_t prot, struct page **pages)
-//{
-//	unsigned long start = addr;
-//	unsigned long end = addr + size;
-//	unsigned long next;
-//	pgd_t *pgd;
-//	int err = 0;
-//	int nr = 0;
-//	pgtbl_mod_mask mask = 0;
-//
-//	BUG_ON(addr >= end);
-//	pgd = pgd_offset_k(addr);
-//	do {
-//		next = pgd_addr_end(addr, end);
-//		if (pgd_bad(*pgd))
-//			mask |= PGTBL_PGD_MODIFIED;
-//		err = vmap_p4d_range(pgd, addr, next, prot, pages, &nr, &mask);
-//		if (err)
-//			return err;
-//	} while (pgd++, addr = next, addr != end);
-//
-//	if (mask & ARCH_PAGE_TABLE_SYNC_MASK)
-//		arch_sync_kernel_mappings(start, end);
-//
-//	return 0;
-//}
-//
-//int map_kernel_range(unsigned long start, unsigned long size, pgprot_t prot,
-//		struct page **pages)
-//{
-//	int ret;
-//
-//	ret = map_kernel_range_noflush(start, size, prot, pages);
-//	flush_cache_vmap(start, start + size);
-//	return ret;
-//}
+static int vmap_pte_range(pmd_t *pmd, unsigned long addr,
+		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
+		pgtbl_mod_mask *mask)
+{
+	pte_t *pte;
+
+	/*
+	 * nr is a running index into the array which helps higher level
+	 * callers keep track of where we're up to.
+	 */
+
+	pte = pte_alloc_kernel_track(pmd, addr, mask);
+	if (!pte)
+		return -ENOMEM;
+	do {
+		struct page *page = pages[*nr];
+
+		if (WARN_ON(!pte_none(*pte)))
+			return -EBUSY;
+		if (WARN_ON(!page))
+			return -ENOMEM;
+		set_pte_at(&init_mm, addr, pte, mk_pte(page, prot));
+		(*nr)++;
+	} while (pte++, addr += PAGE_SIZE, addr != end);
+	*mask |= PGTBL_PTE_MODIFIED;
+	return 0;
+}
+
+static int vmap_pmd_range(pud_t *pud, unsigned long addr,
+		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
+		pgtbl_mod_mask *mask)
+{
+	pmd_t *pmd;
+	unsigned long next;
+
+	pmd = pmd_alloc_track(&init_mm, pud, addr, mask);
+	if (!pmd)
+		return -ENOMEM;
+	do {
+		next = pmd_addr_end(addr, end);
+		if (vmap_pte_range(pmd, addr, next, prot, pages, nr, mask))
+			return -ENOMEM;
+	} while (pmd++, addr = next, addr != end);
+	return 0;
+}
+
+static int vmap_pud_range(p4d_t *p4d, unsigned long addr,
+		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
+		pgtbl_mod_mask *mask)
+{
+	pud_t *pud;
+	unsigned long next;
+
+	pud = pud_alloc_track(&init_mm, p4d, addr, mask);
+	if (!pud)
+		return -ENOMEM;
+	do {
+		next = pud_addr_end(addr, end);
+		if (vmap_pmd_range(pud, addr, next, prot, pages, nr, mask))
+			return -ENOMEM;
+	} while (pud++, addr = next, addr != end);
+	return 0;
+}
+
+static int vmap_p4d_range(pgd_t *pgd, unsigned long addr,
+		unsigned long end, pgprot_t prot, struct page **pages, int *nr,
+		pgtbl_mod_mask *mask)
+{
+	p4d_t *p4d;
+	unsigned long next;
+
+	p4d = p4d_alloc_track(&init_mm, pgd, addr, mask);
+	if (!p4d)
+		return -ENOMEM;
+	do {
+		next = p4d_addr_end(addr, end);
+		if (vmap_pud_range(p4d, addr, next, prot, pages, nr, mask))
+			return -ENOMEM;
+	} while (p4d++, addr = next, addr != end);
+	return 0;
+}
+
+/**
+ * map_kernel_range_noflush - map kernel VM area with the specified pages
+ * @addr: start of the VM area to map
+ * @size: size of the VM area to map
+ * @prot: page protection flags to use
+ * @pages: pages to map
+ *
+ * Map PFN_UP(@size) pages at @addr.  The VM area @addr and @size specify should
+ * have been allocated using get_vm_area() and its friends.
+ *
+ * NOTE:
+ * This function does NOT do any cache flushing.  The caller is responsible for
+ * calling flush_cache_vmap() on to-be-mapped areas before calling this
+ * function.
+ *
+ * RETURNS:
+ * 0 on success, -errno on failure.
+ */
+int map_kernel_range_noflush(unsigned long addr, unsigned long size,
+			     pgprot_t prot, struct page **pages)
+{
+	unsigned long start = addr;
+	unsigned long end = addr + size;
+	unsigned long next;
+	pgd_t *pgd;
+	int err = 0;
+	int nr = 0;
+	pgtbl_mod_mask mask = 0;
+
+	BUG_ON(addr >= end);
+	pgd = pgd_offset_k(addr);
+	do {
+		next = pgd_addr_end(addr, end);
+		if (pgd_bad(*pgd))
+			mask |= PGTBL_PGD_MODIFIED;
+		err = vmap_p4d_range(pgd, addr, next, prot, pages, &nr, &mask);
+		if (err)
+			return err;
+	} while (pgd++, addr = next, addr != end);
+
+	if (mask & ARCH_PAGE_TABLE_SYNC_MASK)
+		arch_sync_kernel_mappings(start, end);
+
+	return 0;
+}
+
+int map_kernel_range(unsigned long start, unsigned long size, pgprot_t prot,
+		struct page **pages)
+{
+	int ret;
+
+	ret = map_kernel_range_noflush(start, size, prot, pages);
+	flush_cache_vmap(start, start + size);
+	return ret;
+}
 
 int is_vmalloc_or_module_addr(const void *x)
 {
@@ -445,12 +445,12 @@ static LIST_HEAD(free_vmap_area_list);
  */
 static struct rb_root free_vmap_area_root = RB_ROOT;
 
-///*
-// * Preload a CPU with one object for "no edge" split case. The
-// * aim is to get rid of allocations from the atomic context, thus
-// * to use more permissive allocation masks.
-// */
-//static DEFINE_PER_CPU(struct vmap_area *, ne_fit_preload_node);
+/*
+ * Preload a CPU with one object for "no edge" split case. The
+ * aim is to get rid of allocations from the atomic context, thus
+ * to use more permissive allocation masks.
+ */
+static DEFINE_PER_CPU(struct vmap_area *, ne_fit_preload_node);
 
 static __always_inline unsigned long
 va_size(struct vmap_area *va)
@@ -458,15 +458,15 @@ va_size(struct vmap_area *va)
 	return (va->va_end - va->va_start);
 }
 
-//static __always_inline unsigned long
-//get_subtree_max_size(struct rb_node *node)
-//{
-//	struct vmap_area *va;
-//
-//	va = rb_entry_safe(node, struct vmap_area, rb_node);
-//	return va ? va->subtree_max_size : 0;
-//}
-//
+static __always_inline unsigned long
+get_subtree_max_size(struct rb_node *node)
+{
+	struct vmap_area *va;
+
+	va = rb_entry_safe(node, struct vmap_area, rb_node);
+	return va ? va->subtree_max_size : 0;
+}
+
 ///*
 // * Gets called when remove the node and rotate.
 // */
@@ -481,8 +481,8 @@ va_size(struct vmap_area *va)
 RB_DECLARE_CALLBACKS_MAX(static, free_vmap_area_rb_augment_cb,
 	struct vmap_area, rb_node, unsigned long, subtree_max_size, va_size)
 
-//static void purge_vmap_area_lazy(void);
-//static BLOCKING_NOTIFIER_HEAD(vmap_notify_list);
+static void purge_vmap_area_lazy(void);
+static BLOCKING_NOTIFIER_HEAD(vmap_notify_list);
 static unsigned long lazy_max_pages(void);
 
 static atomic_long_t nr_vmalloc_pages;
@@ -829,86 +829,86 @@ insert:
 	return va;
 }
 
-//static __always_inline bool
-//is_within_this_va(struct vmap_area *va, unsigned long size,
-//	unsigned long align, unsigned long vstart)
-//{
-//	unsigned long nva_start_addr;
-//
-//	if (va->va_start > vstart)
-//		nva_start_addr = ALIGN(va->va_start, align);
-//	else
-//		nva_start_addr = ALIGN(vstart, align);
-//
-//	/* Can be overflowed due to big size or alignment. */
-//	if (nva_start_addr + size < nva_start_addr ||
-//			nva_start_addr < vstart)
-//		return false;
-//
-//	return (nva_start_addr + size <= va->va_end);
-//}
-//
-///*
-// * Find the first free block(lowest start address) in the tree,
-// * that will accomplish the request corresponding to passing
-// * parameters.
-// */
-//static __always_inline struct vmap_area *
-//find_vmap_lowest_match(unsigned long size,
-//	unsigned long align, unsigned long vstart)
-//{
-//	struct vmap_area *va;
-//	struct rb_node *node;
-//	unsigned long length;
-//
-//	/* Start from the root. */
-//	node = free_vmap_area_root.rb_node;
-//
-//	/* Adjust the search size for alignment overhead. */
-//	length = size + align - 1;
-//
-//	while (node) {
-//		va = rb_entry(node, struct vmap_area, rb_node);
-//
-//		if (get_subtree_max_size(node->rb_left) >= length &&
-//				vstart < va->va_start) {
-//			node = node->rb_left;
-//		} else {
-//			if (is_within_this_va(va, size, align, vstart))
-//				return va;
-//
-//			/*
-//			 * Does not make sense to go deeper towards the right
-//			 * sub-tree if it does not have a free block that is
-//			 * equal or bigger to the requested search length.
-//			 */
-//			if (get_subtree_max_size(node->rb_right) >= length) {
-//				node = node->rb_right;
-//				continue;
-//			}
-//
-//			/*
-//			 * OK. We roll back and find the first right sub-tree,
-//			 * that will satisfy the search criteria. It can happen
-//			 * only once due to "vstart" restriction.
-//			 */
-//			while ((node = rb_parent(node))) {
-//				va = rb_entry(node, struct vmap_area, rb_node);
-//				if (is_within_this_va(va, size, align, vstart))
-//					return va;
-//
-//				if (get_subtree_max_size(node->rb_right) >= length &&
-//						vstart <= va->va_start) {
-//					node = node->rb_right;
-//					break;
-//				}
-//			}
-//		}
-//	}
-//
-//	return NULL;
-//}
-//
+static __always_inline bool
+is_within_this_va(struct vmap_area *va, unsigned long size,
+	unsigned long align, unsigned long vstart)
+{
+	unsigned long nva_start_addr;
+
+	if (va->va_start > vstart)
+		nva_start_addr = ALIGN(va->va_start, align);
+	else
+		nva_start_addr = ALIGN(vstart, align);
+
+	/* Can be overflowed due to big size or alignment. */
+	if (nva_start_addr + size < nva_start_addr ||
+			nva_start_addr < vstart)
+		return false;
+
+	return (nva_start_addr + size <= va->va_end);
+}
+
+/*
+ * Find the first free block(lowest start address) in the tree,
+ * that will accomplish the request corresponding to passing
+ * parameters.
+ */
+static __always_inline struct vmap_area *
+find_vmap_lowest_match(unsigned long size,
+	unsigned long align, unsigned long vstart)
+{
+	struct vmap_area *va;
+	struct rb_node *node;
+	unsigned long length;
+
+	/* Start from the root. */
+	node = free_vmap_area_root.rb_node;
+
+	/* Adjust the search size for alignment overhead. */
+	length = size + align - 1;
+
+	while (node) {
+		va = rb_entry(node, struct vmap_area, rb_node);
+
+		if (get_subtree_max_size(node->rb_left) >= length &&
+				vstart < va->va_start) {
+			node = node->rb_left;
+		} else {
+			if (is_within_this_va(va, size, align, vstart))
+				return va;
+
+			/*
+			 * Does not make sense to go deeper towards the right
+			 * sub-tree if it does not have a free block that is
+			 * equal or bigger to the requested search length.
+			 */
+			if (get_subtree_max_size(node->rb_right) >= length) {
+				node = node->rb_right;
+				continue;
+			}
+
+			/*
+			 * OK. We roll back and find the first right sub-tree,
+			 * that will satisfy the search criteria. It can happen
+			 * only once due to "vstart" restriction.
+			 */
+			while ((node = rb_parent(node))) {
+				va = rb_entry(node, struct vmap_area, rb_node);
+				if (is_within_this_va(va, size, align, vstart))
+					return va;
+
+				if (get_subtree_max_size(node->rb_right) >= length &&
+						vstart <= va->va_start) {
+					node = node->rb_right;
+					break;
+				}
+			}
+		}
+	}
+
+	return NULL;
+}
+
 //#if DEBUG_AUGMENT_LOWEST_MATCH_CHECK
 //#include <linux/random.h>
 //
@@ -946,324 +946,324 @@ insert:
 //			va_1, va_2, vstart);
 //}
 //#endif
-//
-//enum fit_type {
-//	NOTHING_FIT = 0,
-//	FL_FIT_TYPE = 1,	/* full fit */
-//	LE_FIT_TYPE = 2,	/* left edge fit */
-//	RE_FIT_TYPE = 3,	/* right edge fit */
-//	NE_FIT_TYPE = 4		/* no edge fit */
-//};
-//
-//static __always_inline enum fit_type
-//classify_va_fit_type(struct vmap_area *va,
-//	unsigned long nva_start_addr, unsigned long size)
-//{
-//	enum fit_type type;
-//
-//	/* Check if it is within VA. */
-//	if (nva_start_addr < va->va_start ||
-//			nva_start_addr + size > va->va_end)
-//		return NOTHING_FIT;
-//
-//	/* Now classify. */
-//	if (va->va_start == nva_start_addr) {
-//		if (va->va_end == nva_start_addr + size)
-//			type = FL_FIT_TYPE;
-//		else
-//			type = LE_FIT_TYPE;
-//	} else if (va->va_end == nva_start_addr + size) {
-//		type = RE_FIT_TYPE;
-//	} else {
-//		type = NE_FIT_TYPE;
-//	}
-//
-//	return type;
-//}
-//
-//static __always_inline int
-//adjust_va_to_fit_type(struct vmap_area *va,
-//	unsigned long nva_start_addr, unsigned long size,
-//	enum fit_type type)
-//{
-//	struct vmap_area *lva = NULL;
-//
-//	if (type == FL_FIT_TYPE) {
-//		/*
-//		 * No need to split VA, it fully fits.
-//		 *
-//		 * |               |
-//		 * V      NVA      V
-//		 * |---------------|
-//		 */
-//		unlink_va(va, &free_vmap_area_root);
-//		kmem_cache_free(vmap_area_cachep, va);
-//	} else if (type == LE_FIT_TYPE) {
-//		/*
-//		 * Split left edge of fit VA.
-//		 *
-//		 * |       |
-//		 * V  NVA  V   R
-//		 * |-------|-------|
-//		 */
-//		va->va_start += size;
-//	} else if (type == RE_FIT_TYPE) {
-//		/*
-//		 * Split right edge of fit VA.
-//		 *
-//		 *         |       |
-//		 *     L   V  NVA  V
-//		 * |-------|-------|
-//		 */
-//		va->va_end = nva_start_addr;
-//	} else if (type == NE_FIT_TYPE) {
-//		/*
-//		 * Split no edge of fit VA.
-//		 *
-//		 *     |       |
-//		 *   L V  NVA  V R
-//		 * |---|-------|---|
-//		 */
-//		lva = __this_cpu_xchg(ne_fit_preload_node, NULL);
-//		if (unlikely(!lva)) {
-//			/*
-//			 * For percpu allocator we do not do any pre-allocation
-//			 * and leave it as it is. The reason is it most likely
-//			 * never ends up with NE_FIT_TYPE splitting. In case of
-//			 * percpu allocations offsets and sizes are aligned to
-//			 * fixed align request, i.e. RE_FIT_TYPE and FL_FIT_TYPE
-//			 * are its main fitting cases.
-//			 *
-//			 * There are a few exceptions though, as an example it is
-//			 * a first allocation (early boot up) when we have "one"
-//			 * big free space that has to be split.
-//			 *
-//			 * Also we can hit this path in case of regular "vmap"
-//			 * allocations, if "this" current CPU was not preloaded.
-//			 * See the comment in alloc_vmap_area() why. If so, then
-//			 * GFP_NOWAIT is used instead to get an extra object for
-//			 * split purpose. That is rare and most time does not
-//			 * occur.
-//			 *
-//			 * What happens if an allocation gets failed. Basically,
-//			 * an "overflow" path is triggered to purge lazily freed
-//			 * areas to free some memory, then, the "retry" path is
-//			 * triggered to repeat one more time. See more details
-//			 * in alloc_vmap_area() function.
-//			 */
-//			lva = kmem_cache_alloc(vmap_area_cachep, GFP_NOWAIT);
-//			if (!lva)
-//				return -1;
-//		}
-//
-//		/*
-//		 * Build the remainder.
-//		 */
-//		lva->va_start = va->va_start;
-//		lva->va_end = nva_start_addr;
-//
-//		/*
-//		 * Shrink this VA to remaining size.
-//		 */
-//		va->va_start = nva_start_addr + size;
-//	} else {
-//		return -1;
-//	}
-//
-//	if (type != FL_FIT_TYPE) {
-//		augment_tree_propagate_from(va);
-//
-//		if (lva)	/* type == NE_FIT_TYPE */
-//			insert_vmap_area_augment(lva, &va->rb_node,
-//				&free_vmap_area_root, &free_vmap_area_list);
-//	}
-//
-//	return 0;
-//}
-//
-///*
-// * Returns a start address of the newly allocated area, if success.
-// * Otherwise a vend is returned that indicates failure.
-// */
-//static __always_inline unsigned long
-//__alloc_vmap_area(unsigned long size, unsigned long align,
-//	unsigned long vstart, unsigned long vend)
-//{
-//	unsigned long nva_start_addr;
-//	struct vmap_area *va;
-//	enum fit_type type;
-//	int ret;
-//
-//	va = find_vmap_lowest_match(size, align, vstart);
-//	if (unlikely(!va))
-//		return vend;
-//
-//	if (va->va_start > vstart)
-//		nva_start_addr = ALIGN(va->va_start, align);
-//	else
-//		nva_start_addr = ALIGN(vstart, align);
-//
-//	/* Check the "vend" restriction. */
-//	if (nva_start_addr + size > vend)
-//		return vend;
-//
-//	/* Classify what we have found. */
-//	type = classify_va_fit_type(va, nva_start_addr, size);
-//	if (WARN_ON_ONCE(type == NOTHING_FIT))
-//		return vend;
-//
-//	/* Update the free vmap_area. */
-//	ret = adjust_va_to_fit_type(va, nva_start_addr, size, type);
-//	if (ret)
-//		return vend;
-//
-//#if DEBUG_AUGMENT_LOWEST_MATCH_CHECK
-//	find_vmap_lowest_match_check(size);
-//#endif
-//
-//	return nva_start_addr;
-//}
-//
-///*
-// * Free a region of KVA allocated by alloc_vmap_area
-// */
-//static void free_vmap_area(struct vmap_area *va)
-//{
-//	/*
-//	 * Remove from the busy tree/list.
-//	 */
-//	spin_lock(&vmap_area_lock);
-//	unlink_va(va, &vmap_area_root);
-//	spin_unlock(&vmap_area_lock);
-//
-//	/*
-//	 * Insert/Merge it back to the free tree/list.
-//	 */
-//	spin_lock(&free_vmap_area_lock);
-//	merge_or_add_vmap_area(va, &free_vmap_area_root, &free_vmap_area_list);
-//	spin_unlock(&free_vmap_area_lock);
-//}
-//
-///*
-// * Allocate a region of KVA of the specified size and alignment, within the
-// * vstart and vend.
-// */
-//static struct vmap_area *alloc_vmap_area(unsigned long size,
-//				unsigned long align,
-//				unsigned long vstart, unsigned long vend,
-//				int node, gfp_t gfp_mask)
-//{
-//	struct vmap_area *va, *pva;
-//	unsigned long addr;
-//	int purged = 0;
-//	int ret;
-//
-//	BUG_ON(!size);
-//	BUG_ON(offset_in_page(size));
-//	BUG_ON(!is_power_of_2(align));
-//
-//	if (unlikely(!vmap_initialized))
-//		return ERR_PTR(-EBUSY);
-//
-//	might_sleep();
-//	gfp_mask = gfp_mask & GFP_RECLAIM_MASK;
-//
-//	va = kmem_cache_alloc_node(vmap_area_cachep, gfp_mask, node);
-//	if (unlikely(!va))
-//		return ERR_PTR(-ENOMEM);
-//
-//	/*
-//	 * Only scan the relevant parts containing pointers to other objects
-//	 * to avoid false negatives.
-//	 */
-//	kmemleak_scan_area(&va->rb_node, SIZE_MAX, gfp_mask);
-//
-//retry:
-//	/*
-//	 * Preload this CPU with one extra vmap_area object. It is used
-//	 * when fit type of free area is NE_FIT_TYPE. Please note, it
-//	 * does not guarantee that an allocation occurs on a CPU that
-//	 * is preloaded, instead we minimize the case when it is not.
-//	 * It can happen because of cpu migration, because there is a
-//	 * race until the below spinlock is taken.
-//	 *
-//	 * The preload is done in non-atomic context, thus it allows us
-//	 * to use more permissive allocation masks to be more stable under
-//	 * low memory condition and high memory pressure. In rare case,
-//	 * if not preloaded, GFP_NOWAIT is used.
-//	 *
-//	 * Set "pva" to NULL here, because of "retry" path.
-//	 */
-//	pva = NULL;
-//
-//	if (!this_cpu_read(ne_fit_preload_node))
-//		/*
-//		 * Even if it fails we do not really care about that.
-//		 * Just proceed as it is. If needed "overflow" path
-//		 * will refill the cache we allocate from.
-//		 */
-//		pva = kmem_cache_alloc_node(vmap_area_cachep, gfp_mask, node);
-//
-//	spin_lock(&free_vmap_area_lock);
-//
-//	if (pva && __this_cpu_cmpxchg(ne_fit_preload_node, NULL, pva))
-//		kmem_cache_free(vmap_area_cachep, pva);
-//
-//	/*
-//	 * If an allocation fails, the "vend" address is
-//	 * returned. Therefore trigger the overflow path.
-//	 */
-//	addr = __alloc_vmap_area(size, align, vstart, vend);
-//	spin_unlock(&free_vmap_area_lock);
-//
-//	if (unlikely(addr == vend))
-//		goto overflow;
-//
-//	va->va_start = addr;
-//	va->va_end = addr + size;
-//	va->vm = NULL;
-//
-//
-//	spin_lock(&vmap_area_lock);
-//	insert_vmap_area(va, &vmap_area_root, &vmap_area_list);
-//	spin_unlock(&vmap_area_lock);
-//
-//	BUG_ON(!IS_ALIGNED(va->va_start, align));
-//	BUG_ON(va->va_start < vstart);
-//	BUG_ON(va->va_end > vend);
-//
-//	ret = kasan_populate_vmalloc(addr, size);
-//	if (ret) {
-//		free_vmap_area(va);
-//		return ERR_PTR(ret);
-//	}
-//
-//	return va;
-//
-//overflow:
-//	if (!purged) {
-//		purge_vmap_area_lazy();
-//		purged = 1;
-//		goto retry;
-//	}
-//
-//	if (gfpflags_allow_blocking(gfp_mask)) {
-//		unsigned long freed = 0;
-//		blocking_notifier_call_chain(&vmap_notify_list, 0, &freed);
-//		if (freed > 0) {
-//			purged = 0;
-//			goto retry;
-//		}
-//	}
-//
-//	if (!(gfp_mask & __GFP_NOWARN) && printk_ratelimit())
-//		pr_warn("vmap allocation for size %lu failed: use vmalloc=<size> to increase size\n",
-//			size);
-//
-//	kmem_cache_free(vmap_area_cachep, va);
-//	return ERR_PTR(-EBUSY);
-//}
-//
+
+enum fit_type {
+	NOTHING_FIT = 0,
+	FL_FIT_TYPE = 1,	/* full fit */
+	LE_FIT_TYPE = 2,	/* left edge fit */
+	RE_FIT_TYPE = 3,	/* right edge fit */
+	NE_FIT_TYPE = 4		/* no edge fit */
+};
+
+static __always_inline enum fit_type
+classify_va_fit_type(struct vmap_area *va,
+	unsigned long nva_start_addr, unsigned long size)
+{
+	enum fit_type type;
+
+	/* Check if it is within VA. */
+	if (nva_start_addr < va->va_start ||
+			nva_start_addr + size > va->va_end)
+		return NOTHING_FIT;
+
+	/* Now classify. */
+	if (va->va_start == nva_start_addr) {
+		if (va->va_end == nva_start_addr + size)
+			type = FL_FIT_TYPE;
+		else
+			type = LE_FIT_TYPE;
+	} else if (va->va_end == nva_start_addr + size) {
+		type = RE_FIT_TYPE;
+	} else {
+		type = NE_FIT_TYPE;
+	}
+
+	return type;
+}
+
+static __always_inline int
+adjust_va_to_fit_type(struct vmap_area *va,
+	unsigned long nva_start_addr, unsigned long size,
+	enum fit_type type)
+{
+	struct vmap_area *lva = NULL;
+
+	if (type == FL_FIT_TYPE) {
+		/*
+		 * No need to split VA, it fully fits.
+		 *
+		 * |               |
+		 * V      NVA      V
+		 * |---------------|
+		 */
+		unlink_va(va, &free_vmap_area_root);
+		kmem_cache_free(vmap_area_cachep, va);
+	} else if (type == LE_FIT_TYPE) {
+		/*
+		 * Split left edge of fit VA.
+		 *
+		 * |       |
+		 * V  NVA  V   R
+		 * |-------|-------|
+		 */
+		va->va_start += size;
+	} else if (type == RE_FIT_TYPE) {
+		/*
+		 * Split right edge of fit VA.
+		 *
+		 *         |       |
+		 *     L   V  NVA  V
+		 * |-------|-------|
+		 */
+		va->va_end = nva_start_addr;
+	} else if (type == NE_FIT_TYPE) {
+		/*
+		 * Split no edge of fit VA.
+		 *
+		 *     |       |
+		 *   L V  NVA  V R
+		 * |---|-------|---|
+		 */
+		lva = __this_cpu_xchg(ne_fit_preload_node, NULL);
+		if (unlikely(!lva)) {
+			/*
+			 * For percpu allocator we do not do any pre-allocation
+			 * and leave it as it is. The reason is it most likely
+			 * never ends up with NE_FIT_TYPE splitting. In case of
+			 * percpu allocations offsets and sizes are aligned to
+			 * fixed align request, i.e. RE_FIT_TYPE and FL_FIT_TYPE
+			 * are its main fitting cases.
+			 *
+			 * There are a few exceptions though, as an example it is
+			 * a first allocation (early boot up) when we have "one"
+			 * big free space that has to be split.
+			 *
+			 * Also we can hit this path in case of regular "vmap"
+			 * allocations, if "this" current CPU was not preloaded.
+			 * See the comment in alloc_vmap_area() why. If so, then
+			 * GFP_NOWAIT is used instead to get an extra object for
+			 * split purpose. That is rare and most time does not
+			 * occur.
+			 *
+			 * What happens if an allocation gets failed. Basically,
+			 * an "overflow" path is triggered to purge lazily freed
+			 * areas to free some memory, then, the "retry" path is
+			 * triggered to repeat one more time. See more details
+			 * in alloc_vmap_area() function.
+			 */
+			lva = kmem_cache_alloc(vmap_area_cachep, GFP_NOWAIT);
+			if (!lva)
+				return -1;
+		}
+
+		/*
+		 * Build the remainder.
+		 */
+		lva->va_start = va->va_start;
+		lva->va_end = nva_start_addr;
+
+		/*
+		 * Shrink this VA to remaining size.
+		 */
+		va->va_start = nva_start_addr + size;
+	} else {
+		return -1;
+	}
+
+	if (type != FL_FIT_TYPE) {
+		augment_tree_propagate_from(va);
+
+		if (lva)	/* type == NE_FIT_TYPE */
+			insert_vmap_area_augment(lva, &va->rb_node,
+				&free_vmap_area_root, &free_vmap_area_list);
+	}
+
+	return 0;
+}
+
+/*
+ * Returns a start address of the newly allocated area, if success.
+ * Otherwise a vend is returned that indicates failure.
+ */
+static __always_inline unsigned long
+__alloc_vmap_area(unsigned long size, unsigned long align,
+	unsigned long vstart, unsigned long vend)
+{
+	unsigned long nva_start_addr;
+	struct vmap_area *va;
+	enum fit_type type;
+	int ret;
+
+	va = find_vmap_lowest_match(size, align, vstart);
+	if (unlikely(!va))
+		return vend;
+
+	if (va->va_start > vstart)
+		nva_start_addr = ALIGN(va->va_start, align);
+	else
+		nva_start_addr = ALIGN(vstart, align);
+
+	/* Check the "vend" restriction. */
+	if (nva_start_addr + size > vend)
+		return vend;
+
+	/* Classify what we have found. */
+	type = classify_va_fit_type(va, nva_start_addr, size);
+	if (WARN_ON_ONCE(type == NOTHING_FIT))
+		return vend;
+
+	/* Update the free vmap_area. */
+	ret = adjust_va_to_fit_type(va, nva_start_addr, size, type);
+	if (ret)
+		return vend;
+
+#if DEBUG_AUGMENT_LOWEST_MATCH_CHECK
+	find_vmap_lowest_match_check(size);
+#endif
+
+	return nva_start_addr;
+}
+
+/*
+ * Free a region of KVA allocated by alloc_vmap_area
+ */
+static void free_vmap_area(struct vmap_area *va)
+{
+	/*
+	 * Remove from the busy tree/list.
+	 */
+	spin_lock(&vmap_area_lock);
+	unlink_va(va, &vmap_area_root);
+	spin_unlock(&vmap_area_lock);
+
+	/*
+	 * Insert/Merge it back to the free tree/list.
+	 */
+	spin_lock(&free_vmap_area_lock);
+	merge_or_add_vmap_area(va, &free_vmap_area_root, &free_vmap_area_list);
+	spin_unlock(&free_vmap_area_lock);
+}
+
+/*
+ * Allocate a region of KVA of the specified size and alignment, within the
+ * vstart and vend.
+ */
+static struct vmap_area *alloc_vmap_area(unsigned long size,
+				unsigned long align,
+				unsigned long vstart, unsigned long vend,
+				int node, gfp_t gfp_mask)
+{
+	struct vmap_area *va, *pva;
+	unsigned long addr;
+	int purged = 0;
+	int ret;
+
+	BUG_ON(!size);
+	BUG_ON(offset_in_page(size));
+	BUG_ON(!is_power_of_2(align));
+
+	if (unlikely(!vmap_initialized))
+		return ERR_PTR(-EBUSY);
+
+	might_sleep();
+	gfp_mask = gfp_mask & GFP_RECLAIM_MASK;
+
+	va = kmem_cache_alloc_node(vmap_area_cachep, gfp_mask, node);
+	if (unlikely(!va))
+		return ERR_PTR(-ENOMEM);
+
+	/*
+	 * Only scan the relevant parts containing pointers to other objects
+	 * to avoid false negatives.
+	 */
+	kmemleak_scan_area(&va->rb_node, SIZE_MAX, gfp_mask);
+
+retry:
+	/*
+	 * Preload this CPU with one extra vmap_area object. It is used
+	 * when fit type of free area is NE_FIT_TYPE. Please note, it
+	 * does not guarantee that an allocation occurs on a CPU that
+	 * is preloaded, instead we minimize the case when it is not.
+	 * It can happen because of cpu migration, because there is a
+	 * race until the below spinlock is taken.
+	 *
+	 * The preload is done in non-atomic context, thus it allows us
+	 * to use more permissive allocation masks to be more stable under
+	 * low memory condition and high memory pressure. In rare case,
+	 * if not preloaded, GFP_NOWAIT is used.
+	 *
+	 * Set "pva" to NULL here, because of "retry" path.
+	 */
+	pva = NULL;
+
+	if (!this_cpu_read(ne_fit_preload_node))
+		/*
+		 * Even if it fails we do not really care about that.
+		 * Just proceed as it is. If needed "overflow" path
+		 * will refill the cache we allocate from.
+		 */
+		pva = kmem_cache_alloc_node(vmap_area_cachep, gfp_mask, node);
+
+	spin_lock(&free_vmap_area_lock);
+
+	if (pva && __this_cpu_cmpxchg(ne_fit_preload_node, NULL, pva))
+		kmem_cache_free(vmap_area_cachep, pva);
+
+	/*
+	 * If an allocation fails, the "vend" address is
+	 * returned. Therefore trigger the overflow path.
+	 */
+	addr = __alloc_vmap_area(size, align, vstart, vend);
+	spin_unlock(&free_vmap_area_lock);
+
+	if (unlikely(addr == vend))
+		goto overflow;
+
+	va->va_start = addr;
+	va->va_end = addr + size;
+	va->vm = NULL;
+
+
+	spin_lock(&vmap_area_lock);
+	insert_vmap_area(va, &vmap_area_root, &vmap_area_list);
+	spin_unlock(&vmap_area_lock);
+
+	BUG_ON(!IS_ALIGNED(va->va_start, align));
+	BUG_ON(va->va_start < vstart);
+	BUG_ON(va->va_end > vend);
+
+	ret = kasan_populate_vmalloc(addr, size);
+	if (ret) {
+		free_vmap_area(va);
+		return ERR_PTR(ret);
+	}
+
+	return va;
+
+overflow:
+	if (!purged) {
+		purge_vmap_area_lazy();
+		purged = 1;
+		goto retry;
+	}
+
+	if (gfpflags_allow_blocking(gfp_mask)) {
+		unsigned long freed = 0;
+		blocking_notifier_call_chain(&vmap_notify_list, 0, &freed);
+		if (freed > 0) {
+			purged = 0;
+			goto retry;
+		}
+	}
+
+	if (!(gfp_mask & __GFP_NOWARN) && printk_ratelimit())
+		pr_warn("vmap allocation for size %lu failed: use vmalloc=<size> to increase size\n",
+			size);
+
+	kmem_cache_free(vmap_area_cachep, va);
+	return ERR_PTR(-EBUSY);
+}
+
 //int register_vmap_purge_notifier(struct notifier_block *nb)
 //{
 //	return blocking_notifier_chain_register(&vmap_notify_list, nb);
@@ -1394,16 +1394,16 @@ static void try_purge_vmap_area_lazy(void)
 	}
 }
 
-///*
-// * Kick off a purge of the outstanding lazy areas.
-// */
-//static void purge_vmap_area_lazy(void)
-//{
-//	mutex_lock(&vmap_purge_lock);
-//	purge_fragmented_blocks_allcpus();
-//	__purge_vmap_area_lazy(ULONG_MAX, 0);
-//	mutex_unlock(&vmap_purge_lock);
-//}
+/*
+ * Kick off a purge of the outstanding lazy areas.
+ */
+static void purge_vmap_area_lazy(void)
+{
+	mutex_lock(&vmap_purge_lock);
+	purge_fragmented_blocks_allcpus();
+	__purge_vmap_area_lazy(ULONG_MAX, 0);
+	mutex_unlock(&vmap_purge_lock);
+}
 
 /*
  * Free a vmap area, caller ensuring that the area has been unmapped
@@ -2026,73 +2026,73 @@ EXPORT_SYMBOL(vmalloc_init);
 //	unmap_kernel_range_noflush(addr, size);
 //	flush_tlb_kernel_range(addr, end);
 //}
-//
-//static inline void setup_vmalloc_vm_locked(struct vm_struct *vm,
-//	struct vmap_area *va, unsigned long flags, const void *caller)
-//{
-//	vm->flags = flags;
-//	vm->addr = (void *)va->va_start;
-//	vm->size = va->va_end - va->va_start;
-//	vm->caller = caller;
-//	va->vm = vm;
-//}
-//
-//static void setup_vmalloc_vm(struct vm_struct *vm, struct vmap_area *va,
-//			      unsigned long flags, const void *caller)
-//{
-//	spin_lock(&vmap_area_lock);
-//	setup_vmalloc_vm_locked(vm, va, flags, caller);
-//	spin_unlock(&vmap_area_lock);
-//}
-//
-//static void clear_vm_uninitialized_flag(struct vm_struct *vm)
-//{
-//	/*
-//	 * Before removing VM_UNINITIALIZED,
-//	 * we should make sure that vm has proper values.
-//	 * Pair with smp_rmb() in show_numa_info().
-//	 */
-//	smp_wmb();
-//	vm->flags &= ~VM_UNINITIALIZED;
-//}
-//
-//static struct vm_struct *__get_vm_area_node(unsigned long size,
-//		unsigned long align, unsigned long flags, unsigned long start,
-//		unsigned long end, int node, gfp_t gfp_mask, const void *caller)
-//{
-//	struct vmap_area *va;
-//	struct vm_struct *area;
-//	unsigned long requested_size = size;
-//
-//	BUG_ON(in_interrupt());
-//	size = PAGE_ALIGN(size);
-//	if (unlikely(!size))
-//		return NULL;
-//
-//	if (flags & VM_IOREMAP)
-//		align = 1ul << clamp_t(int, get_count_order_long(size),
-//				       PAGE_SHIFT, IOREMAP_MAX_ORDER);
-//
-//	area = kzalloc_node(sizeof(*area), gfp_mask & GFP_RECLAIM_MASK, node);
-//	if (unlikely(!area))
-//		return NULL;
-//
-//	if (!(flags & VM_NO_GUARD))
-//		size += PAGE_SIZE;
-//
-//	va = alloc_vmap_area(size, align, start, end, node, gfp_mask);
-//	if (IS_ERR(va)) {
-//		kfree(area);
-//		return NULL;
-//	}
-//
-//	kasan_unpoison_vmalloc((void *)va->va_start, requested_size);
-//
-//	setup_vmalloc_vm(area, va, flags, caller);
-//
-//	return area;
-//}
-//
+
+static inline void setup_vmalloc_vm_locked(struct vm_struct *vm,
+	struct vmap_area *va, unsigned long flags, const void *caller)
+{
+	vm->flags = flags;
+	vm->addr = (void *)va->va_start;
+	vm->size = va->va_end - va->va_start;
+	vm->caller = caller;
+	va->vm = vm;
+}
+
+static void setup_vmalloc_vm(struct vm_struct *vm, struct vmap_area *va,
+			      unsigned long flags, const void *caller)
+{
+	spin_lock(&vmap_area_lock);
+	setup_vmalloc_vm_locked(vm, va, flags, caller);
+	spin_unlock(&vmap_area_lock);
+}
+
+static void clear_vm_uninitialized_flag(struct vm_struct *vm)
+{
+	/*
+	 * Before removing VM_UNINITIALIZED,
+	 * we should make sure that vm has proper values.
+	 * Pair with smp_rmb() in show_numa_info().
+	 */
+	smp_wmb();
+	vm->flags &= ~VM_UNINITIALIZED;
+}
+
+static struct vm_struct *__get_vm_area_node(unsigned long size,
+		unsigned long align, unsigned long flags, unsigned long start,
+		unsigned long end, int node, gfp_t gfp_mask, const void *caller)
+{
+	struct vmap_area *va;
+	struct vm_struct *area;
+	unsigned long requested_size = size;
+
+	BUG_ON(in_interrupt());
+	size = PAGE_ALIGN(size);
+	if (unlikely(!size))
+		return NULL;
+
+	if (flags & VM_IOREMAP)
+		align = 1ul << clamp_t(int, get_count_order_long(size),
+				       PAGE_SHIFT, IOREMAP_MAX_ORDER);
+
+	area = kzalloc_node(sizeof(*area), gfp_mask & GFP_RECLAIM_MASK, node);
+	if (unlikely(!area))
+		return NULL;
+
+	if (!(flags & VM_NO_GUARD))
+		size += PAGE_SIZE;
+
+	va = alloc_vmap_area(size, align, start, end, node, gfp_mask);
+	if (IS_ERR(va)) {
+		kfree(area);
+		return NULL;
+	}
+
+	kasan_unpoison_vmalloc((void *)va->va_start, requested_size);
+
+	setup_vmalloc_vm(area, va, flags, caller);
+
+	return area;
+}
+
 //struct vm_struct *__get_vm_area_caller(unsigned long size, unsigned long flags,
 //				       unsigned long start, unsigned long end,
 //				       const void *caller)
@@ -2281,20 +2281,20 @@ static void __vunmap(const void *addr, int deallocate_pages)
 	return;
 }
 
-//static inline void __vfree_deferred(const void *addr)
-//{
-//	/*
-//	 * Use raw_cpu_ptr() because this can be called from preemptible
-//	 * context. Preemption is absolutely fine here, because the llist_add()
-//	 * implementation is lockless, so it works even if we are adding to
-//	 * another cpu's list. schedule_work() should be fine with this too.
-//	 */
-//	struct vfree_deferred *p = raw_cpu_ptr(&vfree_deferred);
-//
-//	if (llist_add((struct llist_node *)addr, &p->list))
-//		schedule_work(&p->wq);
-//}
-//
+static inline void __vfree_deferred(const void *addr)
+{
+	/*
+	 * Use raw_cpu_ptr() because this can be called from preemptible
+	 * context. Preemption is absolutely fine here, because the llist_add()
+	 * implementation is lockless, so it works even if we are adding to
+	 * another cpu's list. schedule_work() should be fine with this too.
+	 */
+	struct vfree_deferred *p = raw_cpu_ptr(&vfree_deferred);
+
+	if (llist_add((struct llist_node *)addr, &p->list))
+		schedule_work(&p->wq);
+}
+
 ///**
 // * vfree_atomic - release memory allocated by vmalloc()
 // * @addr:	  memory base address
@@ -2312,15 +2312,15 @@ static void __vunmap(const void *addr, int deallocate_pages)
 //		return;
 //	__vfree_deferred(addr);
 //}
-//
-//static void __vfree(const void *addr)
-//{
-//	if (unlikely(in_interrupt()))
-//		__vfree_deferred(addr);
-//	else
-//		__vunmap(addr, 1);
-//}
-//
+
+static void __vfree(const void *addr)
+{
+	if (unlikely(in_interrupt()))
+		__vfree_deferred(addr);
+	else
+		__vunmap(addr, 1);
+}
+
 ///**
 // * vfree - release memory allocated by vmalloc()
 // * @addr:  memory base address
@@ -2407,154 +2407,154 @@ static void __vunmap(const void *addr, int deallocate_pages)
 //	return area->addr;
 //}
 //EXPORT_SYMBOL(vmap);
-//
-//static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
-//				 pgprot_t prot, int node)
-//{
-//	struct page **pages;
-//	unsigned int nr_pages, array_size, i;
-//	const gfp_t nested_gfp = (gfp_mask & GFP_RECLAIM_MASK) | __GFP_ZERO;
-//	const gfp_t alloc_mask = gfp_mask | __GFP_NOWARN;
-//	const gfp_t highmem_mask = (gfp_mask & (GFP_DMA | GFP_DMA32)) ?
-//					0 :
-//					__GFP_HIGHMEM;
-//
-//	nr_pages = get_vm_area_size(area) >> PAGE_SHIFT;
-//	array_size = (nr_pages * sizeof(struct page *));
-//
-//	/* Please note that the recursion is strictly bounded. */
-//	if (array_size > PAGE_SIZE) {
-//		pages = __vmalloc_node(array_size, 1, nested_gfp|highmem_mask,
-//				node, area->caller);
-//	} else {
-//		pages = kmalloc_node(array_size, nested_gfp, node);
-//	}
-//
-//	if (!pages) {
-//		remove_vm_area(area->addr);
-//		kfree(area);
-//		return NULL;
-//	}
-//
-//	area->pages = pages;
-//	area->nr_pages = nr_pages;
-//
-//	for (i = 0; i < area->nr_pages; i++) {
-//		struct page *page;
-//
-//		if (node == NUMA_NO_NODE)
-//			page = alloc_page(alloc_mask|highmem_mask);
-//		else
-//			page = alloc_pages_node(node, alloc_mask|highmem_mask, 0);
-//
-//		if (unlikely(!page)) {
-//			/* Successfully allocated i pages, free them in __vunmap() */
-//			area->nr_pages = i;
-//			atomic_long_add(area->nr_pages, &nr_vmalloc_pages);
-//			goto fail;
-//		}
-//		area->pages[i] = page;
-//		if (gfpflags_allow_blocking(gfp_mask))
-//			cond_resched();
-//	}
-//	atomic_long_add(area->nr_pages, &nr_vmalloc_pages);
-//
-//	if (map_kernel_range((unsigned long)area->addr, get_vm_area_size(area),
-//			prot, pages) < 0)
-//		goto fail;
-//
-//	return area->addr;
-//
-//fail:
-//	warn_alloc(gfp_mask, NULL,
-//			  "vmalloc: allocation failure, allocated %ld of %ld bytes",
-//			  (area->nr_pages*PAGE_SIZE), area->size);
-//	__vfree(area->addr);
-//	return NULL;
-//}
-//
-///**
-// * __vmalloc_node_range - allocate virtually contiguous memory
-// * @size:		  allocation size
-// * @align:		  desired alignment
-// * @start:		  vm area range start
-// * @end:		  vm area range end
-// * @gfp_mask:		  flags for the page level allocator
-// * @prot:		  protection mask for the allocated pages
-// * @vm_flags:		  additional vm area flags (e.g. %VM_NO_GUARD)
-// * @node:		  node to use for allocation or NUMA_NO_NODE
-// * @caller:		  caller's return address
-// *
-// * Allocate enough pages to cover @size from the page level
-// * allocator with @gfp_mask flags.  Map them into contiguous
-// * kernel virtual space, using a pagetable protection of @prot.
-// *
-// * Return: the address of the area or %NULL on failure
-// */
-//void *__vmalloc_node_range(unsigned long size, unsigned long align,
-//			unsigned long start, unsigned long end, gfp_t gfp_mask,
-//			pgprot_t prot, unsigned long vm_flags, int node,
-//			const void *caller)
-//{
-//	struct vm_struct *area;
-//	void *addr;
-//	unsigned long real_size = size;
-//
-//	size = PAGE_ALIGN(size);
-//	if (!size || (size >> PAGE_SHIFT) > totalram_pages())
-//		goto fail;
-//
-//	area = __get_vm_area_node(real_size, align, VM_ALLOC | VM_UNINITIALIZED |
-//				vm_flags, start, end, node, gfp_mask, caller);
-//	if (!area)
-//		goto fail;
-//
-//	addr = __vmalloc_area_node(area, gfp_mask, prot, node);
-//	if (!addr)
-//		return NULL;
-//
-//	/*
-//	 * In this function, newly allocated vm_struct has VM_UNINITIALIZED
-//	 * flag. It means that vm_struct is not fully initialized.
-//	 * Now, it is fully initialized, so remove this flag here.
-//	 */
-//	clear_vm_uninitialized_flag(area);
-//
-//	kmemleak_vmalloc(area, size, gfp_mask);
-//
-//	return addr;
-//
-//fail:
-//	warn_alloc(gfp_mask, NULL,
-//			  "vmalloc: allocation failure: %lu bytes", real_size);
-//	return NULL;
-//}
-//
-///**
-// * __vmalloc_node - allocate virtually contiguous memory
-// * @size:	    allocation size
-// * @align:	    desired alignment
-// * @gfp_mask:	    flags for the page level allocator
-// * @node:	    node to use for allocation or NUMA_NO_NODE
-// * @caller:	    caller's return address
-// *
-// * Allocate enough pages to cover @size from the page level allocator with
-// * @gfp_mask flags.  Map them into contiguous kernel virtual space.
-// *
-// * Reclaim modifiers in @gfp_mask - __GFP_NORETRY, __GFP_RETRY_MAYFAIL
-// * and __GFP_NOFAIL are not supported
-// *
-// * Any use of gfp flags outside of GFP_KERNEL should be consulted
-// * with mm people.
-// *
-// * Return: pointer to the allocated memory or %NULL on error
-// */
-//void *__vmalloc_node(unsigned long size, unsigned long align,
-//			    gfp_t gfp_mask, int node, const void *caller)
-//{
-//	return __vmalloc_node_range(size, align, VMALLOC_START, VMALLOC_END,
-//				gfp_mask, PAGE_KERNEL, 0, node, caller);
-//}
+
+static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
+				 pgprot_t prot, int node)
+{
+	struct page **pages;
+	unsigned int nr_pages, array_size, i;
+	const gfp_t nested_gfp = (gfp_mask & GFP_RECLAIM_MASK) | __GFP_ZERO;
+	const gfp_t alloc_mask = gfp_mask | __GFP_NOWARN;
+	const gfp_t highmem_mask = (gfp_mask & (GFP_DMA | GFP_DMA32)) ?
+					0 :
+					__GFP_HIGHMEM;
+
+	nr_pages = get_vm_area_size(area) >> PAGE_SHIFT;
+	array_size = (nr_pages * sizeof(struct page *));
+
+	/* Please note that the recursion is strictly bounded. */
+	if (array_size > PAGE_SIZE) {
+		pages = __vmalloc_node(array_size, 1, nested_gfp|highmem_mask,
+				node, area->caller);
+	} else {
+		pages = kmalloc_node(array_size, nested_gfp, node);
+	}
+
+	if (!pages) {
+		remove_vm_area(area->addr);
+		kfree(area);
+		return NULL;
+	}
+
+	area->pages = pages;
+	area->nr_pages = nr_pages;
+
+	for (i = 0; i < area->nr_pages; i++) {
+		struct page *page;
+
+		if (node == NUMA_NO_NODE)
+			page = alloc_page(alloc_mask|highmem_mask);
+		else
+			page = alloc_pages_node(node, alloc_mask|highmem_mask, 0);
+
+		if (unlikely(!page)) {
+			/* Successfully allocated i pages, free them in __vunmap() */
+			area->nr_pages = i;
+			atomic_long_add(area->nr_pages, &nr_vmalloc_pages);
+			goto fail;
+		}
+		area->pages[i] = page;
+		if (gfpflags_allow_blocking(gfp_mask))
+			cond_resched();
+	}
+	atomic_long_add(area->nr_pages, &nr_vmalloc_pages);
+
+	if (map_kernel_range((unsigned long)area->addr, get_vm_area_size(area),
+			prot, pages) < 0)
+		goto fail;
+
+	return area->addr;
+
+fail:
+	warn_alloc(gfp_mask, NULL,
+			  "vmalloc: allocation failure, allocated %ld of %ld bytes",
+			  (area->nr_pages*PAGE_SIZE), area->size);
+	__vfree(area->addr);
+	return NULL;
+}
+
+/**
+ * __vmalloc_node_range - allocate virtually contiguous memory
+ * @size:		  allocation size
+ * @align:		  desired alignment
+ * @start:		  vm area range start
+ * @end:		  vm area range end
+ * @gfp_mask:		  flags for the page level allocator
+ * @prot:		  protection mask for the allocated pages
+ * @vm_flags:		  additional vm area flags (e.g. %VM_NO_GUARD)
+ * @node:		  node to use for allocation or NUMA_NO_NODE
+ * @caller:		  caller's return address
+ *
+ * Allocate enough pages to cover @size from the page level
+ * allocator with @gfp_mask flags.  Map them into contiguous
+ * kernel virtual space, using a pagetable protection of @prot.
+ *
+ * Return: the address of the area or %NULL on failure
+ */
+void *__vmalloc_node_range(unsigned long size, unsigned long align,
+			unsigned long start, unsigned long end, gfp_t gfp_mask,
+			pgprot_t prot, unsigned long vm_flags, int node,
+			const void *caller)
+{
+	struct vm_struct *area;
+	void *addr;
+	unsigned long real_size = size;
+
+	size = PAGE_ALIGN(size);
+	if (!size || (size >> PAGE_SHIFT) > totalram_pages())
+		goto fail;
+
+	area = __get_vm_area_node(real_size, align, VM_ALLOC | VM_UNINITIALIZED |
+				vm_flags, start, end, node, gfp_mask, caller);
+	if (!area)
+		goto fail;
+
+	addr = __vmalloc_area_node(area, gfp_mask, prot, node);
+	if (!addr)
+		return NULL;
+
+	/*
+	 * In this function, newly allocated vm_struct has VM_UNINITIALIZED
+	 * flag. It means that vm_struct is not fully initialized.
+	 * Now, it is fully initialized, so remove this flag here.
+	 */
+	clear_vm_uninitialized_flag(area);
+
+	kmemleak_vmalloc(area, size, gfp_mask);
+
+	return addr;
+
+fail:
+	warn_alloc(gfp_mask, NULL,
+			  "vmalloc: allocation failure: %lu bytes", real_size);
+	return NULL;
+}
+
+/**
+ * __vmalloc_node - allocate virtually contiguous memory
+ * @size:	    allocation size
+ * @align:	    desired alignment
+ * @gfp_mask:	    flags for the page level allocator
+ * @node:	    node to use for allocation or NUMA_NO_NODE
+ * @caller:	    caller's return address
+ *
+ * Allocate enough pages to cover @size from the page level allocator with
+ * @gfp_mask flags.  Map them into contiguous kernel virtual space.
+ *
+ * Reclaim modifiers in @gfp_mask - __GFP_NORETRY, __GFP_RETRY_MAYFAIL
+ * and __GFP_NOFAIL are not supported
+ *
+ * Any use of gfp flags outside of GFP_KERNEL should be consulted
+ * with mm people.
+ *
+ * Return: pointer to the allocated memory or %NULL on error
+ */
+void *__vmalloc_node(unsigned long size, unsigned long align,
+			    gfp_t gfp_mask, int node, const void *caller)
+{
+	return __vmalloc_node_range(size, align, VMALLOC_START, VMALLOC_END,
+				gfp_mask, PAGE_KERNEL, 0, node, caller);
+}
 ///*
 // * This is only for performance analysis of vmalloc and stress purpose.
 // * It is required by vmalloc test module, therefore do not use it other
@@ -2563,14 +2563,13 @@ static void __vunmap(const void *addr, int deallocate_pages)
 //#ifdef CONFIG_TEST_VMALLOC_MODULE
 //EXPORT_SYMBOL_GPL(__vmalloc_node);
 //#endif
-//
-//void *__vmalloc(unsigned long size, gfp_t gfp_mask)
-//{
-//	return __vmalloc_node(size, 1, gfp_mask, NUMA_NO_NODE,
-//				__builtin_return_address(0));
-//}
-//EXPORT_SYMBOL(__vmalloc);
-//
+
+void *__vmalloc(unsigned long size, gfp_t gfp_mask)
+{
+	return __vmalloc_node(size, 1, gfp_mask, NUMA_NO_NODE,
+				__builtin_return_address(0));
+}
+
 ///**
 // * vmalloc - allocate virtually contiguous memory
 // * @size:    allocation size

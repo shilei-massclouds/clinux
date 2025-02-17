@@ -43,16 +43,16 @@
 // */
 //unsigned int __read_mostly sysctl_oops_all_cpu_backtrace;
 //#endif /* CONFIG_SMP */
-//
+
 //int panic_on_oops = CONFIG_PANIC_ON_OOPS_VALUE;
-//static unsigned long tainted_mask =
-//	IS_ENABLED(CONFIG_GCC_PLUGIN_RANDSTRUCT) ? (1 << TAINT_RANDSTRUCT) : 0;
+static unsigned long tainted_mask =
+	IS_ENABLED(CONFIG_GCC_PLUGIN_RANDSTRUCT) ? (1 << TAINT_RANDSTRUCT) : 0;
 //static int pause_on_oops;
 //static int pause_on_oops_flag;
 //static DEFINE_SPINLOCK(pause_on_oops_lock);
 //bool crash_kexec_post_notifiers;
 int panic_on_warn __read_mostly;
-EXPORT_SYMBOL(panic_on_warn );
+EXPORT_SYMBOL(panic_on_warn);
 //unsigned long panic_on_taint;
 //bool panic_on_taint_nousertaint = false;
 //
@@ -388,38 +388,38 @@ EXPORT_SYMBOL(panic_on_warn );
 //	[ TAINT_AUX ]			= { 'X', ' ', true },
 //	[ TAINT_RANDSTRUCT ]		= { 'T', ' ', true },
 //};
-//
-///**
-// * print_tainted - return a string to represent the kernel taint state.
-// *
-// * For individual taint flag meanings, see Documentation/admin-guide/sysctl/kernel.rst
-// *
-// * The string is overwritten by the next call to print_tainted(),
-// * but is always NULL terminated.
-// */
-//const char *print_tainted(void)
-//{
-//	static char buf[TAINT_FLAGS_COUNT + sizeof("Tainted: ")];
-//
-//	BUILD_BUG_ON(ARRAY_SIZE(taint_flags) != TAINT_FLAGS_COUNT);
-//
-//	if (tainted_mask) {
-//		char *s;
-//		int i;
-//
-//		s = buf + sprintf(buf, "Tainted: ");
-//		for (i = 0; i < TAINT_FLAGS_COUNT; i++) {
-//			const struct taint_flag *t = &taint_flags[i];
-//			*s++ = test_bit(i, &tainted_mask) ?
-//					t->c_true : t->c_false;
-//		}
-//		*s = 0;
-//	} else
-//		snprintf(buf, sizeof(buf), "Not tainted");
-//
-//	return buf;
-//}
-//
+
+/**
+ * print_tainted - return a string to represent the kernel taint state.
+ *
+ * For individual taint flag meanings, see Documentation/admin-guide/sysctl/kernel.rst
+ *
+ * The string is overwritten by the next call to print_tainted(),
+ * but is always NULL terminated.
+ */
+const char *print_tainted(void)
+{
+	static char buf[TAINT_FLAGS_COUNT + sizeof("Tainted: ")];
+
+	BUILD_BUG_ON(ARRAY_SIZE(taint_flags) != TAINT_FLAGS_COUNT);
+
+	if (tainted_mask) {
+		char *s;
+		int i;
+
+		s = buf + sprintf(buf, "Tainted: ");
+		for (i = 0; i < TAINT_FLAGS_COUNT; i++) {
+			const struct taint_flag *t = &taint_flags[i];
+			*s++ = test_bit(i, &tainted_mask) ?
+					t->c_true : t->c_false;
+		}
+		*s = 0;
+	} else
+		snprintf(buf, sizeof(buf), "Not tainted");
+
+	return buf;
+}
+
 //int test_taint(unsigned flag)
 //{
 //	return test_bit(flag, &tainted_mask);
@@ -615,40 +615,40 @@ EXPORT_SYMBOL(panic_on_warn );
 //	/* Just a warning, don't kill lockdep. */
 //	add_taint(taint, LOCKDEP_STILL_OK);
 //}
-//
-//#ifndef __WARN_FLAGS
-//void warn_slowpath_fmt(const char *file, int line, unsigned taint,
-//		       const char *fmt, ...)
-//{
-//	struct warn_args args;
-//
-//	pr_warn(CUT_HERE);
-//
-//	if (!fmt) {
-//		__warn(file, line, __builtin_return_address(0), taint,
-//		       NULL, NULL);
-//		return;
-//	}
-//
-//	args.fmt = fmt;
-//	va_start(args.args, fmt);
-//	__warn(file, line, __builtin_return_address(0), taint, NULL, &args);
-//	va_end(args.args);
-//}
-//EXPORT_SYMBOL(warn_slowpath_fmt);
-//#else
-//void __warn_printk(const char *fmt, ...)
-//{
-//	va_list args;
-//
-//	pr_warn(CUT_HERE);
-//
-//	va_start(args, fmt);
-//	vprintk(fmt, args);
-//	va_end(args);
-//}
-//EXPORT_SYMBOL(__warn_printk);
-//#endif
+
+#ifndef __WARN_FLAGS
+void warn_slowpath_fmt(const char *file, int line, unsigned taint,
+		       const char *fmt, ...)
+{
+	struct warn_args args;
+
+	pr_warn(CUT_HERE);
+
+	if (!fmt) {
+		__warn(file, line, __builtin_return_address(0), taint,
+		       NULL, NULL);
+		return;
+	}
+
+	args.fmt = fmt;
+	va_start(args.args, fmt);
+	__warn(file, line, __builtin_return_address(0), taint, NULL, &args);
+	va_end(args.args);
+}
+EXPORT_SYMBOL(warn_slowpath_fmt);
+#else
+void __warn_printk(const char *fmt, ...)
+{
+	va_list args;
+
+	pr_warn(CUT_HERE);
+
+	va_start(args, fmt);
+	vprintk(fmt, args);
+	va_end(args);
+}
+EXPORT_SYMBOL(__warn_printk);
+#endif
 //
 //#ifdef CONFIG_BUG
 //

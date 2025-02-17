@@ -16,13 +16,6 @@ cl_vmalloc_init(void)
 }
 EXPORT_SYMBOL(cl_vmalloc_init);
 
-/*
-void call_rcu(struct rcu_head *head, rcu_callback_t func)
-{
-    booter_panic("No impl 'slub'.");
-}
-*/
-
 int set_direct_map_invalid_noflush(struct page *page)
 {
     booter_panic("No impl 'slub'.");
@@ -43,17 +36,30 @@ void pmd_clear_bad(pmd_t *pmd)
     booter_panic("No impl 'slub'.");
 }
 
+int __pte_alloc_kernel(pmd_t *pmd)
+{
+    booter_panic("No impl 'slub'.");
+}
+
+int __printk_ratelimit(const char *func)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(__printk_ratelimit);
+
+int __pmd_alloc(struct mm_struct *mm, pud_t *pud,
+                        unsigned long address)
+{
+    booter_panic("No impl 'slub'.");
+}
+void flush_icache_pte(pte_t pte)
+{
+    booter_panic("No impl 'slub'.");
+}
 /*
-bool llist_add_batch(struct llist_node *new_first, struct llist_node *new_last,
-             struct llist_head *head)
+void warn_alloc(gfp_t gfp_mask, nodemask_t *nodemask, const char *fmt, ...)
 {
     booter_panic("No impl 'slub'.");
 }
 */
 
-/*
-void kvfree(const void *addr)
-{
-    booter_panic("No impl 'slub'.");
-}
-*/

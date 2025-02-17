@@ -53,11 +53,12 @@ components := \
 	memblock bootmem paging rmap backing_dev \
 	page_alloc slub vmalloc mm_util \
 	spinlock semaphore mutex rwsem rcu \
-	inode dcache file_table block_dev \
-	cred user_namespace nsproxy \
+	inode dcache file_table block_dev do_mounts \
+	cred user_namespace nsproxy fs_namespace \
+	ramfs \
 	fork mmap \
-	buffer \
-	early_printk printk panic dump_stack
+	buffer swap_state \
+	early_printk printk panic dump_stack show_mem
 	#partitions \
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)

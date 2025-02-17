@@ -4601,55 +4601,55 @@ EXPORT_SYMBOL_GPL(workqueue_set_max_active);
 //	}
 //}
 //EXPORT_SYMBOL_GPL(set_worker_desc);
-//
-///**
-// * print_worker_info - print out worker information and description
-// * @log_lvl: the log level to use when printing
-// * @task: target task
-// *
-// * If @task is a worker and currently executing a work item, print out the
-// * name of the workqueue being serviced and worker description set with
-// * set_worker_desc() by the currently executing work item.
-// *
-// * This function can be safely called on any task as long as the
-// * task_struct itself is accessible.  While safe, this function isn't
-// * synchronized and may print out mixups or garbages of limited length.
-// */
-//void print_worker_info(const char *log_lvl, struct task_struct *task)
-//{
-//	work_func_t *fn = NULL;
-//	char name[WQ_NAME_LEN] = { };
-//	char desc[WORKER_DESC_LEN] = { };
-//	struct pool_workqueue *pwq = NULL;
-//	struct workqueue_struct *wq = NULL;
-//	struct worker *worker;
-//
-//	if (!(task->flags & PF_WQ_WORKER))
-//		return;
-//
-//	/*
-//	 * This function is called without any synchronization and @task
-//	 * could be in any state.  Be careful with dereferences.
-//	 */
-//	worker = kthread_probe_data(task);
-//
-//	/*
-//	 * Carefully copy the associated workqueue's workfn, name and desc.
-//	 * Keep the original last '\0' in case the original is garbage.
-//	 */
-//	copy_from_kernel_nofault(&fn, &worker->current_func, sizeof(fn));
-//	copy_from_kernel_nofault(&pwq, &worker->current_pwq, sizeof(pwq));
-//	copy_from_kernel_nofault(&wq, &pwq->wq, sizeof(wq));
-//	copy_from_kernel_nofault(name, wq->name, sizeof(name) - 1);
-//	copy_from_kernel_nofault(desc, worker->desc, sizeof(desc) - 1);
-//
-//	if (fn || name[0] || desc[0]) {
-//		printk("%sWorkqueue: %s %ps", log_lvl, name, fn);
-//		if (strcmp(name, desc))
-//			pr_cont(" (%s)", desc);
-//		pr_cont("\n");
-//	}
-//}
+
+/**
+ * print_worker_info - print out worker information and description
+ * @log_lvl: the log level to use when printing
+ * @task: target task
+ *
+ * If @task is a worker and currently executing a work item, print out the
+ * name of the workqueue being serviced and worker description set with
+ * set_worker_desc() by the currently executing work item.
+ *
+ * This function can be safely called on any task as long as the
+ * task_struct itself is accessible.  While safe, this function isn't
+ * synchronized and may print out mixups or garbages of limited length.
+ */
+void print_worker_info(const char *log_lvl, struct task_struct *task)
+{
+	work_func_t *fn = NULL;
+	char name[WQ_NAME_LEN] = { };
+	char desc[WORKER_DESC_LEN] = { };
+	struct pool_workqueue *pwq = NULL;
+	struct workqueue_struct *wq = NULL;
+	struct worker *worker;
+
+	if (!(task->flags & PF_WQ_WORKER))
+		return;
+
+	/*
+	 * This function is called without any synchronization and @task
+	 * could be in any state.  Be careful with dereferences.
+	 */
+	worker = kthread_probe_data(task);
+
+	/*
+	 * Carefully copy the associated workqueue's workfn, name and desc.
+	 * Keep the original last '\0' in case the original is garbage.
+	 */
+	copy_from_kernel_nofault(&fn, &worker->current_func, sizeof(fn));
+	copy_from_kernel_nofault(&pwq, &worker->current_pwq, sizeof(pwq));
+	copy_from_kernel_nofault(&wq, &pwq->wq, sizeof(wq));
+	copy_from_kernel_nofault(name, wq->name, sizeof(name) - 1);
+	copy_from_kernel_nofault(desc, worker->desc, sizeof(desc) - 1);
+
+	if (fn || name[0] || desc[0]) {
+		printk("%sWorkqueue: %s %ps", log_lvl, name, fn);
+		if (strcmp(name, desc))
+			pr_cont(" (%s)", desc);
+		pr_cont("\n");
+	}
+}
 
 static void pr_cont_pool_info(struct worker_pool *pool)
 {

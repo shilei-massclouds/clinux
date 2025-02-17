@@ -30,7 +30,7 @@ int cl_lib_init(void)
 }
 EXPORT_SYMBOL(cl_lib_init);
 
-void print_worker_info(const char *log_lvl, struct task_struct *task)
+__weak void print_worker_info(const char *log_lvl, struct task_struct *task)
 {
     booter_panic("No impl 'print_worker_info'.");
 }
@@ -51,7 +51,7 @@ int in_sched_functions(unsigned long addr)
 }
 EXPORT_SYMBOL(in_sched_functions);
 
-const char *print_tainted(void)
+__weak const char *print_tainted(void)
 {
     booter_panic("No impl 'print_tainted'.");
 }
@@ -63,8 +63,9 @@ bool ns_capable(struct user_namespace *ns, int cap)
 }
 EXPORT_SYMBOL(ns_capable);
 
-void __warn_printk(const char *fmt, ...)
+__weak void __warn_printk(const char *fmt, ...)
 {
     sbi_puts("[RAW_WARN] ");
     sbi_puts(printk_skip_level(fmt));
 }
+EXPORT_SYMBOL(__warn_printk);

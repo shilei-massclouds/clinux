@@ -2037,11 +2037,10 @@ asmlinkage int vprintk_emit(int facility, int level,
 }
 EXPORT_SYMBOL(vprintk_emit);
 
-//asmlinkage int vprintk(const char *fmt, va_list args)
-//{
-//	return vprintk_func(fmt, args);
-//}
-//EXPORT_SYMBOL(vprintk);
+asmlinkage int vprintk(const char *fmt, va_list args)
+{
+	return vprintk_func(fmt, args);
+}
 
 int vprintk_default(const char *fmt, va_list args)
 {

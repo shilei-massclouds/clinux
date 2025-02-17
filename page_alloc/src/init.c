@@ -35,11 +35,13 @@ void __dump_page(struct page *page, const char *reason)
     booter_panic("No impl 'page_alloc'.");
 }
 
+/*
 void* __weak __vmalloc(unsigned long size, gfp_t gfp_mask)
 {
     booter_panic("No impl 'page_alloc'.");
 }
 EXPORT_SYMBOL(__vmalloc);
+*/
 
 unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
                 gfp_t gfp_mask, nodemask_t *nodemask)
@@ -87,10 +89,12 @@ enum compact_result try_to_compact_pages(gfp_t gfp_mask, unsigned int order,
     booter_panic("No impl 'page_alloc'.");
 }
 
+/*
 void show_mem(unsigned int filter, nodemask_t *nodemask)
 {
     booter_panic("No impl 'page_init_poison'.");
 }
+*/
 
 long congestion_wait(int sync, long timeout)
 {
@@ -111,3 +115,10 @@ bool node_dirty_ok(struct pglist_data *pgdat)
  * and mark_oom_victim
  */
 DEFINE_MUTEX(oom_lock);
+
+/*
+void show_swap_cache_info(void)
+{
+    booter_panic("No impl.");
+}
+*/

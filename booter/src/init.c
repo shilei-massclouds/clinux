@@ -230,3 +230,9 @@ int proc_alloc_inum(unsigned int *inum)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(proc_alloc_inum);
+
+__weak void *__vmalloc(unsigned long size, gfp_t gfp_mask)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(__vmalloc);

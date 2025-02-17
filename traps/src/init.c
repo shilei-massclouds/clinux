@@ -47,10 +47,12 @@ void oops_enter(void)
 {
     booter_panic("No impl!\n");
 }
+/*
 int __printk_ratelimit(const char *func)
 {
     booter_panic("No impl!\n");
 }
+*/
 void
 show_regs(struct pt_regs *regs)
 {

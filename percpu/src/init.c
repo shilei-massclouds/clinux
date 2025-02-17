@@ -13,11 +13,6 @@ cl_percpu_init(void)
 }
 EXPORT_SYMBOL(cl_percpu_init);
 
-void *__vmalloc(unsigned long size, gfp_t gfp_mask)
-{
-    booter_panic("No impl 'percpu'.");
-}
-
 void kvfree(const void *addr)
 {
     booter_panic("No impl 'percpu'.");

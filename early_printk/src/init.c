@@ -107,7 +107,8 @@ asmlinkage __visible int cl_printk(const char *fmt, ...)
 }
 EXPORT_SYMBOL(cl_printk);
 
-void __weak __warn_printk(const char *fmt, ...)
+/*
+void __warn_printk(const char *fmt, ...)
 {
     int ret;
     va_list args;
@@ -116,4 +117,10 @@ void __weak __warn_printk(const char *fmt, ...)
     early_vprintk(printk_skip_level(fmt), args);
     va_end(args);
 }
-EXPORT_SYMBOL(__warn_printk);
+*/
+
+__weak asmlinkage int vprintk(const char *fmt, va_list args)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(vprintk);
