@@ -359,3 +359,15 @@ int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *attr,
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(sysfs_create_file_ns);
+
+__weak int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sysfs_create_dir_ns);
+
+__weak void sysfs_remove_dir(struct kobject *kobj)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sysfs_remove_dir);

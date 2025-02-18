@@ -39,20 +39,24 @@ __weak void *kmem_cache_alloc(struct kmem_cache *s, gfp_t gfpflags)
 }
 EXPORT_SYMBOL(kmem_cache_alloc);
 
+/*
 void sysfs_remove_dir(struct kobject *kobj)
 {
     booter_panic("No impl in 'kobject'.");
 }
+*/
 
 int sysfs_create_groups(struct kobject *kobj,
             const struct attribute_group **groups)
 {
     booter_panic("No impl in 'kobject'.");
 }
+/*
 int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
 {
     booter_panic("No impl in 'kobject'.");
 }
+*/
 
 struct kmem_cache *
 kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1] __ro_after_init =

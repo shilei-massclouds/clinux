@@ -288,6 +288,7 @@ struct kernfs_node *kernfs_get_parent(struct kernfs_node *kn)
 
 	return parent;
 }
+EXPORT_SYMBOL(kernfs_get_parent);
 
 /**
  *	kernfs_name_hash
@@ -1040,6 +1041,7 @@ struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
 	kernfs_put(kn);
 	return ERR_PTR(rc);
 }
+EXPORT_SYMBOL(kernfs_create_dir_ns);
 
 /**
  * kernfs_create_empty_dir - create an always empty directory
@@ -1073,6 +1075,7 @@ struct kernfs_node *kernfs_create_empty_dir(struct kernfs_node *parent,
 	kernfs_put(kn);
 	return ERR_PTR(rc);
 }
+EXPORT_SYMBOL_GPL(kernfs_create_empty_dir);
 
 static struct dentry *kernfs_iop_lookup(struct inode *dir,
 					struct dentry *dentry,
@@ -1357,6 +1360,7 @@ void kernfs_remove(struct kernfs_node *kn)
 	__kernfs_remove(kn);
 	mutex_unlock(&kernfs_mutex);
 }
+EXPORT_SYMBOL_GPL(kernfs_remove);
 
 /**
  * kernfs_break_active_protection - break out of active protection
@@ -1522,6 +1526,7 @@ int kernfs_remove_by_name_ns(struct kernfs_node *parent, const char *name,
 	else
 		return -ENOENT;
 }
+EXPORT_SYMBOL_GPL(kernfs_remove_by_name_ns);
 
 /**
  * kernfs_rename_ns - move and rename a kernfs_node
@@ -1598,6 +1603,7 @@ int kernfs_rename_ns(struct kernfs_node *kn, struct kernfs_node *new_parent,
 	mutex_unlock(&kernfs_mutex);
 	return error;
 }
+EXPORT_SYMBOL_GPL(kernfs_rename_ns);
 
 /* Relationship between s_mode and the DT_xxx types */
 static inline unsigned char dt_type(struct kernfs_node *kn)
