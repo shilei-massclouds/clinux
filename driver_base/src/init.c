@@ -93,19 +93,7 @@ int lock_device_hotplug_sysfs(void)
 {
     booter_panic("No impl 'driver_base'.");
 }
-/*
-void __srcu_read_unlock(struct srcu_struct *ssp, int idx)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-*/
 int kobject_synth_uevent(struct kobject *kobj, const char *buf, size_t count)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-
-void sysfs_delete_link(struct kobject *kobj, struct kobject *targ,
-            const char *name)
 {
     booter_panic("No impl 'driver_base'.");
 }
@@ -115,8 +103,6 @@ void device_remove_file(struct device *dev,
 {
     booter_panic("No impl 'driver_base'.");
 }
-
-//const struct sysfs_ops kobj_sysfs_ops;
 
 void kset_unregister(struct kset *k)
 {

@@ -111,6 +111,7 @@ int kernfs_setattr(struct kernfs_node *kn, const struct iattr *iattr)
 	mutex_unlock(&kernfs_mutex);
 	return ret;
 }
+EXPORT_SYMBOL(kernfs_setattr);
 
 int kernfs_iop_setattr(struct dentry *dentry, struct iattr *iattr)
 {

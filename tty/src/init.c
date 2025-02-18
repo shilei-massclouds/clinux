@@ -42,10 +42,6 @@ int kill_pgrp(struct pid *pid, int sig, int priv)
 {
     booter_panic("No impl.\n");
 }
-void sysfs_notify(struct kobject *kobj, const char *dir, const char *attr)
-{
-    booter_panic("No impl.\n");
-}
 int __sched ldsem_down_write(struct ld_semaphore *sem, long timeout)
 {
     booter_panic("No impl.\n");

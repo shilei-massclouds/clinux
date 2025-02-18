@@ -86,11 +86,18 @@ __weak void __warn_printk(const char *fmt, ...)
 }
 EXPORT_SYMBOL(__warn_printk);
 
-void sysfs_remove_link(struct kobject *kobj, const char *name)
+__weak void sysfs_remove_link(struct kobject *kobj, const char *name)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(sysfs_remove_link);
+
+__weak void sysfs_delete_link(struct kobject *kobj, struct kobject *targ,
+			const char *name)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(sysfs_delete_link);
 
 int kobject_uevent(struct kobject *kobj, enum kobject_action action)
 {
@@ -167,7 +174,7 @@ void module_put(struct module *module)
 }
 EXPORT_SYMBOL(module_put);
 
-int sysfs_create_link(struct kobject *kobj, struct kobject *target,
+__weak int sysfs_create_link(struct kobject *kobj, struct kobject *target,
               const char *name)
 {
     booter_panic("No impl 'driver_base'.");
@@ -353,7 +360,7 @@ struct proc_dir_entry *proc_create_single_data(const char *name, umode_t mode,
 }
 EXPORT_SYMBOL(proc_create_single_data);
 
-int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *attr,
+__weak int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *attr,
              const void *ns)
 {
     booter_panic("No impl 'driver_base'.");

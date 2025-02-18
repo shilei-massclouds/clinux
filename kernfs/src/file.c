@@ -1035,3 +1035,4 @@ struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
 	}
 	return kn;
 }
+EXPORT_SYMBOL(__kernfs_create_file);

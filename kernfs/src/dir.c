@@ -1384,6 +1384,7 @@ void kernfs_break_active_protection(struct kernfs_node *kn)
 	 */
 	kernfs_put_active(kn);
 }
+EXPORT_SYMBOL(kernfs_break_active_protection);
 
 /**
  * kernfs_unbreak_active_protection - undo kernfs_break_active_protection()
@@ -1415,6 +1416,7 @@ void kernfs_unbreak_active_protection(struct kernfs_node *kn)
 	if (kernfs_lockdep(kn))
 		rwsem_acquire(&kn->dep_map, 0, 1, _RET_IP_);
 }
+EXPORT_SYMBOL(kernfs_unbreak_active_protection);
 
 /**
  * kernfs_remove_self - remove a kernfs_node from its own method
@@ -1492,6 +1494,7 @@ bool kernfs_remove_self(struct kernfs_node *kn)
 	mutex_unlock(&kernfs_mutex);
 	return ret;
 }
+EXPORT_SYMBOL(kernfs_remove_self);
 
 /**
  * kernfs_remove_by_name_ns - find a kernfs_node by name and remove it
