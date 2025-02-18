@@ -21,33 +21,11 @@ void kfree_sensitive(const void *p)
     booter_panic("No impl!\n");
 }
 
-int call_usermodehelper_exec(struct subprocess_info *sub_info, int wait)
-{
-    booter_panic("No impl!\n");
-}
-
 int groups_search(const struct group_info *group_info, kgid_t grp)
 {
     booter_panic("No impl!\n");
 }
-struct subprocess_info *call_usermodehelper_setup(const char *path, char **argv,
-        char **envp, gfp_t gfp_mask,
-        int (*init)(struct subprocess_info *info, struct cred *new),
-        void (*cleanup)(struct subprocess_info *info),
-        void *data)
-{
-    booter_panic("No impl!\n");
-}
-/*
-gid_t from_kgid(struct user_namespace *to, kgid_t kgid)
-{
-    booter_panic("No impl!\n");
-}
-uid_t from_kuid(struct user_namespace *to, kuid_t kuid)
-{
-    booter_panic("No impl!\n");
-}
-*/
+
 void *kmemdup(const void *src, size_t len, gfp_t gfp)
 {
     booter_panic("No impl!\n");

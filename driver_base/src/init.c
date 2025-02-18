@@ -16,23 +16,7 @@ cl_driver_base_init(void)
 EXPORT_SYMBOL(cl_driver_base_init);
 
 struct device_type part_type;
-/*
-void dpm_sysfs_remove(struct device *dev)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 
-void srcu_drive_gp(struct work_struct *wp)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-*/
-
-int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *attr,
-             const void *ns)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 
 void unlock_device_hotplug(void)
 {

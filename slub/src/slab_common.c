@@ -583,11 +583,6 @@ struct kmem_cache *__init create_kmalloc_cache(const char *name,
 	return s;
 }
 
-struct kmem_cache *
-kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1] __ro_after_init =
-{ /* initialization for https://bugs.llvm.org/show_bug.cgi?id=42570 */ };
-EXPORT_SYMBOL(kmalloc_caches);
-
 /*
  * Conversion table for small slabs sizes / 8 to the index in the
  * kmalloc array. This is necessary for slabs < 192 since we have non power

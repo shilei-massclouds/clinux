@@ -3909,11 +3909,11 @@ context_switch(struct rq *rq, struct task_struct *prev,
 //
 //#endif
 
-DEFINE_PER_CPU(struct kernel_stat, kstat);
-DEFINE_PER_CPU(struct kernel_cpustat, kernel_cpustat);
-
-EXPORT_PER_CPU_SYMBOL(kstat);
-EXPORT_PER_CPU_SYMBOL(kernel_cpustat);
+//DEFINE_PER_CPU(struct kernel_stat, kstat);
+//DEFINE_PER_CPU(struct kernel_cpustat, kernel_cpustat);
+//
+//EXPORT_PER_CPU_SYMBOL(kstat);
+//EXPORT_PER_CPU_SYMBOL(kernel_cpustat);
 
 ///*
 // * The function fair_sched_class.update_curr accesses the struct curr
@@ -5087,7 +5087,6 @@ int idle_cpu(int cpu)
 
 	return 1;
 }
-EXPORT_SYMBOL(idle_cpu);
 
 ///**
 // * available_idle_cpu - is a given CPU idle for enqueuing work.
@@ -5559,7 +5558,6 @@ void sched_set_fifo(struct task_struct *p)
 	struct sched_param sp = { .sched_priority = MAX_RT_PRIO / 2 };
 	WARN_ON_ONCE(sched_setscheduler_nocheck(p, SCHED_FIFO, &sp) != 0);
 }
-EXPORT_SYMBOL_GPL(sched_set_fifo);
 
 ///*
 // * For when you don't much care about FIFO, but want to be above SCHED_NORMAL.

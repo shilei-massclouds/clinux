@@ -181,3 +181,102 @@ void __weak finish_swait(struct swait_queue_head *q, struct swait_queue *wait)
     booter_panic("No impl in 'early_sched'.");
 }
 EXPORT_SYMBOL(finish_swait);
+
+__weak int kernfs_path_from_node(struct kernfs_node *to, struct kernfs_node *from,
+              char *buf, size_t buflen)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(kernfs_path_from_node);
+
+__weak void
+prepare_to_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(prepare_to_wait);
+
+__weak void finish_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(finish_wait);
+
+__weak int __sched out_of_line_wait_on_bit(void *word, int bit,
+				    wait_bit_action_f *action, unsigned mode)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(out_of_line_wait_on_bit);
+
+__weak __sched int bit_wait(struct wait_bit_key *word, int mode)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(bit_wait);
+
+__weak void __wake_up_bit(struct wait_queue_head *wq_head, void *word, int bit)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__wake_up_bit);
+
+__weak void wake_up_bit(void *word, int bit)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(wake_up_bit);
+
+__weak long prepare_to_wait_event(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(prepare_to_wait_event);
+
+__weak void init_wait_entry(struct wait_queue_entry *wq_entry, int flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(init_wait_entry);
+
+__weak int idle_cpu(int cpu)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(idle_cpu);
+
+__weak void sched_set_fifo(struct task_struct *p)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(sched_set_fifo);
+
+DEFINE_PER_CPU(struct kernel_stat, kstat);
+DEFINE_PER_CPU(struct kernel_cpustat, kernel_cpustat);
+
+EXPORT_PER_CPU_SYMBOL(kstat);
+EXPORT_PER_CPU_SYMBOL(kernel_cpustat);
+
+__weak wait_queue_head_t *bit_waitqueue(void *word, int bit)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(bit_waitqueue);
+
+__weak int wake_bit_function(struct wait_queue_entry *wq_entry, unsigned mode, int sync, void *arg)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(wake_bit_function);
+
+__weak int autoremove_wake_function(struct wait_queue_entry *wq_entry, unsigned mode, int sync, void *key)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(autoremove_wake_function);
+
+__weak void add_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(add_wait_queue);

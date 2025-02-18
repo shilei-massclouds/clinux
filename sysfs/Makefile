@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
 
 obj_y := init.o
-obj_y += module.o
-obj_y += kmod.o
+obj_y += mount.o
+obj_y += dir.o

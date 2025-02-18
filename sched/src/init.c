@@ -26,12 +26,6 @@ __weak struct task_struct *__switch_to(struct task_struct *,
 }
 EXPORT_SYMBOL(__switch_to);
 
-int kernfs_path_from_node(struct kernfs_node *to, struct kernfs_node *from,
-              char *buf, size_t buflen)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 /*
 void __put_task_struct(struct task_struct *tsk)
 {

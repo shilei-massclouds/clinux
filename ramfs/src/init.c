@@ -15,10 +15,6 @@ cl_ramfs_init(void)
 }
 EXPORT_SYMBOL(cl_ramfs_init);
 
-struct dentry *d_make_root(struct inode *root_inode)
-{
-    booter_panic("No impl!\n");
-}
 int get_tree_nodev(struct fs_context *fc,
           int (*fill_super)(struct super_block *sb,
                     struct fs_context *fc))
@@ -39,56 +35,11 @@ int __fs_parse(struct p_log *log,
     booter_panic("No impl!\n");
 }
 
-void inode_init_owner(struct inode *inode, const struct inode *dir,
-            umode_t mode)
-{
-    booter_panic("No impl!\n");
-}
-struct inode *new_inode(struct super_block *sb)
-{
-    booter_panic("No impl!\n");
-}
-void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
-{
-    booter_panic("No impl!\n");
-}
-struct timespec64 current_time(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
-unsigned int get_next_ino(void)
-{
-    booter_panic("No impl!\n");
-}
-void inode_nohighmem(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
-int simple_readpage(struct file *file, struct page *page)
-{
-    booter_panic("No impl!\n");
-}
-void inc_nlink(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
 int __set_page_dirty_no_writeback(struct page *page)
 {
     booter_panic("No impl!\n");
 }
-int simple_write_end(struct file *file, struct address_space *mapping,
-            loff_t pos, unsigned len, unsigned copied,
-            struct page *page, void *fsdata)
-{
-    booter_panic("No impl!\n");
-}
 
-int simple_write_begin(struct file *file, struct address_space *mapping,
-            loff_t pos, unsigned len, unsigned flags,
-            struct page **pagep, void **fsdata)
-{
-    booter_panic("No impl!\n");
-}
 
 
 const struct file_operations simple_dir_operations;

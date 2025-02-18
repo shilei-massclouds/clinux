@@ -15,10 +15,6 @@ cl_fs_namespace_init(void)
 }
 EXPORT_SYMBOL(cl_fs_namespace_init);
 
-int __init sysfs_init(void)
-{
-    booter_panic("No impl!\n");
-}
 void set_fs_root(struct fs_struct *fs, const struct path *path)
 {
     booter_panic("No impl!\n");
@@ -28,16 +24,6 @@ int __init shmem_init(void)
     booter_panic("No impl!\n");
 }
 void set_fs_pwd(struct fs_struct *fs, const struct path *path)
-{
-    booter_panic("No impl!\n");
-}
-/*
-struct kobject *kobject_create_and_add(const char *name, struct kobject *parent)
-{
-    booter_panic("No impl!\n");
-}
-*/
-void __init kernfs_init(void)
 {
     booter_panic("No impl!\n");
 }

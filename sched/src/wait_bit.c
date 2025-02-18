@@ -16,7 +16,6 @@ wait_queue_head_t *bit_waitqueue(void *word, int bit)
 
 	return bit_wait_table + hash_long(val, WAIT_TABLE_BITS);
 }
-EXPORT_SYMBOL(bit_waitqueue);
 
 int wake_bit_function(struct wait_queue_entry *wq_entry, unsigned mode, int sync, void *arg)
 {
@@ -30,7 +29,6 @@ int wake_bit_function(struct wait_queue_entry *wq_entry, unsigned mode, int sync
 
 	return autoremove_wake_function(wq_entry, mode, sync, key);
 }
-EXPORT_SYMBOL(wake_bit_function);
 
 /*
  * To allow interruptible waiting and asynchronous (i.e. nonblocking)
@@ -63,7 +61,6 @@ int __sched out_of_line_wait_on_bit(void *word, int bit,
 
 	return __wait_on_bit(wq_head, &wq_entry, action, mode);
 }
-EXPORT_SYMBOL(out_of_line_wait_on_bit);
 
 int __sched out_of_line_wait_on_bit_timeout(
 	void *word, int bit, wait_bit_action_f *action,
@@ -125,7 +122,6 @@ void __wake_up_bit(struct wait_queue_head *wq_head, void *word, int bit)
 	if (waitqueue_active(wq_head))
 		__wake_up(wq_head, TASK_NORMAL, 1, &key);
 }
-EXPORT_SYMBOL(__wake_up_bit);
 
 /**
  * wake_up_bit - wake up a waiter on a bit
@@ -148,7 +144,6 @@ void wake_up_bit(void *word, int bit)
 {
 	__wake_up_bit(bit_waitqueue(word, bit), word, bit);
 }
-EXPORT_SYMBOL(wake_up_bit);
 
 wait_queue_head_t *__var_waitqueue(void *p)
 {
@@ -202,7 +197,6 @@ __sched int bit_wait(struct wait_bit_key *word, int mode)
 
 	return 0;
 }
-EXPORT_SYMBOL(bit_wait);
 
 __sched int bit_wait_io(struct wait_bit_key *word, int mode)
 {

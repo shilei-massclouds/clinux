@@ -150,11 +150,13 @@ void __put_task_struct(struct task_struct *tsk)
 }
 EXPORT_SYMBOL(__put_task_struct);
 
+/*
 void kobject_del(struct kobject *kobj)
 {
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(kobject_del);
+*/
 
 struct kobject *kernel_kobj;
 EXPORT_SYMBOL_GPL(kernel_kobj);
@@ -260,3 +262,100 @@ void show_state_filter(unsigned long state_filter)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(show_state_filter);
+
+__weak void kernfs_get(struct kernfs_node *kn)
+{
+    booter_panic("No impl in 'kobject'.");
+}
+EXPORT_SYMBOL_GPL(kernfs_get);
+
+__weak void kernfs_put(struct kernfs_node *kn)
+{
+    booter_panic("No impl in 'kobject'.");
+}
+EXPORT_SYMBOL(kernfs_put);
+
+void kill_anon_super(struct super_block *sb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kill_anon_super);
+
+struct dentry *d_make_root(struct inode *root_inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(d_make_root);
+
+int simple_readpage(struct file *file, struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_readpage);
+
+int simple_write_begin(struct file *file, struct address_space *mapping,
+            loff_t pos, unsigned len, unsigned flags,
+            struct page **pagep, void **fsdata)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_write_begin);
+
+int simple_write_end(struct file *file, struct address_space *mapping,
+            loff_t pos, unsigned len, unsigned copied,
+            struct page *page, void *fsdata)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_write_end);
+
+/*
+int register_filesystem(struct file_system_type * fs)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(register_filesystem);
+*/
+
+__weak struct module *__module_address(unsigned long addr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__module_address);
+
+__weak bool try_module_get(struct module *module)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(try_module_get);
+
+int call_usermodehelper_exec(struct subprocess_info *sub_info, int wait)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(call_usermodehelper_exec);
+
+struct subprocess_info *call_usermodehelper_setup(const char *path, char **argv,
+        char **envp, gfp_t gfp_mask,
+        int (*init)(struct subprocess_info *info, struct cred *new),
+        void (*cleanup)(struct subprocess_info *info),
+        void *data)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(call_usermodehelper_setup);
+
+struct proc_dir_entry *proc_create_single_data(const char *name, umode_t mode,
+        struct proc_dir_entry *parent,
+        int (*show)(struct seq_file *, void *), void *data)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(proc_create_single_data);
+
+int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *attr,
+             const void *ns)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(sysfs_create_file_ns);

@@ -186,10 +186,6 @@ void cdev_init(struct cdev *cdev, const struct file_operations *fops)
 {
     booter_panic("No impl.\n");
 }
-int __request_module(bool wait, const char *fmt, ...)
-{
-    booter_panic("No impl.\n");
-}
 struct device *class_find_device(struct class *class, struct device *start,
                  const void *data,
                  int (*match)(struct device *, const void *))

@@ -1115,17 +1115,17 @@ static void module_assert_mutex_or_preempt(void)
 //
 //static struct module_attribute modinfo_refcnt =
 //	__ATTR(refcnt, 0444, show_refcnt, NULL);
-//
-//void __module_get(struct module *module)
-//{
-//	if (module) {
-//		preempt_disable();
-//		atomic_inc(&module->refcnt);
-//		trace_module_get(module, _RET_IP_);
-//		preempt_enable();
-//	}
-//}
-//EXPORT_SYMBOL(__module_get);
+
+void __module_get(struct module *module)
+{
+	if (module) {
+		preempt_disable();
+		atomic_inc(&module->refcnt);
+		trace_module_get(module, _RET_IP_);
+		preempt_enable();
+	}
+}
+EXPORT_SYMBOL(__module_get);
 
 bool try_module_get(struct module *module)
 {
@@ -1144,7 +1144,6 @@ bool try_module_get(struct module *module)
 	}
 	return ret;
 }
-EXPORT_SYMBOL(try_module_get);
 
 //void module_put(struct module *module)
 //{
@@ -4517,7 +4516,6 @@ struct module *__module_address(unsigned long addr)
 	}
 	return mod;
 }
-EXPORT_SYMBOL(__module_address);
 
 ///*
 // * is_module_text_address - is this address inside module code?

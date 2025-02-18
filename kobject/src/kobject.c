@@ -17,24 +17,24 @@
 #include <linux/slab.h>
 #include <linux/random.h>
 
-///**
-// * kobject_namespace() - Return @kobj's namespace tag.
-// * @kobj: kobject in question
-// *
-// * Returns namespace tag of @kobj if its parent has namespace ops enabled
-// * and thus @kobj should have a namespace tag associated with it.  Returns
-// * %NULL otherwise.
-// */
-//const void *kobject_namespace(struct kobject *kobj)
-//{
-//	const struct kobj_ns_type_operations *ns_ops = kobj_ns_ops(kobj);
-//
-//	if (!ns_ops || ns_ops->type == KOBJ_NS_TYPE_NONE)
-//		return NULL;
-//
-//	return kobj->ktype->namespace(kobj);
-//}
-//
+/**
+ * kobject_namespace() - Return @kobj's namespace tag.
+ * @kobj: kobject in question
+ *
+ * Returns namespace tag of @kobj if its parent has namespace ops enabled
+ * and thus @kobj should have a namespace tag associated with it.  Returns
+ * %NULL otherwise.
+ */
+const void *kobject_namespace(struct kobject *kobj)
+{
+	const struct kobj_ns_type_operations *ns_ops = kobj_ns_ops(kobj);
+
+	if (!ns_ops || ns_ops->type == KOBJ_NS_TYPE_NONE)
+		return NULL;
+
+	return kobj->ktype->namespace(kobj);
+}
+
 ///**
 // * kobject_get_ownership() - Get sysfs ownership data for @kobj.
 // * @kobj: kobject in question
@@ -53,79 +53,79 @@
 //	if (kobj->ktype->get_ownership)
 //		kobj->ktype->get_ownership(kobj, uid, gid);
 //}
-//
-///*
-// * populate_dir - populate directory with attributes.
-// * @kobj: object we're working on.
-// *
-// * Most subsystems have a set of default attributes that are associated
-// * with an object that registers with them.  This is a helper called during
-// * object registration that loops through the default attributes of the
-// * subsystem and creates attributes files for them in sysfs.
-// */
-//static int populate_dir(struct kobject *kobj)
-//{
-//	struct kobj_type *t = get_ktype(kobj);
-//	struct attribute *attr;
-//	int error = 0;
-//	int i;
-//
-//	if (t && t->default_attrs) {
-//		for (i = 0; (attr = t->default_attrs[i]) != NULL; i++) {
-//			error = sysfs_create_file(kobj, attr);
-//			if (error)
-//				break;
-//		}
-//	}
-//	return error;
-//}
-//
-//static int create_dir(struct kobject *kobj)
-//{
-//	const struct kobj_type *ktype = get_ktype(kobj);
-//	const struct kobj_ns_type_operations *ops;
-//	int error;
-//
-//	error = sysfs_create_dir_ns(kobj, kobject_namespace(kobj));
-//	if (error)
-//		return error;
-//
-//	error = populate_dir(kobj);
-//	if (error) {
-//		sysfs_remove_dir(kobj);
-//		return error;
-//	}
-//
-//	if (ktype) {
-//		error = sysfs_create_groups(kobj, ktype->default_groups);
-//		if (error) {
-//			sysfs_remove_dir(kobj);
-//			return error;
-//		}
-//	}
-//
-//	/*
-//	 * @kobj->sd may be deleted by an ancestor going away.  Hold an
-//	 * extra reference so that it stays until @kobj is gone.
-//	 */
-//	sysfs_get(kobj->sd);
-//
-//	/*
-//	 * If @kobj has ns_ops, its children need to be filtered based on
-//	 * their namespace tags.  Enable namespace support on @kobj->sd.
-//	 */
-//	ops = kobj_child_ns_ops(kobj);
-//	if (ops) {
-//		BUG_ON(ops->type <= KOBJ_NS_TYPE_NONE);
-//		BUG_ON(ops->type >= KOBJ_NS_TYPES);
-//		BUG_ON(!kobj_ns_type_registered(ops->type));
-//
-//		sysfs_enable_ns(kobj->sd);
-//	}
-//
-//	return 0;
-//}
-//
+
+/*
+ * populate_dir - populate directory with attributes.
+ * @kobj: object we're working on.
+ *
+ * Most subsystems have a set of default attributes that are associated
+ * with an object that registers with them.  This is a helper called during
+ * object registration that loops through the default attributes of the
+ * subsystem and creates attributes files for them in sysfs.
+ */
+static int populate_dir(struct kobject *kobj)
+{
+	struct kobj_type *t = get_ktype(kobj);
+	struct attribute *attr;
+	int error = 0;
+	int i;
+
+	if (t && t->default_attrs) {
+		for (i = 0; (attr = t->default_attrs[i]) != NULL; i++) {
+			error = sysfs_create_file(kobj, attr);
+			if (error)
+				break;
+		}
+	}
+	return error;
+}
+
+static int create_dir(struct kobject *kobj)
+{
+	const struct kobj_type *ktype = get_ktype(kobj);
+	const struct kobj_ns_type_operations *ops;
+	int error;
+
+	error = sysfs_create_dir_ns(kobj, kobject_namespace(kobj));
+	if (error)
+		return error;
+
+	error = populate_dir(kobj);
+	if (error) {
+		sysfs_remove_dir(kobj);
+		return error;
+	}
+
+	if (ktype) {
+		error = sysfs_create_groups(kobj, ktype->default_groups);
+		if (error) {
+			sysfs_remove_dir(kobj);
+			return error;
+		}
+	}
+
+	/*
+	 * @kobj->sd may be deleted by an ancestor going away.  Hold an
+	 * extra reference so that it stays until @kobj is gone.
+	 */
+	sysfs_get(kobj->sd);
+
+	/*
+	 * If @kobj has ns_ops, its children need to be filtered based on
+	 * their namespace tags.  Enable namespace support on @kobj->sd.
+	 */
+	ops = kobj_child_ns_ops(kobj);
+	if (ops) {
+		BUG_ON(ops->type <= KOBJ_NS_TYPE_NONE);
+		BUG_ON(ops->type >= KOBJ_NS_TYPES);
+		BUG_ON(!kobj_ns_type_registered(ops->type));
+
+		sysfs_enable_ns(kobj->sd);
+	}
+
+	return 0;
+}
+
 //static int get_kobj_path_length(struct kobject *kobj)
 //{
 //	int length = 1;
@@ -184,18 +184,18 @@
 //	return path;
 //}
 //EXPORT_SYMBOL_GPL(kobject_get_path);
-//
-///* add the kobject to its kset's list */
-//static void kobj_kset_join(struct kobject *kobj)
-//{
-//	if (!kobj->kset)
-//		return;
-//
-//	kset_get(kobj->kset);
-//	spin_lock(&kobj->kset->list_lock);
-//	list_add_tail(&kobj->entry, &kobj->kset->list);
-//	spin_unlock(&kobj->kset->list_lock);
-//}
+
+/* add the kobject to its kset's list */
+static void kobj_kset_join(struct kobject *kobj)
+{
+	if (!kobj->kset)
+		return;
+
+	kset_get(kobj->kset);
+	spin_lock(&kobj->kset->list_lock);
+	list_add_tail(&kobj->entry, &kobj->kset->list);
+	spin_unlock(&kobj->kset->list_lock);
+}
 
 /* remove the kobject from its kset's list */
 static void kobj_kset_leave(struct kobject *kobj)
@@ -222,55 +222,55 @@ static void kobject_init_internal(struct kobject *kobj)
 }
 
 
-//static int kobject_add_internal(struct kobject *kobj)
-//{
-//	int error = 0;
-//	struct kobject *parent;
-//
-//	if (!kobj)
-//		return -ENOENT;
-//
-//	if (!kobj->name || !kobj->name[0]) {
-//		WARN(1,
-//		     "kobject: (%p): attempted to be registered with empty name!\n",
-//		     kobj);
-//		return -EINVAL;
-//	}
-//
-//	parent = kobject_get(kobj->parent);
-//
-//	/* join kset if set, use it as parent if we do not already have one */
-//	if (kobj->kset) {
-//		if (!parent)
-//			parent = kobject_get(&kobj->kset->kobj);
-//		kobj_kset_join(kobj);
-//		kobj->parent = parent;
-//	}
-//
-//	pr_debug("kobject: '%s' (%p): %s: parent: '%s', set: '%s'\n",
-//		 kobject_name(kobj), kobj, __func__,
-//		 parent ? kobject_name(parent) : "<NULL>",
-//		 kobj->kset ? kobject_name(&kobj->kset->kobj) : "<NULL>");
-//
-//	error = create_dir(kobj);
-//	if (error) {
-//		kobj_kset_leave(kobj);
-//		kobject_put(parent);
-//		kobj->parent = NULL;
-//
-//		/* be noisy on error issues */
-//		if (error == -EEXIST)
-//			pr_err("%s failed for %s with -EEXIST, don't try to register things with the same name in the same directory.\n",
-//			       __func__, kobject_name(kobj));
-//		else
-//			pr_err("%s failed for %s (error: %d parent: %s)\n",
-//			       __func__, kobject_name(kobj), error,
-//			       parent ? kobject_name(parent) : "'none'");
-//	} else
-//		kobj->state_in_sysfs = 1;
-//
-//	return error;
-//}
+static int kobject_add_internal(struct kobject *kobj)
+{
+	int error = 0;
+	struct kobject *parent;
+
+	if (!kobj)
+		return -ENOENT;
+
+	if (!kobj->name || !kobj->name[0]) {
+		WARN(1,
+		     "kobject: (%p): attempted to be registered with empty name!\n",
+		     kobj);
+		return -EINVAL;
+	}
+
+	parent = kobject_get(kobj->parent);
+
+	/* join kset if set, use it as parent if we do not already have one */
+	if (kobj->kset) {
+		if (!parent)
+			parent = kobject_get(&kobj->kset->kobj);
+		kobj_kset_join(kobj);
+		kobj->parent = parent;
+	}
+
+	pr_debug("kobject: '%s' (%p): %s: parent: '%s', set: '%s'\n",
+		 kobject_name(kobj), kobj, __func__,
+		 parent ? kobject_name(parent) : "<NULL>",
+		 kobj->kset ? kobject_name(&kobj->kset->kobj) : "<NULL>");
+
+	error = create_dir(kobj);
+	if (error) {
+		kobj_kset_leave(kobj);
+		kobject_put(parent);
+		kobj->parent = NULL;
+
+		/* be noisy on error issues */
+		if (error == -EEXIST)
+			pr_err("%s failed for %s with -EEXIST, don't try to register things with the same name in the same directory.\n",
+			       __func__, kobject_name(kobj));
+		else
+			pr_err("%s failed for %s (error: %d parent: %s)\n",
+			       __func__, kobject_name(kobj), error,
+			       parent ? kobject_name(parent) : "'none'");
+	} else
+		kobj->state_in_sysfs = 1;
+
+	return error;
+}
 
 /**
  * kobject_set_name_vargs() - Set the name of a kobject.
@@ -376,77 +376,77 @@ error:
 }
 EXPORT_SYMBOL(kobject_init);
 
-//static __printf(3, 0) int kobject_add_varg(struct kobject *kobj,
-//					   struct kobject *parent,
-//					   const char *fmt, va_list vargs)
-//{
-//	int retval;
-//
-//	retval = kobject_set_name_vargs(kobj, fmt, vargs);
-//	if (retval) {
-//		pr_err("kobject: can not set name properly!\n");
-//		return retval;
-//	}
-//	kobj->parent = parent;
-//	return kobject_add_internal(kobj);
-//}
-//
-///**
-// * kobject_add() - The main kobject add function.
-// * @kobj: the kobject to add
-// * @parent: pointer to the parent of the kobject.
-// * @fmt: format to name the kobject with.
-// *
-// * The kobject name is set and added to the kobject hierarchy in this
-// * function.
-// *
-// * If @parent is set, then the parent of the @kobj will be set to it.
-// * If @parent is NULL, then the parent of the @kobj will be set to the
-// * kobject associated with the kset assigned to this kobject.  If no kset
-// * is assigned to the kobject, then the kobject will be located in the
-// * root of the sysfs tree.
-// *
-// * Note, no "add" uevent will be created with this call, the caller should set
-// * up all of the necessary sysfs files for the object and then call
-// * kobject_uevent() with the UEVENT_ADD parameter to ensure that
-// * userspace is properly notified of this kobject's creation.
-// *
-// * Return: If this function returns an error, kobject_put() must be
-// *         called to properly clean up the memory associated with the
-// *         object.  Under no instance should the kobject that is passed
-// *         to this function be directly freed with a call to kfree(),
-// *         that can leak memory.
-// *
-// *         If this function returns success, kobject_put() must also be called
-// *         in order to properly clean up the memory associated with the object.
-// *
-// *         In short, once this function is called, kobject_put() MUST be called
-// *         when the use of the object is finished in order to properly free
-// *         everything.
-// */
-//int kobject_add(struct kobject *kobj, struct kobject *parent,
-//		const char *fmt, ...)
-//{
-//	va_list args;
-//	int retval;
-//
-//	if (!kobj)
-//		return -EINVAL;
-//
-//	if (!kobj->state_initialized) {
-//		pr_err("kobject '%s' (%p): tried to add an uninitialized object, something is seriously wrong.\n",
-//		       kobject_name(kobj), kobj);
-//		dump_stack();
-//		return -EINVAL;
-//	}
-//	va_start(args, fmt);
-//	retval = kobject_add_varg(kobj, parent, fmt, args);
-//	va_end(args);
-//
-//	return retval;
-//}
-//EXPORT_SYMBOL(kobject_add);
-//
+static __printf(3, 0) int kobject_add_varg(struct kobject *kobj,
+					   struct kobject *parent,
+					   const char *fmt, va_list vargs)
+{
+	int retval;
+
+	retval = kobject_set_name_vargs(kobj, fmt, vargs);
+	if (retval) {
+		pr_err("kobject: can not set name properly!\n");
+		return retval;
+	}
+	kobj->parent = parent;
+	return kobject_add_internal(kobj);
+}
+
+/**
+ * kobject_add() - The main kobject add function.
+ * @kobj: the kobject to add
+ * @parent: pointer to the parent of the kobject.
+ * @fmt: format to name the kobject with.
+ *
+ * The kobject name is set and added to the kobject hierarchy in this
+ * function.
+ *
+ * If @parent is set, then the parent of the @kobj will be set to it.
+ * If @parent is NULL, then the parent of the @kobj will be set to the
+ * kobject associated with the kset assigned to this kobject.  If no kset
+ * is assigned to the kobject, then the kobject will be located in the
+ * root of the sysfs tree.
+ *
+ * Note, no "add" uevent will be created with this call, the caller should set
+ * up all of the necessary sysfs files for the object and then call
+ * kobject_uevent() with the UEVENT_ADD parameter to ensure that
+ * userspace is properly notified of this kobject's creation.
+ *
+ * Return: If this function returns an error, kobject_put() must be
+ *         called to properly clean up the memory associated with the
+ *         object.  Under no instance should the kobject that is passed
+ *         to this function be directly freed with a call to kfree(),
+ *         that can leak memory.
+ *
+ *         If this function returns success, kobject_put() must also be called
+ *         in order to properly clean up the memory associated with the object.
+ *
+ *         In short, once this function is called, kobject_put() MUST be called
+ *         when the use of the object is finished in order to properly free
+ *         everything.
+ */
+int kobject_add(struct kobject *kobj, struct kobject *parent,
+		const char *fmt, ...)
+{
+	va_list args;
+	int retval;
+
+	if (!kobj)
+		return -EINVAL;
+
+	if (!kobj->state_initialized) {
+		pr_err("kobject '%s' (%p): tried to add an uninitialized object, something is seriously wrong.\n",
+		       kobject_name(kobj), kobj);
+		dump_stack();
+		return -EINVAL;
+	}
+	va_start(args, fmt);
+	retval = kobject_add_varg(kobj, parent, fmt, args);
+	va_end(args);
+
+	return retval;
+}
+EXPORT_SYMBOL(kobject_add);
+
 ///**
 // * kobject_init_and_add() - Initialize a kobject structure and add it to
 // *                          the kobject hierarchy.
@@ -626,25 +626,25 @@ static void __kobject_del(struct kobject *kobj)
 	kobj->parent = NULL;
 }
 
-///**
-// * kobject_del() - Unlink kobject from hierarchy.
-// * @kobj: object.
-// *
-// * This is the function that should be called to delete an object
-// * successfully added via kobject_add().
-// */
-//void kobject_del(struct kobject *kobj)
-//{
-//	struct kobject *parent;
-//
-//	if (!kobj)
-//		return;
-//
-//	parent = kobj->parent;
-//	__kobject_del(kobj);
-//	kobject_put(parent);
-//}
-//EXPORT_SYMBOL(kobject_del);
+/**
+ * kobject_del() - Unlink kobject from hierarchy.
+ * @kobj: object.
+ *
+ * This is the function that should be called to delete an object
+ * successfully added via kobject_add().
+ */
+void kobject_del(struct kobject *kobj)
+{
+	struct kobject *parent;
+
+	if (!kobj)
+		return;
+
+	parent = kobj->parent;
+	__kobject_del(kobj);
+	kobject_put(parent);
+}
+EXPORT_SYMBOL(kobject_del);
 
 /**
  * kobject_get() - Increment refcount for object.
@@ -756,72 +756,72 @@ void kobject_put(struct kobject *kobj)
 }
 EXPORT_SYMBOL(kobject_put);
 
-//static void dynamic_kobj_release(struct kobject *kobj)
-//{
-//	pr_debug("kobject: (%p): %s\n", kobj, __func__);
-//	kfree(kobj);
-//}
-//
-//static struct kobj_type dynamic_kobj_ktype = {
-//	.release	= dynamic_kobj_release,
-//	.sysfs_ops	= &kobj_sysfs_ops,
-//};
-//
-///**
-// * kobject_create() - Create a struct kobject dynamically.
-// *
-// * This function creates a kobject structure dynamically and sets it up
-// * to be a "dynamic" kobject with a default release function set up.
-// *
-// * If the kobject was not able to be created, NULL will be returned.
-// * The kobject structure returned from here must be cleaned up with a
-// * call to kobject_put() and not kfree(), as kobject_init() has
-// * already been called on this structure.
-// */
-//struct kobject *kobject_create(void)
-//{
-//	struct kobject *kobj;
-//
-//	kobj = kzalloc(sizeof(*kobj), GFP_KERNEL);
-//	if (!kobj)
-//		return NULL;
-//
-//	kobject_init(kobj, &dynamic_kobj_ktype);
-//	return kobj;
-//}
-//
-///**
-// * kobject_create_and_add() - Create a struct kobject dynamically and
-// *                            register it with sysfs.
-// * @name: the name for the kobject
-// * @parent: the parent kobject of this kobject, if any.
-// *
-// * This function creates a kobject structure dynamically and registers it
-// * with sysfs.  When you are finished with this structure, call
-// * kobject_put() and the structure will be dynamically freed when
-// * it is no longer being used.
-// *
-// * If the kobject was not able to be created, NULL will be returned.
-// */
-//struct kobject *kobject_create_and_add(const char *name, struct kobject *parent)
-//{
-//	struct kobject *kobj;
-//	int retval;
-//
-//	kobj = kobject_create();
-//	if (!kobj)
-//		return NULL;
-//
-//	retval = kobject_add(kobj, parent, "%s", name);
-//	if (retval) {
-//		pr_warn("%s: kobject_add error: %d\n", __func__, retval);
-//		kobject_put(kobj);
-//		kobj = NULL;
-//	}
-//	return kobj;
-//}
-//EXPORT_SYMBOL_GPL(kobject_create_and_add);
-//
+static void dynamic_kobj_release(struct kobject *kobj)
+{
+	pr_debug("kobject: (%p): %s\n", kobj, __func__);
+	kfree(kobj);
+}
+
+static struct kobj_type dynamic_kobj_ktype = {
+	.release	= dynamic_kobj_release,
+	.sysfs_ops	= &kobj_sysfs_ops,
+};
+
+/**
+ * kobject_create() - Create a struct kobject dynamically.
+ *
+ * This function creates a kobject structure dynamically and sets it up
+ * to be a "dynamic" kobject with a default release function set up.
+ *
+ * If the kobject was not able to be created, NULL will be returned.
+ * The kobject structure returned from here must be cleaned up with a
+ * call to kobject_put() and not kfree(), as kobject_init() has
+ * already been called on this structure.
+ */
+struct kobject *kobject_create(void)
+{
+	struct kobject *kobj;
+
+	kobj = kzalloc(sizeof(*kobj), GFP_KERNEL);
+	if (!kobj)
+		return NULL;
+
+	kobject_init(kobj, &dynamic_kobj_ktype);
+	return kobj;
+}
+
+/**
+ * kobject_create_and_add() - Create a struct kobject dynamically and
+ *                            register it with sysfs.
+ * @name: the name for the kobject
+ * @parent: the parent kobject of this kobject, if any.
+ *
+ * This function creates a kobject structure dynamically and registers it
+ * with sysfs.  When you are finished with this structure, call
+ * kobject_put() and the structure will be dynamically freed when
+ * it is no longer being used.
+ *
+ * If the kobject was not able to be created, NULL will be returned.
+ */
+struct kobject *kobject_create_and_add(const char *name, struct kobject *parent)
+{
+	struct kobject *kobj;
+	int retval;
+
+	kobj = kobject_create();
+	if (!kobj)
+		return NULL;
+
+	retval = kobject_add(kobj, parent, "%s", name);
+	if (retval) {
+		pr_warn("%s: kobject_add error: %d\n", __func__, retval);
+		kobject_put(kobj);
+		kobj = NULL;
+	}
+	return kobj;
+}
+EXPORT_SYMBOL_GPL(kobject_create_and_add);
+
 ///**
 // * kset_init() - Initialize a kset for use.
 // * @k: kset
@@ -1021,11 +1021,11 @@ EXPORT_SYMBOL(kobject_put);
 //	return kset;
 //}
 //EXPORT_SYMBOL_GPL(kset_create_and_add);
-//
-//
-//static DEFINE_SPINLOCK(kobj_ns_type_lock);
-//static const struct kobj_ns_type_operations *kobj_ns_ops_tbl[KOBJ_NS_TYPES];
-//
+
+
+static DEFINE_SPINLOCK(kobj_ns_type_lock);
+static const struct kobj_ns_type_operations *kobj_ns_ops_tbl[KOBJ_NS_TYPES];
+
 //int kobj_ns_type_register(const struct kobj_ns_type_operations *ops)
 //{
 //	enum kobj_ns_type type = ops->type;
@@ -1052,61 +1052,62 @@ EXPORT_SYMBOL(kobject_put);
 //	spin_unlock(&kobj_ns_type_lock);
 //	return error;
 //}
-//
-//int kobj_ns_type_registered(enum kobj_ns_type type)
-//{
-//	int registered = 0;
-//
-//	spin_lock(&kobj_ns_type_lock);
-//	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES))
-//		registered = kobj_ns_ops_tbl[type] != NULL;
-//	spin_unlock(&kobj_ns_type_lock);
-//
-//	return registered;
-//}
-//
-//const struct kobj_ns_type_operations *kobj_child_ns_ops(struct kobject *parent)
-//{
-//	const struct kobj_ns_type_operations *ops = NULL;
-//
-//	if (parent && parent->ktype && parent->ktype->child_ns_type)
-//		ops = parent->ktype->child_ns_type(parent);
-//
-//	return ops;
-//}
-//
-//const struct kobj_ns_type_operations *kobj_ns_ops(struct kobject *kobj)
-//{
-//	return kobj_child_ns_ops(kobj->parent);
-//}
-//
-//bool kobj_ns_current_may_mount(enum kobj_ns_type type)
-//{
-//	bool may_mount = true;
-//
-//	spin_lock(&kobj_ns_type_lock);
-//	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES) &&
-//	    kobj_ns_ops_tbl[type])
-//		may_mount = kobj_ns_ops_tbl[type]->current_may_mount();
-//	spin_unlock(&kobj_ns_type_lock);
-//
-//	return may_mount;
-//}
-//
-//void *kobj_ns_grab_current(enum kobj_ns_type type)
-//{
-//	void *ns = NULL;
-//
-//	spin_lock(&kobj_ns_type_lock);
-//	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES) &&
-//	    kobj_ns_ops_tbl[type])
-//		ns = kobj_ns_ops_tbl[type]->grab_current_ns();
-//	spin_unlock(&kobj_ns_type_lock);
-//
-//	return ns;
-//}
-//EXPORT_SYMBOL_GPL(kobj_ns_grab_current);
-//
+
+int kobj_ns_type_registered(enum kobj_ns_type type)
+{
+	int registered = 0;
+
+	spin_lock(&kobj_ns_type_lock);
+	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES))
+		registered = kobj_ns_ops_tbl[type] != NULL;
+	spin_unlock(&kobj_ns_type_lock);
+
+	return registered;
+}
+
+const struct kobj_ns_type_operations *kobj_child_ns_ops(struct kobject *parent)
+{
+	const struct kobj_ns_type_operations *ops = NULL;
+
+	if (parent && parent->ktype && parent->ktype->child_ns_type)
+		ops = parent->ktype->child_ns_type(parent);
+
+	return ops;
+}
+
+const struct kobj_ns_type_operations *kobj_ns_ops(struct kobject *kobj)
+{
+	return kobj_child_ns_ops(kobj->parent);
+}
+
+bool kobj_ns_current_may_mount(enum kobj_ns_type type)
+{
+	bool may_mount = true;
+
+	spin_lock(&kobj_ns_type_lock);
+	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES) &&
+	    kobj_ns_ops_tbl[type])
+		may_mount = kobj_ns_ops_tbl[type]->current_may_mount();
+	spin_unlock(&kobj_ns_type_lock);
+
+	return may_mount;
+}
+EXPORT_SYMBOL(kobj_ns_current_may_mount);
+
+void *kobj_ns_grab_current(enum kobj_ns_type type)
+{
+	void *ns = NULL;
+
+	spin_lock(&kobj_ns_type_lock);
+	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES) &&
+	    kobj_ns_ops_tbl[type])
+		ns = kobj_ns_ops_tbl[type]->grab_current_ns();
+	spin_unlock(&kobj_ns_type_lock);
+
+	return ns;
+}
+EXPORT_SYMBOL_GPL(kobj_ns_grab_current);
+
 //const void *kobj_ns_netlink(enum kobj_ns_type type, struct sock *sk)
 //{
 //	const void *ns = NULL;
@@ -1132,13 +1133,13 @@ EXPORT_SYMBOL(kobject_put);
 //
 //	return ns;
 //}
-//
-//void kobj_ns_drop(enum kobj_ns_type type, void *ns)
-//{
-//	spin_lock(&kobj_ns_type_lock);
-//	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES) &&
-//	    kobj_ns_ops_tbl[type] && kobj_ns_ops_tbl[type]->drop_ns)
-//		kobj_ns_ops_tbl[type]->drop_ns(ns);
-//	spin_unlock(&kobj_ns_type_lock);
-//}
-//EXPORT_SYMBOL_GPL(kobj_ns_drop);
+
+void kobj_ns_drop(enum kobj_ns_type type, void *ns)
+{
+	spin_lock(&kobj_ns_type_lock);
+	if ((type > KOBJ_NS_TYPE_NONE) && (type < KOBJ_NS_TYPES) &&
+	    kobj_ns_ops_tbl[type] && kobj_ns_ops_tbl[type]->drop_ns)
+		kobj_ns_ops_tbl[type]->drop_ns(ns);
+	spin_unlock(&kobj_ns_type_lock);
+}
+EXPORT_SYMBOL_GPL(kobj_ns_drop);
