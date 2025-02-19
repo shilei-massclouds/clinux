@@ -388,12 +388,6 @@ __weak void logfc(struct fc_log *log, const char *prefix, char level, const char
 }
 EXPORT_SYMBOL(logfc);
 
-void lockref_get(struct lockref *lockref)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(lockref_get);
-
 __weak void deactivate_locked_super(struct super_block *s)
 {
     booter_panic("No impl!\n");
