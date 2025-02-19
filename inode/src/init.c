@@ -17,12 +17,6 @@ EXPORT_SYMBOL(cl_inode_init);
 const struct file_operations pipefifo_fops;
 const struct file_operations def_chr_fops;
 
-bool list_lru_del(struct list_lru *lru, struct list_head *item)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(list_lru_del);
-
 int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
 {
     booter_panic("No impl!\n");
@@ -78,10 +72,12 @@ int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
 {
     booter_panic("No impl!\n");
 }
+/*
 void list_lru_isolate(struct list_lru_one *list, struct list_head *item)
 {
     booter_panic("No impl!\n");
 }
+*/
 int
 send_sig(int sig, struct task_struct *p, int priv)
 {
@@ -104,11 +100,13 @@ void __mark_inode_dirty(struct inode *inode, int flags)
     booter_panic("No impl!\n");
 }
 
+/*
 bool list_lru_add(struct list_lru *lru, struct list_head *item)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(list_lru_add);
+*/
 
 int inode_has_buffers(struct inode *inode)
 {
@@ -150,11 +148,13 @@ void cd_forget(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
+/*
 void list_lru_isolate_move(struct list_lru_one *list, struct list_head *item,
                struct list_head *head)
 {
     booter_panic("No impl!\n");
 }
+*/
 void
 locks_free_lock_context(struct inode *inode)
 {
@@ -164,6 +164,7 @@ int remove_inode_buffers(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
+/*
 unsigned long
 list_lru_walk_one(struct list_lru *lru, int nid, struct mem_cgroup *memcg,
           list_lru_walk_cb isolate, void *cb_arg,
@@ -171,5 +172,6 @@ list_lru_walk_one(struct list_lru *lru, int nid, struct mem_cgroup *memcg,
 {
     booter_panic("No impl!\n");
 }
+*/
 
 int sysctl_vfs_cache_pressure __read_mostly = 100;

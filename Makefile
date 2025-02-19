@@ -38,7 +38,8 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter lib math radix_tree idr xarray assoc_array \
+	prebuilt booter lib math \
+	radix_tree idr xarray assoc_array list_lru \
 	kasprintf random crypto \
 	traps irq softirq \
 	kobject driver_base \
