@@ -492,3 +492,14 @@ void __lock_page(struct page *__page)
 }
 EXPORT_SYMBOL(__lock_page);
 
+__weak void prandom_bytes(void *buf, size_t bytes)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(prandom_bytes);
+
+__weak void get_random_bytes(void *buf, int nbytes)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(get_random_bytes);

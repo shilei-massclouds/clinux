@@ -1575,7 +1575,6 @@ void get_random_bytes(void *buf, int nbytes)
 	warn_unseeded_randomness(&previous);
 	_get_random_bytes(buf, nbytes);
 }
-EXPORT_SYMBOL(get_random_bytes);
 
 
 /*

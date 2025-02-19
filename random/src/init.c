@@ -19,10 +19,6 @@ int proc_dostring(struct ctl_table *table, int write,
 {
     booter_panic("No impl in 'lib'.");
 }
-void generate_random_uuid(unsigned char uuid[16])
-{
-    booter_panic("No impl in 'lib'.");
-}
 loff_t noop_llseek(struct file *file, loff_t offset, int whence)
 {
     booter_panic("No impl in 'lib'.");

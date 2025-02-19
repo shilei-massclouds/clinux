@@ -136,7 +136,6 @@ void prandom_bytes(void *buf, size_t bytes)
 	prandom_bytes_state(state, buf, bytes);
 	put_cpu_var(net_rand_state);
 }
-EXPORT_SYMBOL(prandom_bytes);
 
 static void prandom_warmup(struct rnd_state *state)
 {
