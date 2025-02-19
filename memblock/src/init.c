@@ -48,3 +48,17 @@ void page_init_poison(struct page *page, size_t size)
 {
     booter_panic("No impl 'page_init_poison'.");
 }
+
+__weak struct kmem_cache *
+kmem_cache_create(const char *name, unsigned int size, unsigned int align,
+        slab_flags_t flags, void (*ctor)(void *))
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(kmem_cache_create);
+
+__weak void kmem_cache_free(struct kmem_cache *s, void *x)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(kmem_cache_free);

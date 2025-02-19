@@ -35,11 +35,13 @@ void __dump_page(struct page *page, const char *reason)
     booter_panic("No impl 'page_alloc'.");
 }
 
+/*
 unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
                 gfp_t gfp_mask, nodemask_t *nodemask)
 {
     booter_panic("No impl 'page_alloc'.");
 }
+*/
 
 void __kernel_map_pages(struct page *page, int numpages, int enable)
 {
@@ -58,6 +60,7 @@ void compaction_defer_reset(struct zone *zone, int order,
     booter_panic("No impl 'page_alloc'.");
 }
 
+/*
 void wakeup_kswapd(struct zone *zone, gfp_t gfp_flags, int order,
            enum zone_type highest_zoneidx)
 {
@@ -68,6 +71,7 @@ unsigned long zone_reclaimable_pages(struct zone *zone)
 {
     booter_panic("No impl 'page_alloc'.");
 }
+*/
 
 bool out_of_memory(struct oom_control *oc)
 {
@@ -92,6 +96,7 @@ long congestion_wait(int sync, long timeout)
 {
     booter_panic("No impl 'page_init_poison'.");
 }
+EXPORT_SYMBOL(congestion_wait);
 
 bool node_dirty_ok(struct pglist_data *pgdat)
 {

@@ -287,18 +287,19 @@ static char * const zone_names[MAX_NR_ZONES] = {
 //	"Isolate",
 //#endif
 //};
-//
-//compound_page_dtor * const compound_page_dtors[NR_COMPOUND_DTORS] = {
-//	[NULL_COMPOUND_DTOR] = NULL,
-//	[COMPOUND_PAGE_DTOR] = free_compound_page,
-//#ifdef CONFIG_HUGETLB_PAGE
-//	[HUGETLB_PAGE_DTOR] = free_huge_page,
-//#endif
-//#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-//	[TRANSHUGE_PAGE_DTOR] = free_transhuge_page,
-//#endif
-//};
-//
+
+compound_page_dtor * const compound_page_dtors[NR_COMPOUND_DTORS] = {
+	[NULL_COMPOUND_DTOR] = NULL,
+	[COMPOUND_PAGE_DTOR] = free_compound_page,
+#ifdef CONFIG_HUGETLB_PAGE
+	[HUGETLB_PAGE_DTOR] = free_huge_page,
+#endif
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+	[TRANSHUGE_PAGE_DTOR] = free_transhuge_page,
+#endif
+};
+EXPORT_SYMBOL(compound_page_dtors);
+
 //int min_free_kbytes = 1024;
 //int user_min_free_kbytes = -1;
 #ifdef CONFIG_DISCONTIGMEM
@@ -643,12 +644,12 @@ out:
 // * The first tail page's ->compound_order holds the order of allocation.
 // * This usage means that zero-order pages may not be compound.
 // */
-//
-//void free_compound_page(struct page *page)
-//{
-//	mem_cgroup_uncharge(page);
-//	__free_pages_ok(page, compound_order(page));
-//}
+
+void free_compound_page(struct page *page)
+{
+	mem_cgroup_uncharge(page);
+	__free_pages_ok(page, compound_order(page));
+}
 
 void prep_compound_page(struct page *page, unsigned int order)
 {

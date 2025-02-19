@@ -426,6 +426,69 @@ EXPORT_SYMBOL(dput);
 
 int rcuwait_wake_up(struct rcuwait *w)
 {
-    booter_panic("No impl in 'workqueue'.");
+    booter_panic("No impl in 'booter'.");
 }
 EXPORT_SYMBOL(rcuwait_wake_up);
+
+__weak void free_prealloced_shrinker(struct shrinker *shrinker)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(free_prealloced_shrinker);
+
+__weak int prealloc_shrinker(struct shrinker *shrinker)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(prealloc_shrinker);
+
+__weak unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
+				gfp_t gfp_mask, nodemask_t *nodemask)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(try_to_free_pages);
+
+__weak void register_shrinker_prepared(struct shrinker *shrinker)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(register_shrinker_prepared);
+
+__weak void unregister_shrinker(struct shrinker *shrinker)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(unregister_shrinker);
+
+__weak void wakeup_kswapd(struct zone *zone, gfp_t gfp_flags, int order,
+		   enum zone_type highest_zoneidx)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(wakeup_kswapd);
+
+__weak unsigned long zone_reclaimable_pages(struct zone *zone)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(zone_reclaimable_pages);
+
+void __put_page(struct page *page)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(__put_page);
+
+void unlock_page(struct page *page)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(unlock_page);
+
+void __lock_page(struct page *__page)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(__lock_page);
+

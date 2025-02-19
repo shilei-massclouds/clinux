@@ -51,7 +51,7 @@ components := \
 	early_sched sched \
 	percpu workqueue_itf workqueue notifier \
 	memblock bootmem paging rmap backing_dev \
-	page_alloc slub vmalloc mm_util \
+	page_alloc slub vmalloc mm_util vmscan \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu \
 	inode dcache file_table do_mounts \
 	cred user_namespace nsproxy fs_namespace \

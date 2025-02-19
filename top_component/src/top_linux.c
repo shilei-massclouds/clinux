@@ -498,6 +498,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(earlycon);
     REQUIRE_COMPONENT(show_mem);
     REQUIRE_COMPONENT(shmem);
+    REQUIRE_COMPONENT(vmscan);
 
     //
     // start_kernel (init/main.c)
