@@ -878,7 +878,6 @@ void dput(struct dentry *dentry)
 		dentry = dentry_kill(dentry);
 	}
 }
-EXPORT_SYMBOL(dput);
 
 //static void __dput_to_list(struct dentry *dentry, struct list_head *list)
 //__must_hold(&dentry->d_lock)

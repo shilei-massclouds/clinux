@@ -8,6 +8,7 @@
 #include <linux/irq.h>
 #include <linux/module.h>
 #include <linux/fs.h>
+#include <linux/fs_context.h>
 #include <linux/user_namespace.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
@@ -282,7 +283,7 @@ __weak void kernfs_put(struct kernfs_node *kn)
 }
 EXPORT_SYMBOL(kernfs_put);
 
-void kill_anon_super(struct super_block *sb)
+__weak void kill_anon_super(struct super_block *sb)
 {
     booter_panic("No impl!\n");
 }
@@ -384,3 +385,47 @@ __weak void logfc(struct fc_log *log, const char *prefix, char level, const char
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(logfc);
+
+void lockref_get(struct lockref *lockref)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(lockref_get);
+
+__weak void deactivate_locked_super(struct super_block *s)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(deactivate_locked_super);
+
+__weak void put_fs_context(struct fs_context *fc)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(put_fs_context);
+
+__weak int parse_monolithic_mount_data(struct fs_context *fc, void *data)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(parse_monolithic_mount_data);
+
+__weak struct fs_context *fs_context_for_reconfigure(struct dentry *dentry,
+					unsigned int sb_flags,
+					unsigned int sb_flags_mask)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fs_context_for_reconfigure);
+
+__weak void dput(struct dentry *dentry)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(dput);
+
+int rcuwait_wake_up(struct rcuwait *w)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(rcuwait_wake_up);

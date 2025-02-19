@@ -43,18 +43,13 @@ void make_empty_dir_inode(struct inode *inode)
     booter_panic("No impl!\n");
 }
 /*
-int fsnotify(__u32 mask, const void *data, int data_type, struct inode *dir,
-         const struct qstr *file_name, struct inode *inode, u32 cookie)
-{
-    booter_panic("No impl!\n");
-}
-*/
 struct super_block *sget_fc(struct fs_context *fc,
                 int (*test)(struct super_block *, struct fs_context *),
                 int (*set)(struct super_block *, struct fs_context *))
 {
     booter_panic("No impl!\n");
 }
+*/
 struct dentry *d_splice_alias(struct inode *inode, struct dentry *dentry)
 {
     booter_panic("No impl!\n");
@@ -82,21 +77,18 @@ ssize_t generic_read_dir(struct file *filp, char __user *buf, size_t siz, loff_t
 {
     booter_panic("No impl!\n");
 }
+/*
 int set_anon_super_fc(struct super_block *sb, struct fs_context *fc)
 {
     booter_panic("No impl!\n");
 }
-void lockref_get(struct lockref *lockref)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(lockref_get);
 
 void deactivate_locked_super(struct super_block *s)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(deactivate_locked_super);
+*/
 
 void kfree_link(void *p)
 {
@@ -144,6 +136,7 @@ int seq_dentry(struct seq_file *m, struct dentry *dentry, const char *esc)
     booter_panic("No impl!\n");
 }
 
+/*
 int get_tree_nodev(struct fs_context *fc,
           int (*fill_super)(struct super_block *sb,
                     struct fs_context *fc))
@@ -151,6 +144,7 @@ int get_tree_nodev(struct fs_context *fc,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(get_tree_nodev);
+*/
 
 int __set_page_dirty_no_writeback(struct page *page)
 {
@@ -158,12 +152,13 @@ int __set_page_dirty_no_writeback(struct page *page)
 }
 EXPORT_SYMBOL(__set_page_dirty_no_writeback);
 
-
+/*
 void kill_litter_super(struct super_block *sb)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(kill_litter_super);
+*/
 
 const struct file_operations simple_dir_operations;
 EXPORT_SYMBOL(simple_dir_operations);

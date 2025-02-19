@@ -88,11 +88,6 @@ int bitmap_parse(const char *start, unsigned int buflen,
     booter_panic("No impl in 'workqueue'.");
 }
 
-int rcuwait_wake_up(struct rcuwait *w)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
-
 void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
 {
     booter_panic("No impl in 'workqueue'.");

@@ -34,10 +34,12 @@ __weak int __init shmem_init(void)
     booter_panic("No impl!\n");
 }
 
+/*
 int vfs_get_tree(struct fs_context *fc)
 {
     booter_panic("No impl!\n");
 }
+*/
 
 
 const struct proc_ns_operations mntns_operations;

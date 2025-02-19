@@ -290,7 +290,6 @@ struct fs_context *fs_context_for_reconfigure(struct dentry *dentry,
 	return alloc_fs_context(dentry->d_sb->s_type, dentry, sb_flags,
 				sb_flags_mask, FS_CONTEXT_FOR_RECONFIGURE);
 }
-EXPORT_SYMBOL(fs_context_for_reconfigure);
 
 struct fs_context *fs_context_for_submount(struct file_system_type *type,
 					   struct dentry *reference)
@@ -453,7 +452,6 @@ void put_fs_context(struct fs_context *fc)
 	kfree(fc->source);
 	kfree(fc);
 }
-EXPORT_SYMBOL(put_fs_context);
 
 /*
  * Free the config for a filesystem that doesn't support fs_context.
@@ -647,7 +645,6 @@ int parse_monolithic_mount_data(struct fs_context *fc, void *data)
 
 	return monolithic_mount_data(fc, data);
 }
-EXPORT_SYMBOL(parse_monolithic_mount_data);
 
 /*
  * Clean up a context after performing an action on it and put it into a state

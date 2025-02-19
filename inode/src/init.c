@@ -27,10 +27,6 @@ int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
 {
     booter_panic("No impl!\n");
 }
-int __sb_start_write(struct super_block *sb, int level, bool wait)
-{
-    booter_panic("No impl!\n");
-}
 
 void __fsnotify_inode_delete(struct inode *inode)
 {
@@ -55,10 +51,6 @@ int fsnotify(__u32 mask, const void *data, int data_type, struct inode *dir,
 }
 EXPORT_SYMBOL(fsnotify);
 
-void __sb_end_write(struct super_block *sb, int level)
-{
-    booter_panic("No impl!\n");
-}
 int __mnt_want_write(struct vfsmount *m)
 {
     booter_panic("No impl!\n");
@@ -180,3 +172,4 @@ list_lru_walk_one(struct list_lru *lru, int nid, struct mem_cgroup *memcg,
     booter_panic("No impl!\n");
 }
 
+int sysctl_vfs_cache_pressure __read_mostly = 100;
