@@ -56,7 +56,7 @@ components := \
 	inode dcache file_table do_mounts \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs kernfs sysfs block_dev filesystems shmem \
-	fs_context \
+	fs_context fs_parser \
 	fork mmap \
 	buffer swap \
 	early_printk printk panic dump_stack show_mem

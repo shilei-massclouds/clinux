@@ -378,3 +378,9 @@ __weak void sysfs_remove_dir(struct kobject *kobj)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(sysfs_remove_dir);
+
+__weak void logfc(struct fc_log *log, const char *prefix, char level, const char *fmt, ...)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(logfc);

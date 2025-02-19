@@ -144,14 +144,6 @@ int seq_dentry(struct seq_file *m, struct dentry *dentry, const char *esc)
     booter_panic("No impl!\n");
 }
 
-int __fs_parse(struct p_log *log,
-         const struct fs_parameter_spec *desc,
-         struct fs_parameter *param,
-         struct fs_parse_result *result)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(__fs_parse);
 int get_tree_nodev(struct fs_context *fc,
           int (*fill_super)(struct super_block *sb,
                     struct fs_context *fc))
@@ -159,12 +151,6 @@ int get_tree_nodev(struct fs_context *fc,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(get_tree_nodev);
-int fs_param_is_u32(struct p_log *log, const struct fs_parameter_spec *p,
-            struct fs_parameter *param, struct fs_parse_result *result)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(fs_param_is_u32);
 
 int __set_page_dirty_no_writeback(struct page *page)
 {

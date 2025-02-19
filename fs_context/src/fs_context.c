@@ -406,7 +406,6 @@ void logfc(struct fc_log *log, const char *prefix, char level, const char *fmt, 
 	}
 	va_end(va);
 }
-EXPORT_SYMBOL(logfc);
 
 /*
  * Free a logging structure.
