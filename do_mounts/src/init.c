@@ -14,8 +14,4 @@ cl_do_mounts_init(void)
 }
 EXPORT_SYMBOL(cl_do_mounts_init);
 
-void kill_litter_super(struct super_block *sb)
-{
-    booter_panic("No impl!\n");
-}
 

@@ -19,18 +19,7 @@ void set_fs_root(struct fs_struct *fs, const struct path *path)
 {
     booter_panic("No impl!\n");
 }
-int __init shmem_init(void)
-{
-    booter_panic("No impl!\n");
-}
 void set_fs_pwd(struct fs_struct *fs, const struct path *path)
-{
-    booter_panic("No impl!\n");
-}
-
-struct vfsmount *vfs_kern_mount(struct file_system_type *type,
-                int flags, const char *name,
-                void *data)
 {
     booter_panic("No impl!\n");
 }
@@ -39,5 +28,16 @@ void __init init_rootfs(void)
 {
     booter_panic("No impl!\n");
 }
+
+__weak int __init shmem_init(void)
+{
+    booter_panic("No impl!\n");
+}
+
+int vfs_get_tree(struct fs_context *fc)
+{
+    booter_panic("No impl!\n");
+}
+
 
 const struct proc_ns_operations mntns_operations;

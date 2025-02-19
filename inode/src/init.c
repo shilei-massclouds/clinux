@@ -21,6 +21,8 @@ bool list_lru_del(struct list_lru *lru, struct list_head *item)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(list_lru_del);
+
 int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
 {
     booter_panic("No impl!\n");
@@ -29,10 +31,13 @@ int __sb_start_write(struct super_block *sb, int level, bool wait)
 {
     booter_panic("No impl!\n");
 }
+
 void __fsnotify_inode_delete(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(__fsnotify_inode_delete);
+
 unsigned long invalidate_mapping_pages(struct address_space *mapping,
         pgoff_t start, pgoff_t end)
 {
@@ -106,10 +111,13 @@ void __mark_inode_dirty(struct inode *inode, int flags)
 {
     booter_panic("No impl!\n");
 }
+
 bool list_lru_add(struct list_lru *lru, struct list_head *item)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(list_lru_add);
+
 int inode_has_buffers(struct inode *inode)
 {
     booter_panic("No impl!\n");

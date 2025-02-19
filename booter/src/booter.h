@@ -29,4 +29,10 @@ do { \
     sbi_shutdown(); \
 } while (0);
 
+//
+// Helper for decomposing components.
+//
+#define CL_MINE(name) \
+    void name() { booter_panic("No impl.\n"); }
+
 #endif /* _BOOTER_H_ */

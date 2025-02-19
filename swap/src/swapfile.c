@@ -60,6 +60,7 @@ atomic_long_t nr_swap_pages;
 EXPORT_SYMBOL_GPL(nr_swap_pages);
 /* protected with swap_lock. reading in vm_swap_full() doesn't need lock */
 long total_swap_pages;
+EXPORT_SYMBOL_GPL(total_swap_pages);
 static int least_priority = -1;
 
 static const char Bad_file[] = "Bad swap file entry ";

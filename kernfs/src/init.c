@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/fs.h>
+#include <linux/fs_parser.h>
 #include <linux/xattr.h>
 #include <linux/seq_file.h>
 #include "../../booter/src/booter.h"
@@ -20,14 +21,19 @@ void generic_fillattr(struct inode *inode, struct kstat *stat)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(generic_fillattr);
 int setattr_prepare(struct dentry *dentry, struct iattr *attr)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(setattr_prepare);
+
 int noop_fsync(struct file *file, loff_t start, loff_t end, int datasync)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(noop_fsync);
+
 int seq_release(struct inode *inode, struct file *file)
 {
     booter_panic("No impl!\n");
@@ -58,22 +64,20 @@ void unmap_mapping_range(struct address_space *mapping,
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(unmap_mapping_range);
 int generic_permission(struct inode *inode, int mask)
 {
     booter_panic("No impl!\n");
 }
+
 int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
              const void *value, size_t size, int flags,
              ssize_t *removed_size)
 {
     booter_panic("No impl!\n");
 }
-/*
-void truncate_inode_pages_final(struct address_space *mapping)
-{
-    booter_panic("No impl!\n");
-}
-*/
+EXPORT_SYMBOL(simple_xattr_set);
+
 ssize_t generic_read_dir(struct file *filp, char __user *buf, size_t siz, loff_t *ppos)
 {
     booter_panic("No impl!\n");
@@ -86,10 +90,14 @@ void lockref_get(struct lockref *lockref)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(lockref_get);
+
 void deactivate_locked_super(struct super_block *s)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(deactivate_locked_super);
+
 void kfree_link(void *p)
 {
     booter_panic("No impl!\n");
@@ -107,16 +115,19 @@ ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(simple_xattr_list);
 
 const char *xattr_full_name(const struct xattr_handler *handler,
                 const char *name)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(xattr_full_name);
 void setattr_copy(struct inode *inode, const struct iattr *attr)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(setattr_copy);
 struct dentry *d_obtain_alias(struct inode *inode)
 {
     booter_panic("No impl!\n");
@@ -126,8 +137,53 @@ int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(simple_xattr_get);
 
 int seq_dentry(struct seq_file *m, struct dentry *dentry, const char *esc)
 {
     booter_panic("No impl!\n");
 }
+
+int __fs_parse(struct p_log *log,
+         const struct fs_parameter_spec *desc,
+         struct fs_parameter *param,
+         struct fs_parse_result *result)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__fs_parse);
+int get_tree_nodev(struct fs_context *fc,
+          int (*fill_super)(struct super_block *sb,
+                    struct fs_context *fc))
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(get_tree_nodev);
+int fs_param_is_u32(struct p_log *log, const struct fs_parameter_spec *p,
+            struct fs_parameter *param, struct fs_parse_result *result)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fs_param_is_u32);
+
+int __set_page_dirty_no_writeback(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__set_page_dirty_no_writeback);
+
+
+void kill_litter_super(struct super_block *sb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kill_litter_super);
+
+const struct file_operations simple_dir_operations;
+EXPORT_SYMBOL(simple_dir_operations);
+
+int simple_statfs(struct dentry *dentry, struct kstatfs *buf)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_statfs);

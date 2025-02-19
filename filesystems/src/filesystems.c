@@ -40,11 +40,13 @@ struct file_system_type *get_filesystem(struct file_system_type *fs)
 	__module_get(fs->owner);
 	return fs;
 }
+EXPORT_SYMBOL(get_filesystem);
 
 void put_filesystem(struct file_system_type *fs)
 {
 	module_put(fs->owner);
 }
+EXPORT_SYMBOL(put_filesystem);
 
 static struct file_system_type **find_filesystem(const char *name, unsigned len)
 {
