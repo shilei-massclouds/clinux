@@ -280,3 +280,9 @@ __weak void add_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_en
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(add_wait_queue);
+
+__weak void __wake_up_locked(struct wait_queue_head *wq_head, unsigned int mode, int nr)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(__wake_up_locked);

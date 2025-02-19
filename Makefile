@@ -52,7 +52,7 @@ components := \
 	percpu workqueue_itf workqueue notifier \
 	memblock bootmem paging rmap backing_dev \
 	page_alloc slub vmalloc mm_util \
-	spinlock semaphore mutex rwsem rcu \
+	spinlock semaphore mutex rwsem percpu_rwsem rcu \
 	inode dcache file_table do_mounts \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs kernfs sysfs block_dev filesystems shmem \
