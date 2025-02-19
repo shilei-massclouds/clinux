@@ -3231,9 +3231,12 @@ void __init vfs_caches_init(void)
 	inode_init();
 	files_init();
 	files_maxfiles_init();
+    printk("============> vfs_caches_init 1 ======> \n");
 	mnt_init();
-	//bdev_cache_init();
-	//chrdev_init();
+    printk("============> vfs_caches_init 2 ======> \n");
+	bdev_cache_init();
+    printk("============> vfs_caches_init 3 ======> \n");
+	chrdev_init();
     printk("============> vfs_caches_init ======> \n");
 }
 EXPORT_SYMBOL(vfs_caches_init);

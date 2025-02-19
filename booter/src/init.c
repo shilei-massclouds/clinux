@@ -158,18 +158,10 @@ void __put_task_struct(struct task_struct *tsk)
 }
 EXPORT_SYMBOL(__put_task_struct);
 
-/*
-void kobject_del(struct kobject *kobj)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-EXPORT_SYMBOL(kobject_del);
-*/
-
 struct kobject *kernel_kobj;
 EXPORT_SYMBOL_GPL(kernel_kobj);
 
-void module_put(struct module *module)
+__weak void module_put(struct module *module)
 {
     booter_panic("No impl in 'time'.");
 }

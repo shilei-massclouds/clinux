@@ -840,7 +840,6 @@ void __init bdev_cache_init(void)
 		panic("Cannot create bdev pseudo-fs");
 	blockdev_superblock = bd_mnt->mnt_sb;   /* For writeback */
 }
-EXPORT_SYMBOL_GPL(bdev_cache_init);
 
 ///*
 // * Most likely _very_ bad one - but then it's hardly critical for small

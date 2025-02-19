@@ -3989,14 +3989,12 @@ int __init shmem_init(void)
 		goto out2;
 	}
 
-    printk("========================== %s\n", __func__);
 	shm_mnt = kern_mount(&shmem_fs_type);
 	if (IS_ERR(shm_mnt)) {
 		error = PTR_ERR(shm_mnt);
 		pr_err("Could not kern_mount tmpfs\n");
 		goto out1;
 	}
-    printk("-------------------------- %s\n", __func__);
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 	if (has_transparent_hugepage() && shmem_huge > SHMEM_HUGE_DENY)

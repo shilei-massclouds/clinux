@@ -19,3 +19,14 @@ __weak void __init mnt_init(void)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(mnt_init);
+
+__weak void __init bdev_cache_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(bdev_cache_init);
+
+void __init chrdev_init(void)
+{
+    booter_panic("No impl!\n");
+}

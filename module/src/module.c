@@ -1145,20 +1145,19 @@ bool try_module_get(struct module *module)
 	return ret;
 }
 
-//void module_put(struct module *module)
-//{
-//	int ret;
-//
-//	if (module) {
-//		preempt_disable();
-//		ret = atomic_dec_if_positive(&module->refcnt);
-//		WARN_ON(ret < 0);	/* Failed to put refcount */
-//		trace_module_put(module, _RET_IP_);
-//		preempt_enable();
-//	}
-//}
-//EXPORT_SYMBOL(module_put);
-//
+void module_put(struct module *module)
+{
+	int ret;
+
+	if (module) {
+		preempt_disable();
+		ret = atomic_dec_if_positive(&module->refcnt);
+		WARN_ON(ret < 0);	/* Failed to put refcount */
+		trace_module_put(module, _RET_IP_);
+		preempt_enable();
+	}
+}
+
 #else /* !CONFIG_MODULE_UNLOAD */
 //static inline void print_unload_info(struct seq_file *m, struct module *mod)
 //{
