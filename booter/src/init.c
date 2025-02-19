@@ -289,11 +289,13 @@ __weak void kill_anon_super(struct super_block *sb)
 }
 EXPORT_SYMBOL(kill_anon_super);
 
+/*
 struct dentry *d_make_root(struct inode *root_inode)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(d_make_root);
+*/
 
 int simple_readpage(struct file *file, struct page *page)
 {
