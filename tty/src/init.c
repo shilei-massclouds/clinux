@@ -20,11 +20,6 @@ ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_
 {
     booter_panic("No impl.\n");
 }
-int alloc_chrdev_region(dev_t *dev, unsigned baseminor, unsigned count,
-            const char *name)
-{
-    booter_panic("No impl.\n");
-}
 struct class *__class_create(struct module *owner, const char *name,
                  struct lock_class_key *key)
 {
@@ -53,10 +48,6 @@ void *vzalloc(unsigned long size)
 int iterate_fd(struct files_struct *files, unsigned n,
         int (*f)(const void *, struct file *, unsigned),
         const void *p)
-{
-    booter_panic("No impl.\n");
-}
-int cdev_add(struct cdev *p, dev_t dev, unsigned count)
 {
     booter_panic("No impl.\n");
 }
@@ -138,10 +129,6 @@ void vfree(const void *addr)
 {
     booter_panic("No impl.\n");
 }
-void unregister_chrdev_region(dev_t from, unsigned count)
-{
-    booter_panic("No impl.\n");
-}
 void device_destroy(struct class *class, dev_t devt)
 {
     booter_panic("No impl.\n");
@@ -162,10 +149,6 @@ void ldsem_up_read(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");
 }
-int register_chrdev_region(dev_t from, unsigned count, const char *name)
-{
-    booter_panic("No impl.\n");
-}
 struct ctl_table_header *register_sysctl_table(struct ctl_table *table)
 {
     booter_panic("No impl.\n");
@@ -174,21 +157,9 @@ int __init vty_init(const struct file_operations *console_fops)
 {
     booter_panic("No impl.\n");
 }
-void cdev_init(struct cdev *cdev, const struct file_operations *fops)
-{
-    booter_panic("No impl.\n");
-}
 struct device *class_find_device(struct class *class, struct device *start,
                  const void *data,
                  int (*match)(struct device *, const void *))
-{
-    booter_panic("No impl.\n");
-}
-struct cdev *cdev_alloc(void)
-{
-    booter_panic("No impl.\n");
-}
-void cdev_del(struct cdev *p)
 {
     booter_panic("No impl.\n");
 }

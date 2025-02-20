@@ -618,3 +618,8 @@ int set_page_dirty(struct page *page)
 }
 EXPORT_SYMBOL(set_page_dirty);
 
+loff_t noop_llseek(struct file *file, loff_t offset, int whence)
+{
+    booter_panic("No impl in 'lib'.");
+}
+EXPORT_SYMBOL(noop_llseek);

@@ -15,7 +15,6 @@ cl_inode_init(void)
 EXPORT_SYMBOL(cl_inode_init);
 
 const struct file_operations pipefifo_fops;
-const struct file_operations def_chr_fops;
 
 int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
 {
@@ -132,10 +131,6 @@ int proc_doulongvec_minmax(struct ctl_table *table, int write,
     booter_panic("No impl!\n");
 }
 int write_inode_now(struct inode *inode, int sync)
-{
-    booter_panic("No impl!\n");
-}
-void cd_forget(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }

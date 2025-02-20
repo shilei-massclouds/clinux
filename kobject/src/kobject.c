@@ -314,27 +314,27 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
 }
 EXPORT_SYMBOL(kobject_set_name_vargs);
 
-///**
-// * kobject_set_name() - Set the name of a kobject.
-// * @kobj: struct kobject to set the name of
-// * @fmt: format string used to build the name
-// *
-// * This sets the name of the kobject.  If you have already added the
-// * kobject to the system, you must call kobject_rename() in order to
-// * change the name of the kobject.
-// */
-//int kobject_set_name(struct kobject *kobj, const char *fmt, ...)
-//{
-//	va_list vargs;
-//	int retval;
-//
-//	va_start(vargs, fmt);
-//	retval = kobject_set_name_vargs(kobj, fmt, vargs);
-//	va_end(vargs);
-//
-//	return retval;
-//}
-//EXPORT_SYMBOL(kobject_set_name);
+/**
+ * kobject_set_name() - Set the name of a kobject.
+ * @kobj: struct kobject to set the name of
+ * @fmt: format string used to build the name
+ *
+ * This sets the name of the kobject.  If you have already added the
+ * kobject to the system, you must call kobject_rename() in order to
+ * change the name of the kobject.
+ */
+int kobject_set_name(struct kobject *kobj, const char *fmt, ...)
+{
+	va_list vargs;
+	int retval;
+
+	va_start(vargs, fmt);
+	retval = kobject_set_name_vargs(kobj, fmt, vargs);
+	va_end(vargs);
+
+	return retval;
+}
+EXPORT_SYMBOL(kobject_set_name);
 
 /**
  * kobject_init() - Initialize a kobject structure.
@@ -664,15 +664,15 @@ struct kobject *kobject_get(struct kobject *kobj)
 }
 EXPORT_SYMBOL(kobject_get);
 
-//struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
-//{
-//	if (!kobj)
-//		return NULL;
-//	if (!kref_get_unless_zero(&kobj->kref))
-//		kobj = NULL;
-//	return kobj;
-//}
-//EXPORT_SYMBOL(kobject_get_unless_zero);
+struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
+{
+	if (!kobj)
+		return NULL;
+	if (!kref_get_unless_zero(&kobj->kref))
+		kobj = NULL;
+	return kobj;
+}
+EXPORT_SYMBOL(kobject_get_unless_zero);
 
 /*
  * kobject_cleanup - free kobject resources.
