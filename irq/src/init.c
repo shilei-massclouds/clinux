@@ -29,7 +29,3 @@ task_work_cancel(struct task_struct *task, task_work_func_t func)
 {
     booter_panic("No impl in 'irq'.");
 }
-void seq_putc(struct seq_file *m, char c)
-{
-    booter_panic("No impl in 'irq'.");
-}

@@ -373,6 +373,7 @@ int num_to_str(char *buf, int size, unsigned long long num, unsigned int width)
 
 	return len + width;
 }
+EXPORT_SYMBOL(num_to_str);
 
 #define SIGN	1		/* unsigned/signed, must be 1 */
 #define LEFT	2		/* left justified */

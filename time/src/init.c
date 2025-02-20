@@ -58,12 +58,6 @@ int rtc_set_ntp_time(struct timespec64 now, unsigned long *target_nsec)
     booter_panic("No impl in 'time'.");
 }
 
-loff_t seq_lseek(struct file *file, loff_t offset, int whence)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(seq_lseek);
-
 int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
 {
     booter_panic("No impl in 'time'.");
@@ -84,12 +78,12 @@ void irq_work_tick(void)
 {
     booter_panic("No impl in 'time'.");
 }
-*/
 ssize_t seq_read(struct file *file, char __user *buf, size_t size, loff_t *ppos)
 {
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(seq_read);
+*/
 struct dentry *debugfs_create_file(const char *name, umode_t mode,
                    struct dentry *parent, void *data,
                    const struct file_operations *fops)
@@ -103,28 +97,6 @@ void __weak scheduler_tick(void)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(scheduler_tick);
-
-void seq_printf(struct seq_file *m, const char *f, ...)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(seq_printf);
-void seq_puts(struct seq_file *m, const char *s)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(seq_puts);
-int single_release(struct inode *inode, struct file *file)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(single_release);
-int single_open(struct file *file, int (*show)(struct seq_file *, void *),
-        void *data)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(single_open);
 
 /*
 void run_posix_cpu_timers(void)

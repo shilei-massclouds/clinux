@@ -17,13 +17,6 @@ cl_kernfs_init(void)
 }
 EXPORT_SYMBOL(cl_kernfs_init);
 
-
-int seq_release(struct inode *inode, struct file *file)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(seq_release);
-
 void unmap_mapping_range(struct address_space *mapping,
         loff_t const holebegin, loff_t const holelen, int even_cows)
 {
@@ -38,12 +31,6 @@ int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(simple_xattr_set);
-
-int seq_open(struct file *file, const struct seq_operations *op)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(seq_open);
 
 loff_t generic_file_llseek(struct file *file, loff_t offset, int whence)
 {
@@ -71,8 +58,3 @@ int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(simple_xattr_get);
-
-int seq_dentry(struct seq_file *m, struct dentry *dentry, const char *esc)
-{
-    booter_panic("No impl!\n");
-}

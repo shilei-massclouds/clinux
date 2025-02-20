@@ -97,10 +97,6 @@ void *vmemdup_user(const void __user *src, size_t len)
 {
     booter_panic("No impl!\n");
 }
-void *kvmalloc_node(size_t size, gfp_t flags, int node)
-{
-    booter_panic("No impl!\n");
-}
 
 void input_unregister_handle(struct input_handle *handle)
 {

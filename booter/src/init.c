@@ -767,3 +767,9 @@ int is_current_pgrp_orphaned(void)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(is_current_pgrp_orphaned);
+
+void *kvmalloc_node(size_t size, gfp_t flags, int node)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kvmalloc_node);

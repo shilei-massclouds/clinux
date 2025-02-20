@@ -703,10 +703,10 @@ cl_top_linux_init(void)
     dbg_late_init();
     vfs_caches_init();
     pagecache_init();
-    printk("======================= %s\n", __func__);
     signals_init();
     printk("======================= %s\n", __func__);
-    //seq_file_init();
+    seq_file_init();
+    printk("======================= %s\n", __func__);
     //proc_root_init();
     //nsfs_init();
     //cpuset_init();
