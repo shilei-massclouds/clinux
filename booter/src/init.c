@@ -506,8 +506,51 @@ int sync_filesystem(struct super_block *sb)
 }
 EXPORT_SYMBOL(sync_filesystem);
 
-void path_put(const struct path *path)
+__weak void path_get(const struct path *path)
 {
-    booter_panic("Need random driver take effect!\n");
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(path_get);
+
+__weak void path_put(const struct path *path)
+{
+    booter_panic("No impl in 'booter'.");
 }
 EXPORT_SYMBOL(path_put);
+
+/*
+ * vfsmount lock may be taken for read to prevent changes to the
+ * vfsmount hash, ie. during mountpoint lookups or walking back
+ * up the tree.
+ *
+ * It should be taken for write in all cases where the vfsmount
+ * tree or hash is modified or when a vfsmount structure is modified.
+ */
+__cacheline_aligned_in_smp DEFINE_SEQLOCK(mount_lock);
+EXPORT_SYMBOL_GPL(mount_lock);
+
+__weak void __detach_mounts(struct dentry *dentry)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(__detach_mounts);
+
+struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
+        int fgp_flags, gfp_t gfp_mask)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(pagecache_get_page);
+
+__weak void mntput(struct vfsmount *mnt)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(mntput);
+
+int
+task_work_add(struct task_struct *task, struct callback_head *work, int notify)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(task_work_add);

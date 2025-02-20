@@ -1818,6 +1818,7 @@ bool atime_needs_update(const struct path *path, struct inode *inode)
 
 	return true;
 }
+EXPORT_SYMBOL(atime_needs_update);
 
 void touch_atime(const struct path *path)
 {

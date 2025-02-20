@@ -7,6 +7,8 @@
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
+struct mount;
+
 int
 cl_fs_namespace_init(void)
 {
@@ -30,6 +32,22 @@ void set_fs_pwd(struct fs_struct *fs, const struct path *path)
 */
 
 __weak int __init shmem_init(void)
+{
+    booter_panic("No impl!\n");
+}
+
+
+void __fsnotify_vfsmount_delete(struct vfsmount *mnt)
+{
+    booter_panic("No impl!\n");
+}
+
+void mnt_pin_kill(struct mount *m)
+{
+    booter_panic("No impl!\n");
+}
+
+void change_mnt_propagation(struct mount *mnt, int type)
 {
     booter_panic("No impl!\n");
 }

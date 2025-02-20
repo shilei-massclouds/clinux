@@ -4,7 +4,7 @@
 CL_MINE(default_llseek)
 //CL_MINE(d_find_alias)
 //CL_MINE(d_find_any_alias)
-CL_MINE(d_invalidate)
+//CL_MINE(d_invalidate)
 //CL_MINE(d_splice_alias)
 //CL_MINE(generic_file_llseek)
 //CL_MINE(generic_read_dir)

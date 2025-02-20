@@ -13,19 +13,3 @@ cl_fs_parser_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_fs_parser_init);
-
-void putname(struct filename *name)
-{
-    booter_panic("Need random driver take effect!\n");
-}
-struct filename *
-getname_kernel(const char * filename)
-{
-    booter_panic("Need random driver take effect!\n");
-}
-int filename_lookup(int dfd, struct filename *name, unsigned flags,
-            struct path *path, struct path *root)
-{
-    booter_panic("Need random driver take effect!\n");
-}
-

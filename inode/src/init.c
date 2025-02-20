@@ -21,6 +21,7 @@ int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(__break_lease);
 
 void __fsnotify_inode_delete(struct inode *inode)
 {
@@ -49,10 +50,13 @@ int __mnt_want_write(struct vfsmount *m)
 {
     booter_panic("No impl!\n");
 }
+
 int in_group_p(kgid_t grp)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(in_group_p);
+
 int simple_setattr(struct dentry *dentry, struct iattr *iattr)
 {
     booter_panic("No impl!\n");
@@ -68,6 +72,8 @@ bool capable_wrt_inode_uidgid(const struct inode *inode, int cap)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(capable_wrt_inode_uidgid);
+
 int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
 {
     booter_panic("No impl!\n");
@@ -84,10 +90,6 @@ send_sig(int sig, struct task_struct *p, int priv)
     booter_panic("No impl!\n");
 }
 void inode_io_list_del(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
-int inode_permission(struct inode *inode, int mask)
 {
     booter_panic("No impl!\n");
 }

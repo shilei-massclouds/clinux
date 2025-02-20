@@ -13,8 +13,3 @@ cl_fs_struct_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_fs_struct_init);
-
-void path_get(const struct path *path)
-{
-    booter_panic("No impl.\n");
-}

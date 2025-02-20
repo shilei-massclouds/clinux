@@ -501,6 +501,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(vmscan);
     REQUIRE_COMPONENT(fs_namespace);
     REQUIRE_COMPONENT(proc);
+    REQUIRE_COMPONENT(namei);
 
     //
     // start_kernel (init/main.c)

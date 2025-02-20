@@ -33,27 +33,3 @@ void seq_putc(struct seq_file *m, char c)
 {
     booter_panic("No impl in 'irq'.");
 }
-/*
-struct proc_dir_entry *proc_mkdir(const char *name,
-        struct proc_dir_entry *parent)
-{
-    booter_panic("No impl in 'irq'.");
-}
-*/
-
-int
-task_work_add(struct task_struct *task, struct callback_head *work, int notify)
-{
-    booter_panic("No impl in 'irq'.");
-}
-/*
-void remove_proc_entry(const char *name, struct proc_dir_entry *parent)
-{
-    booter_panic("No impl in 'irq'.");
-}
-
-void proc_remove(struct proc_dir_entry *de)
-{
-    booter_panic("No impl in 'irq'.");
-}
-*/

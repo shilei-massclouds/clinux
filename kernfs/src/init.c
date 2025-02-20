@@ -66,10 +66,6 @@ void unmap_mapping_range(struct address_space *mapping,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(unmap_mapping_range);
-int generic_permission(struct inode *inode, int mask)
-{
-    booter_panic("No impl!\n");
-}
 
 int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
              const void *value, size_t size, int flags,

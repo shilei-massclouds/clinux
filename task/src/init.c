@@ -263,3 +263,9 @@ void __weak key_put(struct key *key)
     booter_panic("No impl 'key_put'.");
 }
 EXPORT_SYMBOL(key_put);
+
+int current_umask(void)
+{
+	return current->fs->umask;
+}
+EXPORT_SYMBOL(current_umask);
