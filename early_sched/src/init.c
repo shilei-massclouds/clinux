@@ -286,3 +286,22 @@ __weak void __wake_up_locked(struct wait_queue_head *wq_head, unsigned int mode,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(__wake_up_locked);
+
+__weak void __sched io_schedule(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(io_schedule);
+
+__weak void __wake_up_locked_key_bookmark(struct wait_queue_head *wq_head,
+		unsigned int mode, void *key, wait_queue_entry_t *bookmark)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(__wake_up_locked_key_bookmark);
+
+__weak int wake_up_state(struct task_struct *p, unsigned int state)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(wake_up_state);

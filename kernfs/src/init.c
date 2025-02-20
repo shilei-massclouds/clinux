@@ -17,16 +17,6 @@ cl_kernfs_init(void)
 }
 EXPORT_SYMBOL(cl_kernfs_init);
 
-void generic_fillattr(struct inode *inode, struct kstat *stat)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(generic_fillattr);
-int setattr_prepare(struct dentry *dentry, struct iattr *attr)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(setattr_prepare);
 
 int seq_release(struct inode *inode, struct file *file)
 {
@@ -34,20 +24,6 @@ int seq_release(struct inode *inode, struct file *file)
 }
 EXPORT_SYMBOL(seq_release);
 
-/*
-struct super_block *sget_fc(struct fs_context *fc,
-                int (*test)(struct super_block *, struct fs_context *),
-                int (*set)(struct super_block *, struct fs_context *))
-{
-    booter_panic("No impl!\n");
-}
-*/
-/*
-struct dentry *d_splice_alias(struct inode *inode, struct dentry *dentry)
-{
-    booter_panic("No impl!\n");
-}
-*/
 void unmap_mapping_range(struct address_space *mapping,
         loff_t const holebegin, loff_t const holelen, int even_cows)
 {
@@ -62,24 +38,6 @@ int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(simple_xattr_set);
-
-/*
-int set_anon_super_fc(struct super_block *sb, struct fs_context *fc)
-{
-    booter_panic("No impl!\n");
-}
-
-void deactivate_locked_super(struct super_block *s)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(deactivate_locked_super);
-
-void kfree_link(void *p)
-{
-    booter_panic("No impl!\n");
-}
-*/
 
 int seq_open(struct file *file, const struct seq_operations *op)
 {
@@ -106,11 +64,6 @@ const char *xattr_full_name(const struct xattr_handler *handler,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(xattr_full_name);
-void setattr_copy(struct inode *inode, const struct iattr *attr)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(setattr_copy);
 
 int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
              void *buffer, size_t size)

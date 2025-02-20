@@ -6293,7 +6293,6 @@ void __sched io_schedule(void)
 	schedule();
 	io_schedule_finish(token);
 }
-EXPORT_SYMBOL(io_schedule);
 
 ///**
 // * sys_sched_get_priority_max - return maximum RT priority.

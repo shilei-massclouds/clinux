@@ -450,18 +450,6 @@ void __put_page(struct page *page)
 }
 EXPORT_SYMBOL(__put_page);
 
-void unlock_page(struct page *page)
-{
-    booter_panic("No impl in 'booter'.");
-}
-EXPORT_SYMBOL(unlock_page);
-
-void __lock_page(struct page *__page)
-{
-    booter_panic("No impl in 'booter'.");
-}
-EXPORT_SYMBOL(__lock_page);
-
 __weak void prandom_bytes(void *buf, size_t bytes)
 {
     booter_panic("No impl in 'booter'.");
@@ -526,13 +514,6 @@ __weak void __detach_mounts(struct dentry *dentry)
     booter_panic("No impl in 'booter'.");
 }
 EXPORT_SYMBOL(__detach_mounts);
-
-struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
-        int fgp_flags, gfp_t gfp_mask)
-{
-    booter_panic("No impl in 'booter'.");
-}
-EXPORT_SYMBOL(pagecache_get_page);
 
 __weak struct vfsmount *mntget(struct vfsmount *mnt)
 {
@@ -623,3 +604,79 @@ loff_t noop_llseek(struct file *file, loff_t offset, int whence)
     booter_panic("No impl in 'lib'.");
 }
 EXPORT_SYMBOL(noop_llseek);
+
+int setattr_prepare(struct dentry *dentry, struct iattr *attr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(setattr_prepare);
+
+void generic_fillattr(struct inode *inode, struct kstat *stat)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(generic_fillattr);
+
+void setattr_copy(struct inode *inode, const struct iattr *attr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(setattr_copy);
+
+__weak struct pseudo_fs_context *init_pseudo(struct fs_context *fc,
+					unsigned long magic)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(init_pseudo);
+
+__weak void mark_page_accessed(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(mark_page_accessed);
+
+struct pagevec;
+__weak void __pagevec_release(struct pagevec *pvec)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__pagevec_release);
+
+__weak bool shmem_mapping(struct address_space *mapping)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(shmem_mapping);
+
+size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
+             struct iov_iter *i)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(copy_page_to_iter);
+
+void wait_on_page_writeback(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(wait_on_page_writeback);
+
+errseq_t errseq_set(errseq_t *eseq, int err)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(errseq_set);
+
+int try_to_free_buffers(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(try_to_free_buffers);
+
+int
+send_sig(int sig, struct task_struct *p, int priv)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(send_sig);

@@ -376,7 +376,6 @@ struct pseudo_fs_context *init_pseudo(struct fs_context *fc,
 	}
 	return ctx;
 }
-EXPORT_SYMBOL(init_pseudo);
 
 int simple_open(struct inode *inode, struct file *file)
 {

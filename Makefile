@@ -58,7 +58,7 @@ components := \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem \
 	fs_context fs_parser fs_struct namei libfs \
-	fork mmap \
+	fork mmap filemap \
 	buffer swap \
 	early_printk printk panic dump_stack show_mem
 	#partitions \

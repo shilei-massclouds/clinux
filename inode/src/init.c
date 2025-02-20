@@ -33,6 +33,8 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(invalidate_mapping_pages);
+
 int __mnt_want_write_file(struct file *file)
 {
     booter_panic("No impl!\n");
@@ -77,12 +79,12 @@ void list_lru_isolate(struct list_lru_one *list, struct list_head *item)
 {
     booter_panic("No impl!\n");
 }
-*/
 int
 send_sig(int sig, struct task_struct *p, int priv)
 {
     booter_panic("No impl!\n");
 }
+*/
 void inode_io_list_del(struct inode *inode)
 {
     booter_panic("No impl!\n");

@@ -48,12 +48,12 @@ static inline struct bdev_inode *BDEV_I(struct inode *inode)
 	return container_of(inode, struct bdev_inode, vfs_inode);
 }
 
-//struct block_device *I_BDEV(struct inode *inode)
-//{
-//	return &BDEV_I(inode)->bdev;
-//}
-//EXPORT_SYMBOL(I_BDEV);
-//
+struct block_device *I_BDEV(struct inode *inode)
+{
+	return &BDEV_I(inode)->bdev;
+}
+EXPORT_SYMBOL(I_BDEV);
+
 //static void bdev_write_inode(struct block_device *bdev)
 //{
 //	struct inode *inode = bdev->bd_inode;
