@@ -28,23 +28,11 @@ int setattr_prepare(struct dentry *dentry, struct iattr *attr)
 }
 EXPORT_SYMBOL(setattr_prepare);
 
-int noop_fsync(struct file *file, loff_t start, loff_t end, int datasync)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(noop_fsync);
-
 int seq_release(struct inode *inode, struct file *file)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(seq_release);
-
-void make_empty_dir_inode(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(make_empty_dir_inode);
 
 /*
 struct super_block *sget_fc(struct fs_context *fc,
@@ -75,12 +63,6 @@ int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
 }
 EXPORT_SYMBOL(simple_xattr_set);
 
-ssize_t generic_read_dir(struct file *filp, char __user *buf, size_t siz, loff_t *ppos)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(generic_read_dir);
-
 /*
 int set_anon_super_fc(struct super_block *sb, struct fs_context *fc)
 {
@@ -92,12 +74,12 @@ void deactivate_locked_super(struct super_block *s)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(deactivate_locked_super);
-*/
 
 void kfree_link(void *p)
 {
     booter_panic("No impl!\n");
 }
+*/
 
 int seq_open(struct file *file, const struct seq_operations *op)
 {
@@ -129,10 +111,7 @@ void setattr_copy(struct inode *inode, const struct iattr *attr)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(setattr_copy);
-struct dentry *d_obtain_alias(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
+
 int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
              void *buffer, size_t size)
 {
@@ -169,11 +148,3 @@ void kill_litter_super(struct super_block *sb)
 EXPORT_SYMBOL(kill_litter_super);
 */
 
-const struct file_operations simple_dir_operations;
-EXPORT_SYMBOL(simple_dir_operations);
-
-int simple_statfs(struct dentry *dentry, struct kstatfs *buf)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(simple_statfs);

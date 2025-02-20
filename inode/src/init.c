@@ -57,11 +57,6 @@ int in_group_p(kgid_t grp)
 }
 EXPORT_SYMBOL(in_group_p);
 
-int simple_setattr(struct dentry *dentry, struct iattr *iattr)
-{
-    booter_panic("No impl!\n");
-}
-
 void truncate_inode_pages_final(struct address_space *mapping)
 {
     booter_panic("No impl!\n");

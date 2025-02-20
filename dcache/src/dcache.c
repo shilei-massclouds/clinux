@@ -2016,103 +2016,103 @@ struct dentry *d_make_root(struct inode *root_inode)
 }
 EXPORT_SYMBOL(d_make_root);
 
-//static struct dentry *__d_instantiate_anon(struct dentry *dentry,
-//					   struct inode *inode,
-//					   bool disconnected)
-//{
-//	struct dentry *res;
-//	unsigned add_flags;
-//
-//	security_d_instantiate(dentry, inode);
-//	spin_lock(&inode->i_lock);
-//	res = __d_find_any_alias(inode);
-//	if (res) {
-//		spin_unlock(&inode->i_lock);
-//		dput(dentry);
-//		goto out_iput;
-//	}
-//
-//	/* attach a disconnected dentry */
-//	add_flags = d_flags_for_inode(inode);
-//
-//	if (disconnected)
-//		add_flags |= DCACHE_DISCONNECTED;
-//
-//	spin_lock(&dentry->d_lock);
-//	__d_set_inode_and_type(dentry, inode, add_flags);
-//	hlist_add_head(&dentry->d_u.d_alias, &inode->i_dentry);
-//	if (!disconnected) {
-//		hlist_bl_lock(&dentry->d_sb->s_roots);
-//		hlist_bl_add_head(&dentry->d_hash, &dentry->d_sb->s_roots);
-//		hlist_bl_unlock(&dentry->d_sb->s_roots);
-//	}
-//	spin_unlock(&dentry->d_lock);
-//	spin_unlock(&inode->i_lock);
-//
-//	return dentry;
-//
-// out_iput:
-//	iput(inode);
-//	return res;
-//}
-//
-//struct dentry *d_instantiate_anon(struct dentry *dentry, struct inode *inode)
-//{
-//	return __d_instantiate_anon(dentry, inode, true);
-//}
-//EXPORT_SYMBOL(d_instantiate_anon);
-//
-//static struct dentry *__d_obtain_alias(struct inode *inode, bool disconnected)
-//{
-//	struct dentry *tmp;
-//	struct dentry *res;
-//
-//	if (!inode)
-//		return ERR_PTR(-ESTALE);
-//	if (IS_ERR(inode))
-//		return ERR_CAST(inode);
-//
-//	res = d_find_any_alias(inode);
-//	if (res)
-//		goto out_iput;
-//
-//	tmp = d_alloc_anon(inode->i_sb);
-//	if (!tmp) {
-//		res = ERR_PTR(-ENOMEM);
-//		goto out_iput;
-//	}
-//
-//	return __d_instantiate_anon(tmp, inode, disconnected);
-//
-//out_iput:
-//	iput(inode);
-//	return res;
-//}
-//
-///**
-// * d_obtain_alias - find or allocate a DISCONNECTED dentry for a given inode
-// * @inode: inode to allocate the dentry for
-// *
-// * Obtain a dentry for an inode resulting from NFS filehandle conversion or
-// * similar open by handle operations.  The returned dentry may be anonymous,
-// * or may have a full name (if the inode was already in the cache).
-// *
-// * When called on a directory inode, we must ensure that the inode only ever
-// * has one dentry.  If a dentry is found, that is returned instead of
-// * allocating a new one.
-// *
-// * On successful return, the reference to the inode has been transferred
-// * to the dentry.  In case of an error the reference on the inode is released.
-// * To make it easier to use in export operations a %NULL or IS_ERR inode may
-// * be passed in and the error will be propagated to the return value,
-// * with a %NULL @inode replaced by ERR_PTR(-ESTALE).
-// */
-//struct dentry *d_obtain_alias(struct inode *inode)
-//{
-//	return __d_obtain_alias(inode, true);
-//}
-//EXPORT_SYMBOL(d_obtain_alias);
-//
+static struct dentry *__d_instantiate_anon(struct dentry *dentry,
+					   struct inode *inode,
+					   bool disconnected)
+{
+	struct dentry *res;
+	unsigned add_flags;
+
+	security_d_instantiate(dentry, inode);
+	spin_lock(&inode->i_lock);
+	res = __d_find_any_alias(inode);
+	if (res) {
+		spin_unlock(&inode->i_lock);
+		dput(dentry);
+		goto out_iput;
+	}
+
+	/* attach a disconnected dentry */
+	add_flags = d_flags_for_inode(inode);
+
+	if (disconnected)
+		add_flags |= DCACHE_DISCONNECTED;
+
+	spin_lock(&dentry->d_lock);
+	__d_set_inode_and_type(dentry, inode, add_flags);
+	hlist_add_head(&dentry->d_u.d_alias, &inode->i_dentry);
+	if (!disconnected) {
+		hlist_bl_lock(&dentry->d_sb->s_roots);
+		hlist_bl_add_head(&dentry->d_hash, &dentry->d_sb->s_roots);
+		hlist_bl_unlock(&dentry->d_sb->s_roots);
+	}
+	spin_unlock(&dentry->d_lock);
+	spin_unlock(&inode->i_lock);
+
+	return dentry;
+
+ out_iput:
+	iput(inode);
+	return res;
+}
+
+struct dentry *d_instantiate_anon(struct dentry *dentry, struct inode *inode)
+{
+	return __d_instantiate_anon(dentry, inode, true);
+}
+EXPORT_SYMBOL(d_instantiate_anon);
+
+static struct dentry *__d_obtain_alias(struct inode *inode, bool disconnected)
+{
+	struct dentry *tmp;
+	struct dentry *res;
+
+	if (!inode)
+		return ERR_PTR(-ESTALE);
+	if (IS_ERR(inode))
+		return ERR_CAST(inode);
+
+	res = d_find_any_alias(inode);
+	if (res)
+		goto out_iput;
+
+	tmp = d_alloc_anon(inode->i_sb);
+	if (!tmp) {
+		res = ERR_PTR(-ENOMEM);
+		goto out_iput;
+	}
+
+	return __d_instantiate_anon(tmp, inode, disconnected);
+
+out_iput:
+	iput(inode);
+	return res;
+}
+
+/**
+ * d_obtain_alias - find or allocate a DISCONNECTED dentry for a given inode
+ * @inode: inode to allocate the dentry for
+ *
+ * Obtain a dentry for an inode resulting from NFS filehandle conversion or
+ * similar open by handle operations.  The returned dentry may be anonymous,
+ * or may have a full name (if the inode was already in the cache).
+ *
+ * When called on a directory inode, we must ensure that the inode only ever
+ * has one dentry.  If a dentry is found, that is returned instead of
+ * allocating a new one.
+ *
+ * On successful return, the reference to the inode has been transferred
+ * to the dentry.  In case of an error the reference on the inode is released.
+ * To make it easier to use in export operations a %NULL or IS_ERR inode may
+ * be passed in and the error will be propagated to the return value,
+ * with a %NULL @inode replaced by ERR_PTR(-ESTALE).
+ */
+struct dentry *d_obtain_alias(struct inode *inode)
+{
+	return __d_obtain_alias(inode, true);
+}
+EXPORT_SYMBOL(d_obtain_alias);
+
 ///**
 // * d_obtain_root - find or allocate a dentry for a given inode
 // * @inode: inode to allocate the dentry for
@@ -3111,29 +3111,28 @@ EXPORT_SYMBOL(d_splice_alias);
 //	return result;
 //}
 //EXPORT_SYMBOL(is_subdir);
-//
-//static enum d_walk_ret d_genocide_kill(void *data, struct dentry *dentry)
-//{
-//	struct dentry *root = data;
-//	if (dentry != root) {
-//		if (d_unhashed(dentry) || !dentry->d_inode)
-//			return D_WALK_SKIP;
-//
-//		if (!(dentry->d_flags & DCACHE_GENOCIDE)) {
-//			dentry->d_flags |= DCACHE_GENOCIDE;
-//			dentry->d_lockref.count--;
-//		}
-//	}
-//	return D_WALK_CONTINUE;
-//}
-//
-//void d_genocide(struct dentry *parent)
-//{
-//	d_walk(parent, parent, d_genocide_kill);
-//}
-//
-//EXPORT_SYMBOL(d_genocide);
-//
+
+static enum d_walk_ret d_genocide_kill(void *data, struct dentry *dentry)
+{
+	struct dentry *root = data;
+	if (dentry != root) {
+		if (d_unhashed(dentry) || !dentry->d_inode)
+			return D_WALK_SKIP;
+
+		if (!(dentry->d_flags & DCACHE_GENOCIDE)) {
+			dentry->d_flags |= DCACHE_GENOCIDE;
+			dentry->d_lockref.count--;
+		}
+	}
+	return D_WALK_CONTINUE;
+}
+
+void d_genocide(struct dentry *parent)
+{
+	d_walk(parent, parent, d_genocide_kill);
+}
+
+
 //void d_tmpfile(struct dentry *dentry, struct inode *inode)
 //{
 //	inode_dec_link_count(inode);
@@ -3234,7 +3233,6 @@ void __init vfs_caches_init(void)
 	inode_init();
 	files_init();
 	files_maxfiles_init();
-    printk("============> vfs_caches_init 1 ======> \n");
 	mnt_init();
     printk("============> vfs_caches_init 2 ======> \n");
 	bdev_cache_init();

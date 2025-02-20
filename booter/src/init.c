@@ -271,21 +271,13 @@ __weak void kill_anon_super(struct super_block *sb)
 }
 EXPORT_SYMBOL(kill_anon_super);
 
-/*
-struct dentry *d_make_root(struct inode *root_inode)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(d_make_root);
-*/
-
-int simple_readpage(struct file *file, struct page *page)
+__weak int simple_readpage(struct file *file, struct page *page)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(simple_readpage);
 
-int simple_write_begin(struct file *file, struct address_space *mapping,
+__weak int simple_write_begin(struct file *file, struct address_space *mapping,
             loff_t pos, unsigned len, unsigned flags,
             struct page **pagep, void **fsdata)
 {
@@ -293,7 +285,7 @@ int simple_write_begin(struct file *file, struct address_space *mapping,
 }
 EXPORT_SYMBOL(simple_write_begin);
 
-int simple_write_end(struct file *file, struct address_space *mapping,
+__weak int simple_write_end(struct file *file, struct address_space *mapping,
             loff_t pos, unsigned len, unsigned copied,
             struct page *page, void *fsdata)
 {
@@ -560,3 +552,69 @@ task_work_add(struct task_struct *task, struct callback_head *work, int notify)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(task_work_add);
+
+__weak
+struct vfsmount *vfs_kern_mount(struct file_system_type *type,
+				int flags, const char *name,
+				void *data)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(vfs_kern_mount);
+
+__weak int noop_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(noop_fsync);
+
+__weak int simple_statfs(struct dentry *dentry, struct kstatfs *buf)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_statfs);
+
+__weak void make_empty_dir_inode(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(make_empty_dir_inode);
+
+__weak void d_genocide(struct dentry *parent)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(d_genocide);
+
+__weak ssize_t generic_read_dir(struct file *filp, char __user *buf, size_t siz, loff_t *ppos)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(generic_read_dir);
+
+__weak void kfree_link(void *p)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kfree_link);
+
+int nonseekable_open(struct inode *inode, struct file *filp)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(nonseekable_open);
+
+loff_t
+generic_file_llseek_size(struct file *file, loff_t offset, int whence,
+        loff_t maxsize, loff_t eof)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(generic_file_llseek_size);
+
+int set_page_dirty(struct page *page)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(set_page_dirty);
+

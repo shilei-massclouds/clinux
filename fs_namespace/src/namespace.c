@@ -1013,7 +1013,6 @@ struct vfsmount *vfs_kern_mount(struct file_system_type *type,
 	put_fs_context(fc);
 	return mnt;
 }
-EXPORT_SYMBOL_GPL(vfs_kern_mount);
 
 //struct vfsmount *
 //vfs_submount(const struct dentry *mountpoint, struct file_system_type *type,
@@ -3244,13 +3243,11 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns, bool a
 	if (!ucounts)
 		return ERR_PTR(-ENOSPC);
 
-    printk("===============> %s step1\n", __func__);
 	new_ns = kzalloc(sizeof(struct mnt_namespace), GFP_KERNEL);
 	if (!new_ns) {
 		dec_mnt_namespaces(ucounts);
 		return ERR_PTR(-ENOMEM);
 	}
-    printk("===============> %s step2\n", __func__);
 	if (!anon) {
 		ret = ns_alloc_inum(&new_ns->ns);
 		if (ret) {
@@ -3259,7 +3256,6 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns, bool a
 			return ERR_PTR(ret);
 		}
 	}
-    printk("===============> %s step3\n", __func__);
 	new_ns->ns.ops = &mntns_operations;
 	if (!anon)
 		new_ns->seq = atomic64_add_return(1, &mnt_ns_seq);
@@ -3796,11 +3792,8 @@ static void __init init_mount_tree(void)
 	root.dentry = mnt->mnt_root;
 	mnt->mnt_flags |= MNT_LOCKED;
 
-    printk("===============> %s step1\n", __func__);
 	set_fs_pwd(current->fs, &root);
-    printk("===============> %s step2\n", __func__);
 	set_fs_root(current->fs, &root);
-    printk("===============> %s step3\n", __func__);
 }
 
 void __init mnt_init(void)
@@ -3835,9 +3828,7 @@ void __init mnt_init(void)
 		printk(KERN_WARNING "%s: kobj create error\n", __func__);
 	shmem_init();
 	init_rootfs();
-    printk("===============> %s step1\n", __func__);
 	init_mount_tree();
-    printk("===============> %s step2\n", __func__);
 }
 
 //void put_mnt_ns(struct mnt_namespace *ns)

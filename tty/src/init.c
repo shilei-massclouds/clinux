@@ -113,10 +113,6 @@ char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *tsk)
 {
     booter_panic("No impl.\n");
 }
-int nonseekable_open(struct inode *inode, struct file *filp)
-{
-    booter_panic("No impl.\n");
-}
 void proc_tty_register_driver(struct tty_driver *driver)
 {
     booter_panic("No impl.\n");

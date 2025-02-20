@@ -18,8 +18,10 @@ void invalidate_inode_buffers(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
+/*
 struct pseudo_fs_context *init_pseudo(struct fs_context *fc,
                     unsigned long magic)
 {
     booter_panic("No impl!\n");
 }
+*/
