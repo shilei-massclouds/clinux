@@ -16,8 +16,5 @@ EXPORT_SYMBOL(cl_vmscan_init);
 
 DEFINE_ENABLE_FUNC(vmscan);
 
-int laptop_mode;
-EXPORT_SYMBOL(laptop_mode);
-
 int buffer_heads_over_limit;
 

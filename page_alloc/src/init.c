@@ -98,11 +98,6 @@ long congestion_wait(int sync, long timeout)
 }
 EXPORT_SYMBOL(congestion_wait);
 
-bool node_dirty_ok(struct pglist_data *pgdat)
-{
-    booter_panic("No impl 'page_init_poison'.");
-}
-
 /*
  * Serializes oom killer invocations (out_of_memory()) from all contexts to
  * prevent from over eager oom killing (e.g. when the oom killer is invoked

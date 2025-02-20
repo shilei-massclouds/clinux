@@ -27,9 +27,12 @@ static const char *bdi_unknown_name = "(unknown)";
  * reader side locking.
  */
 DEFINE_SPINLOCK(bdi_lock);
+EXPORT_SYMBOL(bdi_lock);
+
 static u64 bdi_id_cursor;
 static struct rb_root bdi_tree = RB_ROOT;
 LIST_HEAD(bdi_list);
+EXPORT_SYMBOL(bdi_list);
 
 /* bdi_wq serves all asynchronous writeback tasks */
 struct workqueue_struct *bdi_wq;

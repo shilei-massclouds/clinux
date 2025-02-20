@@ -76,28 +76,3 @@ int seq_dentry(struct seq_file *m, struct dentry *dentry, const char *esc)
 {
     booter_panic("No impl!\n");
 }
-
-/*
-int get_tree_nodev(struct fs_context *fc,
-          int (*fill_super)(struct super_block *sb,
-                    struct fs_context *fc))
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(get_tree_nodev);
-*/
-
-int __set_page_dirty_no_writeback(struct page *page)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(__set_page_dirty_no_writeback);
-
-/*
-void kill_litter_super(struct super_block *sb)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(kill_litter_super);
-*/
-

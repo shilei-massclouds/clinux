@@ -6283,7 +6283,6 @@ long __sched io_schedule_timeout(long timeout)
 
 	return ret;
 }
-EXPORT_SYMBOL(io_schedule_timeout);
 
 void __sched io_schedule(void)
 {

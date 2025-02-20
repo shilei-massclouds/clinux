@@ -593,12 +593,6 @@ generic_file_llseek_size(struct file *file, loff_t offset, int whence,
 }
 EXPORT_SYMBOL(generic_file_llseek_size);
 
-int set_page_dirty(struct page *page)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(set_page_dirty);
-
 loff_t noop_llseek(struct file *file, loff_t offset, int whence)
 {
     booter_panic("No impl in 'lib'.");
@@ -656,12 +650,6 @@ size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
 }
 EXPORT_SYMBOL(copy_page_to_iter);
 
-void wait_on_page_writeback(struct page *page)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL_GPL(wait_on_page_writeback);
-
 errseq_t errseq_set(errseq_t *eseq, int err)
 {
     booter_panic("No impl!\n");
@@ -680,3 +668,35 @@ send_sig(int sig, struct task_struct *p, int priv)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(send_sig);
+
+#include <linux/backing-dev-defs.h>
+void wakeup_flusher_threads(enum wb_reason reason)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(wakeup_flusher_threads);
+
+void blk_finish_plug(struct blk_plug *plug)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(blk_finish_plug);
+
+void blk_start_plug(struct blk_plug *plug)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(blk_start_plug);
+
+__weak bool node_dirty_ok(struct pglist_data *pgdat)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(node_dirty_ok);
+
+int proc_doulongvec_minmax(struct ctl_table *table, int write,
+               void *buffer, size_t *lenp, loff_t *ppos)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(proc_doulongvec_minmax);

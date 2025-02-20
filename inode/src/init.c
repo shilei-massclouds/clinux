@@ -127,11 +127,6 @@ void __mnt_drop_write(struct vfsmount *mnt)
 {
     booter_panic("No impl!\n");
 }
-int proc_doulongvec_minmax(struct ctl_table *table, int write,
-               void *buffer, size_t *lenp, loff_t *ppos)
-{
-    booter_panic("No impl!\n");
-}
 int write_inode_now(struct inode *inode, int sync)
 {
     booter_panic("No impl!\n");

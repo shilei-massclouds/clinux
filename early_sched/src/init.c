@@ -305,3 +305,9 @@ __weak int wake_up_state(struct task_struct *p, unsigned int state)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(wake_up_state);
+
+__weak long __sched io_schedule_timeout(long timeout)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(io_schedule_timeout);
