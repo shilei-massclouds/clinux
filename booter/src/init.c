@@ -804,3 +804,9 @@ __weak unsigned int full_name_hash(const void *salt, const char *name, unsigned 
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(full_name_hash);
+
+loff_t no_llseek(struct file *file, loff_t offset, int whence)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(no_llseek);

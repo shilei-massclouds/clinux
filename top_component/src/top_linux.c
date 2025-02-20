@@ -8,10 +8,14 @@
 #include <linux/export.h>
 #include <linux/sched/task.h>
 #include <linux/smp.h>
+#include <linux/cpuset.h>
+#include <linux/taskstats_kern.h>
+#include <linux/delayacct.h>
 #include <linux/cgroup.h>
 #include <linux/cpu.h>
 #include <linux/security.h>
 #include <linux/of_fdt.h>
+#include <linux/proc_ns.h>
 #include <linux/dma-direct.h>
 #include <linux/proc_fs.h>
 #include <linux/initrd.h>
@@ -486,6 +490,12 @@ void __init __weak thread_stack_cache_init(void)
 }
 #endif
 
+int __init cgroup_init(void)
+{
+    pr_warn("================> cgroup_init!\n");;
+    return 0;
+}
+
 int
 cl_top_linux_init(void)
 {
@@ -706,14 +716,25 @@ cl_top_linux_init(void)
     pagecache_init();
     signals_init();
     seq_file_init();
-    printk("======================= %s\n", __func__);
     proc_root_init();
-    printk("======================= %s\n", __func__);
-    //nsfs_init();
-    //cpuset_init();
-    //cgroup_init();
-    //taskstats_init_early();
-    //delayacct_init();
+    nsfs_init();
+    cpuset_init();
+    cgroup_init();
+    taskstats_init_early();
+    delayacct_init();
+
+    //poking_init();
+    //check_bugs();
+
+    //acpi_subsystem_init();
+    //arch_post_acpi_subsys_init();
+    //sfi_init_late();
+    //kcsan_init();
+
+    ///* Do the rest non-__init'ed, we're now alive */
+    //arch_call_rest_init();
+
+    //prevent_tail_call_optimization();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;

@@ -116,10 +116,6 @@ bool cancel_work_sync(struct work_struct *work)
 {
     booter_panic("No impl.\n");
 }
-loff_t no_llseek(struct file *file, loff_t offset, int whence)
-{
-    booter_panic("No impl.\n");
-}
 int ldsem_down_read_trylock(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");

@@ -2438,46 +2438,46 @@ struct dentry *d_hash_and_lookup(struct dentry *dir, struct qstr *name)
 }
 EXPORT_SYMBOL(d_hash_and_lookup);
 
-///*
-// * When a file is deleted, we have two options:
-// * - turn this dentry into a negative dentry
-// * - unhash this dentry and free it.
-// *
-// * Usually, we want to just turn this into
-// * a negative dentry, but if anybody else is
-// * currently using the dentry or the inode
-// * we can't do that and we fall back on removing
-// * it from the hash queues and waiting for
-// * it to be deleted later when it has no users
-// */
-// 
-///**
-// * d_delete - delete a dentry
-// * @dentry: The dentry to delete
-// *
-// * Turn the dentry into a negative dentry if possible, otherwise
-// * remove it from the hash queues so it can be deleted later
-// */
-// 
-//void d_delete(struct dentry * dentry)
-//{
-//	struct inode *inode = dentry->d_inode;
-//
-//	spin_lock(&inode->i_lock);
-//	spin_lock(&dentry->d_lock);
-//	/*
-//	 * Are we the only user?
-//	 */
-//	if (dentry->d_lockref.count == 1) {
-//		dentry->d_flags &= ~DCACHE_CANT_MOUNT;
-//		dentry_unlink_inode(dentry);
-//	} else {
-//		__d_drop(dentry);
-//		spin_unlock(&dentry->d_lock);
-//		spin_unlock(&inode->i_lock);
-//	}
-//}
-//EXPORT_SYMBOL(d_delete);
+/*
+ * When a file is deleted, we have two options:
+ * - turn this dentry into a negative dentry
+ * - unhash this dentry and free it.
+ *
+ * Usually, we want to just turn this into
+ * a negative dentry, but if anybody else is
+ * currently using the dentry or the inode
+ * we can't do that and we fall back on removing
+ * it from the hash queues and waiting for
+ * it to be deleted later when it has no users
+ */
+ 
+/**
+ * d_delete - delete a dentry
+ * @dentry: The dentry to delete
+ *
+ * Turn the dentry into a negative dentry if possible, otherwise
+ * remove it from the hash queues so it can be deleted later
+ */
+ 
+void d_delete(struct dentry * dentry)
+{
+	struct inode *inode = dentry->d_inode;
+
+	spin_lock(&inode->i_lock);
+	spin_lock(&dentry->d_lock);
+	/*
+	 * Are we the only user?
+	 */
+	if (dentry->d_lockref.count == 1) {
+		dentry->d_flags &= ~DCACHE_CANT_MOUNT;
+		dentry_unlink_inode(dentry);
+	} else {
+		__d_drop(dentry);
+		spin_unlock(&dentry->d_lock);
+		spin_unlock(&inode->i_lock);
+	}
+}
+EXPORT_SYMBOL(d_delete);
 
 static void __d_rehash(struct dentry *entry)
 {

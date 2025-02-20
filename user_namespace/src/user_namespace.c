@@ -1308,6 +1308,7 @@ struct ns_common *ns_get_owner(struct ns_common *ns)
 
 	return &get_user_ns(owner)->ns;
 }
+EXPORT_SYMBOL(ns_get_owner);
 
 static struct user_namespace *userns_owner(struct ns_common *ns)
 {
