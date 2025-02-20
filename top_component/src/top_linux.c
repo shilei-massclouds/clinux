@@ -702,10 +702,9 @@ cl_top_linux_init(void)
     security_init();
     dbg_late_init();
     vfs_caches_init();
-    printk("======================= %s\n", __func__);
     pagecache_init();
     printk("======================= %s\n", __func__);
-    //signals_init();
+    signals_init();
     printk("======================= %s\n", __func__);
     //seq_file_init();
     //proc_root_init();

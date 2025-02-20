@@ -269,3 +269,6 @@ int current_umask(void)
 	return current->fs->umask;
 }
 EXPORT_SYMBOL(current_umask);
+
+int print_fatal_signals __read_mostly;
+EXPORT_SYMBOL(print_fatal_signals);

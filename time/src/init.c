@@ -177,8 +177,6 @@ void __weak thread_group_cputime(struct task_struct *tsk, struct task_cputime *t
 }
 EXPORT_SYMBOL(thread_group_cputime);
 
-int print_fatal_signals __read_mostly;
-
 int nanosleep_copyout(struct restart_block *restart, struct timespec64 *ts)
 {
     booter_panic("No impl in 'time'.");
@@ -199,12 +197,8 @@ struct task_struct *pid_task(struct pid *pid, enum pid_type type)
 EXPORT_SYMBOL(pid_task);
 */
 
-int
-__group_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(__group_send_sig_info);
+/*
+*/
 
 int posix_timer_event(struct k_itimer *timr, int si_private)
 {
@@ -216,12 +210,6 @@ unsigned long long task_sched_runtime(struct task_struct *p)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(task_sched_runtime);
-
-struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
-                       unsigned long *flags)
-{
-    booter_panic("No impl in 'time'.");
-}
 
 /*
 struct pid *find_vpid(int nr)

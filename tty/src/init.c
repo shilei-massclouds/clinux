@@ -29,14 +29,6 @@ int ptm_open_peer(struct file *master, struct tty_struct *tty, int flags)
 {
     booter_panic("No impl.\n");
 }
-int is_current_pgrp_orphaned(void)
-{
-    booter_panic("No impl.\n");
-}
-int kill_pgrp(struct pid *pid, int sig, int priv)
-{
-    booter_panic("No impl.\n");
-}
 int __sched ldsem_down_write(struct ld_semaphore *sem, long timeout)
 {
     booter_panic("No impl.\n");
@@ -79,14 +71,6 @@ void proc_tty_unregister_driver(struct tty_driver *driver)
     booter_panic("No impl.\n");
 }
 
-/*
-int
-__group_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
-{
-    booter_panic("No impl.\n");
-}
-*/
-
 int __sched ldsem_down_read(struct ld_semaphore *sem, long timeout)
 {
     booter_panic("No impl.\n");
@@ -117,11 +101,6 @@ struct device *device_create_with_groups(struct class *class,
                      void *drvdata,
                      const struct attribute_group **groups,
                      const char *fmt, ...)
-{
-    booter_panic("No impl.\n");
-}
-int group_send_sig_info(int sig, struct kernel_siginfo *info,
-            struct task_struct *p, enum pid_type type)
 {
     booter_panic("No impl.\n");
 }

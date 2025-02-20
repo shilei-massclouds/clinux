@@ -302,7 +302,6 @@ const void *kernfs_super_ns(struct super_block *sb)
 
 	return info->ns;
 }
-EXPORT_SYMBOL(kernfs_super_ns);
 
 /**
  * kernfs_get_tree - kernfs filesystem access/retrieval helper
@@ -386,7 +385,6 @@ void kernfs_kill_sb(struct super_block *sb)
 	kill_anon_super(sb);
 	kfree(info);
 }
-EXPORT_SYMBOL(kernfs_kill_sb);
 
 void __init kernfs_init(void)
 {

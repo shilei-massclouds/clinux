@@ -60,6 +60,7 @@ components := \
 	fs_context fs_parser fs_struct namei libfs \
 	fork mmap filemap \
 	buffer swap \
+	signal \
 	early_printk printk panic dump_stack show_mem
 	#partitions \
 

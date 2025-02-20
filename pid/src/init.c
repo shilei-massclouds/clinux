@@ -17,13 +17,6 @@ EXPORT_SYMBOL(cl_pid_init);
 
 const struct file_operations pidfd_fops;
 
-//const struct proc_ns_operations pidns_operations;
-
-struct pid *pidfd_pid(const struct file *file)
-{
-    booter_panic("No impl.\n");
-}
-
 struct file *fget_task(struct task_struct *task, unsigned int fd)
 {
     booter_panic("No impl.\n");
@@ -52,10 +45,6 @@ void fput(struct file *file)
 EXPORT_SYMBOL_GPL(fput);
 
 int __receive_fd(int fd, struct file *file, int __user *ufd, unsigned int o_flags)
-{
-    booter_panic("No impl.\n");
-}
-unsigned long __fdget(unsigned int fd)
 {
     booter_panic("No impl.\n");
 }

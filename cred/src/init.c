@@ -49,7 +49,3 @@ void groups_free(struct group_info *group_info)
 {
     booter_panic("No impl.\n");
 }
-void free_uid(struct user_struct *up)
-{
-    booter_panic("No impl.\n");
-}

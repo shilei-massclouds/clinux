@@ -77,10 +77,6 @@ u32 conv_8bit_to_uni(unsigned char c)
     booter_panic("No impl!\n");
 }
 */
-int kill_pid(struct pid *pid, int sig, int priv)
-{
-    booter_panic("No impl!\n");
-}
 int input_open_device(struct input_handle *handle)
 {
     booter_panic("No impl!\n");

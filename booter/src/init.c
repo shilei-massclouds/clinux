@@ -662,8 +662,7 @@ int try_to_free_buffers(struct page *page)
 }
 EXPORT_SYMBOL(try_to_free_buffers);
 
-int
-send_sig(int sig, struct task_struct *p, int priv)
+__weak int send_sig(int sig, struct task_struct *p, int priv)
 {
     booter_panic("No impl!\n");
 }
@@ -700,3 +699,71 @@ int proc_doulongvec_minmax(struct ctl_table *table, int write,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(proc_doulongvec_minmax);
+
+__weak const void *kernfs_super_ns(struct super_block *sb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kernfs_super_ns);
+
+__weak void kernfs_kill_sb(struct super_block *sb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kernfs_kill_sb);
+
+unsigned long __fdget(unsigned int fd)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(__fdget);
+
+void free_uid(struct user_struct *up)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(free_uid);
+
+__weak struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
+					   unsigned long *flags)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(__lock_task_sighand);
+
+__weak int group_send_sig_info(int sig, struct kernel_siginfo *info,
+			struct task_struct *p, enum pid_type type)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(group_send_sig_info);
+
+__weak int __group_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(__group_send_sig_info);
+
+__weak int kill_pid(struct pid *pid, int sig, int priv)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kill_pid);
+
+struct pid *pidfd_pid(const struct file *file)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(pidfd_pid);
+
+__weak int kill_pgrp(struct pid *pid, int sig, int priv)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(kill_pgrp);
+
+int is_current_pgrp_orphaned(void)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(is_current_pgrp_orphaned);
