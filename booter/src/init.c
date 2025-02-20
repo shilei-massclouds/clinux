@@ -542,6 +542,12 @@ struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
 }
 EXPORT_SYMBOL(pagecache_get_page);
 
+__weak struct vfsmount *mntget(struct vfsmount *mnt)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(mntget);
+
 __weak void mntput(struct vfsmount *mnt)
 {
     booter_panic("No impl in 'booter'.");

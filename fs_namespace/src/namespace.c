@@ -1213,14 +1213,13 @@ void mntput(struct vfsmount *mnt)
 	}
 }
 
-//struct vfsmount *mntget(struct vfsmount *mnt)
-//{
-//	if (mnt)
-//		mnt_add_count(real_mount(mnt), 1);
-//	return mnt;
-//}
-//EXPORT_SYMBOL(mntget);
-//
+struct vfsmount *mntget(struct vfsmount *mnt)
+{
+	if (mnt)
+		mnt_add_count(real_mount(mnt), 1);
+	return mnt;
+}
+
 ///* path_is_mountpoint() - Check if path is a mount in the current
 // *                          namespace.
 // *
@@ -3782,11 +3781,9 @@ static void __init init_mount_tree(void)
 	if (IS_ERR(mnt))
 		panic("Can't create rootfs");
 
-    printk("===============> %s step1\n", __func__);
 	ns = alloc_mnt_ns(&init_user_ns, false);
 	if (IS_ERR(ns))
 		panic("Can't allocate initial namespace");
-    printk("===============> %s step2\n", __func__);
 	m = real_mount(mnt);
 	m->mnt_ns = ns;
 	ns->root = m;
@@ -3794,14 +3791,16 @@ static void __init init_mount_tree(void)
 	list_add(&m->mnt_list, &ns->list);
 	init_task.nsproxy->mnt_ns = ns;
 	get_mnt_ns(ns);
-    printk("===============> %s step3\n", __func__);
 
 	root.mnt = mnt;
 	root.dentry = mnt->mnt_root;
 	mnt->mnt_flags |= MNT_LOCKED;
 
+    printk("===============> %s step1\n", __func__);
 	set_fs_pwd(current->fs, &root);
+    printk("===============> %s step2\n", __func__);
 	set_fs_root(current->fs, &root);
+    printk("===============> %s step3\n", __func__);
 }
 
 void __init mnt_init(void)
