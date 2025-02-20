@@ -75,11 +75,6 @@ void io_wq_worker_sleeping(struct task_struct *tsk)
     booter_panic("No impl 'sched'.");
 }
 
-void __mmdrop(struct mm_struct *mm)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 void __cgroup_account_cputime(struct cgroup *cgrp, u64 delta_exec)
 {
     booter_panic("No impl 'sched'.");

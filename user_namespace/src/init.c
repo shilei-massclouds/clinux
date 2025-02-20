@@ -19,11 +19,6 @@ EXPORT_SYMBOL(cl_user_namespace_init);
 int overflowuid = DEFAULT_OVERFLOWUID;
 int overflowgid = DEFAULT_OVERFLOWGID;
 
-bool file_ns_capable(const struct file *file, struct user_namespace *ns,
-             int cap)
-{
-    booter_panic("No impl!\n");
-}
 
 void *memdup_user_nul(const void __user *src, size_t len)
 {

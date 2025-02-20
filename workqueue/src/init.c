@@ -88,10 +88,6 @@ int bitmap_parse(const char *start, unsigned int buflen,
     booter_panic("No impl in 'workqueue'.");
 }
 
-void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
 
 void *kthread_probe_data(struct task_struct *task)
 {

@@ -129,6 +129,7 @@ unsigned long get_wchan(struct task_struct *task)
 		walk_stackframe(task, NULL, save_wchan, &pc);
 	return pc;
 }
+EXPORT_SYMBOL(get_wchan);
 
 
 #ifdef CONFIG_STACKTRACE

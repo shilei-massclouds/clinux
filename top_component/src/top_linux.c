@@ -13,6 +13,7 @@
 #include <linux/security.h>
 #include <linux/of_fdt.h>
 #include <linux/dma-direct.h>
+#include <linux/proc_fs.h>
 #include <linux/initrd.h>
 #include <linux/extable.h>
 #include <linux/kmemleak.h>
@@ -704,10 +705,10 @@ cl_top_linux_init(void)
     vfs_caches_init();
     pagecache_init();
     signals_init();
-    printk("======================= %s\n", __func__);
     seq_file_init();
     printk("======================= %s\n", __func__);
-    //proc_root_init();
+    proc_root_init();
+    printk("======================= %s\n", __func__);
     //nsfs_init();
     //cpuset_init();
     //cgroup_init();

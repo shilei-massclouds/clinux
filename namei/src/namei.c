@@ -923,6 +923,7 @@ err:
 	path_put(path);
 	return error;
 }
+EXPORT_SYMBOL(nd_jump_link);
 
 static inline void put_link(struct nameidata *nd)
 {
@@ -1990,7 +1991,6 @@ unsigned int full_name_hash(const void *salt, const char *name, unsigned int len
 done:
 	return fold_hash(x, y);
 }
-EXPORT_SYMBOL(full_name_hash);
 
 /* Return the "hash_len" (hash and length) of a null-terminated string */
 u64 hashlen_string(const void *salt, const char *name)
@@ -2056,7 +2056,6 @@ unsigned int full_name_hash(const void *salt, const char *name, unsigned int len
 		hash = partial_name_hash((unsigned char)*name++, hash);
 	return end_name_hash(hash);
 }
-EXPORT_SYMBOL(full_name_hash);
 
 /* Return the "hash_len" (hash and length) of a null-terminated string */
 u64 hashlen_string(const void *salt, const char *name)

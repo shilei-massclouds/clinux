@@ -81,6 +81,7 @@ unsigned int _parse_integer(const char *s, unsigned int base, unsigned long long
 	*p = res;
 	return rv;
 }
+EXPORT_SYMBOL(_parse_integer);
 
 static int _kstrtoull(const char *s, unsigned int base, unsigned long long *res)
 {

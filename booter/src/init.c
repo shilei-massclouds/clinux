@@ -773,3 +773,34 @@ void *kvmalloc_node(size_t size, gfp_t flags, int node)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(kvmalloc_node);
+
+void __mmdrop(struct mm_struct *mm)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(__mmdrop);
+
+char *d_path(const struct path *path, char *buf, int buflen)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(d_path);
+
+void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(__set_task_comm);
+
+bool file_ns_capable(const struct file *file, struct user_namespace *ns,
+             int cap)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(file_ns_capable);
+
+__weak unsigned int full_name_hash(const void *salt, const char *name, unsigned int len)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(full_name_hash);

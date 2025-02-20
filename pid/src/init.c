@@ -37,6 +37,7 @@ bool ptrace_may_access(struct task_struct *task, unsigned int mode)
 {
     booter_panic("No impl.\n");
 }
+EXPORT_SYMBOL(ptrace_may_access);
 
 void fput(struct file *file)
 {

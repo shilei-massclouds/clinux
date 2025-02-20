@@ -307,6 +307,7 @@ void __init proc_root_init(void)
 
 	register_filesystem(&proc_fs_type);
 }
+EXPORT_SYMBOL(proc_root_init);
 
 static int proc_root_getattr(const struct path *path, struct kstat *stat,
 			     u32 request_mask, unsigned int query_flags)

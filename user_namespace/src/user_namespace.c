@@ -690,6 +690,7 @@ const struct seq_operations proc_uid_seq_operations = {
 	.next = m_next,
 	.show = uid_m_show,
 };
+EXPORT_SYMBOL(proc_uid_seq_operations);
 
 const struct seq_operations proc_gid_seq_operations = {
 	.start = gid_m_start,
@@ -697,6 +698,7 @@ const struct seq_operations proc_gid_seq_operations = {
 	.next = m_next,
 	.show = gid_m_show,
 };
+EXPORT_SYMBOL(proc_gid_seq_operations);
 
 const struct seq_operations proc_projid_seq_operations = {
 	.start = projid_m_start,
@@ -704,6 +706,7 @@ const struct seq_operations proc_projid_seq_operations = {
 	.next = m_next,
 	.show = projid_m_show,
 };
+EXPORT_SYMBOL(proc_projid_seq_operations);
 
 static bool mappings_overlap(struct uid_gid_map *new_map,
 			     struct uid_gid_extent *extent)
@@ -1044,6 +1047,7 @@ ssize_t proc_uid_map_write(struct file *file, const char __user *buf,
 	return map_write(file, buf, size, ppos, CAP_SETUID,
 			 &ns->uid_map, &ns->parent->uid_map);
 }
+EXPORT_SYMBOL(proc_uid_map_write);
 
 ssize_t proc_gid_map_write(struct file *file, const char __user *buf,
 			   size_t size, loff_t *ppos)
@@ -1061,6 +1065,7 @@ ssize_t proc_gid_map_write(struct file *file, const char __user *buf,
 	return map_write(file, buf, size, ppos, CAP_SETGID,
 			 &ns->gid_map, &ns->parent->gid_map);
 }
+EXPORT_SYMBOL(proc_gid_map_write);
 
 ssize_t proc_projid_map_write(struct file *file, const char __user *buf,
 			      size_t size, loff_t *ppos)
@@ -1079,6 +1084,7 @@ ssize_t proc_projid_map_write(struct file *file, const char __user *buf,
 	return map_write(file, buf, size, ppos, -1,
 			 &ns->projid_map, &ns->parent->projid_map);
 }
+EXPORT_SYMBOL(proc_projid_map_write);
 
 static bool new_idmap_permitted(const struct file *file,
 				struct user_namespace *ns, int cap_setid,
@@ -1128,6 +1134,7 @@ int proc_setgroups_show(struct seq_file *seq, void *v)
 		   "allow" : "deny");
 	return 0;
 }
+EXPORT_SYMBOL(proc_setgroups_show);
 
 ssize_t proc_setgroups_write(struct file *file, const char __user *buf,
 			     size_t count, loff_t *ppos)
@@ -1195,6 +1202,7 @@ out_unlock:
 	mutex_unlock(&userns_state_mutex);
 	goto out;
 }
+EXPORT_SYMBOL(proc_setgroups_write);
 
 bool userns_may_setgroups(const struct user_namespace *ns)
 {

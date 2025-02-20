@@ -311,3 +311,23 @@ __weak long __sched io_schedule_timeout(long timeout)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(io_schedule_timeout);
+
+__weak int default_wake_function(wait_queue_entry_t *curr, unsigned mode, int wake_flags,
+			  void *key)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(default_wake_function);
+
+__weak void proc_sched_set_task(struct task_struct *p)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(proc_sched_set_task);
+
+__weak void proc_sched_show_task(struct task_struct *p, struct pid_namespace *ns,
+						  struct seq_file *m)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(proc_sched_show_task);
