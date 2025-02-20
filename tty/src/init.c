@@ -202,9 +202,6 @@ void __init_ldsem(struct ld_semaphore *sem, const char *name,
     booter_panic("No impl.\n");
 }
 
-// fs/proc/proc_sysctl.c
-const int sysctl_vals[] = { 0, 1, INT_MAX };
-
 struct tty_driver *console_driver;
 
 int fg_console;

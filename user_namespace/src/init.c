@@ -19,46 +19,12 @@ EXPORT_SYMBOL(cl_user_namespace_init);
 int overflowuid = DEFAULT_OVERFLOWUID;
 int overflowgid = DEFAULT_OVERFLOWGID;
 
-void retire_userns_sysctls(struct user_namespace *ns)
-{
-    booter_panic("No impl!\n");
-}
-/*
-struct ucounts *inc_ucount(struct user_namespace *ns, kuid_t uid,
-               enum ucount_type type)
-{
-    booter_panic("No impl!\n");
-}
-*/
-bool setup_userns_sysctls(struct user_namespace *ns)
-{
-    booter_panic("No impl!\n");
-}
-/*
-void proc_free_inum(unsigned int inum)
-{
-    booter_panic("No impl!\n");
-}
-*/
 bool file_ns_capable(const struct file *file, struct user_namespace *ns,
              int cap)
 {
     booter_panic("No impl!\n");
 }
-/*
-void dec_ucount(struct ucounts *ucounts, enum ucount_type type)
-{
-    booter_panic("No impl!\n");
-}
-void key_free_user_ns(struct user_namespace *ns)
-{
-    booter_panic("No impl!\n");
-}
-int proc_alloc_inum(unsigned int *inum)
-{
-    booter_panic("No impl!\n");
-}
-*/
+
 void *memdup_user_nul(const void __user *src, size_t len)
 {
     booter_panic("No impl!\n");

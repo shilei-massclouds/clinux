@@ -220,17 +220,6 @@ int fasync_helper(int fd, struct file * filp, int on, struct fasync_struct **fap
 }
 EXPORT_SYMBOL(fasync_helper);
 
-struct ucounts *inc_ucount(struct user_namespace *ns, kuid_t uid,
-               enum ucount_type type)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(inc_ucount);
-void dec_ucount(struct ucounts *ucounts, enum ucount_type type)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(dec_ucount);
 void proc_free_inum(unsigned int inum)
 {
     booter_panic("No impl.\n");
