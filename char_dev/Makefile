@@ -2,5 +2,3 @@
 
 obj_y := init.o
 obj_y += char_dev.o
-
-obj_y += mine.o
