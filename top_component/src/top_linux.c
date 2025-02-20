@@ -8,6 +8,7 @@
 #include <linux/export.h>
 #include <linux/sched/task.h>
 #include <linux/smp.h>
+#include <linux/sfi.h>
 #include <linux/cpuset.h>
 #include <linux/taskstats_kern.h>
 #include <linux/delayacct.h>
@@ -39,6 +40,7 @@
 #include <linux/utsname.h>
 #include <linux/buffer_head.h>
 #include <linux/kgdb.h>
+#include <asm/bugs.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
 #include <cl_hook.h>
@@ -496,6 +498,10 @@ int __init cgroup_init(void)
     return 0;
 }
 
+void __init __weak poking_init(void) { }
+
+void __init __weak arch_post_acpi_subsys_init(void) { }
+
 int
 cl_top_linux_init(void)
 {
@@ -723,18 +729,18 @@ cl_top_linux_init(void)
     taskstats_init_early();
     delayacct_init();
 
-    //poking_init();
-    //check_bugs();
+    poking_init();
+    check_bugs();
 
-    //acpi_subsystem_init();
-    //arch_post_acpi_subsys_init();
-    //sfi_init_late();
-    //kcsan_init();
+    acpi_subsystem_init();
+    arch_post_acpi_subsys_init();
+    sfi_init_late();
+    kcsan_init();
 
     ///* Do the rest non-__init'ed, we're now alive */
     //arch_call_rest_init();
 
-    //prevent_tail_call_optimization();
+    prevent_tail_call_optimization();
 
     sbi_puts("module[top_linux]: init end!\n");
     return 0;
