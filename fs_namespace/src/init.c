@@ -18,6 +18,7 @@ EXPORT_SYMBOL(cl_fs_namespace_init);
 
 DEFINE_ENABLE_FUNC(fs_namespace);
 
+/*
 void set_fs_root(struct fs_struct *fs, const struct path *path)
 {
     booter_panic("No impl!\n");
@@ -26,6 +27,7 @@ void set_fs_pwd(struct fs_struct *fs, const struct path *path)
 {
     booter_panic("No impl!\n");
 }
+*/
 
 __weak int __init shmem_init(void)
 {

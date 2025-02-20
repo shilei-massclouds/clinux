@@ -505,3 +505,9 @@ int sync_filesystem(struct super_block *sb)
     booter_panic("No impl in 'booter'.");
 }
 EXPORT_SYMBOL(sync_filesystem);
+
+void path_put(const struct path *path)
+{
+    booter_panic("Need random driver take effect!\n");
+}
+EXPORT_SYMBOL(path_put);

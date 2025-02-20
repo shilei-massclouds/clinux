@@ -333,6 +333,7 @@ struct kmem_cache *files_cachep;
 
 /* SLAB cache for fs_struct structures (tsk->fs) */
 struct kmem_cache *fs_cachep;
+EXPORT_SYMBOL(fs_cachep);
 
 /* SLAB cache for vm_area_struct structures */
 static struct kmem_cache *vm_area_cachep;
