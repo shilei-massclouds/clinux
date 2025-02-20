@@ -340,14 +340,14 @@ dev_t ROOT_DEV;
 //	root_mount_data = str;
 //	return 1;
 //}
-//
-//static char * __initdata root_fs_names;
-//static int __init fs_names_setup(char *str)
-//{
-//	root_fs_names = str;
-//	return 1;
-//}
-//
+
+static char * __initdata root_fs_names;
+static int __init fs_names_setup(char *str)
+{
+	root_fs_names = str;
+	return 1;
+}
+
 //static unsigned int __initdata root_delay;
 //static int __init root_delay_setup(char *str)
 //{
@@ -648,9 +648,10 @@ struct file_system_type rootfs_fs_type = {
 };
 EXPORT_SYMBOL(rootfs_fs_type);
 
-//void __init init_rootfs(void)
-//{
-//	if (IS_ENABLED(CONFIG_TMPFS) && !saved_root_name[0] &&
-//		(!root_fs_names || strstr(root_fs_names, "tmpfs")))
-//		is_tmpfs = true;
-//}
+void __init init_rootfs(void)
+{
+	if (IS_ENABLED(CONFIG_TMPFS) && !saved_root_name[0] &&
+		(!root_fs_names || strstr(root_fs_names, "tmpfs")))
+		is_tmpfs = true;
+}
+EXPORT_SYMBOL(init_rootfs);

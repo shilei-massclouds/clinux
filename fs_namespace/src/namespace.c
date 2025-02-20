@@ -3854,7 +3854,6 @@ struct vfsmount *kern_mount(struct file_system_type *type)
 	}
 	return mnt;
 }
-EXPORT_SYMBOL_GPL(kern_mount);
 
 //void kern_unmount(struct vfsmount *mnt)
 //{

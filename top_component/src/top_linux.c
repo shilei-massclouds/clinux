@@ -499,6 +499,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(show_mem);
     REQUIRE_COMPONENT(shmem);
     REQUIRE_COMPONENT(vmscan);
+    REQUIRE_COMPONENT(fs_namespace);
 
     //
     // start_kernel (init/main.c)

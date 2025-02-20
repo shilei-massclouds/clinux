@@ -491,3 +491,9 @@ __weak void get_random_bytes(void *buf, int nbytes)
     booter_panic("No impl in 'booter'.");
 }
 EXPORT_SYMBOL(get_random_bytes);
+
+__weak struct vfsmount *kern_mount(struct file_system_type *type)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL_GPL(kern_mount);
