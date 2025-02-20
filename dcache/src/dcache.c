@@ -73,10 +73,10 @@
 // */
 //int sysctl_vfs_cache_pressure __read_mostly = 100;
 //EXPORT_SYMBOL_GPL(sysctl_vfs_cache_pressure);
-//
-//__cacheline_aligned_in_smp DEFINE_SEQLOCK(rename_lock);
-//
-//EXPORT_SYMBOL(rename_lock);
+
+__cacheline_aligned_in_smp DEFINE_SEQLOCK(rename_lock);
+
+EXPORT_SYMBOL(rename_lock);
 
 static struct kmem_cache *dentry_cache __read_mostly;
 
@@ -905,18 +905,18 @@ void dput(struct dentry *dentry)
 //		__dput_to_list(dentry, list);
 //	spin_unlock(&dentry->d_lock);
 //}
-//
-///* This must be called with d_lock held */
-//static inline void __dget_dlock(struct dentry *dentry)
-//{
-//	dentry->d_lockref.count++;
-//}
-//
-//static inline void __dget(struct dentry *dentry)
-//{
-//	lockref_get(&dentry->d_lockref);
-//}
-//
+
+/* This must be called with d_lock held */
+static inline void __dget_dlock(struct dentry *dentry)
+{
+	dentry->d_lockref.count++;
+}
+
+static inline void __dget(struct dentry *dentry)
+{
+	lockref_get(&dentry->d_lockref);
+}
+
 //struct dentry *dget_parent(struct dentry *dentry)
 //{
 //	int gotref;
@@ -958,82 +958,82 @@ void dput(struct dentry *dentry)
 //	return ret;
 //}
 //EXPORT_SYMBOL(dget_parent);
-//
-//static struct dentry * __d_find_any_alias(struct inode *inode)
-//{
-//	struct dentry *alias;
-//
-//	if (hlist_empty(&inode->i_dentry))
-//		return NULL;
-//	alias = hlist_entry(inode->i_dentry.first, struct dentry, d_u.d_alias);
-//	__dget(alias);
-//	return alias;
-//}
-//
-///**
-// * d_find_any_alias - find any alias for a given inode
-// * @inode: inode to find an alias for
-// *
-// * If any aliases exist for the given inode, take and return a
-// * reference for one of them.  If no aliases exist, return %NULL.
-// */
-//struct dentry *d_find_any_alias(struct inode *inode)
-//{
-//	struct dentry *de;
-//
-//	spin_lock(&inode->i_lock);
-//	de = __d_find_any_alias(inode);
-//	spin_unlock(&inode->i_lock);
-//	return de;
-//}
-//EXPORT_SYMBOL(d_find_any_alias);
-//
-///**
-// * d_find_alias - grab a hashed alias of inode
-// * @inode: inode in question
-// *
-// * If inode has a hashed alias, or is a directory and has any alias,
-// * acquire the reference to alias and return it. Otherwise return NULL.
-// * Notice that if inode is a directory there can be only one alias and
-// * it can be unhashed only if it has no children, or if it is the root
-// * of a filesystem, or if the directory was renamed and d_revalidate
-// * was the first vfs operation to notice.
-// *
-// * If the inode has an IS_ROOT, DCACHE_DISCONNECTED alias, then prefer
-// * any other hashed alias over that one.
-// */
-//static struct dentry *__d_find_alias(struct inode *inode)
-//{
-//	struct dentry *alias;
-//
-//	if (S_ISDIR(inode->i_mode))
-//		return __d_find_any_alias(inode);
-//
-//	hlist_for_each_entry(alias, &inode->i_dentry, d_u.d_alias) {
-//		spin_lock(&alias->d_lock);
-// 		if (!d_unhashed(alias)) {
-//			__dget_dlock(alias);
-//			spin_unlock(&alias->d_lock);
-//			return alias;
-//		}
-//		spin_unlock(&alias->d_lock);
-//	}
-//	return NULL;
-//}
-//
-//struct dentry *d_find_alias(struct inode *inode)
-//{
-//	struct dentry *de = NULL;
-//
-//	if (!hlist_empty(&inode->i_dentry)) {
-//		spin_lock(&inode->i_lock);
-//		de = __d_find_alias(inode);
-//		spin_unlock(&inode->i_lock);
-//	}
-//	return de;
-//}
-//EXPORT_SYMBOL(d_find_alias);
-//
+
+static struct dentry * __d_find_any_alias(struct inode *inode)
+{
+	struct dentry *alias;
+
+	if (hlist_empty(&inode->i_dentry))
+		return NULL;
+	alias = hlist_entry(inode->i_dentry.first, struct dentry, d_u.d_alias);
+	__dget(alias);
+	return alias;
+}
+
+/**
+ * d_find_any_alias - find any alias for a given inode
+ * @inode: inode to find an alias for
+ *
+ * If any aliases exist for the given inode, take and return a
+ * reference for one of them.  If no aliases exist, return %NULL.
+ */
+struct dentry *d_find_any_alias(struct inode *inode)
+{
+	struct dentry *de;
+
+	spin_lock(&inode->i_lock);
+	de = __d_find_any_alias(inode);
+	spin_unlock(&inode->i_lock);
+	return de;
+}
+EXPORT_SYMBOL(d_find_any_alias);
+
+/**
+ * d_find_alias - grab a hashed alias of inode
+ * @inode: inode in question
+ *
+ * If inode has a hashed alias, or is a directory and has any alias,
+ * acquire the reference to alias and return it. Otherwise return NULL.
+ * Notice that if inode is a directory there can be only one alias and
+ * it can be unhashed only if it has no children, or if it is the root
+ * of a filesystem, or if the directory was renamed and d_revalidate
+ * was the first vfs operation to notice.
+ *
+ * If the inode has an IS_ROOT, DCACHE_DISCONNECTED alias, then prefer
+ * any other hashed alias over that one.
+ */
+static struct dentry *__d_find_alias(struct inode *inode)
+{
+	struct dentry *alias;
+
+	if (S_ISDIR(inode->i_mode))
+		return __d_find_any_alias(inode);
+
+	hlist_for_each_entry(alias, &inode->i_dentry, d_u.d_alias) {
+		spin_lock(&alias->d_lock);
+ 		if (!d_unhashed(alias)) {
+			__dget_dlock(alias);
+			spin_unlock(&alias->d_lock);
+			return alias;
+		}
+		spin_unlock(&alias->d_lock);
+	}
+	return NULL;
+}
+
+struct dentry *d_find_alias(struct inode *inode)
+{
+	struct dentry *de = NULL;
+
+	if (!hlist_empty(&inode->i_dentry)) {
+		spin_lock(&inode->i_lock);
+		de = __d_find_alias(inode);
+		spin_unlock(&inode->i_lock);
+	}
+	return de;
+}
+EXPORT_SYMBOL(d_find_alias);
+
 ///*
 // *	Try to kill dentries associated with this inode.
 // * WARNING: you must own a reference to inode.
@@ -2474,16 +2474,16 @@ EXPORT_SYMBOL(d_make_root);
 //	}
 //}
 //EXPORT_SYMBOL(d_delete);
-//
-//static void __d_rehash(struct dentry *entry)
-//{
-//	struct hlist_bl_head *b = d_hash(entry->d_name.hash);
-//
-//	hlist_bl_lock(b);
-//	hlist_bl_add_head_rcu(&entry->d_hash, b);
-//	hlist_bl_unlock(b);
-//}
-//
+
+static void __d_rehash(struct dentry *entry)
+{
+	struct hlist_bl_head *b = d_hash(entry->d_name.hash);
+
+	hlist_bl_lock(b);
+	hlist_bl_add_head_rcu(&entry->d_hash, b);
+	hlist_bl_unlock(b);
+}
+
 ///**
 // * d_rehash	- add an entry back to the hash
 // * @entry: dentry to add to the hash
@@ -2498,23 +2498,23 @@ EXPORT_SYMBOL(d_make_root);
 //	spin_unlock(&entry->d_lock);
 //}
 //EXPORT_SYMBOL(d_rehash);
-//
-//static inline unsigned start_dir_add(struct inode *dir)
-//{
-//
-//	for (;;) {
-//		unsigned n = dir->i_dir_seq;
-//		if (!(n & 1) && cmpxchg(&dir->i_dir_seq, n, n + 1) == n)
-//			return n;
-//		cpu_relax();
-//	}
-//}
-//
-//static inline void end_dir_add(struct inode *dir, unsigned n)
-//{
-//	smp_store_release(&dir->i_dir_seq, n + 2);
-//}
-//
+
+static inline unsigned start_dir_add(struct inode *dir)
+{
+
+	for (;;) {
+		unsigned n = dir->i_dir_seq;
+		if (!(n & 1) && cmpxchg(&dir->i_dir_seq, n, n + 1) == n)
+			return n;
+		cpu_relax();
+	}
+}
+
+static inline void end_dir_add(struct inode *dir, unsigned n)
+{
+	smp_store_release(&dir->i_dir_seq, n + 2);
+}
+
 //static void d_wait_lookup(struct dentry *dentry)
 //{
 //	if (d_in_lookup(dentry)) {
@@ -2638,50 +2638,50 @@ EXPORT_SYMBOL(d_make_root);
 //	goto retry;
 //}
 //EXPORT_SYMBOL(d_alloc_parallel);
-//
-//void __d_lookup_done(struct dentry *dentry)
-//{
-//	struct hlist_bl_head *b = in_lookup_hash(dentry->d_parent,
-//						 dentry->d_name.hash);
-//	hlist_bl_lock(b);
-//	dentry->d_flags &= ~DCACHE_PAR_LOOKUP;
-//	__hlist_bl_del(&dentry->d_u.d_in_lookup_hash);
-//	wake_up_all(dentry->d_wait);
-//	dentry->d_wait = NULL;
-//	hlist_bl_unlock(b);
-//	INIT_HLIST_NODE(&dentry->d_u.d_alias);
-//	INIT_LIST_HEAD(&dentry->d_lru);
-//}
-//EXPORT_SYMBOL(__d_lookup_done);
-//
-///* inode->i_lock held if inode is non-NULL */
-//
-//static inline void __d_add(struct dentry *dentry, struct inode *inode)
-//{
-//	struct inode *dir = NULL;
-//	unsigned n;
-//	spin_lock(&dentry->d_lock);
-//	if (unlikely(d_in_lookup(dentry))) {
-//		dir = dentry->d_parent->d_inode;
-//		n = start_dir_add(dir);
-//		__d_lookup_done(dentry);
-//	}
-//	if (inode) {
-//		unsigned add_flags = d_flags_for_inode(inode);
-//		hlist_add_head(&dentry->d_u.d_alias, &inode->i_dentry);
-//		raw_write_seqcount_begin(&dentry->d_seq);
-//		__d_set_inode_and_type(dentry, inode, add_flags);
-//		raw_write_seqcount_end(&dentry->d_seq);
-//		fsnotify_update_flags(dentry);
-//	}
-//	__d_rehash(dentry);
-//	if (dir)
-//		end_dir_add(dir, n);
-//	spin_unlock(&dentry->d_lock);
-//	if (inode)
-//		spin_unlock(&inode->i_lock);
-//}
-//
+
+void __d_lookup_done(struct dentry *dentry)
+{
+	struct hlist_bl_head *b = in_lookup_hash(dentry->d_parent,
+						 dentry->d_name.hash);
+	hlist_bl_lock(b);
+	dentry->d_flags &= ~DCACHE_PAR_LOOKUP;
+	__hlist_bl_del(&dentry->d_u.d_in_lookup_hash);
+	wake_up_all(dentry->d_wait);
+	dentry->d_wait = NULL;
+	hlist_bl_unlock(b);
+	INIT_HLIST_NODE(&dentry->d_u.d_alias);
+	INIT_LIST_HEAD(&dentry->d_lru);
+}
+EXPORT_SYMBOL(__d_lookup_done);
+
+/* inode->i_lock held if inode is non-NULL */
+
+static inline void __d_add(struct dentry *dentry, struct inode *inode)
+{
+	struct inode *dir = NULL;
+	unsigned n;
+	spin_lock(&dentry->d_lock);
+	if (unlikely(d_in_lookup(dentry))) {
+		dir = dentry->d_parent->d_inode;
+		n = start_dir_add(dir);
+		__d_lookup_done(dentry);
+	}
+	if (inode) {
+		unsigned add_flags = d_flags_for_inode(inode);
+		hlist_add_head(&dentry->d_u.d_alias, &inode->i_dentry);
+		raw_write_seqcount_begin(&dentry->d_seq);
+		__d_set_inode_and_type(dentry, inode, add_flags);
+		raw_write_seqcount_end(&dentry->d_seq);
+		fsnotify_update_flags(dentry);
+	}
+	__d_rehash(dentry);
+	if (dir)
+		end_dir_add(dir, n);
+	spin_unlock(&dentry->d_lock);
+	if (inode)
+		spin_unlock(&inode->i_lock);
+}
+
 ///**
 // * d_add - add dentry to hash queues
 // * @entry: dentry to add
@@ -2746,159 +2746,159 @@ EXPORT_SYMBOL(d_make_root);
 //	return NULL;
 //}
 //EXPORT_SYMBOL(d_exact_alias);
-//
-//static void swap_names(struct dentry *dentry, struct dentry *target)
-//{
-//	if (unlikely(dname_external(target))) {
-//		if (unlikely(dname_external(dentry))) {
-//			/*
-//			 * Both external: swap the pointers
-//			 */
-//			swap(target->d_name.name, dentry->d_name.name);
-//		} else {
-//			/*
-//			 * dentry:internal, target:external.  Steal target's
-//			 * storage and make target internal.
-//			 */
-//			memcpy(target->d_iname, dentry->d_name.name,
-//					dentry->d_name.len + 1);
-//			dentry->d_name.name = target->d_name.name;
-//			target->d_name.name = target->d_iname;
-//		}
-//	} else {
-//		if (unlikely(dname_external(dentry))) {
-//			/*
-//			 * dentry:external, target:internal.  Give dentry's
-//			 * storage to target and make dentry internal
-//			 */
-//			memcpy(dentry->d_iname, target->d_name.name,
-//					target->d_name.len + 1);
-//			target->d_name.name = dentry->d_name.name;
-//			dentry->d_name.name = dentry->d_iname;
-//		} else {
-//			/*
-//			 * Both are internal.
-//			 */
-//			unsigned int i;
-//			BUILD_BUG_ON(!IS_ALIGNED(DNAME_INLINE_LEN, sizeof(long)));
-//			for (i = 0; i < DNAME_INLINE_LEN / sizeof(long); i++) {
-//				swap(((long *) &dentry->d_iname)[i],
-//				     ((long *) &target->d_iname)[i]);
-//			}
-//		}
-//	}
-//	swap(dentry->d_name.hash_len, target->d_name.hash_len);
-//}
-//
-//static void copy_name(struct dentry *dentry, struct dentry *target)
-//{
-//	struct external_name *old_name = NULL;
-//	if (unlikely(dname_external(dentry)))
-//		old_name = external_name(dentry);
-//	if (unlikely(dname_external(target))) {
-//		atomic_inc(&external_name(target)->u.count);
-//		dentry->d_name = target->d_name;
-//	} else {
-//		memcpy(dentry->d_iname, target->d_name.name,
-//				target->d_name.len + 1);
-//		dentry->d_name.name = dentry->d_iname;
-//		dentry->d_name.hash_len = target->d_name.hash_len;
-//	}
-//	if (old_name && likely(atomic_dec_and_test(&old_name->u.count)))
-//		kfree_rcu(old_name, u.head);
-//}
-//
-///*
-// * __d_move - move a dentry
-// * @dentry: entry to move
-// * @target: new dentry
-// * @exchange: exchange the two dentries
-// *
-// * Update the dcache to reflect the move of a file name. Negative
-// * dcache entries should not be moved in this way. Caller must hold
-// * rename_lock, the i_mutex of the source and target directories,
-// * and the sb->s_vfs_rename_mutex if they differ. See lock_rename().
-// */
-//static void __d_move(struct dentry *dentry, struct dentry *target,
-//		     bool exchange)
-//{
-//	struct dentry *old_parent, *p;
-//	struct inode *dir = NULL;
-//	unsigned n;
-//
-//	WARN_ON(!dentry->d_inode);
-//	if (WARN_ON(dentry == target))
-//		return;
-//
-//	BUG_ON(d_ancestor(target, dentry));
-//	old_parent = dentry->d_parent;
-//	p = d_ancestor(old_parent, target);
-//	if (IS_ROOT(dentry)) {
-//		BUG_ON(p);
-//		spin_lock(&target->d_parent->d_lock);
-//	} else if (!p) {
-//		/* target is not a descendent of dentry->d_parent */
-//		spin_lock(&target->d_parent->d_lock);
-//		spin_lock_nested(&old_parent->d_lock, DENTRY_D_LOCK_NESTED);
-//	} else {
-//		BUG_ON(p == dentry);
-//		spin_lock(&old_parent->d_lock);
-//		if (p != target)
-//			spin_lock_nested(&target->d_parent->d_lock,
-//					DENTRY_D_LOCK_NESTED);
-//	}
-//	spin_lock_nested(&dentry->d_lock, 2);
-//	spin_lock_nested(&target->d_lock, 3);
-//
-//	if (unlikely(d_in_lookup(target))) {
-//		dir = target->d_parent->d_inode;
-//		n = start_dir_add(dir);
-//		__d_lookup_done(target);
-//	}
-//
-//	write_seqcount_begin(&dentry->d_seq);
-//	write_seqcount_begin_nested(&target->d_seq, DENTRY_D_LOCK_NESTED);
-//
-//	/* unhash both */
-//	if (!d_unhashed(dentry))
-//		___d_drop(dentry);
-//	if (!d_unhashed(target))
-//		___d_drop(target);
-//
-//	/* ... and switch them in the tree */
-//	dentry->d_parent = target->d_parent;
-//	if (!exchange) {
-//		copy_name(dentry, target);
-//		target->d_hash.pprev = NULL;
-//		dentry->d_parent->d_lockref.count++;
-//		if (dentry != old_parent) /* wasn't IS_ROOT */
-//			WARN_ON(!--old_parent->d_lockref.count);
-//	} else {
-//		target->d_parent = old_parent;
-//		swap_names(dentry, target);
-//		list_move(&target->d_child, &target->d_parent->d_subdirs);
-//		__d_rehash(target);
-//		fsnotify_update_flags(target);
-//	}
-//	list_move(&dentry->d_child, &dentry->d_parent->d_subdirs);
-//	__d_rehash(dentry);
-//	fsnotify_update_flags(dentry);
-//	fscrypt_handle_d_move(dentry);
-//
-//	write_seqcount_end(&target->d_seq);
-//	write_seqcount_end(&dentry->d_seq);
-//
-//	if (dir)
-//		end_dir_add(dir, n);
-//
-//	if (dentry->d_parent != old_parent)
-//		spin_unlock(&dentry->d_parent->d_lock);
-//	if (dentry != old_parent)
-//		spin_unlock(&old_parent->d_lock);
-//	spin_unlock(&target->d_lock);
-//	spin_unlock(&dentry->d_lock);
-//}
-//
+
+static void swap_names(struct dentry *dentry, struct dentry *target)
+{
+	if (unlikely(dname_external(target))) {
+		if (unlikely(dname_external(dentry))) {
+			/*
+			 * Both external: swap the pointers
+			 */
+			swap(target->d_name.name, dentry->d_name.name);
+		} else {
+			/*
+			 * dentry:internal, target:external.  Steal target's
+			 * storage and make target internal.
+			 */
+			memcpy(target->d_iname, dentry->d_name.name,
+					dentry->d_name.len + 1);
+			dentry->d_name.name = target->d_name.name;
+			target->d_name.name = target->d_iname;
+		}
+	} else {
+		if (unlikely(dname_external(dentry))) {
+			/*
+			 * dentry:external, target:internal.  Give dentry's
+			 * storage to target and make dentry internal
+			 */
+			memcpy(dentry->d_iname, target->d_name.name,
+					target->d_name.len + 1);
+			target->d_name.name = dentry->d_name.name;
+			dentry->d_name.name = dentry->d_iname;
+		} else {
+			/*
+			 * Both are internal.
+			 */
+			unsigned int i;
+			BUILD_BUG_ON(!IS_ALIGNED(DNAME_INLINE_LEN, sizeof(long)));
+			for (i = 0; i < DNAME_INLINE_LEN / sizeof(long); i++) {
+				swap(((long *) &dentry->d_iname)[i],
+				     ((long *) &target->d_iname)[i]);
+			}
+		}
+	}
+	swap(dentry->d_name.hash_len, target->d_name.hash_len);
+}
+
+static void copy_name(struct dentry *dentry, struct dentry *target)
+{
+	struct external_name *old_name = NULL;
+	if (unlikely(dname_external(dentry)))
+		old_name = external_name(dentry);
+	if (unlikely(dname_external(target))) {
+		atomic_inc(&external_name(target)->u.count);
+		dentry->d_name = target->d_name;
+	} else {
+		memcpy(dentry->d_iname, target->d_name.name,
+				target->d_name.len + 1);
+		dentry->d_name.name = dentry->d_iname;
+		dentry->d_name.hash_len = target->d_name.hash_len;
+	}
+	if (old_name && likely(atomic_dec_and_test(&old_name->u.count)))
+		kfree_rcu(old_name, u.head);
+}
+
+/*
+ * __d_move - move a dentry
+ * @dentry: entry to move
+ * @target: new dentry
+ * @exchange: exchange the two dentries
+ *
+ * Update the dcache to reflect the move of a file name. Negative
+ * dcache entries should not be moved in this way. Caller must hold
+ * rename_lock, the i_mutex of the source and target directories,
+ * and the sb->s_vfs_rename_mutex if they differ. See lock_rename().
+ */
+static void __d_move(struct dentry *dentry, struct dentry *target,
+		     bool exchange)
+{
+	struct dentry *old_parent, *p;
+	struct inode *dir = NULL;
+	unsigned n;
+
+	WARN_ON(!dentry->d_inode);
+	if (WARN_ON(dentry == target))
+		return;
+
+	BUG_ON(d_ancestor(target, dentry));
+	old_parent = dentry->d_parent;
+	p = d_ancestor(old_parent, target);
+	if (IS_ROOT(dentry)) {
+		BUG_ON(p);
+		spin_lock(&target->d_parent->d_lock);
+	} else if (!p) {
+		/* target is not a descendent of dentry->d_parent */
+		spin_lock(&target->d_parent->d_lock);
+		spin_lock_nested(&old_parent->d_lock, DENTRY_D_LOCK_NESTED);
+	} else {
+		BUG_ON(p == dentry);
+		spin_lock(&old_parent->d_lock);
+		if (p != target)
+			spin_lock_nested(&target->d_parent->d_lock,
+					DENTRY_D_LOCK_NESTED);
+	}
+	spin_lock_nested(&dentry->d_lock, 2);
+	spin_lock_nested(&target->d_lock, 3);
+
+	if (unlikely(d_in_lookup(target))) {
+		dir = target->d_parent->d_inode;
+		n = start_dir_add(dir);
+		__d_lookup_done(target);
+	}
+
+	write_seqcount_begin(&dentry->d_seq);
+	write_seqcount_begin_nested(&target->d_seq, DENTRY_D_LOCK_NESTED);
+
+	/* unhash both */
+	if (!d_unhashed(dentry))
+		___d_drop(dentry);
+	if (!d_unhashed(target))
+		___d_drop(target);
+
+	/* ... and switch them in the tree */
+	dentry->d_parent = target->d_parent;
+	if (!exchange) {
+		copy_name(dentry, target);
+		target->d_hash.pprev = NULL;
+		dentry->d_parent->d_lockref.count++;
+		if (dentry != old_parent) /* wasn't IS_ROOT */
+			WARN_ON(!--old_parent->d_lockref.count);
+	} else {
+		target->d_parent = old_parent;
+		swap_names(dentry, target);
+		list_move(&target->d_child, &target->d_parent->d_subdirs);
+		__d_rehash(target);
+		fsnotify_update_flags(target);
+	}
+	list_move(&dentry->d_child, &dentry->d_parent->d_subdirs);
+	__d_rehash(dentry);
+	fsnotify_update_flags(dentry);
+	fscrypt_handle_d_move(dentry);
+
+	write_seqcount_end(&target->d_seq);
+	write_seqcount_end(&dentry->d_seq);
+
+	if (dir)
+		end_dir_add(dir, n);
+
+	if (dentry->d_parent != old_parent)
+		spin_unlock(&dentry->d_parent->d_lock);
+	if (dentry != old_parent)
+		spin_unlock(&old_parent->d_lock);
+	spin_unlock(&target->d_lock);
+	spin_unlock(&dentry->d_lock);
+}
+
 ///*
 // * d_move - move a dentry
 // * @dentry: entry to move
@@ -2934,138 +2934,138 @@ EXPORT_SYMBOL(d_make_root);
 //
 //	write_sequnlock(&rename_lock);
 //}
-//
-///**
-// * d_ancestor - search for an ancestor
-// * @p1: ancestor dentry
-// * @p2: child dentry
-// *
-// * Returns the ancestor dentry of p2 which is a child of p1, if p1 is
-// * an ancestor of p2, else NULL.
-// */
-//struct dentry *d_ancestor(struct dentry *p1, struct dentry *p2)
-//{
-//	struct dentry *p;
-//
-//	for (p = p2; !IS_ROOT(p); p = p->d_parent) {
-//		if (p->d_parent == p1)
-//			return p;
-//	}
-//	return NULL;
-//}
-//
-///*
-// * This helper attempts to cope with remotely renamed directories
-// *
-// * It assumes that the caller is already holding
-// * dentry->d_parent->d_inode->i_mutex, and rename_lock
-// *
-// * Note: If ever the locking in lock_rename() changes, then please
-// * remember to update this too...
-// */
-//static int __d_unalias(struct inode *inode,
-//		struct dentry *dentry, struct dentry *alias)
-//{
-//	struct mutex *m1 = NULL;
-//	struct rw_semaphore *m2 = NULL;
-//	int ret = -ESTALE;
-//
-//	/* If alias and dentry share a parent, then no extra locks required */
-//	if (alias->d_parent == dentry->d_parent)
-//		goto out_unalias;
-//
-//	/* See lock_rename() */
-//	if (!mutex_trylock(&dentry->d_sb->s_vfs_rename_mutex))
-//		goto out_err;
-//	m1 = &dentry->d_sb->s_vfs_rename_mutex;
-//	if (!inode_trylock_shared(alias->d_parent->d_inode))
-//		goto out_err;
-//	m2 = &alias->d_parent->d_inode->i_rwsem;
-//out_unalias:
-//	__d_move(alias, dentry, false);
-//	ret = 0;
-//out_err:
-//	if (m2)
-//		up_read(m2);
-//	if (m1)
-//		mutex_unlock(m1);
-//	return ret;
-//}
-//
-///**
-// * d_splice_alias - splice a disconnected dentry into the tree if one exists
-// * @inode:  the inode which may have a disconnected dentry
-// * @dentry: a negative dentry which we want to point to the inode.
-// *
-// * If inode is a directory and has an IS_ROOT alias, then d_move that in
-// * place of the given dentry and return it, else simply d_add the inode
-// * to the dentry and return NULL.
-// *
-// * If a non-IS_ROOT directory is found, the filesystem is corrupt, and
-// * we should error out: directories can't have multiple aliases.
-// *
-// * This is needed in the lookup routine of any filesystem that is exportable
-// * (via knfsd) so that we can build dcache paths to directories effectively.
-// *
-// * If a dentry was found and moved, then it is returned.  Otherwise NULL
-// * is returned.  This matches the expected return value of ->lookup.
-// *
-// * Cluster filesystems may call this function with a negative, hashed dentry.
-// * In that case, we know that the inode will be a regular file, and also this
-// * will only occur during atomic_open. So we need to check for the dentry
-// * being already hashed only in the final case.
-// */
-//struct dentry *d_splice_alias(struct inode *inode, struct dentry *dentry)
-//{
-//	if (IS_ERR(inode))
-//		return ERR_CAST(inode);
-//
-//	BUG_ON(!d_unhashed(dentry));
-//
-//	if (!inode)
-//		goto out;
-//
-//	security_d_instantiate(dentry, inode);
-//	spin_lock(&inode->i_lock);
-//	if (S_ISDIR(inode->i_mode)) {
-//		struct dentry *new = __d_find_any_alias(inode);
-//		if (unlikely(new)) {
-//			/* The reference to new ensures it remains an alias */
-//			spin_unlock(&inode->i_lock);
-//			write_seqlock(&rename_lock);
-//			if (unlikely(d_ancestor(new, dentry))) {
-//				write_sequnlock(&rename_lock);
-//				dput(new);
-//				new = ERR_PTR(-ELOOP);
-//				pr_warn_ratelimited(
-//					"VFS: Lookup of '%s' in %s %s"
-//					" would have caused loop\n",
-//					dentry->d_name.name,
-//					inode->i_sb->s_type->name,
-//					inode->i_sb->s_id);
-//			} else if (!IS_ROOT(new)) {
-//				struct dentry *old_parent = dget(new->d_parent);
-//				int err = __d_unalias(inode, dentry, new);
-//				write_sequnlock(&rename_lock);
-//				if (err) {
-//					dput(new);
-//					new = ERR_PTR(err);
-//				}
-//				dput(old_parent);
-//			} else {
-//				__d_move(new, dentry, false);
-//				write_sequnlock(&rename_lock);
-//			}
-//			iput(inode);
-//			return new;
-//		}
-//	}
-//out:
-//	__d_add(dentry, inode);
-//	return NULL;
-//}
-//EXPORT_SYMBOL(d_splice_alias);
-//
+
+/**
+ * d_ancestor - search for an ancestor
+ * @p1: ancestor dentry
+ * @p2: child dentry
+ *
+ * Returns the ancestor dentry of p2 which is a child of p1, if p1 is
+ * an ancestor of p2, else NULL.
+ */
+struct dentry *d_ancestor(struct dentry *p1, struct dentry *p2)
+{
+	struct dentry *p;
+
+	for (p = p2; !IS_ROOT(p); p = p->d_parent) {
+		if (p->d_parent == p1)
+			return p;
+	}
+	return NULL;
+}
+
+/*
+ * This helper attempts to cope with remotely renamed directories
+ *
+ * It assumes that the caller is already holding
+ * dentry->d_parent->d_inode->i_mutex, and rename_lock
+ *
+ * Note: If ever the locking in lock_rename() changes, then please
+ * remember to update this too...
+ */
+static int __d_unalias(struct inode *inode,
+		struct dentry *dentry, struct dentry *alias)
+{
+	struct mutex *m1 = NULL;
+	struct rw_semaphore *m2 = NULL;
+	int ret = -ESTALE;
+
+	/* If alias and dentry share a parent, then no extra locks required */
+	if (alias->d_parent == dentry->d_parent)
+		goto out_unalias;
+
+	/* See lock_rename() */
+	if (!mutex_trylock(&dentry->d_sb->s_vfs_rename_mutex))
+		goto out_err;
+	m1 = &dentry->d_sb->s_vfs_rename_mutex;
+	if (!inode_trylock_shared(alias->d_parent->d_inode))
+		goto out_err;
+	m2 = &alias->d_parent->d_inode->i_rwsem;
+out_unalias:
+	__d_move(alias, dentry, false);
+	ret = 0;
+out_err:
+	if (m2)
+		up_read(m2);
+	if (m1)
+		mutex_unlock(m1);
+	return ret;
+}
+
+/**
+ * d_splice_alias - splice a disconnected dentry into the tree if one exists
+ * @inode:  the inode which may have a disconnected dentry
+ * @dentry: a negative dentry which we want to point to the inode.
+ *
+ * If inode is a directory and has an IS_ROOT alias, then d_move that in
+ * place of the given dentry and return it, else simply d_add the inode
+ * to the dentry and return NULL.
+ *
+ * If a non-IS_ROOT directory is found, the filesystem is corrupt, and
+ * we should error out: directories can't have multiple aliases.
+ *
+ * This is needed in the lookup routine of any filesystem that is exportable
+ * (via knfsd) so that we can build dcache paths to directories effectively.
+ *
+ * If a dentry was found and moved, then it is returned.  Otherwise NULL
+ * is returned.  This matches the expected return value of ->lookup.
+ *
+ * Cluster filesystems may call this function with a negative, hashed dentry.
+ * In that case, we know that the inode will be a regular file, and also this
+ * will only occur during atomic_open. So we need to check for the dentry
+ * being already hashed only in the final case.
+ */
+struct dentry *d_splice_alias(struct inode *inode, struct dentry *dentry)
+{
+	if (IS_ERR(inode))
+		return ERR_CAST(inode);
+
+	BUG_ON(!d_unhashed(dentry));
+
+	if (!inode)
+		goto out;
+
+	security_d_instantiate(dentry, inode);
+	spin_lock(&inode->i_lock);
+	if (S_ISDIR(inode->i_mode)) {
+		struct dentry *new = __d_find_any_alias(inode);
+		if (unlikely(new)) {
+			/* The reference to new ensures it remains an alias */
+			spin_unlock(&inode->i_lock);
+			write_seqlock(&rename_lock);
+			if (unlikely(d_ancestor(new, dentry))) {
+				write_sequnlock(&rename_lock);
+				dput(new);
+				new = ERR_PTR(-ELOOP);
+				pr_warn_ratelimited(
+					"VFS: Lookup of '%s' in %s %s"
+					" would have caused loop\n",
+					dentry->d_name.name,
+					inode->i_sb->s_type->name,
+					inode->i_sb->s_id);
+			} else if (!IS_ROOT(new)) {
+				struct dentry *old_parent = dget(new->d_parent);
+				int err = __d_unalias(inode, dentry, new);
+				write_sequnlock(&rename_lock);
+				if (err) {
+					dput(new);
+					new = ERR_PTR(err);
+				}
+				dput(old_parent);
+			} else {
+				__d_move(new, dentry, false);
+				write_sequnlock(&rename_lock);
+			}
+			iput(inode);
+			return new;
+		}
+	}
+out:
+	__d_add(dentry, inode);
+	return NULL;
+}
+EXPORT_SYMBOL(d_splice_alias);
+
 ///*
 // * Test whether new_dentry is a subdirectory of old_dentry.
 // *

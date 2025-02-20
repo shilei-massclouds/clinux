@@ -38,10 +38,14 @@ int seq_release(struct inode *inode, struct file *file)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(seq_release);
+
 void make_empty_dir_inode(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(make_empty_dir_inode);
+
 /*
 struct super_block *sget_fc(struct fs_context *fc,
                 int (*test)(struct super_block *, struct fs_context *),
@@ -50,10 +54,12 @@ struct super_block *sget_fc(struct fs_context *fc,
     booter_panic("No impl!\n");
 }
 */
+/*
 struct dentry *d_splice_alias(struct inode *inode, struct dentry *dentry)
 {
     booter_panic("No impl!\n");
 }
+*/
 void unmap_mapping_range(struct address_space *mapping,
         loff_t const holebegin, loff_t const holelen, int even_cows)
 {
@@ -77,6 +83,8 @@ ssize_t generic_read_dir(struct file *filp, char __user *buf, size_t siz, loff_t
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(generic_read_dir);
+
 /*
 int set_anon_super_fc(struct super_block *sb, struct fs_context *fc)
 {
@@ -94,14 +102,19 @@ void kfree_link(void *p)
 {
     booter_panic("No impl!\n");
 }
+
 int seq_open(struct file *file, const struct seq_operations *op)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(seq_open);
+
 loff_t generic_file_llseek(struct file *file, loff_t offset, int whence)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(generic_file_llseek);
+
 ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
               char *buffer, size_t size)
 {

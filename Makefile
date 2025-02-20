@@ -56,7 +56,7 @@ components := \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
 	inode dcache file_table do_mounts \
 	cred user_namespace nsproxy fs_namespace \
-	ramfs kernfs sysfs block_dev filesystems shmem \
+	ramfs kernfs sysfs proc block_dev filesystems shmem \
 	fs_context fs_parser \
 	fork mmap \
 	buffer swap \

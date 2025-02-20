@@ -220,12 +220,13 @@ int fasync_helper(int fd, struct file * filp, int on, struct fasync_struct **fap
 }
 EXPORT_SYMBOL(fasync_helper);
 
-void proc_free_inum(unsigned int inum)
+__weak void proc_free_inum(unsigned int inum)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(proc_free_inum);
-int proc_alloc_inum(unsigned int *inum)
+
+__weak int proc_alloc_inum(unsigned int *inum)
 {
     booter_panic("No impl.\n");
 }
@@ -336,7 +337,7 @@ struct subprocess_info *call_usermodehelper_setup(const char *path, char **argv,
 }
 EXPORT_SYMBOL(call_usermodehelper_setup);
 
-struct proc_dir_entry *proc_create_single_data(const char *name, umode_t mode,
+__weak struct proc_dir_entry *proc_create_single_data(const char *name, umode_t mode,
         struct proc_dir_entry *parent,
         int (*show)(struct seq_file *, void *), void *data)
 {
@@ -486,3 +487,21 @@ __weak struct vfsmount *kern_mount(struct file_system_type *type)
     booter_panic("No impl in 'booter'.");
 }
 EXPORT_SYMBOL_GPL(kern_mount);
+
+__weak void put_filesystem(struct file_system_type *fs)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(put_filesystem);
+
+__weak struct file_system_type *get_filesystem(struct file_system_type *fs)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(get_filesystem);
+
+int sync_filesystem(struct super_block *sb)
+{
+    booter_panic("No impl in 'booter'.");
+}
+EXPORT_SYMBOL(sync_filesystem);

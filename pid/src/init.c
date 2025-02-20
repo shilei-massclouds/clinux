@@ -33,10 +33,13 @@ int anon_inode_getfd(const char *name, const struct file_operations *fops,
 {
     booter_panic("No impl.\n");
 }
+
 void put_pid_ns(struct pid_namespace *ns)
 {
     booter_panic("No impl.\n");
 }
+EXPORT_SYMBOL(put_pid_ns);
+
 bool ptrace_may_access(struct task_struct *task, unsigned int mode)
 {
     booter_panic("No impl.\n");

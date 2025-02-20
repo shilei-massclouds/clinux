@@ -500,6 +500,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(shmem);
     REQUIRE_COMPONENT(vmscan);
     REQUIRE_COMPONENT(fs_namespace);
+    REQUIRE_COMPONENT(proc);
 
     //
     // start_kernel (init/main.c)

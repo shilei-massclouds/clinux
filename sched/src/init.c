@@ -103,7 +103,6 @@ void rcu_qs(void)
 {
     booter_panic("No impl 'sched'.");
 }
-*/
 
 struct proc_dir_entry *proc_create_seq_private(const char *name, umode_t mode,
         struct proc_dir_entry *parent, const struct seq_operations *ops,
@@ -111,6 +110,7 @@ struct proc_dir_entry *proc_create_seq_private(const char *name, umode_t mode,
 {
     booter_panic("No impl 'sched'.");
 }
+*/
 
 void rt_mutex_adjust_pi(struct task_struct *task)
 {

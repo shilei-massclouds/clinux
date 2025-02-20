@@ -95,18 +95,12 @@ void __mnt_drop_write_file(struct file *file)
 {
     booter_panic("No impl!\n");
 }
+
 void __mark_inode_dirty(struct inode *inode, int flags)
 {
     booter_panic("No impl!\n");
 }
-
-/*
-bool list_lru_add(struct list_lru *lru, struct list_head *item)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(list_lru_add);
-*/
+EXPORT_SYMBOL(__mark_inode_dirty);
 
 int inode_has_buffers(struct inode *inode)
 {

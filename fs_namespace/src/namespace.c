@@ -3245,11 +3245,13 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns, bool a
 	if (!ucounts)
 		return ERR_PTR(-ENOSPC);
 
+    printk("===============> %s step1\n", __func__);
 	new_ns = kzalloc(sizeof(struct mnt_namespace), GFP_KERNEL);
 	if (!new_ns) {
 		dec_mnt_namespaces(ucounts);
 		return ERR_PTR(-ENOMEM);
 	}
+    printk("===============> %s step2\n", __func__);
 	if (!anon) {
 		ret = ns_alloc_inum(&new_ns->ns);
 		if (ret) {
@@ -3258,6 +3260,7 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns, bool a
 			return ERR_PTR(ret);
 		}
 	}
+    printk("===============> %s step3\n", __func__);
 	new_ns->ns.ops = &mntns_operations;
 	if (!anon)
 		new_ns->seq = atomic64_add_return(1, &mnt_ns_seq);
@@ -3779,9 +3782,11 @@ static void __init init_mount_tree(void)
 	if (IS_ERR(mnt))
 		panic("Can't create rootfs");
 
+    printk("===============> %s step1\n", __func__);
 	ns = alloc_mnt_ns(&init_user_ns, false);
 	if (IS_ERR(ns))
 		panic("Can't allocate initial namespace");
+    printk("===============> %s step2\n", __func__);
 	m = real_mount(mnt);
 	m->mnt_ns = ns;
 	ns->root = m;
@@ -3789,6 +3794,7 @@ static void __init init_mount_tree(void)
 	list_add(&m->mnt_list, &ns->list);
 	init_task.nsproxy->mnt_ns = ns;
 	get_mnt_ns(ns);
+    printk("===============> %s step3\n", __func__);
 
 	root.mnt = mnt;
 	root.dentry = mnt->mnt_root;
@@ -3830,7 +3836,9 @@ void __init mnt_init(void)
 		printk(KERN_WARNING "%s: kobj create error\n", __func__);
 	shmem_init();
 	init_rootfs();
+    printk("===============> %s step1\n", __func__);
 	init_mount_tree();
+    printk("===============> %s step2\n", __func__);
 }
 
 //void put_mnt_ns(struct mnt_namespace *ns)
