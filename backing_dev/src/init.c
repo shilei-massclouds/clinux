@@ -28,7 +28,3 @@ bool mod_delayed_work_on(int cpu, struct workqueue_struct *wq,
 {
     booter_panic("No impl!\n");
 }
-void fprop_local_destroy_percpu(struct fprop_local_percpu *pl)
-{
-    booter_panic("No impl!\n");
-}
