@@ -331,3 +331,21 @@ __weak void proc_sched_show_task(struct task_struct *p, struct pid_namespace *ns
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(proc_sched_show_task);
+
+__weak long wait_woken(struct wait_queue_entry *wq_entry, unsigned mode, long timeout)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(wait_woken);
+
+__weak int woken_wake_function(struct wait_queue_entry *wq_entry, unsigned mode, int sync, void *key)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(woken_wake_function);
+
+__weak void remove_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(remove_wait_queue);

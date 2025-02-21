@@ -138,9 +138,11 @@ EXPORT_SYMBOL(tty_std_termios);
    into this file */
 
 LIST_HEAD(tty_drivers);			/* linked list of tty drivers */
+EXPORT_SYMBOL(tty_drivers);
 
 /* Mutex to protect creating and releasing a tty */
 DEFINE_MUTEX(tty_mutex);
+EXPORT_SYMBOL(tty_mutex);
 
 static ssize_t tty_read(struct file *, char __user *, size_t, loff_t *);
 static ssize_t tty_write(struct file *, const char __user *, size_t, loff_t *);

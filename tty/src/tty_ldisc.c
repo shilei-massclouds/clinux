@@ -239,6 +239,7 @@ const struct seq_operations tty_ldiscs_seq_ops = {
 	.stop	= tty_ldiscs_seq_stop,
 	.show	= tty_ldiscs_seq_show,
 };
+EXPORT_SYMBOL(tty_ldiscs_seq_ops);
 
 /**
  *	tty_ldisc_ref_wait	-	wait for the tty ldisc

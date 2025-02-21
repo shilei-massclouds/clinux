@@ -35,7 +35,6 @@ void remove_wait_queue(struct wait_queue_head *wq_head, struct wait_queue_entry 
 	__remove_wait_queue(wq_head, wq_entry);
 	spin_unlock_irqrestore(&wq_head->lock, flags);
 }
-EXPORT_SYMBOL(remove_wait_queue);
 
 /*
  * Scan threshold to break wait queue walk.
@@ -425,7 +424,6 @@ long wait_woken(struct wait_queue_entry *wq_entry, unsigned mode, long timeout)
 
 	return timeout;
 }
-EXPORT_SYMBOL(wait_woken);
 
 int woken_wake_function(struct wait_queue_entry *wq_entry, unsigned mode, int sync, void *key)
 {
@@ -435,4 +433,3 @@ int woken_wake_function(struct wait_queue_entry *wq_entry, unsigned mode, int sy
 
 	return default_wake_function(wq_entry, mode, sync, key);
 }
-EXPORT_SYMBOL(woken_wake_function);

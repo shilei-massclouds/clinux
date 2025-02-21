@@ -6,6 +6,7 @@
 #include <linux/kobject.h>
 #include <linux/device.h>
 #include <linux/irq.h>
+#include <linux/tty.h>
 #include <linux/module.h>
 #include <linux/fs.h>
 #include <linux/fs_context.h>
@@ -816,3 +817,14 @@ __weak u64 hashlen_string(const void *salt, const char *name)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(hashlen_string);
+
+__weak void proc_tty_register_driver(struct tty_driver *driver)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(proc_tty_register_driver);
+__weak void proc_tty_unregister_driver(struct tty_driver *driver)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(proc_tty_unregister_driver);

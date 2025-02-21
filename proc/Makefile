@@ -8,6 +8,7 @@ obj_y += base.o
 obj_y += self.o
 obj_y += thread_self.o
 obj_y += proc_net.o
+obj_y += proc_tty.o
 obj_y += util.o
 
 obj_y += mine.o

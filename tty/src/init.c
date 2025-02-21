@@ -66,10 +66,6 @@ struct tty_driver *console_device(int *index)
 {
     booter_panic("No impl.\n");
 }
-void proc_tty_unregister_driver(struct tty_driver *driver)
-{
-    booter_panic("No impl.\n");
-}
 
 int __sched ldsem_down_read(struct ld_semaphore *sem, long timeout)
 {
@@ -85,10 +81,6 @@ void __f_setown(struct file *filp, struct pid *pid, enum pid_type type,
     booter_panic("No impl.\n");
 }
 char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *tsk)
-{
-    booter_panic("No impl.\n");
-}
-void proc_tty_register_driver(struct tty_driver *driver)
 {
     booter_panic("No impl.\n");
 }
