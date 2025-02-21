@@ -30,5 +30,5 @@ CL_MINE(proc_tid_stat)
 CL_MINE(proc_tty_init)
 CL_MINE(stack_trace_save_tsk)
 CL_MINE(task_current_syscall)
-CL_MINE(register_pernet_subsys)
+//CL_MINE(register_pernet_subsys)
 

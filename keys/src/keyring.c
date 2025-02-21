@@ -260,6 +260,7 @@ void key_remove_domain(struct key_tag *domain_tag)
 	if (!key_put_tag(domain_tag))
 		key_schedule_gc_links();
 }
+EXPORT_SYMBOL(key_remove_domain);
 
 /*
  * Build the next index key chunk.
