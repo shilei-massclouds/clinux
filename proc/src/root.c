@@ -289,7 +289,6 @@ void __init proc_root_init(void)
 {
 	proc_init_kmemcache();
 	set_proc_pid_nlink();
-    printk("======================= %s start\n", __func__);
 	proc_self_init();
 	proc_thread_self_init();
 	proc_symlink("mounts", NULL, "self/mounts");
@@ -307,7 +306,6 @@ void __init proc_root_init(void)
 	proc_sys_init();
 
 	register_filesystem(&proc_fs_type);
-    printk("======================= %s ok!\n", __func__);
 }
 EXPORT_SYMBOL(proc_root_init);
 

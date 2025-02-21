@@ -61,7 +61,7 @@ components := \
 	net_namespace \
 	fork mmap filemap \
 	buffer swap \
-	signal \
+	signal sysctl \
 	early_printk printk panic dump_stack show_mem
 	#partitions \
 
