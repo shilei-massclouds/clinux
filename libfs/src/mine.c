@@ -2,9 +2,9 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(blkdev_issue_flush)
-CL_MINE(d_add)
+//CL_MINE(d_add)
 CL_MINE(d_alloc_cursor)
-CL_MINE(d_alloc_name)
+//CL_MINE(d_alloc_name)
 //CL_MINE(d_genocide)
 //CL_MINE(d_obtain_alias)
 //CL_MINE(file_check_and_advance_wb_err)

@@ -810,3 +810,9 @@ loff_t no_llseek(struct file *file, loff_t offset, int whence)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(no_llseek);
+
+__weak u64 hashlen_string(const void *salt, const char *name)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(hashlen_string);

@@ -2015,7 +2015,6 @@ inside:
 
 	return hashlen_create(fold_hash(x, y), len + find_zero(mask));
 }
-EXPORT_SYMBOL(hashlen_string);
 
 /*
  * Calculate the length and hash of the path component, and
@@ -2071,7 +2070,6 @@ u64 hashlen_string(const void *salt, const char *name)
 	}
 	return hashlen_create(end_name_hash(hash), len);
 }
-EXPORT_SYMBOL(hashlen_string);
 
 /*
  * We know there's a real path component here of at least

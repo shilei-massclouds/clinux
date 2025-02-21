@@ -1841,16 +1841,16 @@ EXPORT_SYMBOL(d_alloc_anon);
 //		dentry->d_flags |= DCACHE_NORCU;
 //	return dentry;
 //}
-//
-//struct dentry *d_alloc_name(struct dentry *parent, const char *name)
-//{
-//	struct qstr q;
-//
-//	q.name = name;
-//	q.hash_len = hashlen_string(parent, name);
-//	return d_alloc(parent, &q);
-//}
-//EXPORT_SYMBOL(d_alloc_name);
+
+struct dentry *d_alloc_name(struct dentry *parent, const char *name)
+{
+	struct qstr q;
+
+	q.name = name;
+	q.hash_len = hashlen_string(parent, name);
+	return d_alloc(parent, &q);
+}
+EXPORT_SYMBOL(d_alloc_name);
 
 void d_set_d_op(struct dentry *dentry, const struct dentry_operations *op)
 {
@@ -2686,25 +2686,25 @@ static inline void __d_add(struct dentry *dentry, struct inode *inode)
 		spin_unlock(&inode->i_lock);
 }
 
-///**
-// * d_add - add dentry to hash queues
-// * @entry: dentry to add
-// * @inode: The inode to attach to this dentry
-// *
-// * This adds the entry to the hash queues and initializes @inode.
-// * The entry was actually filled in earlier during d_alloc().
-// */
-//
-//void d_add(struct dentry *entry, struct inode *inode)
-//{
-//	if (inode) {
-//		security_d_instantiate(entry, inode);
-//		spin_lock(&inode->i_lock);
-//	}
-//	__d_add(entry, inode);
-//}
-//EXPORT_SYMBOL(d_add);
-//
+/**
+ * d_add - add dentry to hash queues
+ * @entry: dentry to add
+ * @inode: The inode to attach to this dentry
+ *
+ * This adds the entry to the hash queues and initializes @inode.
+ * The entry was actually filled in earlier during d_alloc().
+ */
+
+void d_add(struct dentry *entry, struct inode *inode)
+{
+	if (inode) {
+		security_d_instantiate(entry, inode);
+		spin_lock(&inode->i_lock);
+	}
+	__d_add(entry, inode);
+}
+EXPORT_SYMBOL(d_add);
+
 ///**
 // * d_exact_alias - find and hash an exact unhashed alias
 // * @entry: dentry to add
