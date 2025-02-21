@@ -121,7 +121,7 @@ EXPORT_SYMBOL(dev_printk);
 unsigned long lpj_fine;
 EXPORT_SYMBOL(lpj_fine);
 
-void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
+__weak void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
 {
     booter_panic("No impl '__local_bh_enable_ip'.");
 }
@@ -873,3 +873,22 @@ __weak struct ctl_table_header *register_sysctl_table(struct ctl_table *table)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(register_sysctl_table);
+
+__weak int proc_cgroup_show(struct seq_file *m, struct pid_namespace *ns,
+		     struct pid *pid, struct task_struct *tsk)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(proc_cgroup_show);
+
+bool refcount_dec_not_one(refcount_t *r)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(refcount_dec_not_one);
+
+bool cancel_work_sync(struct work_struct *work)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(cancel_work_sync);

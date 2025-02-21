@@ -110,26 +110,26 @@ EXPORT_SYMBOL(kstrdup_const);
 //	return buf;
 //}
 //EXPORT_SYMBOL(kstrndup);
-//
-///**
-// * kmemdup - duplicate region of memory
-// *
-// * @src: memory region to duplicate
-// * @len: memory region length
-// * @gfp: GFP mask to use
-// *
-// * Return: newly allocated copy of @src or %NULL in case of error
-// */
-//void *kmemdup(const void *src, size_t len, gfp_t gfp)
-//{
-//	void *p;
-//
-//	p = kmalloc_track_caller(len, gfp);
-//	if (p)
-//		memcpy(p, src, len);
-//	return p;
-//}
-//EXPORT_SYMBOL(kmemdup);
+
+/**
+ * kmemdup - duplicate region of memory
+ *
+ * @src: memory region to duplicate
+ * @len: memory region length
+ * @gfp: GFP mask to use
+ *
+ * Return: newly allocated copy of @src or %NULL in case of error
+ */
+void *kmemdup(const void *src, size_t len, gfp_t gfp)
+{
+	void *p;
+
+	p = kmalloc_track_caller(len, gfp);
+	if (p)
+		memcpy(p, src, len);
+	return p;
+}
+EXPORT_SYMBOL(kmemdup);
 
 /**
  * kmemdup_nul - Create a NUL-terminated string from unterminated data

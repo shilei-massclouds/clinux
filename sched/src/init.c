@@ -75,11 +75,6 @@ void io_wq_worker_sleeping(struct task_struct *tsk)
     booter_panic("No impl 'sched'.");
 }
 
-void __cgroup_account_cputime(struct cgroup *cgrp, u64 delta_exec)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
 {
     booter_panic("No impl 'sched'.");
@@ -112,14 +107,9 @@ void rt_mutex_adjust_pi(struct task_struct *task)
     booter_panic("No impl in 'sched'.");
 }
 
+/*
 void __cgroup_account_cputime_field(struct cgroup *cgrp,
                     enum cpu_usage_stat index, u64 delta_exec)
-{
-    booter_panic("No impl in 'sched'.");
-}
-
-/*
-unsigned long long task_sched_runtime(struct task_struct *p)
 {
     booter_panic("No impl in 'sched'.");
 }

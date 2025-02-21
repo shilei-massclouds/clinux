@@ -623,12 +623,12 @@ static void set_work_pwq(struct work_struct *work, struct pool_workqueue *pwq,
 		      WORK_STRUCT_PENDING | WORK_STRUCT_PWQ | extra_flags);
 }
 
-//static void set_work_pool_and_keep_pending(struct work_struct *work,
-//					   int pool_id)
-//{
-//	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT,
-//		      WORK_STRUCT_PENDING);
-//}
+static void set_work_pool_and_keep_pending(struct work_struct *work,
+					   int pool_id)
+{
+	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT,
+		      WORK_STRUCT_PENDING);
+}
 
 static void set_work_pool_and_clear_pending(struct work_struct *work,
 					    int pool_id)
@@ -746,13 +746,13 @@ static struct worker_pool *get_work_pool(struct work_struct *work)
 //	pool_id <<= WORK_OFFQ_POOL_SHIFT;
 //	set_work_data(work, pool_id | WORK_OFFQ_CANCELING, WORK_STRUCT_PENDING);
 //}
-//
-//static bool work_is_canceling(struct work_struct *work)
-//{
-//	unsigned long data = atomic_long_read(&work->data);
-//
-//	return !(data & WORK_STRUCT_PWQ) && (data & WORK_OFFQ_CANCELING);
-//}
+
+static bool work_is_canceling(struct work_struct *work)
+{
+	unsigned long data = atomic_long_read(&work->data);
+
+	return !(data & WORK_STRUCT_PWQ) && (data & WORK_OFFQ_CANCELING);
+}
 
 /*
  * Policy functions.  These define the policies on how the global worker
@@ -1204,109 +1204,109 @@ out_put:
 	put_pwq(pwq);
 }
 
-///**
-// * try_to_grab_pending - steal work item from worklist and disable irq
-// * @work: work item to steal
-// * @is_dwork: @work is a delayed_work
-// * @flags: place to store irq state
-// *
-// * Try to grab PENDING bit of @work.  This function can handle @work in any
-// * stable state - idle, on timer or on worklist.
-// *
-// * Return:
-// *  1		if @work was pending and we successfully stole PENDING
-// *  0		if @work was idle and we claimed PENDING
-// *  -EAGAIN	if PENDING couldn't be grabbed at the moment, safe to busy-retry
-// *  -ENOENT	if someone else is canceling @work, this state may persist
-// *		for arbitrarily long
-// *
-// * Note:
-// * On >= 0 return, the caller owns @work's PENDING bit.  To avoid getting
-// * interrupted while holding PENDING and @work off queue, irq must be
-// * disabled on entry.  This, combined with delayed_work->timer being
-// * irqsafe, ensures that we return -EAGAIN for finite short period of time.
-// *
-// * On successful return, >= 0, irq is disabled and the caller is
-// * responsible for releasing it using local_irq_restore(*@flags).
-// *
-// * This function is safe to call from any context including IRQ handler.
-// */
-//static int try_to_grab_pending(struct work_struct *work, bool is_dwork,
-//			       unsigned long *flags)
-//{
-//	struct worker_pool *pool;
-//	struct pool_workqueue *pwq;
-//
-//	local_irq_save(*flags);
-//
-//	/* try to steal the timer if it exists */
-//	if (is_dwork) {
-//		struct delayed_work *dwork = to_delayed_work(work);
-//
-//		/*
-//		 * dwork->timer is irqsafe.  If del_timer() fails, it's
-//		 * guaranteed that the timer is not queued anywhere and not
-//		 * running on the local CPU.
-//		 */
-//		if (likely(del_timer(&dwork->timer)))
-//			return 1;
-//	}
-//
-//	/* try to claim PENDING the normal way */
-//	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work)))
-//		return 0;
-//
-//	rcu_read_lock();
-//	/*
-//	 * The queueing is in progress, or it is already queued. Try to
-//	 * steal it from ->worklist without clearing WORK_STRUCT_PENDING.
-//	 */
-//	pool = get_work_pool(work);
-//	if (!pool)
-//		goto fail;
-//
-//	raw_spin_lock(&pool->lock);
-//	/*
-//	 * work->data is guaranteed to point to pwq only while the work
-//	 * item is queued on pwq->wq, and both updating work->data to point
-//	 * to pwq on queueing and to pool on dequeueing are done under
-//	 * pwq->pool->lock.  This in turn guarantees that, if work->data
-//	 * points to pwq which is associated with a locked pool, the work
-//	 * item is currently queued on that pool.
-//	 */
-//	pwq = get_work_pwq(work);
-//	if (pwq && pwq->pool == pool) {
-//		debug_work_deactivate(work);
-//
-//		/*
-//		 * A delayed work item cannot be grabbed directly because
-//		 * it might have linked NO_COLOR work items which, if left
-//		 * on the delayed_list, will confuse pwq->nr_active
-//		 * management later on and cause stall.  Make sure the work
-//		 * item is activated before grabbing.
-//		 */
-//		if (*work_data_bits(work) & WORK_STRUCT_DELAYED)
-//			pwq_activate_delayed_work(work);
-//
-//		list_del_init(&work->entry);
-//		pwq_dec_nr_in_flight(pwq, get_work_color(work));
-//
-//		/* work->data points to pwq iff queued, point to pool */
-//		set_work_pool_and_keep_pending(work, pool->id);
-//
-//		raw_spin_unlock(&pool->lock);
-//		rcu_read_unlock();
-//		return 1;
-//	}
-//	raw_spin_unlock(&pool->lock);
-//fail:
-//	rcu_read_unlock();
-//	local_irq_restore(*flags);
-//	if (work_is_canceling(work))
-//		return -ENOENT;
-//	cpu_relax();
-//	return -EAGAIN;
-//}
+/**
+ * try_to_grab_pending - steal work item from worklist and disable irq
+ * @work: work item to steal
+ * @is_dwork: @work is a delayed_work
+ * @flags: place to store irq state
+ *
+ * Try to grab PENDING bit of @work.  This function can handle @work in any
+ * stable state - idle, on timer or on worklist.
+ *
+ * Return:
+ *  1		if @work was pending and we successfully stole PENDING
+ *  0		if @work was idle and we claimed PENDING
+ *  -EAGAIN	if PENDING couldn't be grabbed at the moment, safe to busy-retry
+ *  -ENOENT	if someone else is canceling @work, this state may persist
+ *		for arbitrarily long
+ *
+ * Note:
+ * On >= 0 return, the caller owns @work's PENDING bit.  To avoid getting
+ * interrupted while holding PENDING and @work off queue, irq must be
+ * disabled on entry.  This, combined with delayed_work->timer being
+ * irqsafe, ensures that we return -EAGAIN for finite short period of time.
+ *
+ * On successful return, >= 0, irq is disabled and the caller is
+ * responsible for releasing it using local_irq_restore(*@flags).
+ *
+ * This function is safe to call from any context including IRQ handler.
+ */
+static int try_to_grab_pending(struct work_struct *work, bool is_dwork,
+			       unsigned long *flags)
+{
+	struct worker_pool *pool;
+	struct pool_workqueue *pwq;
+
+	local_irq_save(*flags);
+
+	/* try to steal the timer if it exists */
+	if (is_dwork) {
+		struct delayed_work *dwork = to_delayed_work(work);
+
+		/*
+		 * dwork->timer is irqsafe.  If del_timer() fails, it's
+		 * guaranteed that the timer is not queued anywhere and not
+		 * running on the local CPU.
+		 */
+		if (likely(del_timer(&dwork->timer)))
+			return 1;
+	}
+
+	/* try to claim PENDING the normal way */
+	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work)))
+		return 0;
+
+	rcu_read_lock();
+	/*
+	 * The queueing is in progress, or it is already queued. Try to
+	 * steal it from ->worklist without clearing WORK_STRUCT_PENDING.
+	 */
+	pool = get_work_pool(work);
+	if (!pool)
+		goto fail;
+
+	raw_spin_lock(&pool->lock);
+	/*
+	 * work->data is guaranteed to point to pwq only while the work
+	 * item is queued on pwq->wq, and both updating work->data to point
+	 * to pwq on queueing and to pool on dequeueing are done under
+	 * pwq->pool->lock.  This in turn guarantees that, if work->data
+	 * points to pwq which is associated with a locked pool, the work
+	 * item is currently queued on that pool.
+	 */
+	pwq = get_work_pwq(work);
+	if (pwq && pwq->pool == pool) {
+		debug_work_deactivate(work);
+
+		/*
+		 * A delayed work item cannot be grabbed directly because
+		 * it might have linked NO_COLOR work items which, if left
+		 * on the delayed_list, will confuse pwq->nr_active
+		 * management later on and cause stall.  Make sure the work
+		 * item is activated before grabbing.
+		 */
+		if (*work_data_bits(work) & WORK_STRUCT_DELAYED)
+			pwq_activate_delayed_work(work);
+
+		list_del_init(&work->entry);
+		pwq_dec_nr_in_flight(pwq, get_work_color(work));
+
+		/* work->data points to pwq iff queued, point to pool */
+		set_work_pool_and_keep_pending(work, pool->id);
+
+		raw_spin_unlock(&pool->lock);
+		rcu_read_unlock();
+		return 1;
+	}
+	raw_spin_unlock(&pool->lock);
+fail:
+	rcu_read_unlock();
+	local_irq_restore(*flags);
+	if (work_is_canceling(work))
+		return -ENOENT;
+	cpu_relax();
+	return -EAGAIN;
+}
 
 /**
  * insert_work - insert a work into a pool
@@ -1679,44 +1679,44 @@ bool queue_delayed_work_on(int cpu, struct workqueue_struct *wq,
 	return ret;
 }
 
-///**
-// * mod_delayed_work_on - modify delay of or queue a delayed work on specific CPU
-// * @cpu: CPU number to execute work on
-// * @wq: workqueue to use
-// * @dwork: work to queue
-// * @delay: number of jiffies to wait before queueing
-// *
-// * If @dwork is idle, equivalent to queue_delayed_work_on(); otherwise,
-// * modify @dwork's timer so that it expires after @delay.  If @delay is
-// * zero, @work is guaranteed to be scheduled immediately regardless of its
-// * current state.
-// *
-// * Return: %false if @dwork was idle and queued, %true if @dwork was
-// * pending and its timer was modified.
-// *
-// * This function is safe to call from any context including IRQ handler.
-// * See try_to_grab_pending() for details.
-// */
-//bool mod_delayed_work_on(int cpu, struct workqueue_struct *wq,
-//			 struct delayed_work *dwork, unsigned long delay)
-//{
-//	unsigned long flags;
-//	int ret;
-//
-//	do {
-//		ret = try_to_grab_pending(&dwork->work, true, &flags);
-//	} while (unlikely(ret == -EAGAIN));
-//
-//	if (likely(ret >= 0)) {
-//		__queue_delayed_work(cpu, wq, dwork, delay);
-//		local_irq_restore(flags);
-//	}
-//
-//	/* -ENOENT from try_to_grab_pending() becomes %true */
-//	return ret;
-//}
-//EXPORT_SYMBOL_GPL(mod_delayed_work_on);
-//
+/**
+ * mod_delayed_work_on - modify delay of or queue a delayed work on specific CPU
+ * @cpu: CPU number to execute work on
+ * @wq: workqueue to use
+ * @dwork: work to queue
+ * @delay: number of jiffies to wait before queueing
+ *
+ * If @dwork is idle, equivalent to queue_delayed_work_on(); otherwise,
+ * modify @dwork's timer so that it expires after @delay.  If @delay is
+ * zero, @work is guaranteed to be scheduled immediately regardless of its
+ * current state.
+ *
+ * Return: %false if @dwork was idle and queued, %true if @dwork was
+ * pending and its timer was modified.
+ *
+ * This function is safe to call from any context including IRQ handler.
+ * See try_to_grab_pending() for details.
+ */
+bool mod_delayed_work_on(int cpu, struct workqueue_struct *wq,
+			 struct delayed_work *dwork, unsigned long delay)
+{
+	unsigned long flags;
+	int ret;
+
+	do {
+		ret = try_to_grab_pending(&dwork->work, true, &flags);
+	} while (unlikely(ret == -EAGAIN));
+
+	if (likely(ret >= 0)) {
+		__queue_delayed_work(cpu, wq, dwork, delay);
+		local_irq_restore(flags);
+	}
+
+	/* -ENOENT from try_to_grab_pending() becomes %true */
+	return ret;
+}
+EXPORT_SYMBOL_GPL(mod_delayed_work_on);
+
 //static void rcu_work_rcufn(struct rcu_head *rcu)
 //{
 //	struct rcu_work *rwork = container_of(rcu, struct rcu_work, rcu);

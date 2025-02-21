@@ -171,39 +171,38 @@ void _local_bh_enable(void)
 }
 EXPORT_SYMBOL(_local_bh_enable);
 
-//void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
-//{
-//	WARN_ON_ONCE(in_irq());
-//	lockdep_assert_irqs_enabled();
+void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
+{
+	WARN_ON_ONCE(in_irq());
+	lockdep_assert_irqs_enabled();
 #ifdef CONFIG_TRACE_IRQFLAGS
-//	local_irq_disable();
+	local_irq_disable();
 #endif
-//	/*
-//	 * Are softirqs going to be turned on now:
-//	 */
-//	if (softirq_count() == SOFTIRQ_DISABLE_OFFSET)
-//		lockdep_softirqs_on(ip);
-//	/*
-//	 * Keep preemption disabled until we are done with
-//	 * softirq processing:
-//	 */
-//	preempt_count_sub(cnt - 1);
-//
-//	if (unlikely(!in_interrupt() && local_softirq_pending())) {
-//		/*
-//		 * Run softirq if any pending. And do it in its own stack
-//		 * as we may be calling this deep in a task call stack already.
-//		 */
-//		do_softirq();
-//	}
-//
-//	preempt_count_dec();
+	/*
+	 * Are softirqs going to be turned on now:
+	 */
+	if (softirq_count() == SOFTIRQ_DISABLE_OFFSET)
+		lockdep_softirqs_on(ip);
+	/*
+	 * Keep preemption disabled until we are done with
+	 * softirq processing:
+	 */
+	preempt_count_sub(cnt - 1);
+
+	if (unlikely(!in_interrupt() && local_softirq_pending())) {
+		/*
+		 * Run softirq if any pending. And do it in its own stack
+		 * as we may be calling this deep in a task call stack already.
+		 */
+		do_softirq();
+	}
+
+	preempt_count_dec();
 #ifdef CONFIG_TRACE_IRQFLAGS
-//	local_irq_enable();
+	local_irq_enable();
 #endif
-//	preempt_check_resched();
-//}
-//EXPORT_SYMBOL(__local_bh_enable_ip);
+	preempt_check_resched();
+}
 
 /*
  * We restart softirq processing for at most MAX_SOFTIRQ_RESTART times,
@@ -329,23 +328,23 @@ restart:
 	current_restore_flags(old_flags, PF_MEMALLOC);
 }
 
-//asmlinkage __visible void do_softirq(void)
-//{
-//	__u32 pending;
-//	unsigned long flags;
-//
-//	if (in_interrupt())
-//		return;
-//
-//	local_irq_save(flags);
-//
-//	pending = local_softirq_pending();
-//
-//	if (pending && !ksoftirqd_running(pending))
-//		do_softirq_own_stack();
-//
-//	local_irq_restore(flags);
-//}
+asmlinkage __visible void do_softirq(void)
+{
+	__u32 pending;
+	unsigned long flags;
+
+	if (in_interrupt())
+		return;
+
+	local_irq_save(flags);
+
+	pending = local_softirq_pending();
+
+	if (pending && !ksoftirqd_running(pending))
+		do_softirq_own_stack();
+
+	local_irq_restore(flags);
+}
 
 /**
  * irq_enter_rcu - Enter an interrupt context with RCU watching

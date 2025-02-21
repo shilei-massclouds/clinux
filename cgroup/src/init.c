@@ -2,8 +2,9 @@
 
 #include <linux/types.h>
 #include <linux/export.h>
-#include <linux/workqueue.h>
+#include <linux/fs_parser.h>
 #include <linux/cgroup-defs.h>
+#include <linux/kernfs.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -15,7 +16,7 @@ cl_cgroup_init(void)
 }
 EXPORT_SYMBOL(cl_cgroup_init);
 
-void cgroup1_release_agent(struct work_struct *work)
+int call_usermodehelper(const char *path, char **argv, char **envp, int wait)
 {
-    booter_panic("No impl 'cgroup1_release_agent'.");
+    booter_panic("No impl.\n");
 }

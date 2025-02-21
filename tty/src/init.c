@@ -104,10 +104,6 @@ void device_destroy(struct class *class, dev_t devt)
 {
     booter_panic("No impl.\n");
 }
-bool cancel_work_sync(struct work_struct *work)
-{
-    booter_panic("No impl.\n");
-}
 int ldsem_down_read_trylock(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");

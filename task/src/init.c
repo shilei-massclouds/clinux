@@ -148,6 +148,7 @@ struct cgroup_namespace init_cgroup_ns = {
     .ns.inum    = PROC_CGROUP_INIT_INO,
     .root_cset  = &init_css_set,
 };
+EXPORT_SYMBOL(init_cgroup_ns);
 
 /*
  * The default css_set - used by init and its children prior to any

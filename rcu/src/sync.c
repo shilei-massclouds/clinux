@@ -39,6 +39,7 @@ void rcu_sync_enter_start(struct rcu_sync *rsp)
 	rsp->gp_count++;
 	rsp->gp_state = GP_PASSED;
 }
+EXPORT_SYMBOL(rcu_sync_enter_start);
 
 
 static void rcu_sync_func(struct rcu_head *rhp);

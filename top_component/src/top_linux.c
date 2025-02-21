@@ -492,12 +492,6 @@ void __init __weak thread_stack_cache_init(void)
 }
 #endif
 
-int __init cgroup_init(void)
-{
-    pr_warn("================> cgroup_init!\n");;
-    return 0;
-}
-
 void __init __weak poking_init(void) { }
 
 void __init __weak arch_post_acpi_subsys_init(void) { }
@@ -737,6 +731,7 @@ cl_top_linux_init(void)
     sfi_init_late();
     kcsan_init();
 
+    sbi_puts("module[top_linux]: enter rest_init ...\n");
     ///* Do the rest non-__init'ed, we're now alive */
     //arch_call_rest_init();
 

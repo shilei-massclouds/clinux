@@ -26,12 +26,6 @@ int groups_search(const struct group_info *group_info, kgid_t grp)
     booter_panic("No impl!\n");
 }
 
-void *kmemdup(const void *src, size_t len, gfp_t gfp)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(kmemdup);
-
 bool refcount_dec_and_lock(refcount_t *r, spinlock_t *lock)
 {
     booter_panic("No impl!\n");

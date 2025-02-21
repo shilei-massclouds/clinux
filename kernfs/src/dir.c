@@ -608,6 +608,7 @@ struct kernfs_node *kernfs_node_from_dentry(struct dentry *dentry)
 		return kernfs_dentry_node(dentry);
 	return NULL;
 }
+EXPORT_SYMBOL(kernfs_node_from_dentry);
 
 static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
 					     struct kernfs_node *parent,
@@ -743,6 +744,7 @@ err_unlock:
 	spin_unlock(&kernfs_idr_lock);
 	return NULL;
 }
+EXPORT_SYMBOL(kernfs_find_and_get_node_by_id);
 
 /**
  *	kernfs_add_one - add kernfs_node to parent without warning
@@ -932,6 +934,7 @@ struct kernfs_node *kernfs_walk_and_get_ns(struct kernfs_node *parent,
 
 	return kn;
 }
+EXPORT_SYMBOL_GPL(kernfs_walk_and_get_ns);
 
 /**
  * kernfs_create_root - create a new kernfs hierarchy
@@ -1281,6 +1284,7 @@ void kernfs_activate(struct kernfs_node *kn)
 
 	mutex_unlock(&kernfs_mutex);
 }
+EXPORT_SYMBOL_GPL(kernfs_activate);
 
 static void __kernfs_remove(struct kernfs_node *kn)
 {

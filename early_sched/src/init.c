@@ -349,3 +349,28 @@ __weak void remove_wait_queue(struct wait_queue_head *wq_head, struct wait_queue
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(remove_wait_queue);
+
+__weak void init_wait_var_entry(struct wait_bit_queue_entry *wbq_entry, void *var, int flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(init_wait_var_entry);
+
+__weak wait_queue_head_t *__var_waitqueue(void *p)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__var_waitqueue);
+
+__weak void __cgroup_account_cputime_field(struct cgroup *cgrp,
+				    enum cpu_usage_stat index, u64 delta_exec)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__cgroup_account_cputime_field);
+
+__weak void __cgroup_account_cputime(struct cgroup *cgrp, u64 delta_exec)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(__cgroup_account_cputime);

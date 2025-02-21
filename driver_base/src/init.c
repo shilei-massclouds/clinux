@@ -85,10 +85,6 @@ int device_offline(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
 }
-bool refcount_dec_not_one(refcount_t *r)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 int lock_device_hotplug_sysfs(void)
 {
     booter_panic("No impl 'driver_base'.");

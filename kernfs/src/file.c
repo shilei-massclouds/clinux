@@ -843,6 +843,7 @@ __poll_t kernfs_generic_poll(struct kernfs_open_file *of, poll_table *wait)
 
 	return DEFAULT_POLLMASK;
 }
+EXPORT_SYMBOL_GPL(kernfs_generic_poll);
 
 static __poll_t kernfs_fop_poll(struct file *filp, poll_table *wait)
 {

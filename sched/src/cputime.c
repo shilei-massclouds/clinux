@@ -443,6 +443,7 @@ void cputime_adjust(struct task_cputime *curr, struct prev_cputime *prev,
 	*ut = curr->utime;
 	*st = curr->stime;
 }
+EXPORT_SYMBOL_GPL(cputime_adjust);
 
 void task_cputime_adjusted(struct task_struct *p, u64 *ut, u64 *st)
 {
@@ -610,6 +611,7 @@ out:
 	*st = prev->stime;
 	raw_spin_unlock_irqrestore(&prev->lock, flags);
 }
+EXPORT_SYMBOL_GPL(cputime_adjust);
 
 void task_cputime_adjusted(struct task_struct *p, u64 *ut, u64 *st)
 {

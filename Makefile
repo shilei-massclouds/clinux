@@ -50,7 +50,7 @@ components := \
 	cpu task cgroup resource dma \
 	jump_label extable vdso utsname keys ucount \
 	early_sched sched \
-	percpu workqueue_itf workqueue notifier \
+	percpu percpu_refcount workqueue_itf workqueue notifier \
 	memblock bootmem paging rmap backing_dev \
 	page_alloc slub vmalloc mm_util vmscan \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \

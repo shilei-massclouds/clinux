@@ -256,6 +256,7 @@ struct inode *kernfs_get_inode(struct super_block *sb, struct kernfs_node *kn)
 
 	return inode;
 }
+EXPORT_SYMBOL_GPL(kernfs_get_inode);
 
 /*
  * The kernfs_node serves as both an inode and a directory entry for

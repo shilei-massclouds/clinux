@@ -149,7 +149,6 @@ wait_queue_head_t *__var_waitqueue(void *p)
 {
 	return bit_wait_table + hash_ptr(p, WAIT_TABLE_BITS);
 }
-EXPORT_SYMBOL(__var_waitqueue);
 
 static int
 var_wake_function(struct wait_queue_entry *wq_entry, unsigned int mode,
@@ -181,7 +180,6 @@ void init_wait_var_entry(struct wait_bit_queue_entry *wbq_entry, void *var, int 
 		},
 	};
 }
-EXPORT_SYMBOL(init_wait_var_entry);
 
 void wake_up_var(void *var)
 {
