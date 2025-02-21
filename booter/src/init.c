@@ -816,3 +816,9 @@ __weak u64 hashlen_string(const void *salt, const char *name)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(hashlen_string);
+
+void __put_net(struct net *net)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(__put_net);

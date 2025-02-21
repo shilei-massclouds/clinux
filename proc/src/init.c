@@ -19,7 +19,6 @@ DEFINE_ENABLE_FUNC(proc);
 
 const struct file_operations proc_fd_operations;
 const struct file_operations proc_pid_smaps_rollup_operations;
-const struct file_operations proc_net_operations;
 const struct file_operations proc_clear_refs_operations;
 const struct file_operations proc_tid_children_operations;
 const struct file_operations proc_fd_inode_operations;
@@ -28,7 +27,6 @@ const struct file_operations proc_fdinfo_inode_operations;
 const struct file_operations proc_fdinfo_operations;
 const struct file_operations proc_ns_dir_operations;
 const struct file_operations proc_mounts_operations;
-const struct file_operations proc_net_inode_operations;
 const struct file_operations proc_pid_maps_operations;
 const struct file_operations proc_pagemap_operations;
 const struct file_operations proc_mountinfo_operations;
