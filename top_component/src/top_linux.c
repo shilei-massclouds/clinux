@@ -54,7 +54,7 @@
 #define MAX_INIT_ENVS CONFIG_INIT_ENV_ARG_LIMIT
 
 /* Untouched saved command line (eg. for /proc) */
-char *saved_command_line;
+extern char *saved_command_line;
 
 /* Command line for parameter parsing */
 static char *static_command_line;

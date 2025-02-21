@@ -19,3 +19,4 @@ int proc_dostring(struct ctl_table *table, int write,
 {
     booter_panic("No impl in 'lib'.");
 }
+EXPORT_SYMBOL(proc_dostring);

@@ -272,3 +272,7 @@ EXPORT_SYMBOL(current_umask);
 
 int print_fatal_signals __read_mostly;
 EXPORT_SYMBOL(print_fatal_signals);
+
+/* Untouched saved command line (eg. for /proc) */
+char *saved_command_line;
+EXPORT_SYMBOL(saved_command_line);

@@ -116,10 +116,6 @@ void ldsem_up_read(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");
 }
-struct ctl_table_header *register_sysctl_table(struct ctl_table *table)
-{
-    booter_panic("No impl.\n");
-}
 int __init vty_init(const struct file_operations *console_fops)
 {
     booter_panic("No impl.\n");

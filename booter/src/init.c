@@ -828,3 +828,48 @@ __weak void proc_tty_unregister_driver(struct tty_driver *driver)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(proc_tty_unregister_driver);
+
+__weak struct ctl_table_header *register_sysctl(const char *path, struct ctl_table *table)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(register_sysctl);
+
+__weak void setup_sysctl_set(struct ctl_table_set *set,
+	struct ctl_table_root *root,
+	int (*is_seen)(struct ctl_table_set *))
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(setup_sysctl_set);
+
+__weak void retire_sysctl_set(struct ctl_table_set *set)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(retire_sysctl_set);
+
+__weak void unregister_sysctl_table(struct ctl_table_header * header)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(unregister_sysctl_table);
+
+__weak struct ctl_table_header *__register_sysctl_table(
+	struct ctl_table_set *set,
+	const char *path, struct ctl_table *table)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(__register_sysctl_table);
+
+// From fs/proc/proc_sysctl.c
+/* shared constants to be used in various sysctls */
+const int sysctl_vals[] = { 0, 1, INT_MAX };
+EXPORT_SYMBOL(sysctl_vals);
+
+__weak struct ctl_table_header *register_sysctl_table(struct ctl_table *table)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(register_sysctl_table);

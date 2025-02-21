@@ -13,8 +13,3 @@ cl_ucount_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_ucount_init);
-
-// From fs/proc/proc_sysctl.c
-/* shared constants to be used in various sysctls */
-const int sysctl_vals[] = { 0, 1, INT_MAX };
-EXPORT_SYMBOL(sysctl_vals);

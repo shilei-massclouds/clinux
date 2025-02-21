@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/fs.h>
+#include <linux/jump_label.h>
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
@@ -33,3 +34,6 @@ const struct file_operations proc_mountinfo_operations;
 const struct file_operations proc_mountstats_operations;
 const struct file_operations proc_pid_smaps_operations;
 
+// From kernel/bpf/cgroup.c
+DEFINE_STATIC_KEY_FALSE(cgroup_bpf_enabled_key);
+EXPORT_SYMBOL(cgroup_bpf_enabled_key);
