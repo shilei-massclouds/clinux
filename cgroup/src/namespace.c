@@ -89,6 +89,7 @@ struct cgroup_namespace *copy_cgroup_ns(unsigned long flags,
 
 	return new_ns;
 }
+EXPORT_SYMBOL(copy_cgroup_ns);
 
 static inline struct cgroup_namespace *to_cg_ns(struct ns_common *ns)
 {

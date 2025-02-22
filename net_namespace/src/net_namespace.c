@@ -496,6 +496,7 @@ dec_ucounts:
 	}
 	return net;
 }
+EXPORT_SYMBOL(copy_net_ns);
 
 /**
  * net_ns_get_ownership - get sysfs ownership data for @net

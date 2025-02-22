@@ -102,6 +102,7 @@ struct uts_namespace *copy_utsname(unsigned long flags,
 	put_uts_ns(old_ns);
 	return new_ns;
 }
+EXPORT_SYMBOL(copy_utsname);
 
 void free_uts_ns(struct kref *kref)
 {

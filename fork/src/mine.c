@@ -3,7 +3,6 @@
 
 CL_MINE(anon_inode_getfile)
 CL_MINE(anon_vma_fork)
-CL_MINE(copy_namespaces)
 CL_MINE(copy_page_range)
 CL_MINE(copy_thread)
 CL_MINE(current_is_single_threaded)
