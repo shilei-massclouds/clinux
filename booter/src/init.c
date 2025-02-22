@@ -1136,3 +1136,15 @@ __weak int lookup_symbol_name(unsigned long addr, char *symname)
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(lookup_symbol_name);
+
+__weak notrace void touch_softlockup_watchdog(void)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(touch_softlockup_watchdog);
+
+__weak notrace void touch_softlockup_watchdog_sched(void)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(touch_softlockup_watchdog_sched);

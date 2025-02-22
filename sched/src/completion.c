@@ -325,4 +325,3 @@ bool completion_done(struct completion *x)
 	raw_spin_unlock_irqrestore(&x->wait.lock, flags);
 	return true;
 }
-EXPORT_SYMBOL(completion_done);

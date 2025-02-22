@@ -54,7 +54,7 @@ components := \
 	memblock bootmem paging rmap backing_dev riscv_mm_context \
 	page_alloc slub vmalloc mm_util vmscan \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
-	ipc_sem \
+	ipc_sem watchdog \
 	inode dcache file_table do_mounts file \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs \

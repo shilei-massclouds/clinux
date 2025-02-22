@@ -5803,6 +5803,7 @@ notrace void wq_watchdog_touch(int cpu)
 	else
 		wq_watchdog_touched = jiffies;
 }
+EXPORT_SYMBOL(wq_watchdog_touch);
 
 static void wq_watchdog_set_thresh(unsigned long thresh)
 {

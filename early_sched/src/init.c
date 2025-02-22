@@ -116,11 +116,13 @@ void __weak __init_swait_queue_head(struct swait_queue_head *q, const char *name
 }
 EXPORT_SYMBOL(__init_swait_queue_head);
 
+/*
 notrace void touch_softlockup_watchdog(void)
 {
     booter_panic("No impl 'touch_softlockup_watchdog'.");
 }
 EXPORT_SYMBOL(touch_softlockup_watchdog);
+*/
 
 void __weak complete(struct completion *x)
 {
@@ -429,3 +431,9 @@ __weak void wake_up_new_task(struct task_struct *p)
     booter_panic("No impl 'rwsem'.");
 }
 EXPORT_SYMBOL(wake_up_new_task);
+
+__weak bool completion_done(struct completion *x)
+{
+    booter_panic("No impl 'rwsem'.");
+}
+EXPORT_SYMBOL(completion_done);

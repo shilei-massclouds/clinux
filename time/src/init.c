@@ -138,10 +138,12 @@ void timerfd_clock_was_set(void)
 {
     booter_panic("No impl in 'time'.");
 }
+/*
 void touch_softlockup_watchdog_sched(void)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 
 void __weak thread_group_cputime(struct task_struct *tsk, struct task_cputime *times)
 {

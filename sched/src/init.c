@@ -38,11 +38,6 @@ void __init generic_sched_clock_init(void)
 }
 */
 
-void touch_all_softlockup_watchdogs(void)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 struct dentry *debugfs_create_bool(const char *name, umode_t mode,
                    struct dentry *parent, bool *value)
 {
