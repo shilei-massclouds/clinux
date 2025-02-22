@@ -445,6 +445,7 @@ void init_irq_proc(void)
 	for_each_irq_desc(irq, desc)
 		register_irq_proc(irq, desc);
 }
+EXPORT_SYMBOL(init_irq_proc);
 
 #ifdef CONFIG_GENERIC_IRQ_SHOW
 

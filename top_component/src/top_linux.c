@@ -70,6 +70,18 @@ extern initcall_entry_t __initcall6_start[];
 extern initcall_entry_t __initcall7_start[];
 extern initcall_entry_t __initcall_end[];
 
+static initcall_entry_t *initcall_levels[] __initdata = {
+    __initcall0_start,
+    __initcall1_start,
+    __initcall2_start,
+    __initcall3_start,
+    __initcall4_start,
+    __initcall5_start,
+    __initcall6_start,
+    __initcall7_start,
+    __initcall_end,
+};
+
 /* Untouched saved command line (eg. for /proc) */
 extern char *saved_command_line;
 
@@ -580,6 +592,59 @@ static bool __init_or_module initcall_blacklisted(initcall_t fn)
 }
 #endif
 
+static __init_or_module void
+trace_initcall_start_cb(void *data, initcall_t fn)
+{
+    ktime_t *calltime = (ktime_t *)data;
+
+    printk(KERN_DEBUG "calling  %pS @ %i\n", fn, task_pid_nr(current));
+    *calltime = ktime_get();
+}
+
+static __init_or_module void
+trace_initcall_finish_cb(void *data, initcall_t fn, int ret)
+{
+    ktime_t *calltime = (ktime_t *)data;
+    ktime_t delta, rettime;
+    unsigned long long duration;
+
+    rettime = ktime_get();
+    delta = ktime_sub(rettime, *calltime);
+    duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+    printk(KERN_DEBUG "initcall %pS returned %d after %lld usecs\n",
+         fn, ret, duration);
+}
+
+static ktime_t initcall_calltime;
+
+#ifdef TRACEPOINTS_ENABLED
+static void __init initcall_debug_enable(void)
+{
+    int ret;
+
+    ret = register_trace_initcall_start(trace_initcall_start_cb,
+                        &initcall_calltime);
+    ret |= register_trace_initcall_finish(trace_initcall_finish_cb,
+                          &initcall_calltime);
+    WARN(ret, "Failed to register initcall tracepoints\n");
+}
+# define do_trace_initcall_start    trace_initcall_start
+# define do_trace_initcall_finish   trace_initcall_finish
+#else
+static inline void do_trace_initcall_start(initcall_t fn)
+{
+    if (!initcall_debug)
+        return;
+    trace_initcall_start_cb(&initcall_calltime, fn);
+}
+static inline void do_trace_initcall_finish(initcall_t fn, int ret)
+{
+    if (!initcall_debug)
+        return;
+    trace_initcall_finish_cb(&initcall_calltime, fn, ret);
+}
+#endif /* !TRACEPOINTS_ENABLED */
+
 int __init_or_module do_one_initcall(initcall_t fn)
 {
     int count = preempt_count();
@@ -590,23 +655,23 @@ int __init_or_module do_one_initcall(initcall_t fn)
     if (initcall_blacklisted(fn))
         return -EPERM;
 
-//    do_trace_initcall_start(fn);
-//    ret = fn();
-//    do_trace_initcall_finish(fn, ret);
-//
-//    msgbuf[0] = 0;
-//
-//    if (preempt_count() != count) {
-//        sprintf(msgbuf, "preemption imbalance ");
-//        preempt_count_set(count);
-//    }
-//    if (irqs_disabled()) {
-//        strlcat(msgbuf, "disabled interrupts ", sizeof(msgbuf));
-//        local_irq_enable();
-//    }
-//    WARN(msgbuf[0], "initcall %pS returned with %s\n", fn, msgbuf);
-//
-//    add_latent_entropy();
+    do_trace_initcall_start(fn);
+    ret = fn();
+    do_trace_initcall_finish(fn, ret);
+
+    msgbuf[0] = 0;
+
+    if (preempt_count() != count) {
+        sprintf(msgbuf, "preemption imbalance ");
+        preempt_count_set(count);
+    }
+    if (irqs_disabled()) {
+        strlcat(msgbuf, "disabled interrupts ", sizeof(msgbuf));
+        local_irq_enable();
+    }
+    WARN(msgbuf[0], "initcall %pS returned with %s\n", fn, msgbuf);
+
+    add_latent_entropy();
     printk("%s: ================ stepn\n", __func__);
     return ret;
 }
@@ -743,6 +808,24 @@ void __init __weak arch_call_rest_init(void)
     rest_init();
 }
 
+/* Keep these in sync with initcalls in include/linux/init.h */
+static const char *initcall_level_names[] __initdata = {
+    "pure",
+    "core",
+    "postcore",
+    "arch",
+    "subsys",
+    "fs",
+    "device",
+    "late",
+};
+
+static int __init ignore_unknown_bootoption(char *param, char *val,
+                   const char *unused, void *arg)
+{
+    return 0;
+}
+
 static void __init do_pre_smp_initcalls(void)
 {
     initcall_entry_t *fn;
@@ -750,6 +833,75 @@ static void __init do_pre_smp_initcalls(void)
     trace_initcall_level("early");
     for (fn = __initcall_start; fn < __initcall0_start; fn++)
         do_one_initcall(initcall_from_entry(fn));
+}
+
+/* Call all constructor functions linked into the kernel. */
+static void __init do_ctors(void)
+{
+#ifdef CONFIG_CONSTRUCTORS
+    ctor_fn_t *fn = (ctor_fn_t *) __ctors_start;
+
+    for (; fn < (ctor_fn_t *) __ctors_end; fn++)
+        (*fn)();
+#endif
+}
+
+static void __init do_initcall_level(int level, char *command_line)
+{
+    initcall_entry_t *fn;
+
+    parse_args(initcall_level_names[level],
+           command_line, __start___param,
+           __stop___param - __start___param,
+           level, level,
+           NULL, ignore_unknown_bootoption);
+
+    trace_initcall_level(initcall_level_names[level]);
+    for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
+        do_one_initcall(initcall_from_entry(fn));
+}
+
+static void __init do_initcalls(void)
+{
+    int level;
+    size_t len = strlen(saved_command_line) + 1;
+    char *command_line;
+
+    command_line = kzalloc(len, GFP_KERNEL);
+    if (!command_line)
+        panic("%s: Failed to allocate %zu bytes\n", __func__, len);
+
+    for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++) {
+        /* Parser modifies command_line, restore it each time */
+        strcpy(command_line, saved_command_line);
+        do_initcall_level(level, command_line);
+    }
+
+    kfree(command_line);
+}
+
+void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
+{
+    pr_warn("===================== %s\n", __func__);
+}
+
+/*
+ * Ok, the machine is now initialized. None of the devices
+ * have been touched yet, but the CPU subsystem is up and
+ * running, and memory and process management works.
+ *
+ * Now we can finally start doing some real work..
+ */
+static void __init do_basic_setup(void)
+{
+    printk("%s: ==========\n", __func__);
+    //cpuset_init_smp();
+    //driver_init();
+    //init_irq_proc();
+    //do_ctors();
+    //usermodehelper_enable();
+    //do_initcalls();
+    printk("%s: ==========\n", __func__);
 }
 
 static noinline void __init kernel_init_freeable(void)
@@ -782,15 +934,14 @@ static noinline void __init kernel_init_freeable(void)
     sched_init_smp();
 
     padata_init();
-    printk("%s: ============ 1 \n", __func__);
     page_alloc_init_late();
-    printk("%s: ============ 2 \n", __func__);
     /* Initialize page ext after all struct pages are initialized. */
     page_ext_init();
+
+    printk("%s: ============ 1 \n", __func__);
+    do_basic_setup();
+
     printk("%s: ============ 3 \n", __func__);
-//
-//    do_basic_setup();
-//
 //    console_on_rootfs();
 //
 //    /*

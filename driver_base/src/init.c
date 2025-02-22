@@ -4,6 +4,11 @@
 #include <linux/export.h>
 #include <linux/device.h>
 #include <linux/fwnode.h>
+#include <linux/init.h>
+#include <linux/memory.h>
+#include <linux/of.h>
+
+#include "base.h"
 #include "../../booter/src/booter.h"
 
 int
@@ -14,6 +19,35 @@ cl_driver_base_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_driver_base_init);
+
+/**
+ * driver_init - initialize driver model.
+ *
+ * Call the driver model init functions to initialize their
+ * subsystems. Called early from init/main.c.
+ */
+void __init driver_init(void)
+{
+    printk("%s: ==========\n", __func__);
+    ///* These are the core pieces */
+    //devtmpfs_init();
+    //devices_init();
+    //buses_init();
+    //classes_init();
+    //firmware_init();
+    //hypervisor_init();
+
+    ///* These are also core pieces, but must come after the
+    // * core core pieces.
+    // */
+    //of_core_init();
+    //platform_bus_init();
+    //cpu_dev_init();
+    //memory_dev_init();
+    //container_dev_init();
+    printk("%s: ==========\n", __func__);
+}
+EXPORT_SYMBOL(driver_init);
 
 struct device_type part_type;
 
