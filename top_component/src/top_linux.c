@@ -774,14 +774,15 @@ static noinline void __init kernel_init_freeable(void)
 
     init_mm_internals();
 
-    printk("%s: ============ 2 \n", __func__);
     do_pre_smp_initcalls();
     lockup_detector_init();
 
     printk("%s: ============ 1 \n", __func__);
-//    smp_init();
-//    sched_init_smp();
-//
+    smp_init();
+    printk("%s: ============ 2 \n", __func__);
+    sched_init_smp();
+
+    printk("%s: ============ 3 \n", __func__);
 //    padata_init();
 //    page_alloc_init_late();
 //    /* Initialize page ext after all struct pages are initialized. */

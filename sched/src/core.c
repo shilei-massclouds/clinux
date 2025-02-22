@@ -640,8 +640,8 @@ void resched_curr(struct rq *rq)
 //	raw_spin_unlock_irqrestore(&rq->lock, flags);
 //}
 //
-//#ifdef CONFIG_SMP
-//#ifdef CONFIG_NO_HZ_COMMON
+#ifdef CONFIG_SMP
+#ifdef CONFIG_NO_HZ_COMMON
 ///*
 // * In the semi idle case, use the nearest busy CPU for migrating timers
 // * from an idle CPU.  This is good for power-savings.
@@ -756,9 +756,9 @@ void resched_curr(struct rq *rq)
 //	}
 //}
 //
-//#endif /* CONFIG_NO_HZ_COMMON */
+#endif /* CONFIG_NO_HZ_COMMON */
 //
-//#ifdef CONFIG_NO_HZ_FULL
+#ifdef CONFIG_NO_HZ_FULL
 //bool sched_can_stop_tick(struct rq *rq)
 //{
 //	int fifo_nr_running;
@@ -796,8 +796,8 @@ void resched_curr(struct rq *rq)
 //
 //	return true;
 //}
-//#endif /* CONFIG_NO_HZ_FULL */
-//#endif /* CONFIG_SMP */
+#endif /* CONFIG_NO_HZ_FULL */
+#endif /* CONFIG_SMP */
 
 #if defined(CONFIG_RT_GROUP_SCHED) || (defined(CONFIG_FAIR_GROUP_SCHED) && \
 			(defined(CONFIG_SMP) || defined(CONFIG_CFS_BANDWIDTH)))
@@ -6572,7 +6572,7 @@ void init_idle(struct task_struct *idle, int cpu)
 #endif
 }
 
-//#ifdef CONFIG_SMP
+#ifdef CONFIG_SMP
 //
 //int cpuset_cpumask_can_shrink(const struct cpumask *cur,
 //			      const struct cpumask *trial)
@@ -6989,31 +6989,31 @@ void init_idle(struct task_struct *idle, int cpu)
 //	return 0;
 //}
 //#endif
-//
-//void __init sched_init_smp(void)
-//{
-//	sched_init_numa();
-//
-//	/*
-//	 * There's no userspace yet to cause hotplug operations; hence all the
-//	 * CPU masks are stable and all blatant races in the below code cannot
-//	 * happen.
-//	 */
-//	mutex_lock(&sched_domains_mutex);
-//	sched_init_domains(cpu_active_mask);
-//	mutex_unlock(&sched_domains_mutex);
-//
-//	/* Move init over to a non-isolated CPU */
-//	if (set_cpus_allowed_ptr(current, housekeeping_cpumask(HK_FLAG_DOMAIN)) < 0)
-//		BUG();
-//	sched_init_granularity();
-//
-//	init_sched_rt_class();
-//	init_sched_dl_class();
-//
-//	sched_smp_initialized = true;
-//}
-//
+
+void __init sched_init_smp(void)
+{
+	sched_init_numa();
+
+	/*
+	 * There's no userspace yet to cause hotplug operations; hence all the
+	 * CPU masks are stable and all blatant races in the below code cannot
+	 * happen.
+	 */
+	mutex_lock(&sched_domains_mutex);
+	sched_init_domains(cpu_active_mask);
+	mutex_unlock(&sched_domains_mutex);
+
+	/* Move init over to a non-isolated CPU */
+	if (set_cpus_allowed_ptr(current, housekeeping_cpumask(HK_FLAG_DOMAIN)) < 0)
+		BUG();
+	sched_init_granularity();
+
+	init_sched_rt_class();
+	init_sched_dl_class();
+
+	sched_smp_initialized = true;
+}
+
 //static int __init migration_init(void)
 //{
 //	sched_cpu_starting(smp_processor_id());
@@ -7021,12 +7021,13 @@ void init_idle(struct task_struct *idle, int cpu)
 //}
 //early_initcall(migration_init);
 //
-//#else
-//void __init sched_init_smp(void)
-//{
-//	sched_init_granularity();
-//}
-//#endif /* CONFIG_SMP */
+#else
+void __init sched_init_smp(void)
+{
+	sched_init_granularity();
+}
+EXPORT_SYMBOL(sched_init_smp);
+#endif /* CONFIG_SMP */
 //
 //int in_sched_functions(unsigned long addr)
 //{
