@@ -156,8 +156,3 @@ const struct file_operations pidfd_fops = {
 #endif
 };
 EXPORT_SYMBOL(pidfd_fops);
-
-bool thread_group_exited(struct pid *pid)
-{
-    booter_panic("No impl.\n");
-}

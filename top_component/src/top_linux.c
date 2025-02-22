@@ -574,6 +574,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(proc);
     REQUIRE_COMPONENT(namei);
     REQUIRE_COMPONENT(kthread);
+    REQUIRE_COMPONENT(exit);
 
     //
     // start_kernel (init/main.c)

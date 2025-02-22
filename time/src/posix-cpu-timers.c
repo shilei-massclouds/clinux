@@ -488,10 +488,13 @@ void posix_cpu_timers_exit(struct task_struct *tsk)
 {
 	cleanup_timers(&tsk->posix_cputimers);
 }
+EXPORT_SYMBOL(posix_cpu_timers_exit);
+
 void posix_cpu_timers_exit_group(struct task_struct *tsk)
 {
 	cleanup_timers(&tsk->signal->posix_cputimers);
 }
+EXPORT_SYMBOL(posix_cpu_timers_exit_group);
 
 /*
  * Insert the timer on the appropriate list before any timers that

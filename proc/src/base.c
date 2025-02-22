@@ -3318,6 +3318,7 @@ void proc_flush_pid(struct pid *pid)
 {
 	proc_invalidate_siblings_dcache(&pid->inodes, &pid->lock);
 }
+EXPORT_SYMBOL(proc_flush_pid);
 
 static struct dentry *proc_pid_instantiate(struct dentry * dentry,
 				   struct task_struct *task, const void *ptr)

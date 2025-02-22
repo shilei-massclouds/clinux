@@ -361,6 +361,7 @@ void detach_pid(struct task_struct *task, enum pid_type type)
 {
 	__change_pid(task, type, NULL);
 }
+EXPORT_SYMBOL(detach_pid);
 
 void change_pid(struct task_struct *task, enum pid_type type,
 		struct pid *pid)

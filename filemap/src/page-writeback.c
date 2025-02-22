@@ -1860,6 +1860,7 @@ static DEFINE_PER_CPU(int, bdp_ratelimits);
  * count and eventually get throttled.
  */
 DEFINE_PER_CPU(int, dirty_throttle_leaks) = 0;
+EXPORT_SYMBOL(dirty_throttle_leaks);
 
 /**
  * balance_dirty_pages_ratelimited - balance dirty memory state

@@ -122,6 +122,7 @@
  */
 unsigned long total_forks;	/* Handle normal Linux uptimes. */
 int nr_threads;			/* The idle threads do not count.. */
+EXPORT_SYMBOL(nr_threads);
 
 static int max_threads;		/* tunable limit on nr_threads */
 
@@ -135,6 +136,7 @@ static const char * const resident_page_types[] = {
 };
 
 DEFINE_PER_CPU(unsigned long, process_counts) = 0;
+EXPORT_SYMBOL(process_counts);
 
 //__cacheline_aligned DEFINE_RWLOCK(tasklist_lock);  /* outer */
 
@@ -1309,6 +1311,7 @@ void exit_mm_release(struct task_struct *tsk, struct mm_struct *mm)
 	futex_exit_release(tsk);
 	mm_release(tsk, mm);
 }
+EXPORT_SYMBOL(exit_mm_release);
 
 void exec_mm_release(struct task_struct *tsk, struct mm_struct *mm)
 {
@@ -1519,6 +1522,7 @@ void __cleanup_sighand(struct sighand_struct *sighand)
 		kmem_cache_free(sighand_cachep, sighand);
 	}
 }
+EXPORT_SYMBOL(__cleanup_sighand);
 
 /*
  * Initialize POSIX timer handling for a thread group.

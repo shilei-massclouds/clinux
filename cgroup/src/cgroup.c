@@ -6208,6 +6208,7 @@ void cgroup_exit(struct task_struct *tsk)
 		ss->exit(tsk);
 	} while_each_subsys_mask();
 }
+EXPORT_SYMBOL(cgroup_exit);
 
 void cgroup_release(struct task_struct *task)
 {
@@ -6223,6 +6224,7 @@ void cgroup_release(struct task_struct *task)
 	list_del_init(&task->cg_list);
 	spin_unlock_irq(&css_set_lock);
 }
+EXPORT_SYMBOL(cgroup_release);
 
 void cgroup_free(struct task_struct *task)
 {

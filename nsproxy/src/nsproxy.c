@@ -193,25 +193,25 @@ int copy_namespaces(unsigned long flags, struct task_struct *tsk)
 }
 EXPORT_SYMBOL(copy_namespaces);
 
-//void free_nsproxy(struct nsproxy *ns)
-//{
-//	if (ns->mnt_ns)
-//		put_mnt_ns(ns->mnt_ns);
-//	if (ns->uts_ns)
-//		put_uts_ns(ns->uts_ns);
-//	if (ns->ipc_ns)
-//		put_ipc_ns(ns->ipc_ns);
-//	if (ns->pid_ns_for_children)
-//		put_pid_ns(ns->pid_ns_for_children);
-//	if (ns->time_ns)
-//		put_time_ns(ns->time_ns);
-//	if (ns->time_ns_for_children)
-//		put_time_ns(ns->time_ns_for_children);
-//	put_cgroup_ns(ns->cgroup_ns);
-//	put_net(ns->net_ns);
-//	kmem_cache_free(nsproxy_cachep, ns);
-//}
-//
+void free_nsproxy(struct nsproxy *ns)
+{
+	if (ns->mnt_ns)
+		put_mnt_ns(ns->mnt_ns);
+	if (ns->uts_ns)
+		put_uts_ns(ns->uts_ns);
+	if (ns->ipc_ns)
+		put_ipc_ns(ns->ipc_ns);
+	if (ns->pid_ns_for_children)
+		put_pid_ns(ns->pid_ns_for_children);
+	if (ns->time_ns)
+		put_time_ns(ns->time_ns);
+	if (ns->time_ns_for_children)
+		put_time_ns(ns->time_ns_for_children);
+	put_cgroup_ns(ns->cgroup_ns);
+	put_net(ns->net_ns);
+	kmem_cache_free(nsproxy_cachep, ns);
+}
+
 ///*
 // * Called from unshare. Unshare all the namespaces part of nsproxy.
 // * On success, returns the new nsproxy.
@@ -241,27 +241,29 @@ EXPORT_SYMBOL(copy_namespaces);
 //out:
 //	return err;
 //}
-//
-//void switch_task_namespaces(struct task_struct *p, struct nsproxy *new)
-//{
-//	struct nsproxy *ns;
-//
-//	might_sleep();
-//
-//	task_lock(p);
-//	ns = p->nsproxy;
-//	p->nsproxy = new;
-//	task_unlock(p);
-//
-//	if (ns && atomic_dec_and_test(&ns->count))
-//		free_nsproxy(ns);
-//}
-//
-//void exit_task_namespaces(struct task_struct *p)
-//{
-//	switch_task_namespaces(p, NULL);
-//}
-//
+
+void switch_task_namespaces(struct task_struct *p, struct nsproxy *new)
+{
+	struct nsproxy *ns;
+
+	might_sleep();
+
+	task_lock(p);
+	ns = p->nsproxy;
+	p->nsproxy = new;
+	task_unlock(p);
+
+	if (ns && atomic_dec_and_test(&ns->count))
+		free_nsproxy(ns);
+}
+EXPORT_SYMBOL(switch_task_namespaces);
+
+void exit_task_namespaces(struct task_struct *p)
+{
+	switch_task_namespaces(p, NULL);
+}
+EXPORT_SYMBOL(exit_task_namespaces);
+
 //static int check_setns_flags(unsigned long flags)
 //{
 //	if (!flags || (flags & ~(CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWIPC |

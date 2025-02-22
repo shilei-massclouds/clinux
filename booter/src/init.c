@@ -389,7 +389,7 @@ __weak void dput(struct dentry *dentry)
 }
 EXPORT_SYMBOL(dput);
 
-int rcuwait_wake_up(struct rcuwait *w)
+__weak int rcuwait_wake_up(struct rcuwait *w)
 {
     booter_panic("No impl in 'booter'.");
 }
@@ -759,7 +759,7 @@ __weak int kill_pgrp(struct pid *pid, int sig, int priv)
 }
 EXPORT_SYMBOL(kill_pgrp);
 
-int is_current_pgrp_orphaned(void)
+__weak int is_current_pgrp_orphaned(void)
 {
     booter_panic("No impl.\n");
 }
@@ -938,7 +938,7 @@ int cap_vm_enough_memory(struct mm_struct *mm, long pages)
 }
 EXPORT_SYMBOL(cap_vm_enough_memory);
 
-void __noreturn do_exit(long code)
+__weak void __noreturn do_exit(long code)
 {
     booter_panic("No impl!\n");
     do {} while(1);
@@ -1032,3 +1032,45 @@ int filp_close(struct file *filp, fl_owner_t id)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(filp_close);
+
+void exit_io_context(struct task_struct *task)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(exit_io_context);
+
+void exit_shm(struct task_struct *task)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(exit_shm);
+
+__weak void do_group_exit(int exit_code)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(do_group_exit);
+
+__weak void __wake_up_parent(struct task_struct *p, struct task_struct *parent)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(__wake_up_parent);
+
+void task_work_run(void)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(task_work_run);
+
+__weak void put_task_struct_rcu_user(struct task_struct *task)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(put_task_struct_rcu_user);
+
+__weak bool thread_group_exited(struct pid *pid)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(thread_group_exited);

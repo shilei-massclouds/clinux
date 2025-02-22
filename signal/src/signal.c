@@ -465,6 +465,7 @@ void flush_sigqueue(struct sigpending *queue)
 		__sigqueue_free(q);
 	}
 }
+EXPORT_SYMBOL(flush_sigqueue);
 
 /*
  * Flush all pending signals for this kthread.
@@ -1362,6 +1363,7 @@ int zap_other_threads(struct task_struct *p)
 
 	return count;
 }
+EXPORT_SYMBOL(zap_other_threads);
 
 struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
 					   unsigned long *flags)
@@ -1432,6 +1434,7 @@ int __kill_pgrp_info(int sig, struct kernel_siginfo *info, struct pid *pgrp)
 	} while_each_pid_task(pgrp, PIDTYPE_PGID, p);
 	return success ? 0 : retval;
 }
+EXPORT_SYMBOL(__kill_pgrp_info);
 
 int kill_pid_info(int sig, struct kernel_siginfo *info, struct pid *pid)
 {
@@ -1996,6 +1999,7 @@ bool do_notify_parent(struct task_struct *tsk, int sig)
 
 	return autoreap;
 }
+EXPORT_SYMBOL(do_notify_parent);
 
 /**
  * do_notify_parent_cldstop - notify parent of stopped/continued state change
@@ -2875,6 +2879,7 @@ out:
 		read_unlock(&tasklist_lock);
 	}
 }
+EXPORT_SYMBOL(exit_signals);
 
 /*
  * System call entry points.

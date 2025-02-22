@@ -312,6 +312,7 @@ void disassociate_ctty(int on_exit)
 	session_clear_tty(task_session(current));
 	read_unlock(&tasklist_lock);
 }
+EXPORT_SYMBOL(disassociate_ctty);
 
 /*
  *
