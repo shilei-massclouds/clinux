@@ -55,7 +55,7 @@ components := \
 	page_alloc slub vmalloc mm_util vmscan \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
 	ipc_sem \
-	inode dcache file_table do_mounts \
+	inode dcache file_table do_mounts file \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs \
 	fs_context fs_parser fs_struct namei libfs \

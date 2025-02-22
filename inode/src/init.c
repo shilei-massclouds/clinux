@@ -123,10 +123,6 @@ void inode_wait_for_writeback(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
-void __mnt_drop_write(struct vfsmount *mnt)
-{
-    booter_panic("No impl!\n");
-}
 int write_inode_now(struct inode *inode, int sync)
 {
     booter_panic("No impl!\n");

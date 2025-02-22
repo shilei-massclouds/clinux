@@ -329,9 +329,6 @@ static struct kmem_cache *signal_cachep;
 /* SLAB cache for sighand_struct structures (tsk->sighand) */
 struct kmem_cache *sighand_cachep;
 
-/* SLAB cache for files_struct structures (tsk->files) */
-struct kmem_cache *files_cachep;
-
 /* SLAB cache for vm_area_struct structures */
 static struct kmem_cache *vm_area_cachep;
 
@@ -2050,18 +2047,23 @@ static __latent_entropy struct task_struct *copy_process(
 	retval = copy_semundo(clone_flags, p);
 	if (retval)
 		goto bad_fork_cleanup_security;
+    printk("=================== %s 1\n", __func__);
 	retval = copy_files(clone_flags, p);
 	if (retval)
 		goto bad_fork_cleanup_semundo;
+    printk("=================== %s 2\n", __func__);
 	retval = copy_fs(clone_flags, p);
 	if (retval)
 		goto bad_fork_cleanup_files;
+    printk("=================== %s 3\n", __func__);
 	retval = copy_sighand(clone_flags, p);
 	if (retval)
 		goto bad_fork_cleanup_fs;
+    printk("=================== %s 4\n", __func__);
 	retval = copy_signal(clone_flags, p);
 	if (retval)
 		goto bad_fork_cleanup_sighand;
+    printk("=================== %s 5\n", __func__);
 	retval = copy_mm(clone_flags, p);
 	if (retval)
 		goto bad_fork_cleanup_signal;

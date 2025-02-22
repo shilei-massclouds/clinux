@@ -42,22 +42,22 @@ static struct kmem_cache *filp_cachep __read_mostly;
 
 static struct percpu_counter nr_files __cacheline_aligned_in_smp;
 
-//static void file_free_rcu(struct rcu_head *head)
-//{
-//	struct file *f = container_of(head, struct file, f_u.fu_rcuhead);
-//
-//	put_cred(f->f_cred);
-//	kmem_cache_free(filp_cachep, f);
-//}
-//
-//static inline void file_free(struct file *f)
-//{
-//	security_file_free(f);
-//	if (!(f->f_mode & FMODE_NOACCOUNT))
-//		percpu_counter_dec(&nr_files);
-//	call_rcu(&f->f_u.fu_rcuhead, file_free_rcu);
-//}
-//
+static void file_free_rcu(struct rcu_head *head)
+{
+	struct file *f = container_of(head, struct file, f_u.fu_rcuhead);
+
+	put_cred(f->f_cred);
+	kmem_cache_free(filp_cachep, f);
+}
+
+static inline void file_free(struct file *f)
+{
+	security_file_free(f);
+	if (!(f->f_mode & FMODE_NOACCOUNT))
+		percpu_counter_dec(&nr_files);
+	call_rcu(&f->f_u.fu_rcuhead, file_free_rcu);
+}
+
 ///*
 // * Return the total number of open files in the system
 // */
@@ -249,71 +249,71 @@ static struct percpu_counter nr_files __cacheline_aligned_in_smp;
 //	}
 //	return f;
 //}
-//
-///* the real guts of fput() - releasing the last reference to file
-// */
-//static void __fput(struct file *file)
-//{
-//	struct dentry *dentry = file->f_path.dentry;
-//	struct vfsmount *mnt = file->f_path.mnt;
-//	struct inode *inode = file->f_inode;
-//	fmode_t mode = file->f_mode;
-//
-//	if (unlikely(!(file->f_mode & FMODE_OPENED)))
-//		goto out;
-//
-//	might_sleep();
-//
-//	fsnotify_close(file);
-//	/*
-//	 * The function eventpoll_release() should be the first called
-//	 * in the file cleanup chain.
-//	 */
-//	eventpoll_release(file);
-//	locks_remove_file(file);
-//
-//	ima_file_free(file);
-//	if (unlikely(file->f_flags & FASYNC)) {
-//		if (file->f_op->fasync)
-//			file->f_op->fasync(-1, file, 0);
-//	}
-//	if (file->f_op->release)
-//		file->f_op->release(inode, file);
-//	if (unlikely(S_ISCHR(inode->i_mode) && inode->i_cdev != NULL &&
-//		     !(mode & FMODE_PATH))) {
-//		cdev_put(inode->i_cdev);
-//	}
-//	fops_put(file->f_op);
-//	put_pid(file->f_owner.pid);
-//	if ((mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
-//		i_readcount_dec(inode);
-//	if (mode & FMODE_WRITER) {
-//		put_write_access(inode);
-//		__mnt_drop_write(mnt);
-//	}
-//	dput(dentry);
-//	if (unlikely(mode & FMODE_NEED_UNMOUNT))
-//		dissolve_on_fput(mnt);
-//	mntput(mnt);
-//out:
-//	file_free(file);
-//}
-//
-//static LLIST_HEAD(delayed_fput_list);
-//static void delayed_fput(struct work_struct *unused)
-//{
-//	struct llist_node *node = llist_del_all(&delayed_fput_list);
-//	struct file *f, *t;
-//
-//	llist_for_each_entry_safe(f, t, node, f_u.fu_llist)
-//		__fput(f);
-//}
-//
-//static void ____fput(struct callback_head *work)
-//{
-//	__fput(container_of(work, struct file, f_u.fu_rcuhead));
-//}
-//
+
+/* the real guts of fput() - releasing the last reference to file
+ */
+static void __fput(struct file *file)
+{
+	struct dentry *dentry = file->f_path.dentry;
+	struct vfsmount *mnt = file->f_path.mnt;
+	struct inode *inode = file->f_inode;
+	fmode_t mode = file->f_mode;
+
+	if (unlikely(!(file->f_mode & FMODE_OPENED)))
+		goto out;
+
+	might_sleep();
+
+	fsnotify_close(file);
+	/*
+	 * The function eventpoll_release() should be the first called
+	 * in the file cleanup chain.
+	 */
+	eventpoll_release(file);
+	locks_remove_file(file);
+
+	ima_file_free(file);
+	if (unlikely(file->f_flags & FASYNC)) {
+		if (file->f_op->fasync)
+			file->f_op->fasync(-1, file, 0);
+	}
+	if (file->f_op->release)
+		file->f_op->release(inode, file);
+	if (unlikely(S_ISCHR(inode->i_mode) && inode->i_cdev != NULL &&
+		     !(mode & FMODE_PATH))) {
+		cdev_put(inode->i_cdev);
+	}
+	fops_put(file->f_op);
+	put_pid(file->f_owner.pid);
+	if ((mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
+		i_readcount_dec(inode);
+	if (mode & FMODE_WRITER) {
+		put_write_access(inode);
+		__mnt_drop_write(mnt);
+	}
+	dput(dentry);
+	if (unlikely(mode & FMODE_NEED_UNMOUNT))
+		dissolve_on_fput(mnt);
+	mntput(mnt);
+out:
+	file_free(file);
+}
+
+static LLIST_HEAD(delayed_fput_list);
+static void delayed_fput(struct work_struct *unused)
+{
+	struct llist_node *node = llist_del_all(&delayed_fput_list);
+	struct file *f, *t;
+
+	llist_for_each_entry_safe(f, t, node, f_u.fu_llist)
+		__fput(f);
+}
+
+static void ____fput(struct callback_head *work)
+{
+	__fput(container_of(work, struct file, f_u.fu_rcuhead));
+}
+
 ///*
 // * If kernel thread really needs to have the final fput() it has done
 // * to complete, call this.  The only user right now is the boot - we
@@ -329,35 +329,35 @@ static struct percpu_counter nr_files __cacheline_aligned_in_smp;
 //	delayed_fput(NULL);
 //}
 //EXPORT_SYMBOL_GPL(flush_delayed_fput);
-//
-//static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
-//
-//void fput_many(struct file *file, unsigned int refs)
-//{
-//	if (atomic_long_sub_and_test(refs, &file->f_count)) {
-//		struct task_struct *task = current;
-//
-//		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
-//			init_task_work(&file->f_u.fu_rcuhead, ____fput);
-//			if (!task_work_add(task, &file->f_u.fu_rcuhead, true))
-//				return;
-//			/*
-//			 * After this task has run exit_task_work(),
-//			 * task_work_add() will fail.  Fall through to delayed
-//			 * fput to avoid leaking *file.
-//			 */
-//		}
-//
-//		if (llist_add(&file->f_u.fu_llist, &delayed_fput_list))
-//			schedule_delayed_work(&delayed_fput_work, 1);
-//	}
-//}
-//
-//void fput(struct file *file)
-//{
-//	fput_many(file, 1);
-//}
-//
+
+static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
+
+void fput_many(struct file *file, unsigned int refs)
+{
+	if (atomic_long_sub_and_test(refs, &file->f_count)) {
+		struct task_struct *task = current;
+
+		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
+			init_task_work(&file->f_u.fu_rcuhead, ____fput);
+			if (!task_work_add(task, &file->f_u.fu_rcuhead, true))
+				return;
+			/*
+			 * After this task has run exit_task_work(),
+			 * task_work_add() will fail.  Fall through to delayed
+			 * fput to avoid leaking *file.
+			 */
+		}
+
+		if (llist_add(&file->f_u.fu_llist, &delayed_fput_list))
+			schedule_delayed_work(&delayed_fput_work, 1);
+	}
+}
+
+void fput(struct file *file)
+{
+	fput_many(file, 1);
+}
+
 ///*
 // * synchronous analog of fput(); for kernel threads that might be needed
 // * in some umount() (and thus can't use flush_delayed_fput() without

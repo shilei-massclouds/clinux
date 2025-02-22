@@ -37,26 +37,16 @@ void *vzalloc(unsigned long size)
 {
     booter_panic("No impl.\n");
 }
+
+/*
 int iterate_fd(struct files_struct *files, unsigned n,
         int (*f)(const void *, struct file *, unsigned),
         const void *p)
 {
     booter_panic("No impl.\n");
 }
-
-/*
-void fput(struct file *file)
-{
-    booter_panic("No impl.\n");
-}
 */
 
-/*
-struct task_struct *pid_task(struct pid *pid, enum pid_type type)
-{
-    booter_panic("No impl.\n");
-}
-*/
 struct device *device_create(struct class *class, struct device *parent,
                  dev_t devt, void *drvdata, const char *fmt, ...)
 {

@@ -24,7 +24,6 @@ CL_MINE(task_current_syscall)
 
 CL_MINE(__cgroup_bpf_run_filter_sysctl)
 CL_MINE(file_open_root)
-CL_MINE(filp_close)
 CL_MINE(in_egroup_p)
 CL_MINE(kernel_write)
 CL_MINE(kern_unmount)

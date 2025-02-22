@@ -2,6 +2,7 @@
 
 #include <linux/types.h>
 #include <linux/export.h>
+#include <linux/fs.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -12,3 +13,22 @@ cl_file_table_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_file_table_init);
+
+int __fsnotify_parent(struct dentry *dentry, __u32 mask, const void *data,
+              int data_type)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+void locks_remove_file(struct file *filp)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+void dissolve_on_fput(struct vfsmount *mnt)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+void eventpoll_release_file(struct file *file)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+

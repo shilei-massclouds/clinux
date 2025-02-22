@@ -213,6 +213,7 @@ struct files_struct init_files = {
     .file_lock  = __SPIN_LOCK_UNLOCKED(init_files.file_lock),
     .resize_wait    = __WAIT_QUEUE_HEAD_INITIALIZER(init_files.resize_wait),
 };
+EXPORT_SYMBOL_GPL(init_files);
 
 /* init to 2 - one for init_task, one to ensure it is never freed */
 struct group_info init_groups = { .usage = ATOMIC_INIT(2) };
@@ -283,3 +284,7 @@ EXPORT_SYMBOL(saved_command_line);
 /* SLAB cache for fs_struct structures (tsk->fs) */
 struct kmem_cache *fs_cachep;
 EXPORT_SYMBOL(fs_cachep);
+
+/* SLAB cache for files_struct structures (tsk->files) */
+struct kmem_cache *files_cachep;
+EXPORT_SYMBOL(files_cachep);

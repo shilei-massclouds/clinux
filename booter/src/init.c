@@ -713,11 +713,13 @@ __weak void kernfs_kill_sb(struct super_block *sb)
 }
 EXPORT_SYMBOL(kernfs_kill_sb);
 
+/*
 unsigned long __fdget(unsigned int fd)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(__fdget);
+*/
 
 void free_uid(struct user_struct *up)
 {
@@ -942,24 +944,6 @@ int cap_vm_enough_memory(struct mm_struct *mm, long pages)
 }
 EXPORT_SYMBOL(cap_vm_enough_memory);
 
-int get_unused_fd_flags(unsigned flags)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(get_unused_fd_flags);
-
-void put_unused_fd(unsigned int fd)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(put_unused_fd);
-
-void fd_install(unsigned int fd, struct file *file)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(fd_install);
-
 void __noreturn do_exit(long code)
 {
     booter_panic("No impl!\n");
@@ -996,3 +980,61 @@ __weak void free_kthread_struct(struct task_struct *k)
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(free_kthread_struct);
+
+/*
+__weak pid_t __task_pid_nr_ns(struct task_struct *task, enum pid_type type,
+			struct pid_namespace *ns)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+*/
+__weak void cgroup_cancel_fork(struct task_struct *child,
+			struct kernel_clone_args *kargs)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(cgroup_cancel_fork);
+
+__weak void fput(struct file *file)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL_GPL(fput);
+
+__weak int cgroup_can_fork(struct task_struct *child, struct kernel_clone_args *kargs)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(cgroup_can_fork);
+
+__weak void cgroup_post_fork(struct task_struct *child,
+		      struct kernel_clone_args *kargs)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(cgroup_post_fork);
+
+__weak void cgroup_fork(struct task_struct *child)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(cgroup_fork);
+
+__weak int unshare_fd(unsigned long unshare_flags, unsigned int max_fds,
+	       struct files_struct **new_fdp)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(unshare_fd);
+
+void __mnt_drop_write(struct vfsmount *mnt)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(__mnt_drop_write);
+
+int filp_close(struct file *filp, fl_owner_t id)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(filp_close);

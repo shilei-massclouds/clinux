@@ -19,10 +19,13 @@ cl_pid_init(void)
 }
 EXPORT_SYMBOL(cl_pid_init);
 
+/*
 struct file *fget_task(struct task_struct *task, unsigned int fd)
 {
     booter_panic("No impl.\n");
 }
+*/
+
 int anon_inode_getfd(const char *name, const struct file_operations *fops,
              void *priv, int flags)
 {
@@ -41,16 +44,12 @@ bool ptrace_may_access(struct task_struct *task, unsigned int mode)
 }
 EXPORT_SYMBOL(ptrace_may_access);
 
-void fput(struct file *file)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL_GPL(fput);
-
+/*
 int __receive_fd(int fd, struct file *file, int __user *ufd, unsigned int o_flags)
 {
     booter_panic("No impl.\n");
 }
+*/
 
 static int pidfd_release(struct inode *inode, struct file *file)
 {

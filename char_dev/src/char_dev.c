@@ -366,6 +366,7 @@ void cdev_put(struct cdev *p)
 		module_put(owner);
 	}
 }
+EXPORT_SYMBOL(cdev_put);
 
 /*
  * Called every time a character special file is opened

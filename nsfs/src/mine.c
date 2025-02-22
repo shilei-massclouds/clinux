@@ -3,4 +3,3 @@
 
 CL_MINE(dentry_open)
 CL_MINE(dynamic_dname)
-CL_MINE(fget)
