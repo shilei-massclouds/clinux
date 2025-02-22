@@ -70,10 +70,6 @@ void __f_setown(struct file *filp, struct pid *pid, enum pid_type type,
 {
     booter_panic("No impl.\n");
 }
-char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *tsk)
-{
-    booter_panic("No impl.\n");
-}
 void ldsem_up_write(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");
@@ -83,10 +79,6 @@ struct device *device_create_with_groups(struct class *class,
                      void *drvdata,
                      const struct attribute_group **groups,
                      const char *fmt, ...)
-{
-    booter_panic("No impl.\n");
-}
-void vfree(const void *addr)
 {
     booter_panic("No impl.\n");
 }

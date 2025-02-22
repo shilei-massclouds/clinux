@@ -1715,7 +1715,6 @@ bool mod_delayed_work_on(int cpu, struct workqueue_struct *wq,
 	/* -ENOENT from try_to_grab_pending() becomes %true */
 	return ret;
 }
-EXPORT_SYMBOL_GPL(mod_delayed_work_on);
 
 //static void rcu_work_rcufn(struct rcu_head *rcu)
 //{
@@ -2913,7 +2912,6 @@ void flush_workqueue(struct workqueue_struct *wq)
 out_unlock:
 	mutex_unlock(&wq->mutex);
 }
-EXPORT_SYMBOL(flush_workqueue);
 
 /**
  * drain_workqueue - drain a workqueue
@@ -4329,7 +4327,6 @@ err_destroy:
 	destroy_workqueue(wq);
 	return NULL;
 }
-EXPORT_SYMBOL_GPL(alloc_workqueue);
 
 static bool pwq_busy(struct pool_workqueue *pwq)
 {
@@ -4438,7 +4435,6 @@ void destroy_workqueue(struct workqueue_struct *wq)
 		put_pwq_unlocked(pwq);
 	}
 }
-EXPORT_SYMBOL_GPL(destroy_workqueue);
 
 /**
  * workqueue_set_max_active - adjust max_active of a workqueue

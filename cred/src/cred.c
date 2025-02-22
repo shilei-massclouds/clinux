@@ -319,6 +319,7 @@ struct cred *prepare_exec_creds(void)
 
 	return new;
 }
+EXPORT_SYMBOL(prepare_exec_creds);
 
 /*
  * Copy credentials for the new process created by fork()

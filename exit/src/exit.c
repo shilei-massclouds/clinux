@@ -227,6 +227,7 @@ repeat:
 	if (unlikely(zap_leader))
 		goto repeat;
 }
+EXPORT_SYMBOL(release_task);
 
 int rcuwait_wake_up(struct rcuwait *w)
 {

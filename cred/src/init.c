@@ -15,37 +15,15 @@ cl_cred_init(void)
 EXPORT_SYMBOL(cl_cred_init);
 
 int suid_dumpable = 0;
+EXPORT_SYMBOL(suid_dumpable);
 
-/*
-int create_user_ns(struct cred *new)
-{
-    booter_panic("No impl.\n");
-}
-*/
-
-/*
-void key_fsgid_changed(struct cred *new_cred)
-{
-    booter_panic("No impl.\n");
-}
-void key_fsuid_changed(struct cred *new_cred)
-{
-    booter_panic("No impl.\n");
-}
-void key_put(struct key *key)
-{
-    booter_panic("No impl.\n");
-}
-int install_thread_keyring_to_cred(struct cred *new)
-{
-    booter_panic("No impl.\n");
-}
-*/
-void set_dumpable(struct mm_struct *mm, int value)
-{
-    booter_panic("No impl.\n");
-}
 void groups_free(struct group_info *group_info)
 {
     booter_panic("No impl.\n");
 }
+
+__weak void set_dumpable(struct mm_struct *mm, int value)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(set_dumpable);

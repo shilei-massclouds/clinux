@@ -777,7 +777,7 @@ char *d_path(const struct path *path, char *buf, int buflen)
 }
 EXPORT_SYMBOL(d_path);
 
-void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
+__weak void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
 {
     booter_panic("No impl in 'workqueue'.");
 }
@@ -1074,3 +1074,53 @@ __weak bool thread_group_exited(struct pid *pid)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(thread_group_exited);
+
+void exit_itimers(struct signal_struct *sig)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(exit_itimers);
+
+void vfree(const void *addr)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(vfree);
+
+__weak char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *tsk)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(__get_task_comm);
+
+void lru_add_drain(void)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(lru_add_drain);
+
+__weak bool path_noexec(const struct path *path)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(path_noexec);
+
+int __fsnotify_parent(struct dentry *dentry, __u32 mask, const void *data,
+              int data_type)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL_GPL(__fsnotify_parent);
+
+struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL_GPL(find_vma);
+
+struct file *file_open_root(struct dentry *dentry, struct vfsmount *mnt,
+                const char *filename, int flags, umode_t mode)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(file_open_root);

@@ -517,7 +517,6 @@ noinline void __ref rest_init(void)
     struct task_struct *tsk;
     int pid;
 
-    sbi_puts("module[top_linux]: enter rest_init ...\n");
     rcu_scheduler_starting();
     /*
      * We need to spawn init first so that it obtains pid 1, however
@@ -552,7 +551,6 @@ noinline void __ref rest_init(void)
 
     complete(&kthreadd_done);
 
-    sbi_puts("rest_init 1\n");
     /*
      * The boot idle thread must execute schedule()
      * at least once to get things moving:
@@ -587,6 +585,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(namei);
     REQUIRE_COMPONENT(kthread);
     REQUIRE_COMPONENT(exit);
+    REQUIRE_COMPONENT(exec);
 
     //
     // start_kernel (init/main.c)

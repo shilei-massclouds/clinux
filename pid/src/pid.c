@@ -388,6 +388,7 @@ void exchange_tids(struct task_struct *left, struct task_struct *right)
 	WRITE_ONCE(left->pid, pid_nr(pid2));
 	WRITE_ONCE(right->pid, pid_nr(pid1));
 }
+EXPORT_SYMBOL_GPL(exchange_tids);
 
 /* transfer_pid is an optimization of attach_pid(new), detach_pid(old) */
 void transfer_pid(struct task_struct *old, struct task_struct *new,
@@ -397,6 +398,7 @@ void transfer_pid(struct task_struct *old, struct task_struct *new,
 		new->thread_pid = old->thread_pid;
 	hlist_replace_rcu(&old->pid_links[type], &new->pid_links[type]);
 }
+EXPORT_SYMBOL_GPL(transfer_pid);
 
 struct task_struct *pid_task(struct pid *pid, enum pid_type type)
 {

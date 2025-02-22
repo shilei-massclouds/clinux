@@ -328,9 +328,6 @@ void thread_stack_cache_init(void)
 /* SLAB cache for signal_struct structures (tsk->signal) */
 static struct kmem_cache *signal_cachep;
 
-/* SLAB cache for sighand_struct structures (tsk->sighand) */
-struct kmem_cache *sighand_cachep;
-
 /* SLAB cache for vm_area_struct structures */
 static struct kmem_cache *vm_area_cachep;
 
@@ -346,6 +343,7 @@ struct vm_area_struct *vm_area_alloc(struct mm_struct *mm)
 		vma_init(vma, mm);
 	return vma;
 }
+EXPORT_SYMBOL(vm_area_alloc);
 
 struct vm_area_struct *vm_area_dup(struct vm_area_struct *orig)
 {
@@ -369,6 +367,7 @@ void vm_area_free(struct vm_area_struct *vma)
 {
 	kmem_cache_free(vm_area_cachep, vma);
 }
+EXPORT_SYMBOL(vm_area_free);
 
 static void account_kernel_stack(struct task_struct *tsk, int account)
 {
@@ -1055,6 +1054,7 @@ struct mm_struct *mm_alloc(void)
 	memset(mm, 0, sizeof(*mm));
 	return mm_init(mm, current, current_user_ns());
 }
+EXPORT_SYMBOL(mm_alloc);
 
 static inline void __mmput(struct mm_struct *mm)
 {
@@ -1135,6 +1135,7 @@ void set_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file)
 	if (old_exe_file)
 		fput(old_exe_file);
 }
+EXPORT_SYMBOL(set_mm_exe_file);
 
 /**
  * get_mm_exe_file - acquire a reference to the mm's executable file
@@ -1318,6 +1319,7 @@ void exec_mm_release(struct task_struct *tsk, struct mm_struct *mm)
 	futex_exec_release(tsk);
 	mm_release(tsk, mm);
 }
+EXPORT_SYMBOL(exec_mm_release);
 
 /**
  * dup_mm() - duplicates an existing mm structure
@@ -3011,6 +3013,7 @@ int unshare_files(struct files_struct **displaced)
 	task_unlock(task);
 	return 0;
 }
+EXPORT_SYMBOL(unshare_files);
 
 int sysctl_max_threads(struct ctl_table *table, int write,
 		       void *buffer, size_t *lenp, loff_t *ppos)

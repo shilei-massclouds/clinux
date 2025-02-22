@@ -288,3 +288,7 @@ EXPORT_SYMBOL(fs_cachep);
 /* SLAB cache for files_struct structures (tsk->files) */
 struct kmem_cache *files_cachep;
 EXPORT_SYMBOL(files_cachep);
+
+/* SLAB cache for sighand_struct structures (tsk->sighand) */
+struct kmem_cache *sighand_cachep;
+EXPORT_SYMBOL(sighand_cachep);

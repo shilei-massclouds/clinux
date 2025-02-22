@@ -202,12 +202,14 @@ getname_flags(const char __user *filename, int flags, int *empty)
 	audit_getname(result);
 	return result;
 }
+EXPORT_SYMBOL(getname_flags);
 
 struct filename *
 getname(const char __user * filename)
 {
 	return getname_flags(filename, 0, NULL);
 }
+EXPORT_SYMBOL(getname);
 
 struct filename *
 getname_kernel(const char * filename)
@@ -3398,6 +3400,7 @@ struct file *do_filp_open(int dfd, struct filename *pathname,
 	restore_nameidata();
 	return filp;
 }
+EXPORT_SYMBOL_GPL(do_filp_open);
 
 struct file *do_file_open_root(struct dentry *dentry, struct vfsmount *mnt,
 		const char *name, const struct open_flags *op)

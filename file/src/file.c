@@ -448,6 +448,7 @@ void reset_files_struct(struct files_struct *files)
 	task_unlock(tsk);
 	put_files_struct(old);
 }
+EXPORT_SYMBOL(reset_files_struct);
 
 void exit_files(struct task_struct *tsk)
 {
@@ -821,6 +822,7 @@ void do_close_on_exec(struct files_struct *files)
 	}
 	spin_unlock(&files->file_lock);
 }
+EXPORT_SYMBOL_GPL(do_close_on_exec);
 
 static struct file *__fget_files(struct files_struct *files, unsigned int fd,
 				 fmode_t mask, unsigned int refs)

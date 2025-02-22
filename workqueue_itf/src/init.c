@@ -54,3 +54,31 @@ bool __weak flush_work(struct work_struct *work)
     booter_panic("No impl in 'rcu'.");
 }
 EXPORT_SYMBOL(flush_work);
+
+__weak bool mod_delayed_work_on(int cpu, struct workqueue_struct *wq,
+			 struct delayed_work *dwork, unsigned long delay)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL_GPL(mod_delayed_work_on);
+
+__weak void destroy_workqueue(struct workqueue_struct *wq)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL_GPL(destroy_workqueue);
+
+__weak __printf(1, 4)
+struct workqueue_struct *alloc_workqueue(const char *fmt,
+					 unsigned int flags,
+					 int max_active, ...)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL_GPL(alloc_workqueue);
+
+__weak void flush_workqueue(struct workqueue_struct *wq)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(flush_workqueue);

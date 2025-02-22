@@ -157,12 +157,13 @@ EXPORT_SYMBOL(highest_memmap_pfn);
 //	return 0;
 //}
 //core_initcall(init_zero_pfn);
-//
-//void mm_trace_rss_stat(struct mm_struct *mm, int member, long count)
-//{
-//	trace_rss_stat(mm, member, count);
-//}
-//
+
+void mm_trace_rss_stat(struct mm_struct *mm, int member, long count)
+{
+	trace_rss_stat(mm, member, count);
+}
+EXPORT_SYMBOL_GPL(mm_trace_rss_stat);
+
 //#if defined(SPLIT_RSS_COUNTING)
 //
 //void sync_mm_rss(struct mm_struct *mm)

@@ -506,6 +506,7 @@ static void __flush_itimer_signals(struct sigpending *pending)
 
 	sigorsets(&pending->signal, &signal, &retain);
 }
+EXPORT_SYMBOL_GPL(flush_itimer_signals);
 
 void flush_itimer_signals(void)
 {
@@ -1649,6 +1650,7 @@ void force_sigsegv(int sig)
 	}
 	force_sig(SIGSEGV);
 }
+EXPORT_SYMBOL(force_sigsegv);
 
 int force_sig_fault_to_task(int sig, int code, void __user *addr
 	___ARCH_SI_TRAPNO(int trapno)
