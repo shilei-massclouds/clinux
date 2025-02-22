@@ -29,8 +29,8 @@ EXPORT_SYMBOL(cl_driver_base_init);
 void __init driver_init(void)
 {
     printk("%s: ==========\n", __func__);
-    ///* These are the core pieces */
-    //devtmpfs_init();
+    /* These are the core pieces */
+    devtmpfs_init();
     //devices_init();
     //buses_init();
     //classes_init();
@@ -111,10 +111,6 @@ void kobject_del(struct kobject *kobj)
     booter_panic("No impl 'driver_base'.");
 }
 */
-int devtmpfs_delete_node(struct device *dev)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 int device_offline(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
@@ -170,3 +166,15 @@ bool __weak is_of_node(const struct fwnode_handle *fwnode)
 {
     booter_panic("No impl 'driver_base'.");
 }
+
+__weak int devtmpfs_create_node(struct device *dev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(devtmpfs_create_node);
+
+__weak int devtmpfs_delete_node(struct device *dev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(devtmpfs_delete_node);

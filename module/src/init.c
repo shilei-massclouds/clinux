@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/cred.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -13,6 +14,8 @@ cl_module_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_module_init);
+
+DEFINE_ENABLE_FUNC(module);
 
 bool current_is_async(void)
 {

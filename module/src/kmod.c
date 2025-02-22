@@ -174,4 +174,3 @@ int __request_module(bool wait, const char *fmt, ...)
 
 	return ret;
 }
-EXPORT_SYMBOL(__request_module);

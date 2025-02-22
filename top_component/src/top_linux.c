@@ -895,8 +895,8 @@ void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
 static void __init do_basic_setup(void)
 {
     printk("%s: ==========\n", __func__);
-    //cpuset_init_smp();
-    //driver_init();
+    cpuset_init_smp();
+    driver_init();
     //init_irq_proc();
     //do_ctors();
     //usermodehelper_enable();
@@ -986,6 +986,8 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(kthread);
     REQUIRE_COMPONENT(exit);
     REQUIRE_COMPONENT(exec);
+    REQUIRE_COMPONENT(module);
+    REQUIRE_COMPONENT(devtmpfs);
 
     //
     // start_kernel (init/main.c)

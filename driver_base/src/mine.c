@@ -4,7 +4,6 @@
 CL_MINE(bus_add_device)
 CL_MINE(bus_probe_device)
 CL_MINE(device_add_groups)
-CL_MINE(devtmpfs_create_node)
 CL_MINE(_dev_warn)
 CL_MINE(klist_add_tail)
 CL_MINE(klist_init)

@@ -1125,7 +1125,6 @@ void __module_get(struct module *module)
 		preempt_enable();
 	}
 }
-EXPORT_SYMBOL(__module_get);
 
 bool try_module_get(struct module *module)
 {

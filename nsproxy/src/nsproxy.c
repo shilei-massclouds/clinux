@@ -212,35 +212,36 @@ void free_nsproxy(struct nsproxy *ns)
 	kmem_cache_free(nsproxy_cachep, ns);
 }
 
-///*
-// * Called from unshare. Unshare all the namespaces part of nsproxy.
-// * On success, returns the new nsproxy.
-// */
-//int unshare_nsproxy_namespaces(unsigned long unshare_flags,
-//	struct nsproxy **new_nsp, struct cred *new_cred, struct fs_struct *new_fs)
-//{
-//	struct user_namespace *user_ns;
-//	int err = 0;
-//
-//	if (!(unshare_flags & (CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWIPC |
-//			       CLONE_NEWNET | CLONE_NEWPID | CLONE_NEWCGROUP |
-//			       CLONE_NEWTIME)))
-//		return 0;
-//
-//	user_ns = new_cred ? new_cred->user_ns : current_user_ns();
-//	if (!ns_capable(user_ns, CAP_SYS_ADMIN))
-//		return -EPERM;
-//
-//	*new_nsp = create_new_namespaces(unshare_flags, current, user_ns,
-//					 new_fs ? new_fs : current->fs);
-//	if (IS_ERR(*new_nsp)) {
-//		err = PTR_ERR(*new_nsp);
-//		goto out;
-//	}
-//
-//out:
-//	return err;
-//}
+/*
+ * Called from unshare. Unshare all the namespaces part of nsproxy.
+ * On success, returns the new nsproxy.
+ */
+int unshare_nsproxy_namespaces(unsigned long unshare_flags,
+	struct nsproxy **new_nsp, struct cred *new_cred, struct fs_struct *new_fs)
+{
+	struct user_namespace *user_ns;
+	int err = 0;
+
+	if (!(unshare_flags & (CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWIPC |
+			       CLONE_NEWNET | CLONE_NEWPID | CLONE_NEWCGROUP |
+			       CLONE_NEWTIME)))
+		return 0;
+
+	user_ns = new_cred ? new_cred->user_ns : current_user_ns();
+	if (!ns_capable(user_ns, CAP_SYS_ADMIN))
+		return -EPERM;
+
+	*new_nsp = create_new_namespaces(unshare_flags, current, user_ns,
+					 new_fs ? new_fs : current->fs);
+	if (IS_ERR(*new_nsp)) {
+		err = PTR_ERR(*new_nsp);
+		goto out;
+	}
+
+out:
+	return err;
+}
+EXPORT_SYMBOL(unshare_nsproxy_namespaces);
 
 void switch_task_namespaces(struct task_struct *p, struct nsproxy *new)
 {

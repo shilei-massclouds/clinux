@@ -1171,3 +1171,27 @@ __weak void __init early_init_fdt_scan_reserved_mem(void)
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(early_init_fdt_scan_reserved_mem);
+
+__weak void __module_get(struct module *module)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(__module_get);
+
+__weak int __request_module(bool wait, const char *fmt, ...)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(__request_module);
+
+__weak int __init devtmpfs_init(void)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(devtmpfs_init);
+
+int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(notify_change);

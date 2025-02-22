@@ -2447,6 +2447,7 @@ struct dentry *kern_path_locked(const char *name, struct path *path)
 	putname(filename);
 	return d;
 }
+EXPORT_SYMBOL(kern_path_locked);
 
 int kern_path(const char *name, unsigned int flags, struct path *path)
 {

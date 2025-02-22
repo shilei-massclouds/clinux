@@ -107,10 +107,6 @@ int inode_has_buffers(struct inode *inode)
 
 const struct file_operations def_blk_fops;
 
-int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
-{
-    booter_panic("No impl!\n");
-}
 int cap_inode_need_killpriv(struct dentry *dentry)
 {
     booter_panic("No impl!\n");

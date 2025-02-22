@@ -3436,6 +3436,7 @@ const struct fs_parameter_spec shmem_fs_parameters[] = {
 	fsparam_flag  ("inode64",	Opt_inode64),
 	{}
 };
+EXPORT_SYMBOL(shmem_fs_parameters);
 
 static int shmem_parse_one(struct fs_context *fc, struct fs_parameter *param)
 {
