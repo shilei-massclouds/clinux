@@ -41,11 +41,13 @@ void __weak account_idle_ticks(unsigned long ticks)
 }
 EXPORT_SYMBOL(account_idle_ticks);
 
+/*
 int smp_call_function_single(int cpu, void (*func) (void *info), void *info,
                 int wait)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 
 void __weak account_process_tick(struct task_struct *p, int user_tick)
 {
@@ -125,10 +127,12 @@ void raise_softirq(unsigned int nr)
     booter_panic("No impl in 'time'.");
 }
 
+/*
 void on_each_cpu(smp_call_func_t func, void *info, int wait)
 {
     booter_panic("No impl in 'time'.");
 }
+*/
 
 unsigned long nr_iowait_cpu(int cpu)
 {

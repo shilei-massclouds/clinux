@@ -41,13 +41,13 @@ void call_rcu(struct rcu_head *head, rcu_callback_t func)
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(call_rcu);
-*/
 
 void on_each_cpu_cond(smp_cond_func_t cond_func, smp_call_func_t func,
               void *info, bool wait)
 {
     booter_panic("No impl 'slub'.");
 }
+*/
 
 /*
 int sysfs_create_link(struct kobject *kobj, struct kobject *target,
