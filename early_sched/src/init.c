@@ -34,7 +34,7 @@ void __sched __weak wait_for_completion(struct completion *x)
 EXPORT_SYMBOL(wait_for_completion);
 
 #ifndef CONFIG_PREEMPTION
-int __sched _cond_resched(void)
+__weak int __sched _cond_resched(void)
 {
     if (system_state != SYSTEM_BOOTING) {
         booter_panic("_cond_resched");

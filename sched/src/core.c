@@ -4152,24 +4152,24 @@ void scheduler_tick(void)
 //static inline void sched_tick_start(int cpu) { }
 //static inline void sched_tick_stop(int cpu) { }
 //#endif
-//
-//#if defined(CONFIG_PREEMPTION) && (defined(CONFIG_DEBUG_PREEMPT) || \
-//				defined(CONFIG_TRACE_PREEMPT_TOGGLE))
-///*
-// * If the value passed in is equal to the current preempt count
-// * then we just disabled preemption. Start timing the latency.
-// */
-//static inline void preempt_latency_start(int val)
-//{
-//	if (preempt_count() == val) {
-//		unsigned long ip = get_lock_parent_ip();
-//#ifdef CONFIG_DEBUG_PREEMPT
-//		current->preempt_disable_ip = ip;
-//#endif
-//		trace_preempt_off(CALLER_ADDR0, ip);
-//	}
-//}
-//
+
+#if defined(CONFIG_PREEMPTION) && (defined(CONFIG_DEBUG_PREEMPT) || \
+				defined(CONFIG_TRACE_PREEMPT_TOGGLE))
+/*
+ * If the value passed in is equal to the current preempt count
+ * then we just disabled preemption. Start timing the latency.
+ */
+static inline void preempt_latency_start(int val)
+{
+	if (preempt_count() == val) {
+		unsigned long ip = get_lock_parent_ip();
+#ifdef CONFIG_DEBUG_PREEMPT
+		current->preempt_disable_ip = ip;
+#endif
+		trace_preempt_off(CALLER_ADDR0, ip);
+	}
+}
+
 //void preempt_count_add(int val)
 //{
 //#ifdef CONFIG_DEBUG_PREEMPT
@@ -4224,10 +4224,10 @@ void scheduler_tick(void)
 //EXPORT_SYMBOL(preempt_count_sub);
 //NOKPROBE_SYMBOL(preempt_count_sub);
 //
-//#else
-//static inline void preempt_latency_start(int val) { }
-//static inline void preempt_latency_stop(int val) { }
-//#endif
+#else
+static inline void preempt_latency_start(int val) { }
+static inline void preempt_latency_stop(int val) { }
+#endif
 
 static inline unsigned long get_preempt_disable_ip(struct task_struct *p)
 {
@@ -4661,35 +4661,35 @@ void __sched schedule_preempt_disabled(void)
 	preempt_disable();
 }
 
-//static void __sched notrace preempt_schedule_common(void)
-//{
-//	do {
-//		/*
-//		 * Because the function tracer can trace preempt_count_sub()
-//		 * and it also uses preempt_enable/disable_notrace(), if
-//		 * NEED_RESCHED is set, the preempt_enable_notrace() called
-//		 * by the function tracer will call this function again and
-//		 * cause infinite recursion.
-//		 *
-//		 * Preemption must be disabled here before the function
-//		 * tracer can trace. Break up preempt_disable() into two
-//		 * calls. One to disable preemption without fear of being
-//		 * traced. The other to still record the preemption latency,
-//		 * which can also be traced by the function tracer.
-//		 */
-//		preempt_disable_notrace();
-//		preempt_latency_start(1);
-//		__schedule(true);
-//		preempt_latency_stop(1);
-//		preempt_enable_no_resched_notrace();
-//
-//		/*
-//		 * Check again in case we missed a preemption opportunity
-//		 * between schedule and now.
-//		 */
-//	} while (need_resched());
-//}
-//
+static void __sched notrace preempt_schedule_common(void)
+{
+	do {
+		/*
+		 * Because the function tracer can trace preempt_count_sub()
+		 * and it also uses preempt_enable/disable_notrace(), if
+		 * NEED_RESCHED is set, the preempt_enable_notrace() called
+		 * by the function tracer will call this function again and
+		 * cause infinite recursion.
+		 *
+		 * Preemption must be disabled here before the function
+		 * tracer can trace. Break up preempt_disable() into two
+		 * calls. One to disable preemption without fear of being
+		 * traced. The other to still record the preemption latency,
+		 * which can also be traced by the function tracer.
+		 */
+		preempt_disable_notrace();
+		preempt_latency_start(1);
+		__schedule(true);
+		preempt_latency_stop(1);
+		preempt_enable_no_resched_notrace();
+
+		/*
+		 * Check again in case we missed a preemption opportunity
+		 * between schedule and now.
+		 */
+	} while (need_resched());
+}
+
 //#ifdef CONFIG_PREEMPTION
 ///*
 // * This is the entry point to schedule() from in-kernel preemption
@@ -6108,20 +6108,19 @@ void sched_set_fifo(struct task_struct *p)
 //	do_sched_yield();
 //	return 0;
 //}
-//
-//#ifndef CONFIG_PREEMPTION
-//int __sched _cond_resched(void)
-//{
-//	if (should_resched(0)) {
-//		preempt_schedule_common();
-//		return 1;
-//	}
-//	rcu_all_qs();
-//	return 0;
-//}
-//EXPORT_SYMBOL(_cond_resched);
-//#endif
-//
+
+#ifndef CONFIG_PREEMPTION
+int __sched _cond_resched(void)
+{
+	if (should_resched(0)) {
+		preempt_schedule_common();
+		return 1;
+	}
+	rcu_all_qs();
+	return 0;
+}
+#endif
+
 ///*
 // * __cond_resched_lock() - if a reschedule is pending, drop the given lock,
 // * call schedule, and on return reacquire the lock.
