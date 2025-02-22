@@ -54,11 +54,13 @@ int input_register_handle(struct input_handle *handle)
     booter_panic("No impl!\n");
 }
 
+/*
 void show_regs(struct pt_regs *regs)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(show_regs);
+*/
 
 void ctrl_alt_del(void)
 {

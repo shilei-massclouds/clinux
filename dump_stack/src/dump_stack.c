@@ -70,6 +70,7 @@ void show_regs_print_info(const char *log_lvl)
 {
 	dump_stack_print_info(log_lvl);
 }
+EXPORT_SYMBOL(show_regs_print_info);
 
 static void __dump_stack(void)
 {
