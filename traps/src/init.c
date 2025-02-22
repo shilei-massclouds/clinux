@@ -68,25 +68,6 @@ void oops_exit(void)
 {
     booter_panic("No impl!\n");
 }
-/*
-int notrace notify_die(enum die_val val, const char *str,
-           struct pt_regs *regs, long err, int trap, int sig)
-{
-    booter_panic("No impl!\n");
-}
-*/
-asmlinkage __visible void schedule_tail(struct task_struct *prev)
-{
-    booter_panic("No impl!\n");
-}
-/*
-int force_sig_fault(int sig, int code, void __user *addr
-    ___ARCH_SI_TRAPNO(int trapno)
-    ___ARCH_SI_IA64(int imm, unsigned int flags, unsigned long isr))
-{
-    booter_panic("No impl!\n");
-}
-*/
 void do_notify_resume(struct pt_regs *regs)
 {
     booter_panic("No impl!\n");

@@ -195,6 +195,7 @@ void calculate_sigpending(void)
 	recalc_sigpending();
 	spin_unlock_irq(&current->sighand->siglock);
 }
+EXPORT_SYMBOL(calculate_sigpending);
 
 /* Given the mask, find the first available signal that should be serviced. */
 
