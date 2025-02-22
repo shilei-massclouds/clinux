@@ -826,6 +826,7 @@ static char *ptr_to_id(char *buf, char *end, const void *ptr,
 }
 
 int kptr_restrict __read_mostly;
+EXPORT_SYMBOL(kptr_restrict);
 
 static noinline_for_stack
 char *restricted_pointer(char *buf, char *end, const void *ptr,

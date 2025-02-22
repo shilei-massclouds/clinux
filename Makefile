@@ -62,7 +62,7 @@ components := \
 	net_namespace \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap \
-	signal sysctl \
+	signal sysctl kallsyms \
 	early_printk printk panic dump_stack show_mem
 	#partitions \
 

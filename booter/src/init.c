@@ -1130,3 +1130,9 @@ __weak void global_dirty_limits(unsigned long *pbackground, unsigned long *pdirt
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(global_dirty_limits);
+
+__weak int lookup_symbol_name(unsigned long addr, char *symname)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(lookup_symbol_name);
