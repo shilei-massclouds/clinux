@@ -1540,73 +1540,73 @@ void __init memblock_free_pages(struct page *page, unsigned long pfn,
 	__free_pages_core(page, order);
 }
 
-///*
-// * Check that the whole (or subset of) a pageblock given by the interval of
-// * [start_pfn, end_pfn) is valid and within the same zone, before scanning it
-// * with the migration of free compaction scanner. The scanners then need to
-// * use only pfn_valid_within() check for arches that allow holes within
-// * pageblocks.
-// *
-// * Return struct page pointer of start_pfn, or NULL if checks were not passed.
-// *
-// * It's possible on some configurations to have a setup like node0 node1 node0
-// * i.e. it's possible that all pages within a zones range of pages do not
-// * belong to a single zone. We assume that a border between node0 and node1
-// * can occur within a single pageblock, but not a node0 node1 node0
-// * interleaving within a single pageblock. It is therefore sufficient to check
-// * the first and last page of a pageblock and avoid checking each individual
-// * page in a pageblock.
-// */
-//struct page *__pageblock_pfn_to_page(unsigned long start_pfn,
-//				     unsigned long end_pfn, struct zone *zone)
-//{
-//	struct page *start_page;
-//	struct page *end_page;
-//
-//	/* end_pfn is one past the range we are checking */
-//	end_pfn--;
-//
-//	if (!pfn_valid(start_pfn) || !pfn_valid(end_pfn))
-//		return NULL;
-//
-//	start_page = pfn_to_online_page(start_pfn);
-//	if (!start_page)
-//		return NULL;
-//
-//	if (page_zone(start_page) != zone)
-//		return NULL;
-//
-//	end_page = pfn_to_page(end_pfn);
-//
-//	/* This gives a shorter code than deriving page_zone(end_page) */
-//	if (page_zone_id(start_page) != page_zone_id(end_page))
-//		return NULL;
-//
-//	return start_page;
-//}
-//
-//void set_zone_contiguous(struct zone *zone)
-//{
-//	unsigned long block_start_pfn = zone->zone_start_pfn;
-//	unsigned long block_end_pfn;
-//
-//	block_end_pfn = ALIGN(block_start_pfn + 1, pageblock_nr_pages);
-//	for (; block_start_pfn < zone_end_pfn(zone);
-//			block_start_pfn = block_end_pfn,
-//			 block_end_pfn += pageblock_nr_pages) {
-//
-//		block_end_pfn = min(block_end_pfn, zone_end_pfn(zone));
-//
-//		if (!__pageblock_pfn_to_page(block_start_pfn,
-//					     block_end_pfn, zone))
-//			return;
-//		cond_resched();
-//	}
-//
-//	/* We confirm that there is no hole */
-//	zone->contiguous = true;
-//}
-//
+/*
+ * Check that the whole (or subset of) a pageblock given by the interval of
+ * [start_pfn, end_pfn) is valid and within the same zone, before scanning it
+ * with the migration of free compaction scanner. The scanners then need to
+ * use only pfn_valid_within() check for arches that allow holes within
+ * pageblocks.
+ *
+ * Return struct page pointer of start_pfn, or NULL if checks were not passed.
+ *
+ * It's possible on some configurations to have a setup like node0 node1 node0
+ * i.e. it's possible that all pages within a zones range of pages do not
+ * belong to a single zone. We assume that a border between node0 and node1
+ * can occur within a single pageblock, but not a node0 node1 node0
+ * interleaving within a single pageblock. It is therefore sufficient to check
+ * the first and last page of a pageblock and avoid checking each individual
+ * page in a pageblock.
+ */
+struct page *__pageblock_pfn_to_page(unsigned long start_pfn,
+				     unsigned long end_pfn, struct zone *zone)
+{
+	struct page *start_page;
+	struct page *end_page;
+
+	/* end_pfn is one past the range we are checking */
+	end_pfn--;
+
+	if (!pfn_valid(start_pfn) || !pfn_valid(end_pfn))
+		return NULL;
+
+	start_page = pfn_to_online_page(start_pfn);
+	if (!start_page)
+		return NULL;
+
+	if (page_zone(start_page) != zone)
+		return NULL;
+
+	end_page = pfn_to_page(end_pfn);
+
+	/* This gives a shorter code than deriving page_zone(end_page) */
+	if (page_zone_id(start_page) != page_zone_id(end_page))
+		return NULL;
+
+	return start_page;
+}
+
+void set_zone_contiguous(struct zone *zone)
+{
+	unsigned long block_start_pfn = zone->zone_start_pfn;
+	unsigned long block_end_pfn;
+
+	block_end_pfn = ALIGN(block_start_pfn + 1, pageblock_nr_pages);
+	for (; block_start_pfn < zone_end_pfn(zone);
+			block_start_pfn = block_end_pfn,
+			 block_end_pfn += pageblock_nr_pages) {
+
+		block_end_pfn = min(block_end_pfn, zone_end_pfn(zone));
+
+		if (!__pageblock_pfn_to_page(block_start_pfn,
+					     block_end_pfn, zone))
+			return;
+		cond_resched();
+	}
+
+	/* We confirm that there is no hole */
+	zone->contiguous = true;
+}
+
 //void clear_zone_contiguous(struct zone *zone)
 //{
 //	zone->contiguous = false;
@@ -2000,51 +2000,52 @@ void __init memblock_free_pages(struct page *page, unsigned long pfn,
 //}
 //
 //#endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */
-//
-//void __init page_alloc_init_late(void)
-//{
-//	struct zone *zone;
-//	int nid;
-//
-//#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
-//
-//	/* There will be num_node_state(N_MEMORY) threads */
-//	atomic_set(&pgdat_init_n_undone, num_node_state(N_MEMORY));
-//	for_each_node_state(nid, N_MEMORY) {
-//		kthread_run(deferred_init_memmap, NODE_DATA(nid), "pgdatinit%d", nid);
-//	}
-//
-//	/* Block until all are initialised */
-//	wait_for_completion(&pgdat_init_all_done_comp);
-//
-//	/*
-//	 * The number of managed pages has changed due to the initialisation
-//	 * so the pcpu batch and high limits needs to be updated or the limits
-//	 * will be artificially small.
-//	 */
-//	for_each_populated_zone(zone)
-//		zone_pcp_update(zone);
-//
-//	/*
-//	 * We initialized the rest of the deferred pages.  Permanently disable
-//	 * on-demand struct page initialization.
-//	 */
-//	static_branch_disable(&deferred_pages);
-//
-//	/* Reinit limits that are based on free pages after the kernel is up */
-//	files_maxfiles_init();
-//#endif
-//
-//	/* Discard memblock private memory */
-//	memblock_discard();
-//
-//	for_each_node_state(nid, N_MEMORY)
-//		shuffle_free_memory(NODE_DATA(nid));
-//
-//	for_each_populated_zone(zone)
-//		set_zone_contiguous(zone);
-//}
-//
+
+void __init page_alloc_init_late(void)
+{
+	struct zone *zone;
+	int nid;
+
+#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
+
+	/* There will be num_node_state(N_MEMORY) threads */
+	atomic_set(&pgdat_init_n_undone, num_node_state(N_MEMORY));
+	for_each_node_state(nid, N_MEMORY) {
+		kthread_run(deferred_init_memmap, NODE_DATA(nid), "pgdatinit%d", nid);
+	}
+
+	/* Block until all are initialised */
+	wait_for_completion(&pgdat_init_all_done_comp);
+
+	/*
+	 * The number of managed pages has changed due to the initialisation
+	 * so the pcpu batch and high limits needs to be updated or the limits
+	 * will be artificially small.
+	 */
+	for_each_populated_zone(zone)
+		zone_pcp_update(zone);
+
+	/*
+	 * We initialized the rest of the deferred pages.  Permanently disable
+	 * on-demand struct page initialization.
+	 */
+	static_branch_disable(&deferred_pages);
+
+	/* Reinit limits that are based on free pages after the kernel is up */
+	files_maxfiles_init();
+#endif
+
+	/* Discard memblock private memory */
+	memblock_discard();
+
+	for_each_node_state(nid, N_MEMORY)
+		shuffle_free_memory(NODE_DATA(nid));
+
+	for_each_populated_zone(zone)
+		set_zone_contiguous(zone);
+}
+EXPORT_SYMBOL(page_alloc_init_late);
+
 //#ifdef CONFIG_CMA
 ///* Free whole pageblock and set its migration type to MIGRATE_CMA. */
 //void __init init_cma_reserved_pageblock(struct page *page)

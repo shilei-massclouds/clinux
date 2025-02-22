@@ -62,3 +62,13 @@ __weak void kmem_cache_free(struct kmem_cache *s, void *x)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(kmem_cache_free);
+
+__weak void __init memblock_free_pages(struct page *page, unsigned long pfn,
+							unsigned int order)
+{
+    booter_panic("No impl 'page_init_poison'.");
+}
+EXPORT_SYMBOL(memblock_free_pages);
+
+atomic_long_t _totalram_pages __read_mostly;
+EXPORT_SYMBOL(_totalram_pages);

@@ -377,29 +377,30 @@ static void __init_memblock memblock_remove_region(struct memblock_type *type, u
 	}
 }
 
-//#ifndef CONFIG_ARCH_KEEP_MEMBLOCK
-///**
-// * memblock_discard - discard memory and reserved arrays if they were allocated
-// */
-//void __init memblock_discard(void)
-//{
-//	phys_addr_t addr, size;
-//
-//	if (memblock.reserved.regions != memblock_reserved_init_regions) {
-//		addr = __pa(memblock.reserved.regions);
-//		size = PAGE_ALIGN(sizeof(struct memblock_region) *
-//				  memblock.reserved.max);
-//		__memblock_free_late(addr, size);
-//	}
-//
-//	if (memblock.memory.regions != memblock_memory_init_regions) {
-//		addr = __pa(memblock.memory.regions);
-//		size = PAGE_ALIGN(sizeof(struct memblock_region) *
-//				  memblock.memory.max);
-//		__memblock_free_late(addr, size);
-//	}
-//}
-//#endif
+#ifndef CONFIG_ARCH_KEEP_MEMBLOCK
+/**
+ * memblock_discard - discard memory and reserved arrays if they were allocated
+ */
+void __init memblock_discard(void)
+{
+	phys_addr_t addr, size;
+
+	if (memblock.reserved.regions != memblock_reserved_init_regions) {
+		addr = __pa(memblock.reserved.regions);
+		size = PAGE_ALIGN(sizeof(struct memblock_region) *
+				  memblock.reserved.max);
+		__memblock_free_late(addr, size);
+	}
+
+	if (memblock.memory.regions != memblock_memory_init_regions) {
+		addr = __pa(memblock.memory.regions);
+		size = PAGE_ALIGN(sizeof(struct memblock_region) *
+				  memblock.memory.max);
+		__memblock_free_late(addr, size);
+	}
+}
+EXPORT_SYMBOL(memblock_discard);
+#endif
 
 /**
  * memblock_double_array - double the size of the memblock regions array
@@ -1629,32 +1630,32 @@ void * __init memblock_alloc_try_nid(
 }
 EXPORT_SYMBOL(memblock_alloc_try_nid);
 
-///**
-// * __memblock_free_late - free pages directly to buddy allocator
-// * @base: phys starting address of the  boot memory block
-// * @size: size of the boot memory block in bytes
-// *
-// * This is only useful when the memblock allocator has already been torn
-// * down, but we are still initializing the system.  Pages are released directly
-// * to the buddy allocator.
-// */
-//void __init __memblock_free_late(phys_addr_t base, phys_addr_t size)
-//{
-//	phys_addr_t cursor, end;
-//
-//	end = base + size - 1;
-//	memblock_dbg("%s: [%pa-%pa] %pS\n",
-//		     __func__, &base, &end, (void *)_RET_IP_);
-//	kmemleak_free_part_phys(base, size);
-//	cursor = PFN_UP(base);
-//	end = PFN_DOWN(base + size);
-//
-//	for (; cursor < end; cursor++) {
-//		memblock_free_pages(pfn_to_page(cursor), cursor, 0);
-//		totalram_pages_inc();
-//	}
-//}
-//
+/**
+ * __memblock_free_late - free pages directly to buddy allocator
+ * @base: phys starting address of the  boot memory block
+ * @size: size of the boot memory block in bytes
+ *
+ * This is only useful when the memblock allocator has already been torn
+ * down, but we are still initializing the system.  Pages are released directly
+ * to the buddy allocator.
+ */
+void __init __memblock_free_late(phys_addr_t base, phys_addr_t size)
+{
+	phys_addr_t cursor, end;
+
+	end = base + size - 1;
+	memblock_dbg("%s: [%pa-%pa] %pS\n",
+		     __func__, &base, &end, (void *)_RET_IP_);
+	kmemleak_free_part_phys(base, size);
+	cursor = PFN_UP(base);
+	end = PFN_DOWN(base + size);
+
+	for (; cursor < end; cursor++) {
+		memblock_free_pages(pfn_to_page(cursor), cursor, 0);
+		totalram_pages_inc();
+	}
+}
+
 ///*
 // * Remaining API functions
 // */

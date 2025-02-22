@@ -8,6 +8,7 @@
 #include <linux/export.h>
 #include <linux/sched/task.h>
 #include <linux/smp.h>
+#include <linux/padata.h>
 #include <linux/nmi.h>
 #include <linux/sfi.h>
 #include <linux/cpuset.h>
@@ -777,16 +778,16 @@ static noinline void __init kernel_init_freeable(void)
     do_pre_smp_initcalls();
     lockup_detector_init();
 
-    printk("%s: ============ 1 \n", __func__);
     smp_init();
-    printk("%s: ============ 2 \n", __func__);
     sched_init_smp();
 
+    padata_init();
+    printk("%s: ============ 1 \n", __func__);
+    page_alloc_init_late();
+    printk("%s: ============ 2 \n", __func__);
+    /* Initialize page ext after all struct pages are initialized. */
+    page_ext_init();
     printk("%s: ============ 3 \n", __func__);
-//    padata_init();
-//    page_alloc_init_late();
-//    /* Initialize page ext after all struct pages are initialized. */
-//    page_ext_init();
 //
 //    do_basic_setup();
 //

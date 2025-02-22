@@ -1154,3 +1154,20 @@ __weak void touch_all_softlockup_watchdogs(void)
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(touch_all_softlockup_watchdogs);
+
+int initrd_below_start_ok;
+EXPORT_SYMBOL(initrd_below_start_ok);
+phys_addr_t phys_initrd_start __initdata;
+EXPORT_SYMBOL(phys_initrd_start);
+unsigned long phys_initrd_size __initdata;
+EXPORT_SYMBOL(phys_initrd_size);
+unsigned long initrd_start;
+EXPORT_SYMBOL(initrd_start);
+unsigned long initrd_end;
+EXPORT_SYMBOL(initrd_end);
+
+__weak void __init early_init_fdt_scan_reserved_mem(void)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(early_init_fdt_scan_reserved_mem);

@@ -2,3 +2,4 @@
 
 obj_y := init.o
 obj_y += memblock.o
+obj_y += bootmem.o
