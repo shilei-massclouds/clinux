@@ -1148,3 +1148,9 @@ __weak notrace void touch_softlockup_watchdog_sched(void)
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(touch_softlockup_watchdog_sched);
+
+__weak void touch_all_softlockup_watchdogs(void)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(touch_all_softlockup_watchdogs);

@@ -281,7 +281,6 @@ void touch_all_softlockup_watchdogs(void)
 		per_cpu(watchdog_touch_ts, cpu) = SOFTLOCKUP_RESET;
 	wq_watchdog_touch(-1);
 }
-EXPORT_SYMBOL(touch_all_softlockup_watchdogs);
 
 void touch_softlockup_watchdog_sync(void)
 {
