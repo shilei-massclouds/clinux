@@ -105,36 +105,36 @@
 //#endif
 //
 #ifdef CONFIG_VM_EVENT_COUNTERS
-DEFINE_PER_CPU(struct vm_event_state, vm_event_states) = {{0}};
-EXPORT_PER_CPU_SYMBOL(vm_event_states);
-//
-//static void sum_vm_events(unsigned long *ret)
-//{
-//	int cpu;
-//	int i;
-//
-//	memset(ret, 0, NR_VM_EVENT_ITEMS * sizeof(unsigned long));
-//
-//	for_each_online_cpu(cpu) {
-//		struct vm_event_state *this = &per_cpu(vm_event_states, cpu);
-//
-//		for (i = 0; i < NR_VM_EVENT_ITEMS; i++)
-//			ret[i] += this->event[i];
-//	}
-//}
-//
-///*
-// * Accumulate the vm event counters across all CPUs.
-// * The result is unavoidably approximate - it can change
-// * during and after execution of this function.
-//*/
-//void all_vm_events(unsigned long *ret)
-//{
-//	get_online_cpus();
-//	sum_vm_events(ret);
-//	put_online_cpus();
-//}
-//EXPORT_SYMBOL_GPL(all_vm_events);
+//DEFINE_PER_CPU(struct vm_event_state, vm_event_states) = {{0}};
+//EXPORT_PER_CPU_SYMBOL(vm_event_states);
+
+static void sum_vm_events(unsigned long *ret)
+{
+	int cpu;
+	int i;
+
+	memset(ret, 0, NR_VM_EVENT_ITEMS * sizeof(unsigned long));
+
+	for_each_online_cpu(cpu) {
+		struct vm_event_state *this = &per_cpu(vm_event_states, cpu);
+
+		for (i = 0; i < NR_VM_EVENT_ITEMS; i++)
+			ret[i] += this->event[i];
+	}
+}
+
+/*
+ * Accumulate the vm event counters across all CPUs.
+ * The result is unavoidably approximate - it can change
+ * during and after execution of this function.
+*/
+void all_vm_events(unsigned long *ret)
+{
+	get_online_cpus();
+	sum_vm_events(ret);
+	put_online_cpus();
+}
+EXPORT_SYMBOL_GPL(all_vm_events);
 
 /*
  * Fold the foreign cpu events into our own.
@@ -160,12 +160,12 @@ void vm_events_fold_cpu(int cpu)
  *
  * vm_stat contains the global counters
  */
-atomic_long_t vm_zone_stat[NR_VM_ZONE_STAT_ITEMS] __cacheline_aligned_in_smp;
-atomic_long_t vm_numa_stat[NR_VM_NUMA_STAT_ITEMS] __cacheline_aligned_in_smp;
-atomic_long_t vm_node_stat[NR_VM_NODE_STAT_ITEMS] __cacheline_aligned_in_smp;
-EXPORT_SYMBOL(vm_zone_stat);
-EXPORT_SYMBOL(vm_numa_stat);
-EXPORT_SYMBOL(vm_node_stat);
+//atomic_long_t vm_zone_stat[NR_VM_ZONE_STAT_ITEMS] __cacheline_aligned_in_smp;
+//atomic_long_t vm_numa_stat[NR_VM_NUMA_STAT_ITEMS] __cacheline_aligned_in_smp;
+//atomic_long_t vm_node_stat[NR_VM_NODE_STAT_ITEMS] __cacheline_aligned_in_smp;
+//EXPORT_SYMBOL(vm_zone_stat);
+//EXPORT_SYMBOL(vm_numa_stat);
+//EXPORT_SYMBOL(vm_node_stat);
 
 //#ifdef CONFIG_SMP
 //
@@ -1123,683 +1123,683 @@ EXPORT_SYMBOL(vm_node_stat);
 //	return __fragmentation_index(order, &info);
 //}
 //#endif
-//
-//#if defined(CONFIG_PROC_FS) || defined(CONFIG_SYSFS) || \
-//    defined(CONFIG_NUMA) || defined(CONFIG_MEMCG)
-//#ifdef CONFIG_ZONE_DMA
-//#define TEXT_FOR_DMA(xx) xx "_dma",
-//#else
-//#define TEXT_FOR_DMA(xx)
-//#endif
-//
-//#ifdef CONFIG_ZONE_DMA32
-//#define TEXT_FOR_DMA32(xx) xx "_dma32",
-//#else
-//#define TEXT_FOR_DMA32(xx)
-//#endif
-//
-//#ifdef CONFIG_HIGHMEM
-//#define TEXT_FOR_HIGHMEM(xx) xx "_high",
-//#else
-//#define TEXT_FOR_HIGHMEM(xx)
-//#endif
-//
-//#define TEXTS_FOR_ZONES(xx) TEXT_FOR_DMA(xx) TEXT_FOR_DMA32(xx) xx "_normal", \
-//					TEXT_FOR_HIGHMEM(xx) xx "_movable",
-//
-//const char * const vmstat_text[] = {
-//	/* enum zone_stat_item counters */
-//	"nr_free_pages",
-//	"nr_zone_inactive_anon",
-//	"nr_zone_active_anon",
-//	"nr_zone_inactive_file",
-//	"nr_zone_active_file",
-//	"nr_zone_unevictable",
-//	"nr_zone_write_pending",
-//	"nr_mlock",
-//	"nr_page_table_pages",
-//	"nr_bounce",
-//#if IS_ENABLED(CONFIG_ZSMALLOC)
-//	"nr_zspages",
-//#endif
-//	"nr_free_cma",
-//
-//	/* enum numa_stat_item counters */
-//#ifdef CONFIG_NUMA
-//	"numa_hit",
-//	"numa_miss",
-//	"numa_foreign",
-//	"numa_interleave",
-//	"numa_local",
-//	"numa_other",
-//#endif
-//
-//	/* enum node_stat_item counters */
-//	"nr_inactive_anon",
-//	"nr_active_anon",
-//	"nr_inactive_file",
-//	"nr_active_file",
-//	"nr_unevictable",
-//	"nr_slab_reclaimable",
-//	"nr_slab_unreclaimable",
-//	"nr_isolated_anon",
-//	"nr_isolated_file",
-//	"workingset_nodes",
-//	"workingset_refault_anon",
-//	"workingset_refault_file",
-//	"workingset_activate_anon",
-//	"workingset_activate_file",
-//	"workingset_restore_anon",
-//	"workingset_restore_file",
-//	"workingset_nodereclaim",
-//	"nr_anon_pages",
-//	"nr_mapped",
-//	"nr_file_pages",
-//	"nr_dirty",
-//	"nr_writeback",
-//	"nr_writeback_temp",
-//	"nr_shmem",
-//	"nr_shmem_hugepages",
-//	"nr_shmem_pmdmapped",
-//	"nr_file_hugepages",
-//	"nr_file_pmdmapped",
-//	"nr_anon_transparent_hugepages",
-//	"nr_vmscan_write",
-//	"nr_vmscan_immediate_reclaim",
-//	"nr_dirtied",
-//	"nr_written",
-//	"nr_kernel_misc_reclaimable",
-//	"nr_foll_pin_acquired",
-//	"nr_foll_pin_released",
-//	"nr_kernel_stack",
-//#if IS_ENABLED(CONFIG_SHADOW_CALL_STACK)
-//	"nr_shadow_call_stack",
-//#endif
-//
-//	/* enum writeback_stat_item counters */
-//	"nr_dirty_threshold",
-//	"nr_dirty_background_threshold",
-//
-//#if defined(CONFIG_VM_EVENT_COUNTERS) || defined(CONFIG_MEMCG)
-//	/* enum vm_event_item counters */
-//	"pgpgin",
-//	"pgpgout",
-//	"pswpin",
-//	"pswpout",
-//
-//	TEXTS_FOR_ZONES("pgalloc")
-//	TEXTS_FOR_ZONES("allocstall")
-//	TEXTS_FOR_ZONES("pgskip")
-//
-//	"pgfree",
-//	"pgactivate",
-//	"pgdeactivate",
-//	"pglazyfree",
-//
-//	"pgfault",
-//	"pgmajfault",
-//	"pglazyfreed",
-//
-//	"pgrefill",
-//	"pgreuse",
-//	"pgsteal_kswapd",
-//	"pgsteal_direct",
-//	"pgscan_kswapd",
-//	"pgscan_direct",
-//	"pgscan_direct_throttle",
-//	"pgscan_anon",
-//	"pgscan_file",
-//	"pgsteal_anon",
-//	"pgsteal_file",
-//
-//#ifdef CONFIG_NUMA
-//	"zone_reclaim_failed",
-//#endif
-//	"pginodesteal",
-//	"slabs_scanned",
-//	"kswapd_inodesteal",
-//	"kswapd_low_wmark_hit_quickly",
-//	"kswapd_high_wmark_hit_quickly",
-//	"pageoutrun",
-//
-//	"pgrotated",
-//
-//	"drop_pagecache",
-//	"drop_slab",
-//	"oom_kill",
-//
-//#ifdef CONFIG_NUMA_BALANCING
-//	"numa_pte_updates",
-//	"numa_huge_pte_updates",
-//	"numa_hint_faults",
-//	"numa_hint_faults_local",
-//	"numa_pages_migrated",
-//#endif
-//#ifdef CONFIG_MIGRATION
-//	"pgmigrate_success",
-//	"pgmigrate_fail",
-//	"thp_migration_success",
-//	"thp_migration_fail",
-//	"thp_migration_split",
-//#endif
-//#ifdef CONFIG_COMPACTION
-//	"compact_migrate_scanned",
-//	"compact_free_scanned",
-//	"compact_isolated",
-//	"compact_stall",
-//	"compact_fail",
-//	"compact_success",
-//	"compact_daemon_wake",
-//	"compact_daemon_migrate_scanned",
-//	"compact_daemon_free_scanned",
-//#endif
-//
-//#ifdef CONFIG_HUGETLB_PAGE
-//	"htlb_buddy_alloc_success",
-//	"htlb_buddy_alloc_fail",
-//#endif
-//	"unevictable_pgs_culled",
-//	"unevictable_pgs_scanned",
-//	"unevictable_pgs_rescued",
-//	"unevictable_pgs_mlocked",
-//	"unevictable_pgs_munlocked",
-//	"unevictable_pgs_cleared",
-//	"unevictable_pgs_stranded",
-//
-//#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-//	"thp_fault_alloc",
-//	"thp_fault_fallback",
-//	"thp_fault_fallback_charge",
-//	"thp_collapse_alloc",
-//	"thp_collapse_alloc_failed",
-//	"thp_file_alloc",
-//	"thp_file_fallback",
-//	"thp_file_fallback_charge",
-//	"thp_file_mapped",
-//	"thp_split_page",
-//	"thp_split_page_failed",
-//	"thp_deferred_split_page",
-//	"thp_split_pmd",
-//#ifdef CONFIG_HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD
-//	"thp_split_pud",
-//#endif
-//	"thp_zero_page_alloc",
-//	"thp_zero_page_alloc_failed",
-//	"thp_swpout",
-//	"thp_swpout_fallback",
-//#endif
-//#ifdef CONFIG_MEMORY_BALLOON
-//	"balloon_inflate",
-//	"balloon_deflate",
-//#ifdef CONFIG_BALLOON_COMPACTION
-//	"balloon_migrate",
-//#endif
-//#endif /* CONFIG_MEMORY_BALLOON */
-//#ifdef CONFIG_DEBUG_TLBFLUSH
-//	"nr_tlb_remote_flush",
-//	"nr_tlb_remote_flush_received",
-//	"nr_tlb_local_flush_all",
-//	"nr_tlb_local_flush_one",
-//#endif /* CONFIG_DEBUG_TLBFLUSH */
-//
-//#ifdef CONFIG_DEBUG_VM_VMACACHE
-//	"vmacache_find_calls",
-//	"vmacache_find_hits",
-//#endif
-//#ifdef CONFIG_SWAP
-//	"swap_ra",
-//	"swap_ra_hit",
-//#endif
-//#endif /* CONFIG_VM_EVENT_COUNTERS || CONFIG_MEMCG */
-//};
-//#endif /* CONFIG_PROC_FS || CONFIG_SYSFS || CONFIG_NUMA || CONFIG_MEMCG */
-//
-//#if (defined(CONFIG_DEBUG_FS) && defined(CONFIG_COMPACTION)) || \
-//     defined(CONFIG_PROC_FS)
-//static void *frag_start(struct seq_file *m, loff_t *pos)
-//{
-//	pg_data_t *pgdat;
-//	loff_t node = *pos;
-//
-//	for (pgdat = first_online_pgdat();
-//	     pgdat && node;
-//	     pgdat = next_online_pgdat(pgdat))
-//		--node;
-//
-//	return pgdat;
-//}
-//
-//static void *frag_next(struct seq_file *m, void *arg, loff_t *pos)
-//{
-//	pg_data_t *pgdat = (pg_data_t *)arg;
-//
-//	(*pos)++;
-//	return next_online_pgdat(pgdat);
-//}
-//
-//static void frag_stop(struct seq_file *m, void *arg)
-//{
-//}
-//
-///*
-// * Walk zones in a node and print using a callback.
-// * If @assert_populated is true, only use callback for zones that are populated.
-// */
-//static void walk_zones_in_node(struct seq_file *m, pg_data_t *pgdat,
-//		bool assert_populated, bool nolock,
-//		void (*print)(struct seq_file *m, pg_data_t *, struct zone *))
-//{
-//	struct zone *zone;
-//	struct zone *node_zones = pgdat->node_zones;
-//	unsigned long flags;
-//
-//	for (zone = node_zones; zone - node_zones < MAX_NR_ZONES; ++zone) {
-//		if (assert_populated && !populated_zone(zone))
-//			continue;
-//
-//		if (!nolock)
-//			spin_lock_irqsave(&zone->lock, flags);
-//		print(m, pgdat, zone);
-//		if (!nolock)
-//			spin_unlock_irqrestore(&zone->lock, flags);
-//	}
-//}
-//#endif
-//
-//#ifdef CONFIG_PROC_FS
-//static void frag_show_print(struct seq_file *m, pg_data_t *pgdat,
-//						struct zone *zone)
-//{
-//	int order;
-//
-//	seq_printf(m, "Node %d, zone %8s ", pgdat->node_id, zone->name);
-//	for (order = 0; order < MAX_ORDER; ++order)
-//		seq_printf(m, "%6lu ", zone->free_area[order].nr_free);
-//	seq_putc(m, '\n');
-//}
-//
-///*
-// * This walks the free areas for each zone.
-// */
-//static int frag_show(struct seq_file *m, void *arg)
-//{
-//	pg_data_t *pgdat = (pg_data_t *)arg;
-//	walk_zones_in_node(m, pgdat, true, false, frag_show_print);
-//	return 0;
-//}
-//
-//static void pagetypeinfo_showfree_print(struct seq_file *m,
-//					pg_data_t *pgdat, struct zone *zone)
-//{
-//	int order, mtype;
-//
-//	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++) {
-//		seq_printf(m, "Node %4d, zone %8s, type %12s ",
-//					pgdat->node_id,
-//					zone->name,
-//					migratetype_names[mtype]);
-//		for (order = 0; order < MAX_ORDER; ++order) {
-//			unsigned long freecount = 0;
-//			struct free_area *area;
-//			struct list_head *curr;
-//			bool overflow = false;
-//
-//			area = &(zone->free_area[order]);
-//
-//			list_for_each(curr, &area->free_list[mtype]) {
-//				/*
-//				 * Cap the free_list iteration because it might
-//				 * be really large and we are under a spinlock
-//				 * so a long time spent here could trigger a
-//				 * hard lockup detector. Anyway this is a
-//				 * debugging tool so knowing there is a handful
-//				 * of pages of this order should be more than
-//				 * sufficient.
-//				 */
-//				if (++freecount >= 100000) {
-//					overflow = true;
-//					break;
-//				}
-//			}
-//			seq_printf(m, "%s%6lu ", overflow ? ">" : "", freecount);
-//			spin_unlock_irq(&zone->lock);
-//			cond_resched();
-//			spin_lock_irq(&zone->lock);
-//		}
-//		seq_putc(m, '\n');
-//	}
-//}
-//
-///* Print out the free pages at each order for each migatetype */
-//static int pagetypeinfo_showfree(struct seq_file *m, void *arg)
-//{
-//	int order;
-//	pg_data_t *pgdat = (pg_data_t *)arg;
-//
-//	/* Print header */
-//	seq_printf(m, "%-43s ", "Free pages count per migrate type at order");
-//	for (order = 0; order < MAX_ORDER; ++order)
-//		seq_printf(m, "%6d ", order);
-//	seq_putc(m, '\n');
-//
-//	walk_zones_in_node(m, pgdat, true, false, pagetypeinfo_showfree_print);
-//
-//	return 0;
-//}
-//
-//static void pagetypeinfo_showblockcount_print(struct seq_file *m,
-//					pg_data_t *pgdat, struct zone *zone)
-//{
-//	int mtype;
-//	unsigned long pfn;
-//	unsigned long start_pfn = zone->zone_start_pfn;
-//	unsigned long end_pfn = zone_end_pfn(zone);
-//	unsigned long count[MIGRATE_TYPES] = { 0, };
-//
-//	for (pfn = start_pfn; pfn < end_pfn; pfn += pageblock_nr_pages) {
-//		struct page *page;
-//
-//		page = pfn_to_online_page(pfn);
-//		if (!page)
-//			continue;
-//
-//		/* Watch for unexpected holes punched in the memmap */
-//		if (!memmap_valid_within(pfn, page, zone))
-//			continue;
-//
-//		if (page_zone(page) != zone)
-//			continue;
-//
-//		mtype = get_pageblock_migratetype(page);
-//
-//		if (mtype < MIGRATE_TYPES)
-//			count[mtype]++;
-//	}
-//
-//	/* Print counts */
-//	seq_printf(m, "Node %d, zone %8s ", pgdat->node_id, zone->name);
-//	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++)
-//		seq_printf(m, "%12lu ", count[mtype]);
-//	seq_putc(m, '\n');
-//}
-//
-///* Print out the number of pageblocks for each migratetype */
-//static int pagetypeinfo_showblockcount(struct seq_file *m, void *arg)
-//{
-//	int mtype;
-//	pg_data_t *pgdat = (pg_data_t *)arg;
-//
-//	seq_printf(m, "\n%-23s", "Number of blocks type ");
-//	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++)
-//		seq_printf(m, "%12s ", migratetype_names[mtype]);
-//	seq_putc(m, '\n');
-//	walk_zones_in_node(m, pgdat, true, false,
-//		pagetypeinfo_showblockcount_print);
-//
-//	return 0;
-//}
-//
-///*
-// * Print out the number of pageblocks for each migratetype that contain pages
-// * of other types. This gives an indication of how well fallbacks are being
-// * contained by rmqueue_fallback(). It requires information from PAGE_OWNER
-// * to determine what is going on
-// */
-//static void pagetypeinfo_showmixedcount(struct seq_file *m, pg_data_t *pgdat)
-//{
-//#ifdef CONFIG_PAGE_OWNER
-//	int mtype;
-//
-//	if (!static_branch_unlikely(&page_owner_inited))
-//		return;
-//
-//	drain_all_pages(NULL);
-//
-//	seq_printf(m, "\n%-23s", "Number of mixed blocks ");
-//	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++)
-//		seq_printf(m, "%12s ", migratetype_names[mtype]);
-//	seq_putc(m, '\n');
-//
-//	walk_zones_in_node(m, pgdat, true, true,
-//		pagetypeinfo_showmixedcount_print);
-//#endif /* CONFIG_PAGE_OWNER */
-//}
-//
-///*
-// * This prints out statistics in relation to grouping pages by mobility.
-// * It is expensive to collect so do not constantly read the file.
-// */
-//static int pagetypeinfo_show(struct seq_file *m, void *arg)
-//{
-//	pg_data_t *pgdat = (pg_data_t *)arg;
-//
-//	/* check memoryless node */
-//	if (!node_state(pgdat->node_id, N_MEMORY))
-//		return 0;
-//
-//	seq_printf(m, "Page block order: %d\n", pageblock_order);
-//	seq_printf(m, "Pages per block:  %lu\n", pageblock_nr_pages);
-//	seq_putc(m, '\n');
-//	pagetypeinfo_showfree(m, pgdat);
-//	pagetypeinfo_showblockcount(m, pgdat);
-//	pagetypeinfo_showmixedcount(m, pgdat);
-//
-//	return 0;
-//}
-//
-//static const struct seq_operations fragmentation_op = {
-//	.start	= frag_start,
-//	.next	= frag_next,
-//	.stop	= frag_stop,
-//	.show	= frag_show,
-//};
-//
-//static const struct seq_operations pagetypeinfo_op = {
-//	.start	= frag_start,
-//	.next	= frag_next,
-//	.stop	= frag_stop,
-//	.show	= pagetypeinfo_show,
-//};
-//
-//static bool is_zone_first_populated(pg_data_t *pgdat, struct zone *zone)
-//{
-//	int zid;
-//
-//	for (zid = 0; zid < MAX_NR_ZONES; zid++) {
-//		struct zone *compare = &pgdat->node_zones[zid];
-//
-//		if (populated_zone(compare))
-//			return zone == compare;
-//	}
-//
-//	return false;
-//}
-//
-//static void zoneinfo_show_print(struct seq_file *m, pg_data_t *pgdat,
-//							struct zone *zone)
-//{
-//	int i;
-//	seq_printf(m, "Node %d, zone %8s", pgdat->node_id, zone->name);
-//	if (is_zone_first_populated(pgdat, zone)) {
-//		seq_printf(m, "\n  per-node stats");
-//		for (i = 0; i < NR_VM_NODE_STAT_ITEMS; i++) {
-//			seq_printf(m, "\n      %-12s %lu", node_stat_name(i),
-//				   node_page_state_pages(pgdat, i));
-//		}
-//	}
-//	seq_printf(m,
-//		   "\n  pages free     %lu"
-//		   "\n        min      %lu"
-//		   "\n        low      %lu"
-//		   "\n        high     %lu"
-//		   "\n        spanned  %lu"
-//		   "\n        present  %lu"
-//		   "\n        managed  %lu",
-//		   zone_page_state(zone, NR_FREE_PAGES),
-//		   min_wmark_pages(zone),
-//		   low_wmark_pages(zone),
-//		   high_wmark_pages(zone),
-//		   zone->spanned_pages,
-//		   zone->present_pages,
-//		   zone_managed_pages(zone));
-//
-//	seq_printf(m,
-//		   "\n        protection: (%ld",
-//		   zone->lowmem_reserve[0]);
-//	for (i = 1; i < ARRAY_SIZE(zone->lowmem_reserve); i++)
-//		seq_printf(m, ", %ld", zone->lowmem_reserve[i]);
-//	seq_putc(m, ')');
-//
-//	/* If unpopulated, no other information is useful */
-//	if (!populated_zone(zone)) {
-//		seq_putc(m, '\n');
-//		return;
-//	}
-//
-//	for (i = 0; i < NR_VM_ZONE_STAT_ITEMS; i++)
-//		seq_printf(m, "\n      %-12s %lu", zone_stat_name(i),
-//			   zone_page_state(zone, i));
-//
-//#ifdef CONFIG_NUMA
-//	for (i = 0; i < NR_VM_NUMA_STAT_ITEMS; i++)
-//		seq_printf(m, "\n      %-12s %lu", numa_stat_name(i),
-//			   zone_numa_state_snapshot(zone, i));
-//#endif
-//
-//	seq_printf(m, "\n  pagesets");
-//	for_each_online_cpu(i) {
-//		struct per_cpu_pageset *pageset;
-//
-//		pageset = per_cpu_ptr(zone->pageset, i);
-//		seq_printf(m,
-//			   "\n    cpu: %i"
-//			   "\n              count: %i"
-//			   "\n              high:  %i"
-//			   "\n              batch: %i",
-//			   i,
-//			   pageset->pcp.count,
-//			   pageset->pcp.high,
-//			   pageset->pcp.batch);
-//#ifdef CONFIG_SMP
-//		seq_printf(m, "\n  vm stats threshold: %d",
-//				pageset->stat_threshold);
-//#endif
-//	}
-//	seq_printf(m,
-//		   "\n  node_unreclaimable:  %u"
-//		   "\n  start_pfn:           %lu",
-//		   pgdat->kswapd_failures >= MAX_RECLAIM_RETRIES,
-//		   zone->zone_start_pfn);
-//	seq_putc(m, '\n');
-//}
-//
-///*
-// * Output information about zones in @pgdat.  All zones are printed regardless
-// * of whether they are populated or not: lowmem_reserve_ratio operates on the
-// * set of all zones and userspace would not be aware of such zones if they are
-// * suppressed here (zoneinfo displays the effect of lowmem_reserve_ratio).
-// */
-//static int zoneinfo_show(struct seq_file *m, void *arg)
-//{
-//	pg_data_t *pgdat = (pg_data_t *)arg;
-//	walk_zones_in_node(m, pgdat, false, false, zoneinfo_show_print);
-//	return 0;
-//}
-//
-//static const struct seq_operations zoneinfo_op = {
-//	.start	= frag_start, /* iterate over all zones. The same as in
-//			       * fragmentation. */
-//	.next	= frag_next,
-//	.stop	= frag_stop,
-//	.show	= zoneinfo_show,
-//};
-//
-//#define NR_VMSTAT_ITEMS (NR_VM_ZONE_STAT_ITEMS + \
-//			 NR_VM_NUMA_STAT_ITEMS + \
-//			 NR_VM_NODE_STAT_ITEMS + \
-//			 NR_VM_WRITEBACK_STAT_ITEMS + \
-//			 (IS_ENABLED(CONFIG_VM_EVENT_COUNTERS) ? \
-//			  NR_VM_EVENT_ITEMS : 0))
-//
-//static void *vmstat_start(struct seq_file *m, loff_t *pos)
-//{
-//	unsigned long *v;
-//	int i;
-//
-//	if (*pos >= NR_VMSTAT_ITEMS)
-//		return NULL;
-//
-//	BUILD_BUG_ON(ARRAY_SIZE(vmstat_text) < NR_VMSTAT_ITEMS);
-//	v = kmalloc_array(NR_VMSTAT_ITEMS, sizeof(unsigned long), GFP_KERNEL);
-//	m->private = v;
-//	if (!v)
-//		return ERR_PTR(-ENOMEM);
-//	for (i = 0; i < NR_VM_ZONE_STAT_ITEMS; i++)
-//		v[i] = global_zone_page_state(i);
-//	v += NR_VM_ZONE_STAT_ITEMS;
-//
-//#ifdef CONFIG_NUMA
-//	for (i = 0; i < NR_VM_NUMA_STAT_ITEMS; i++)
-//		v[i] = global_numa_state(i);
-//	v += NR_VM_NUMA_STAT_ITEMS;
-//#endif
-//
-//	for (i = 0; i < NR_VM_NODE_STAT_ITEMS; i++)
-//		v[i] = global_node_page_state_pages(i);
-//	v += NR_VM_NODE_STAT_ITEMS;
-//
-//	global_dirty_limits(v + NR_DIRTY_BG_THRESHOLD,
-//			    v + NR_DIRTY_THRESHOLD);
-//	v += NR_VM_WRITEBACK_STAT_ITEMS;
-//
-//#ifdef CONFIG_VM_EVENT_COUNTERS
-//	all_vm_events(v);
-//	v[PGPGIN] /= 2;		/* sectors -> kbytes */
-//	v[PGPGOUT] /= 2;
-//#endif
-//	return (unsigned long *)m->private + *pos;
-//}
-//
-//static void *vmstat_next(struct seq_file *m, void *arg, loff_t *pos)
-//{
-//	(*pos)++;
-//	if (*pos >= NR_VMSTAT_ITEMS)
-//		return NULL;
-//	return (unsigned long *)m->private + *pos;
-//}
-//
-//static int vmstat_show(struct seq_file *m, void *arg)
-//{
-//	unsigned long *l = arg;
-//	unsigned long off = l - (unsigned long *)m->private;
-//
-//	seq_puts(m, vmstat_text[off]);
-//	seq_put_decimal_ull(m, " ", *l);
-//	seq_putc(m, '\n');
-//
-//	if (off == NR_VMSTAT_ITEMS - 1) {
-//		/*
-//		 * We've come to the end - add any deprecated counters to avoid
-//		 * breaking userspace which might depend on them being present.
-//		 */
-//		seq_puts(m, "nr_unstable 0\n");
-//	}
-//	return 0;
-//}
-//
-//static void vmstat_stop(struct seq_file *m, void *arg)
-//{
-//	kfree(m->private);
-//	m->private = NULL;
-//}
-//
-//static const struct seq_operations vmstat_op = {
-//	.start	= vmstat_start,
-//	.next	= vmstat_next,
-//	.stop	= vmstat_stop,
-//	.show	= vmstat_show,
-//};
-//#endif /* CONFIG_PROC_FS */
+
+#if defined(CONFIG_PROC_FS) || defined(CONFIG_SYSFS) || \
+    defined(CONFIG_NUMA) || defined(CONFIG_MEMCG)
+#ifdef CONFIG_ZONE_DMA
+#define TEXT_FOR_DMA(xx) xx "_dma",
+#else
+#define TEXT_FOR_DMA(xx)
+#endif
+
+#ifdef CONFIG_ZONE_DMA32
+#define TEXT_FOR_DMA32(xx) xx "_dma32",
+#else
+#define TEXT_FOR_DMA32(xx)
+#endif
+
+#ifdef CONFIG_HIGHMEM
+#define TEXT_FOR_HIGHMEM(xx) xx "_high",
+#else
+#define TEXT_FOR_HIGHMEM(xx)
+#endif
+
+#define TEXTS_FOR_ZONES(xx) TEXT_FOR_DMA(xx) TEXT_FOR_DMA32(xx) xx "_normal", \
+					TEXT_FOR_HIGHMEM(xx) xx "_movable",
+
+const char * const vmstat_text[] = {
+	/* enum zone_stat_item counters */
+	"nr_free_pages",
+	"nr_zone_inactive_anon",
+	"nr_zone_active_anon",
+	"nr_zone_inactive_file",
+	"nr_zone_active_file",
+	"nr_zone_unevictable",
+	"nr_zone_write_pending",
+	"nr_mlock",
+	"nr_page_table_pages",
+	"nr_bounce",
+#if IS_ENABLED(CONFIG_ZSMALLOC)
+	"nr_zspages",
+#endif
+	"nr_free_cma",
+
+	/* enum numa_stat_item counters */
+#ifdef CONFIG_NUMA
+	"numa_hit",
+	"numa_miss",
+	"numa_foreign",
+	"numa_interleave",
+	"numa_local",
+	"numa_other",
+#endif
+
+	/* enum node_stat_item counters */
+	"nr_inactive_anon",
+	"nr_active_anon",
+	"nr_inactive_file",
+	"nr_active_file",
+	"nr_unevictable",
+	"nr_slab_reclaimable",
+	"nr_slab_unreclaimable",
+	"nr_isolated_anon",
+	"nr_isolated_file",
+	"workingset_nodes",
+	"workingset_refault_anon",
+	"workingset_refault_file",
+	"workingset_activate_anon",
+	"workingset_activate_file",
+	"workingset_restore_anon",
+	"workingset_restore_file",
+	"workingset_nodereclaim",
+	"nr_anon_pages",
+	"nr_mapped",
+	"nr_file_pages",
+	"nr_dirty",
+	"nr_writeback",
+	"nr_writeback_temp",
+	"nr_shmem",
+	"nr_shmem_hugepages",
+	"nr_shmem_pmdmapped",
+	"nr_file_hugepages",
+	"nr_file_pmdmapped",
+	"nr_anon_transparent_hugepages",
+	"nr_vmscan_write",
+	"nr_vmscan_immediate_reclaim",
+	"nr_dirtied",
+	"nr_written",
+	"nr_kernel_misc_reclaimable",
+	"nr_foll_pin_acquired",
+	"nr_foll_pin_released",
+	"nr_kernel_stack",
+#if IS_ENABLED(CONFIG_SHADOW_CALL_STACK)
+	"nr_shadow_call_stack",
+#endif
+
+	/* enum writeback_stat_item counters */
+	"nr_dirty_threshold",
+	"nr_dirty_background_threshold",
+
+#if defined(CONFIG_VM_EVENT_COUNTERS) || defined(CONFIG_MEMCG)
+	/* enum vm_event_item counters */
+	"pgpgin",
+	"pgpgout",
+	"pswpin",
+	"pswpout",
+
+	TEXTS_FOR_ZONES("pgalloc")
+	TEXTS_FOR_ZONES("allocstall")
+	TEXTS_FOR_ZONES("pgskip")
+
+	"pgfree",
+	"pgactivate",
+	"pgdeactivate",
+	"pglazyfree",
+
+	"pgfault",
+	"pgmajfault",
+	"pglazyfreed",
+
+	"pgrefill",
+	"pgreuse",
+	"pgsteal_kswapd",
+	"pgsteal_direct",
+	"pgscan_kswapd",
+	"pgscan_direct",
+	"pgscan_direct_throttle",
+	"pgscan_anon",
+	"pgscan_file",
+	"pgsteal_anon",
+	"pgsteal_file",
+
+#ifdef CONFIG_NUMA
+	"zone_reclaim_failed",
+#endif
+	"pginodesteal",
+	"slabs_scanned",
+	"kswapd_inodesteal",
+	"kswapd_low_wmark_hit_quickly",
+	"kswapd_high_wmark_hit_quickly",
+	"pageoutrun",
+
+	"pgrotated",
+
+	"drop_pagecache",
+	"drop_slab",
+	"oom_kill",
+
+#ifdef CONFIG_NUMA_BALANCING
+	"numa_pte_updates",
+	"numa_huge_pte_updates",
+	"numa_hint_faults",
+	"numa_hint_faults_local",
+	"numa_pages_migrated",
+#endif
+#ifdef CONFIG_MIGRATION
+	"pgmigrate_success",
+	"pgmigrate_fail",
+	"thp_migration_success",
+	"thp_migration_fail",
+	"thp_migration_split",
+#endif
+#ifdef CONFIG_COMPACTION
+	"compact_migrate_scanned",
+	"compact_free_scanned",
+	"compact_isolated",
+	"compact_stall",
+	"compact_fail",
+	"compact_success",
+	"compact_daemon_wake",
+	"compact_daemon_migrate_scanned",
+	"compact_daemon_free_scanned",
+#endif
+
+#ifdef CONFIG_HUGETLB_PAGE
+	"htlb_buddy_alloc_success",
+	"htlb_buddy_alloc_fail",
+#endif
+	"unevictable_pgs_culled",
+	"unevictable_pgs_scanned",
+	"unevictable_pgs_rescued",
+	"unevictable_pgs_mlocked",
+	"unevictable_pgs_munlocked",
+	"unevictable_pgs_cleared",
+	"unevictable_pgs_stranded",
+
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+	"thp_fault_alloc",
+	"thp_fault_fallback",
+	"thp_fault_fallback_charge",
+	"thp_collapse_alloc",
+	"thp_collapse_alloc_failed",
+	"thp_file_alloc",
+	"thp_file_fallback",
+	"thp_file_fallback_charge",
+	"thp_file_mapped",
+	"thp_split_page",
+	"thp_split_page_failed",
+	"thp_deferred_split_page",
+	"thp_split_pmd",
+#ifdef CONFIG_HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD
+	"thp_split_pud",
+#endif
+	"thp_zero_page_alloc",
+	"thp_zero_page_alloc_failed",
+	"thp_swpout",
+	"thp_swpout_fallback",
+#endif
+#ifdef CONFIG_MEMORY_BALLOON
+	"balloon_inflate",
+	"balloon_deflate",
+#ifdef CONFIG_BALLOON_COMPACTION
+	"balloon_migrate",
+#endif
+#endif /* CONFIG_MEMORY_BALLOON */
+#ifdef CONFIG_DEBUG_TLBFLUSH
+	"nr_tlb_remote_flush",
+	"nr_tlb_remote_flush_received",
+	"nr_tlb_local_flush_all",
+	"nr_tlb_local_flush_one",
+#endif /* CONFIG_DEBUG_TLBFLUSH */
+
+#ifdef CONFIG_DEBUG_VM_VMACACHE
+	"vmacache_find_calls",
+	"vmacache_find_hits",
+#endif
+#ifdef CONFIG_SWAP
+	"swap_ra",
+	"swap_ra_hit",
+#endif
+#endif /* CONFIG_VM_EVENT_COUNTERS || CONFIG_MEMCG */
+};
+#endif /* CONFIG_PROC_FS || CONFIG_SYSFS || CONFIG_NUMA || CONFIG_MEMCG */
+
+#if (defined(CONFIG_DEBUG_FS) && defined(CONFIG_COMPACTION)) || \
+     defined(CONFIG_PROC_FS)
+static void *frag_start(struct seq_file *m, loff_t *pos)
+{
+	pg_data_t *pgdat;
+	loff_t node = *pos;
+
+	for (pgdat = first_online_pgdat();
+	     pgdat && node;
+	     pgdat = next_online_pgdat(pgdat))
+		--node;
+
+	return pgdat;
+}
+
+static void *frag_next(struct seq_file *m, void *arg, loff_t *pos)
+{
+	pg_data_t *pgdat = (pg_data_t *)arg;
+
+	(*pos)++;
+	return next_online_pgdat(pgdat);
+}
+
+static void frag_stop(struct seq_file *m, void *arg)
+{
+}
+
+/*
+ * Walk zones in a node and print using a callback.
+ * If @assert_populated is true, only use callback for zones that are populated.
+ */
+static void walk_zones_in_node(struct seq_file *m, pg_data_t *pgdat,
+		bool assert_populated, bool nolock,
+		void (*print)(struct seq_file *m, pg_data_t *, struct zone *))
+{
+	struct zone *zone;
+	struct zone *node_zones = pgdat->node_zones;
+	unsigned long flags;
+
+	for (zone = node_zones; zone - node_zones < MAX_NR_ZONES; ++zone) {
+		if (assert_populated && !populated_zone(zone))
+			continue;
+
+		if (!nolock)
+			spin_lock_irqsave(&zone->lock, flags);
+		print(m, pgdat, zone);
+		if (!nolock)
+			spin_unlock_irqrestore(&zone->lock, flags);
+	}
+}
+#endif
+
+#ifdef CONFIG_PROC_FS
+static void frag_show_print(struct seq_file *m, pg_data_t *pgdat,
+						struct zone *zone)
+{
+	int order;
+
+	seq_printf(m, "Node %d, zone %8s ", pgdat->node_id, zone->name);
+	for (order = 0; order < MAX_ORDER; ++order)
+		seq_printf(m, "%6lu ", zone->free_area[order].nr_free);
+	seq_putc(m, '\n');
+}
+
+/*
+ * This walks the free areas for each zone.
+ */
+static int frag_show(struct seq_file *m, void *arg)
+{
+	pg_data_t *pgdat = (pg_data_t *)arg;
+	walk_zones_in_node(m, pgdat, true, false, frag_show_print);
+	return 0;
+}
+
+static void pagetypeinfo_showfree_print(struct seq_file *m,
+					pg_data_t *pgdat, struct zone *zone)
+{
+	int order, mtype;
+
+	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++) {
+		seq_printf(m, "Node %4d, zone %8s, type %12s ",
+					pgdat->node_id,
+					zone->name,
+					migratetype_names[mtype]);
+		for (order = 0; order < MAX_ORDER; ++order) {
+			unsigned long freecount = 0;
+			struct free_area *area;
+			struct list_head *curr;
+			bool overflow = false;
+
+			area = &(zone->free_area[order]);
+
+			list_for_each(curr, &area->free_list[mtype]) {
+				/*
+				 * Cap the free_list iteration because it might
+				 * be really large and we are under a spinlock
+				 * so a long time spent here could trigger a
+				 * hard lockup detector. Anyway this is a
+				 * debugging tool so knowing there is a handful
+				 * of pages of this order should be more than
+				 * sufficient.
+				 */
+				if (++freecount >= 100000) {
+					overflow = true;
+					break;
+				}
+			}
+			seq_printf(m, "%s%6lu ", overflow ? ">" : "", freecount);
+			spin_unlock_irq(&zone->lock);
+			cond_resched();
+			spin_lock_irq(&zone->lock);
+		}
+		seq_putc(m, '\n');
+	}
+}
+
+/* Print out the free pages at each order for each migatetype */
+static int pagetypeinfo_showfree(struct seq_file *m, void *arg)
+{
+	int order;
+	pg_data_t *pgdat = (pg_data_t *)arg;
+
+	/* Print header */
+	seq_printf(m, "%-43s ", "Free pages count per migrate type at order");
+	for (order = 0; order < MAX_ORDER; ++order)
+		seq_printf(m, "%6d ", order);
+	seq_putc(m, '\n');
+
+	walk_zones_in_node(m, pgdat, true, false, pagetypeinfo_showfree_print);
+
+	return 0;
+}
+
+static void pagetypeinfo_showblockcount_print(struct seq_file *m,
+					pg_data_t *pgdat, struct zone *zone)
+{
+	int mtype;
+	unsigned long pfn;
+	unsigned long start_pfn = zone->zone_start_pfn;
+	unsigned long end_pfn = zone_end_pfn(zone);
+	unsigned long count[MIGRATE_TYPES] = { 0, };
+
+	for (pfn = start_pfn; pfn < end_pfn; pfn += pageblock_nr_pages) {
+		struct page *page;
+
+		page = pfn_to_online_page(pfn);
+		if (!page)
+			continue;
+
+		/* Watch for unexpected holes punched in the memmap */
+		if (!memmap_valid_within(pfn, page, zone))
+			continue;
+
+		if (page_zone(page) != zone)
+			continue;
+
+		mtype = get_pageblock_migratetype(page);
+
+		if (mtype < MIGRATE_TYPES)
+			count[mtype]++;
+	}
+
+	/* Print counts */
+	seq_printf(m, "Node %d, zone %8s ", pgdat->node_id, zone->name);
+	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++)
+		seq_printf(m, "%12lu ", count[mtype]);
+	seq_putc(m, '\n');
+}
+
+/* Print out the number of pageblocks for each migratetype */
+static int pagetypeinfo_showblockcount(struct seq_file *m, void *arg)
+{
+	int mtype;
+	pg_data_t *pgdat = (pg_data_t *)arg;
+
+	seq_printf(m, "\n%-23s", "Number of blocks type ");
+	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++)
+		seq_printf(m, "%12s ", migratetype_names[mtype]);
+	seq_putc(m, '\n');
+	walk_zones_in_node(m, pgdat, true, false,
+		pagetypeinfo_showblockcount_print);
+
+	return 0;
+}
+
+/*
+ * Print out the number of pageblocks for each migratetype that contain pages
+ * of other types. This gives an indication of how well fallbacks are being
+ * contained by rmqueue_fallback(). It requires information from PAGE_OWNER
+ * to determine what is going on
+ */
+static void pagetypeinfo_showmixedcount(struct seq_file *m, pg_data_t *pgdat)
+{
+#ifdef CONFIG_PAGE_OWNER
+	int mtype;
+
+	if (!static_branch_unlikely(&page_owner_inited))
+		return;
+
+	drain_all_pages(NULL);
+
+	seq_printf(m, "\n%-23s", "Number of mixed blocks ");
+	for (mtype = 0; mtype < MIGRATE_TYPES; mtype++)
+		seq_printf(m, "%12s ", migratetype_names[mtype]);
+	seq_putc(m, '\n');
+
+	walk_zones_in_node(m, pgdat, true, true,
+		pagetypeinfo_showmixedcount_print);
+#endif /* CONFIG_PAGE_OWNER */
+}
+
+/*
+ * This prints out statistics in relation to grouping pages by mobility.
+ * It is expensive to collect so do not constantly read the file.
+ */
+static int pagetypeinfo_show(struct seq_file *m, void *arg)
+{
+	pg_data_t *pgdat = (pg_data_t *)arg;
+
+	/* check memoryless node */
+	if (!node_state(pgdat->node_id, N_MEMORY))
+		return 0;
+
+	seq_printf(m, "Page block order: %d\n", pageblock_order);
+	seq_printf(m, "Pages per block:  %lu\n", pageblock_nr_pages);
+	seq_putc(m, '\n');
+	pagetypeinfo_showfree(m, pgdat);
+	pagetypeinfo_showblockcount(m, pgdat);
+	pagetypeinfo_showmixedcount(m, pgdat);
+
+	return 0;
+}
+
+static const struct seq_operations fragmentation_op = {
+	.start	= frag_start,
+	.next	= frag_next,
+	.stop	= frag_stop,
+	.show	= frag_show,
+};
+
+static const struct seq_operations pagetypeinfo_op = {
+	.start	= frag_start,
+	.next	= frag_next,
+	.stop	= frag_stop,
+	.show	= pagetypeinfo_show,
+};
+
+static bool is_zone_first_populated(pg_data_t *pgdat, struct zone *zone)
+{
+	int zid;
+
+	for (zid = 0; zid < MAX_NR_ZONES; zid++) {
+		struct zone *compare = &pgdat->node_zones[zid];
+
+		if (populated_zone(compare))
+			return zone == compare;
+	}
+
+	return false;
+}
+
+static void zoneinfo_show_print(struct seq_file *m, pg_data_t *pgdat,
+							struct zone *zone)
+{
+	int i;
+	seq_printf(m, "Node %d, zone %8s", pgdat->node_id, zone->name);
+	if (is_zone_first_populated(pgdat, zone)) {
+		seq_printf(m, "\n  per-node stats");
+		for (i = 0; i < NR_VM_NODE_STAT_ITEMS; i++) {
+			seq_printf(m, "\n      %-12s %lu", node_stat_name(i),
+				   node_page_state_pages(pgdat, i));
+		}
+	}
+	seq_printf(m,
+		   "\n  pages free     %lu"
+		   "\n        min      %lu"
+		   "\n        low      %lu"
+		   "\n        high     %lu"
+		   "\n        spanned  %lu"
+		   "\n        present  %lu"
+		   "\n        managed  %lu",
+		   zone_page_state(zone, NR_FREE_PAGES),
+		   min_wmark_pages(zone),
+		   low_wmark_pages(zone),
+		   high_wmark_pages(zone),
+		   zone->spanned_pages,
+		   zone->present_pages,
+		   zone_managed_pages(zone));
+
+	seq_printf(m,
+		   "\n        protection: (%ld",
+		   zone->lowmem_reserve[0]);
+	for (i = 1; i < ARRAY_SIZE(zone->lowmem_reserve); i++)
+		seq_printf(m, ", %ld", zone->lowmem_reserve[i]);
+	seq_putc(m, ')');
+
+	/* If unpopulated, no other information is useful */
+	if (!populated_zone(zone)) {
+		seq_putc(m, '\n');
+		return;
+	}
+
+	for (i = 0; i < NR_VM_ZONE_STAT_ITEMS; i++)
+		seq_printf(m, "\n      %-12s %lu", zone_stat_name(i),
+			   zone_page_state(zone, i));
+
+#ifdef CONFIG_NUMA
+	for (i = 0; i < NR_VM_NUMA_STAT_ITEMS; i++)
+		seq_printf(m, "\n      %-12s %lu", numa_stat_name(i),
+			   zone_numa_state_snapshot(zone, i));
+#endif
+
+	seq_printf(m, "\n  pagesets");
+	for_each_online_cpu(i) {
+		struct per_cpu_pageset *pageset;
+
+		pageset = per_cpu_ptr(zone->pageset, i);
+		seq_printf(m,
+			   "\n    cpu: %i"
+			   "\n              count: %i"
+			   "\n              high:  %i"
+			   "\n              batch: %i",
+			   i,
+			   pageset->pcp.count,
+			   pageset->pcp.high,
+			   pageset->pcp.batch);
+#ifdef CONFIG_SMP
+		seq_printf(m, "\n  vm stats threshold: %d",
+				pageset->stat_threshold);
+#endif
+	}
+	seq_printf(m,
+		   "\n  node_unreclaimable:  %u"
+		   "\n  start_pfn:           %lu",
+		   pgdat->kswapd_failures >= MAX_RECLAIM_RETRIES,
+		   zone->zone_start_pfn);
+	seq_putc(m, '\n');
+}
+
+/*
+ * Output information about zones in @pgdat.  All zones are printed regardless
+ * of whether they are populated or not: lowmem_reserve_ratio operates on the
+ * set of all zones and userspace would not be aware of such zones if they are
+ * suppressed here (zoneinfo displays the effect of lowmem_reserve_ratio).
+ */
+static int zoneinfo_show(struct seq_file *m, void *arg)
+{
+	pg_data_t *pgdat = (pg_data_t *)arg;
+	walk_zones_in_node(m, pgdat, false, false, zoneinfo_show_print);
+	return 0;
+}
+
+static const struct seq_operations zoneinfo_op = {
+	.start	= frag_start, /* iterate over all zones. The same as in
+			       * fragmentation. */
+	.next	= frag_next,
+	.stop	= frag_stop,
+	.show	= zoneinfo_show,
+};
+
+#define NR_VMSTAT_ITEMS (NR_VM_ZONE_STAT_ITEMS + \
+			 NR_VM_NUMA_STAT_ITEMS + \
+			 NR_VM_NODE_STAT_ITEMS + \
+			 NR_VM_WRITEBACK_STAT_ITEMS + \
+			 (IS_ENABLED(CONFIG_VM_EVENT_COUNTERS) ? \
+			  NR_VM_EVENT_ITEMS : 0))
+
+static void *vmstat_start(struct seq_file *m, loff_t *pos)
+{
+	unsigned long *v;
+	int i;
+
+	if (*pos >= NR_VMSTAT_ITEMS)
+		return NULL;
+
+	BUILD_BUG_ON(ARRAY_SIZE(vmstat_text) < NR_VMSTAT_ITEMS);
+	v = kmalloc_array(NR_VMSTAT_ITEMS, sizeof(unsigned long), GFP_KERNEL);
+	m->private = v;
+	if (!v)
+		return ERR_PTR(-ENOMEM);
+	for (i = 0; i < NR_VM_ZONE_STAT_ITEMS; i++)
+		v[i] = global_zone_page_state(i);
+	v += NR_VM_ZONE_STAT_ITEMS;
+
+#ifdef CONFIG_NUMA
+	for (i = 0; i < NR_VM_NUMA_STAT_ITEMS; i++)
+		v[i] = global_numa_state(i);
+	v += NR_VM_NUMA_STAT_ITEMS;
+#endif
+
+	for (i = 0; i < NR_VM_NODE_STAT_ITEMS; i++)
+		v[i] = global_node_page_state_pages(i);
+	v += NR_VM_NODE_STAT_ITEMS;
+
+	global_dirty_limits(v + NR_DIRTY_BG_THRESHOLD,
+			    v + NR_DIRTY_THRESHOLD);
+	v += NR_VM_WRITEBACK_STAT_ITEMS;
+
+#ifdef CONFIG_VM_EVENT_COUNTERS
+	all_vm_events(v);
+	v[PGPGIN] /= 2;		/* sectors -> kbytes */
+	v[PGPGOUT] /= 2;
+#endif
+	return (unsigned long *)m->private + *pos;
+}
+
+static void *vmstat_next(struct seq_file *m, void *arg, loff_t *pos)
+{
+	(*pos)++;
+	if (*pos >= NR_VMSTAT_ITEMS)
+		return NULL;
+	return (unsigned long *)m->private + *pos;
+}
+
+static int vmstat_show(struct seq_file *m, void *arg)
+{
+	unsigned long *l = arg;
+	unsigned long off = l - (unsigned long *)m->private;
+
+	seq_puts(m, vmstat_text[off]);
+	seq_put_decimal_ull(m, " ", *l);
+	seq_putc(m, '\n');
+
+	if (off == NR_VMSTAT_ITEMS - 1) {
+		/*
+		 * We've come to the end - add any deprecated counters to avoid
+		 * breaking userspace which might depend on them being present.
+		 */
+		seq_puts(m, "nr_unstable 0\n");
+	}
+	return 0;
+}
+
+static void vmstat_stop(struct seq_file *m, void *arg)
+{
+	kfree(m->private);
+	m->private = NULL;
+}
+
+static const struct seq_operations vmstat_op = {
+	.start	= vmstat_start,
+	.next	= vmstat_next,
+	.stop	= vmstat_stop,
+	.show	= vmstat_show,
+};
+#endif /* CONFIG_PROC_FS */
 //
 //#ifdef CONFIG_SMP
 //static DEFINE_PER_CPU(struct delayed_work, vmstat_work);
@@ -2019,38 +2019,39 @@ EXPORT_SYMBOL(vm_node_stat);
 
 struct workqueue_struct *mm_percpu_wq;
 
-//void __init init_mm_internals(void)
-//{
-//	int ret __maybe_unused;
-//
-//	mm_percpu_wq = alloc_workqueue("mm_percpu_wq", WQ_MEM_RECLAIM, 0);
-//
-//#ifdef CONFIG_SMP
-//	ret = cpuhp_setup_state_nocalls(CPUHP_MM_VMSTAT_DEAD, "mm/vmstat:dead",
-//					NULL, vmstat_cpu_dead);
-//	if (ret < 0)
-//		pr_err("vmstat: failed to register 'dead' hotplug state\n");
-//
-//	ret = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "mm/vmstat:online",
-//					vmstat_cpu_online,
-//					vmstat_cpu_down_prep);
-//	if (ret < 0)
-//		pr_err("vmstat: failed to register 'online' hotplug state\n");
-//
-//	get_online_cpus();
-//	init_cpu_node_state();
-//	put_online_cpus();
-//
-//	start_shepherd_timer();
-//#endif
-//#ifdef CONFIG_PROC_FS
-//	proc_create_seq("buddyinfo", 0444, NULL, &fragmentation_op);
-//	proc_create_seq("pagetypeinfo", 0400, NULL, &pagetypeinfo_op);
-//	proc_create_seq("vmstat", 0444, NULL, &vmstat_op);
-//	proc_create_seq("zoneinfo", 0444, NULL, &zoneinfo_op);
-//#endif
-//}
-//
+void __init init_mm_internals(void)
+{
+	int ret __maybe_unused;
+
+	mm_percpu_wq = alloc_workqueue("mm_percpu_wq", WQ_MEM_RECLAIM, 0);
+
+#ifdef CONFIG_SMP
+	ret = cpuhp_setup_state_nocalls(CPUHP_MM_VMSTAT_DEAD, "mm/vmstat:dead",
+					NULL, vmstat_cpu_dead);
+	if (ret < 0)
+		pr_err("vmstat: failed to register 'dead' hotplug state\n");
+
+	ret = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "mm/vmstat:online",
+					vmstat_cpu_online,
+					vmstat_cpu_down_prep);
+	if (ret < 0)
+		pr_err("vmstat: failed to register 'online' hotplug state\n");
+
+	get_online_cpus();
+	init_cpu_node_state();
+	put_online_cpus();
+
+	start_shepherd_timer();
+#endif
+#ifdef CONFIG_PROC_FS
+	proc_create_seq("buddyinfo", 0444, NULL, &fragmentation_op);
+	proc_create_seq("pagetypeinfo", 0400, NULL, &pagetypeinfo_op);
+	proc_create_seq("vmstat", 0444, NULL, &vmstat_op);
+	proc_create_seq("zoneinfo", 0444, NULL, &zoneinfo_op);
+#endif
+}
+EXPORT_SYMBOL(init_mm_internals);
+
 //#if defined(CONFIG_DEBUG_FS) && defined(CONFIG_COMPACTION)
 //
 ///*

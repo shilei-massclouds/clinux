@@ -3031,23 +3031,22 @@ out:
 //	raw_spin_unlock_irq(&p->pi_lock);
 //	return ret;
 //}
-//
-///**
-// * wake_up_process - Wake up a specific process
-// * @p: The process to be woken up.
-// *
-// * Attempt to wake up the nominated process and move it to the set of runnable
-// * processes.
-// *
-// * Return: 1 if the process was woken up, 0 if it was already running.
-// *
-// * This function executes a full memory barrier before accessing the task state.
-// */
-//int wake_up_process(struct task_struct *p)
-//{
-//	return try_to_wake_up(p, TASK_NORMAL, 0);
-//}
-//EXPORT_SYMBOL(wake_up_process);
+
+/**
+ * wake_up_process - Wake up a specific process
+ * @p: The process to be woken up.
+ *
+ * Attempt to wake up the nominated process and move it to the set of runnable
+ * processes.
+ *
+ * Return: 1 if the process was woken up, 0 if it was already running.
+ *
+ * This function executes a full memory barrier before accessing the task state.
+ */
+int wake_up_process(struct task_struct *p)
+{
+	return try_to_wake_up(p, TASK_NORMAL, 0);
+}
 
 int wake_up_state(struct task_struct *p, unsigned int state)
 {
@@ -7225,79 +7224,77 @@ void __init sched_init(void)
 }
 EXPORT_SYMBOL(sched_init);
 
-//#ifdef CONFIG_DEBUG_ATOMIC_SLEEP
-//static inline int preempt_count_equals(int preempt_offset)
-//{
-//	int nested = preempt_count() + rcu_preempt_depth();
-//
-//	return (nested == preempt_offset);
-//}
-//
-//void __might_sleep(const char *file, int line, int preempt_offset)
-//{
-//	/*
-//	 * Blocking primitives will set (and therefore destroy) current->state,
-//	 * since we will exit with TASK_RUNNING make sure we enter with it,
-//	 * otherwise we will destroy state.
-//	 */
-//	WARN_ONCE(current->state != TASK_RUNNING && current->task_state_change,
-//			"do not call blocking ops when !TASK_RUNNING; "
-//			"state=%lx set at [<%p>] %pS\n",
-//			current->state,
-//			(void *)current->task_state_change,
-//			(void *)current->task_state_change);
-//
-//	___might_sleep(file, line, preempt_offset);
-//}
-//EXPORT_SYMBOL(__might_sleep);
-//
-//void ___might_sleep(const char *file, int line, int preempt_offset)
-//{
-//	/* Ratelimiting timestamp: */
-//	static unsigned long prev_jiffy;
-//
-//	unsigned long preempt_disable_ip;
-//
-//	/* WARN_ON_ONCE() by default, no rate limit required: */
-//	rcu_sleep_check();
-//
-//	if ((preempt_count_equals(preempt_offset) && !irqs_disabled() &&
-//	     !is_idle_task(current) && !current->non_block_count) ||
-//	    system_state == SYSTEM_BOOTING || system_state > SYSTEM_RUNNING ||
-//	    oops_in_progress)
-//		return;
-//
-//	if (time_before(jiffies, prev_jiffy + HZ) && prev_jiffy)
-//		return;
-//	prev_jiffy = jiffies;
-//
-//	/* Save this before calling printk(), since that will clobber it: */
-//	preempt_disable_ip = get_preempt_disable_ip(current);
-//
-//	printk(KERN_ERR
-//		"BUG: sleeping function called from invalid context at %s:%d\n",
-//			file, line);
-//	printk(KERN_ERR
-//		"in_atomic(): %d, irqs_disabled(): %d, non_block: %d, pid: %d, name: %s\n",
-//			in_atomic(), irqs_disabled(), current->non_block_count,
-//			current->pid, current->comm);
-//
-//	if (task_stack_end_corrupted(current))
-//		printk(KERN_EMERG "Thread overran stack, or stack corrupted\n");
-//
-//	debug_show_held_locks(current);
-//	if (irqs_disabled())
-//		print_irqtrace_events(current);
-//	if (IS_ENABLED(CONFIG_DEBUG_PREEMPT)
-//	    && !preempt_count_equals(preempt_offset)) {
-//		pr_err("Preemption disabled at:");
-//		print_ip_sym(KERN_ERR, preempt_disable_ip);
-//	}
-//	dump_stack();
-//	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
-//}
-//EXPORT_SYMBOL(___might_sleep);
-//
+#ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+static inline int preempt_count_equals(int preempt_offset)
+{
+	int nested = preempt_count() + rcu_preempt_depth();
+
+	return (nested == preempt_offset);
+}
+
+void __might_sleep(const char *file, int line, int preempt_offset)
+{
+	/*
+	 * Blocking primitives will set (and therefore destroy) current->state,
+	 * since we will exit with TASK_RUNNING make sure we enter with it,
+	 * otherwise we will destroy state.
+	 */
+	WARN_ONCE(current->state != TASK_RUNNING && current->task_state_change,
+			"do not call blocking ops when !TASK_RUNNING; "
+			"state=%lx set at [<%p>] %pS\n",
+			current->state,
+			(void *)current->task_state_change,
+			(void *)current->task_state_change);
+
+	___might_sleep(file, line, preempt_offset);
+}
+
+void ___might_sleep(const char *file, int line, int preempt_offset)
+{
+	/* Ratelimiting timestamp: */
+	static unsigned long prev_jiffy;
+
+	unsigned long preempt_disable_ip;
+
+	/* WARN_ON_ONCE() by default, no rate limit required: */
+	rcu_sleep_check();
+
+	if ((preempt_count_equals(preempt_offset) && !irqs_disabled() &&
+	     !is_idle_task(current) && !current->non_block_count) ||
+	    system_state == SYSTEM_BOOTING || system_state > SYSTEM_RUNNING ||
+	    oops_in_progress)
+		return;
+
+	if (time_before(jiffies, prev_jiffy + HZ) && prev_jiffy)
+		return;
+	prev_jiffy = jiffies;
+
+	/* Save this before calling printk(), since that will clobber it: */
+	preempt_disable_ip = get_preempt_disable_ip(current);
+
+	printk(KERN_ERR
+		"BUG: sleeping function called from invalid context at %s:%d\n",
+			file, line);
+	printk(KERN_ERR
+		"in_atomic(): %d, irqs_disabled(): %d, non_block: %d, pid: %d, name: %s\n",
+			in_atomic(), irqs_disabled(), current->non_block_count,
+			current->pid, current->comm);
+
+	if (task_stack_end_corrupted(current))
+		printk(KERN_EMERG "Thread overran stack, or stack corrupted\n");
+
+	debug_show_held_locks(current);
+	if (irqs_disabled())
+		print_irqtrace_events(current);
+	if (IS_ENABLED(CONFIG_DEBUG_PREEMPT)
+	    && !preempt_count_equals(preempt_offset)) {
+		pr_err("Preemption disabled at:");
+		print_ip_sym(KERN_ERR, preempt_disable_ip);
+	}
+	dump_stack();
+	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
+}
+
 //void __cant_sleep(const char *file, int line, int preempt_offset)
 //{
 //	static unsigned long prev_jiffy;
@@ -7325,7 +7322,7 @@ EXPORT_SYMBOL(sched_init);
 //	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
 //}
 //EXPORT_SYMBOL_GPL(__cant_sleep);
-//#endif
+#endif
 //
 //#ifdef CONFIG_MAGIC_SYSRQ
 //void normalize_rt_tasks(void)

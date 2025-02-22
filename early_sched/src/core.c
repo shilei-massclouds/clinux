@@ -3044,10 +3044,9 @@
  *
  * This function executes a full memory barrier before accessing the task state.
  */
-int wake_up_process(struct task_struct *p)
+__weak int wake_up_process(struct task_struct *p)
 {
     panic("During early stage, we should never reach here!\n");
-	//return try_to_wake_up(p, TASK_NORMAL, 0);
 }
 EXPORT_SYMBOL(wake_up_process);
 

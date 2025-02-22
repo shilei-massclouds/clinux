@@ -1124,3 +1124,9 @@ struct file *file_open_root(struct dentry *dentry, struct vfsmount *mnt,
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(file_open_root);
+
+__weak void global_dirty_limits(unsigned long *pbackground, unsigned long *pdirty)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(global_dirty_limits);

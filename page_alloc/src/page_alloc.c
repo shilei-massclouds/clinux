@@ -63,6 +63,7 @@
 #include <linux/sched/mm.h>
 #include <linux/page_owner.h>
 #include <linux/kthread.h>
+#include <linux/cma.h>
 #include <linux/memcontrol.h>
 #include <linux/ftrace.h>
 #include <linux/lockdep.h>
@@ -113,15 +114,12 @@ volatile unsigned long latent_entropy __latent_entropy;
 EXPORT_SYMBOL(latent_entropy);
 #endif
 
-atomic_long_t _totalram_pages __read_mostly;
-EXPORT_SYMBOL(_totalram_pages);
-unsigned long totalreserve_pages __read_mostly;
-EXPORT_SYMBOL(totalreserve_pages);
-unsigned long totalcma_pages __read_mostly;
+//unsigned long totalreserve_pages __read_mostly;
+//unsigned long totalcma_pages __read_mostly;
 
 int percpu_pagelist_fraction;
-gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
-EXPORT_SYMBOL(gfp_allowed_mask);
+//gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
+//EXPORT_SYMBOL(gfp_allowed_mask);
 #ifdef CONFIG_INIT_ON_ALLOC_DEFAULT_ON
 DEFINE_STATIC_KEY_TRUE(init_on_alloc);
 #else
@@ -276,30 +274,29 @@ static char * const zone_names[MAX_NR_ZONES] = {
 #endif
 };
 
-//const char * const migratetype_names[MIGRATE_TYPES] = {
-//	"Unmovable",
-//	"Movable",
-//	"Reclaimable",
-//	"HighAtomic",
-//#ifdef CONFIG_CMA
-//	"CMA",
-//#endif
-//#ifdef CONFIG_MEMORY_ISOLATION
-//	"Isolate",
-//#endif
-//};
-
-compound_page_dtor * const compound_page_dtors[NR_COMPOUND_DTORS] = {
-	[NULL_COMPOUND_DTOR] = NULL,
-	[COMPOUND_PAGE_DTOR] = free_compound_page,
-#ifdef CONFIG_HUGETLB_PAGE
-	[HUGETLB_PAGE_DTOR] = free_huge_page,
+const char * const migratetype_names[MIGRATE_TYPES] = {
+	"Unmovable",
+	"Movable",
+	"Reclaimable",
+	"HighAtomic",
+#ifdef CONFIG_CMA
+	"CMA",
 #endif
-#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-	[TRANSHUGE_PAGE_DTOR] = free_transhuge_page,
+#ifdef CONFIG_MEMORY_ISOLATION
+	"Isolate",
 #endif
 };
-EXPORT_SYMBOL(compound_page_dtors);
+
+//compound_page_dtor * const compound_page_dtors[NR_COMPOUND_DTORS] = {
+//	[NULL_COMPOUND_DTOR] = NULL,
+//	[COMPOUND_PAGE_DTOR] = free_compound_page,
+//#ifdef CONFIG_HUGETLB_PAGE
+//	[HUGETLB_PAGE_DTOR] = free_huge_page,
+//#endif
+//#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+//	[TRANSHUGE_PAGE_DTOR] = free_transhuge_page,
+//#endif
+//};
 
 //int min_free_kbytes = 1024;
 //int user_min_free_kbytes = -1;
@@ -676,11 +673,11 @@ void prep_compound_page(struct page *page, unsigned int order)
 unsigned int _debug_guardpage_minorder;
 EXPORT_SYMBOL(_debug_guardpage_minorder);
 
-bool _debug_pagealloc_enabled_early __read_mostly
-			= IS_ENABLED(CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT);
-EXPORT_SYMBOL(_debug_pagealloc_enabled_early);
-DEFINE_STATIC_KEY_FALSE(_debug_pagealloc_enabled);
-EXPORT_SYMBOL(_debug_pagealloc_enabled);
+//bool _debug_pagealloc_enabled_early __read_mostly
+//			= IS_ENABLED(CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT);
+//EXPORT_SYMBOL(_debug_pagealloc_enabled_early);
+//DEFINE_STATIC_KEY_FALSE(_debug_pagealloc_enabled);
+//EXPORT_SYMBOL(_debug_pagealloc_enabled);
 
 DEFINE_STATIC_KEY_FALSE(_debug_guardpage_enabled);
 
@@ -3908,7 +3905,6 @@ void warn_alloc(gfp_t gfp_mask, nodemask_t *nodemask, const char *fmt, ...)
 	dump_stack();
 	warn_alloc_show_mem(gfp_mask, nodemask);
 }
-EXPORT_SYMBOL(warn_alloc);
 
 static inline struct page *
 __alloc_pages_cpuset_fallback(gfp_t gfp_mask, unsigned int order,
@@ -4406,7 +4402,6 @@ bool gfp_pfmemalloc_allowed(gfp_t gfp_mask)
 {
 	return !!__gfp_pfmemalloc_flags(gfp_mask);
 }
-EXPORT_SYMBOL(gfp_pfmemalloc_allowed);
 
 /*
  * Checks whether it makes sense to retry the reclaim to make a forward progress
@@ -4935,7 +4930,6 @@ unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order)
 		return 0;
 	return (unsigned long) page_address(page);
 }
-EXPORT_SYMBOL(__get_free_pages);
 
 //unsigned long get_zeroed_page(gfp_t gfp_mask)
 //{
@@ -4965,7 +4959,6 @@ void free_pages(unsigned long addr, unsigned int order)
 	}
 }
 
-EXPORT_SYMBOL(free_pages);
 
 ///*
 // * Page Fragment:
@@ -5208,7 +5201,6 @@ unsigned long nr_free_buffer_pages(void)
 {
 	return nr_free_zone_pages(gfp_zone(GFP_USER));
 }
-EXPORT_SYMBOL_GPL(nr_free_buffer_pages);
 
 static inline void show_node(struct zone *zone)
 {
@@ -8211,7 +8203,6 @@ void *__init alloc_large_system_hash(const char *tablename,
 
 	return table;
 }
-EXPORT_SYMBOL(alloc_large_system_hash);
 
 ///*
 // * This function checks whether pageblock includes unmovable pages or not.

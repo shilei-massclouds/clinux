@@ -375,7 +375,6 @@ out_unlock:
 	}
 	return s;
 }
-EXPORT_SYMBOL(kmem_cache_create_usercopy);
 
 /**
  * kmem_cache_create - Create a cache.

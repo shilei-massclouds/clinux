@@ -45,13 +45,13 @@ EXPORT_SYMBOL(_cond_resched);
 #endif
 
 #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
-void __might_sleep(const char *file, int line, int preempt_offset)
+__weak void __might_sleep(const char *file, int line, int preempt_offset)
 {
     ___might_sleep(file, line, preempt_offset);
 }
 EXPORT_SYMBOL(__might_sleep);
 
-void ___might_sleep(const char *file, int line, int preempt_offset)
+__weak void ___might_sleep(const char *file, int line, int preempt_offset)
 {
     if (system_state != SYSTEM_BOOTING) {
         booter_panic("___might_sleep");

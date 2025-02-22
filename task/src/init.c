@@ -292,3 +292,6 @@ EXPORT_SYMBOL(files_cachep);
 /* SLAB cache for sighand_struct structures (tsk->sighand) */
 struct kmem_cache *sighand_cachep;
 EXPORT_SYMBOL(sighand_cachep);
+
+struct pid *cad_pid;
+EXPORT_SYMBOL(cad_pid);

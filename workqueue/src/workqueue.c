@@ -4063,90 +4063,90 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
 	return ret;
 }
 
-///**
-// * wq_update_unbound_numa - update NUMA affinity of a wq for CPU hot[un]plug
-// * @wq: the target workqueue
-// * @cpu: the CPU coming up or going down
-// * @online: whether @cpu is coming up or going down
-// *
-// * This function is to be called from %CPU_DOWN_PREPARE, %CPU_ONLINE and
-// * %CPU_DOWN_FAILED.  @cpu is being hot[un]plugged, update NUMA affinity of
-// * @wq accordingly.
-// *
-// * If NUMA affinity can't be adjusted due to memory allocation failure, it
-// * falls back to @wq->dfl_pwq which may not be optimal but is always
-// * correct.
-// *
-// * Note that when the last allowed CPU of a NUMA node goes offline for a
-// * workqueue with a cpumask spanning multiple nodes, the workers which were
-// * already executing the work items for the workqueue will lose their CPU
-// * affinity and may execute on any CPU.  This is similar to how per-cpu
-// * workqueues behave on CPU_DOWN.  If a workqueue user wants strict
-// * affinity, it's the user's responsibility to flush the work item from
-// * CPU_DOWN_PREPARE.
-// */
-//static void wq_update_unbound_numa(struct workqueue_struct *wq, int cpu,
-//				   bool online)
-//{
-//	int node = cpu_to_node(cpu);
-//	int cpu_off = online ? -1 : cpu;
-//	struct pool_workqueue *old_pwq = NULL, *pwq;
-//	struct workqueue_attrs *target_attrs;
-//	cpumask_t *cpumask;
-//
-//	lockdep_assert_held(&wq_pool_mutex);
-//
-//	if (!wq_numa_enabled || !(wq->flags & WQ_UNBOUND) ||
-//	    wq->unbound_attrs->no_numa)
-//		return;
-//
-//	/*
-//	 * We don't wanna alloc/free wq_attrs for each wq for each CPU.
-//	 * Let's use a preallocated one.  The following buf is protected by
-//	 * CPU hotplug exclusion.
-//	 */
-//	target_attrs = wq_update_unbound_numa_attrs_buf;
-//	cpumask = target_attrs->cpumask;
-//
-//	copy_workqueue_attrs(target_attrs, wq->unbound_attrs);
-//	pwq = unbound_pwq_by_node(wq, node);
-//
-//	/*
-//	 * Let's determine what needs to be done.  If the target cpumask is
-//	 * different from the default pwq's, we need to compare it to @pwq's
-//	 * and create a new one if they don't match.  If the target cpumask
-//	 * equals the default pwq's, the default pwq should be used.
-//	 */
-//	if (wq_calc_node_cpumask(wq->dfl_pwq->pool->attrs, node, cpu_off, cpumask)) {
-//		if (cpumask_equal(cpumask, pwq->pool->attrs->cpumask))
-//			return;
-//	} else {
-//		goto use_dfl_pwq;
-//	}
-//
-//	/* create a new pwq */
-//	pwq = alloc_unbound_pwq(wq, target_attrs);
-//	if (!pwq) {
-//		pr_warn("workqueue: allocation failed while updating NUMA affinity of \"%s\"\n",
-//			wq->name);
-//		goto use_dfl_pwq;
-//	}
-//
-//	/* Install the new pwq. */
-//	mutex_lock(&wq->mutex);
-//	old_pwq = numa_pwq_tbl_install(wq, node, pwq);
-//	goto out_unlock;
-//
-//use_dfl_pwq:
-//	mutex_lock(&wq->mutex);
-//	raw_spin_lock_irq(&wq->dfl_pwq->pool->lock);
-//	get_pwq(wq->dfl_pwq);
-//	raw_spin_unlock_irq(&wq->dfl_pwq->pool->lock);
-//	old_pwq = numa_pwq_tbl_install(wq, node, wq->dfl_pwq);
-//out_unlock:
-//	mutex_unlock(&wq->mutex);
-//	put_pwq_unlocked(old_pwq);
-//}
+/**
+ * wq_update_unbound_numa - update NUMA affinity of a wq for CPU hot[un]plug
+ * @wq: the target workqueue
+ * @cpu: the CPU coming up or going down
+ * @online: whether @cpu is coming up or going down
+ *
+ * This function is to be called from %CPU_DOWN_PREPARE, %CPU_ONLINE and
+ * %CPU_DOWN_FAILED.  @cpu is being hot[un]plugged, update NUMA affinity of
+ * @wq accordingly.
+ *
+ * If NUMA affinity can't be adjusted due to memory allocation failure, it
+ * falls back to @wq->dfl_pwq which may not be optimal but is always
+ * correct.
+ *
+ * Note that when the last allowed CPU of a NUMA node goes offline for a
+ * workqueue with a cpumask spanning multiple nodes, the workers which were
+ * already executing the work items for the workqueue will lose their CPU
+ * affinity and may execute on any CPU.  This is similar to how per-cpu
+ * workqueues behave on CPU_DOWN.  If a workqueue user wants strict
+ * affinity, it's the user's responsibility to flush the work item from
+ * CPU_DOWN_PREPARE.
+ */
+static void wq_update_unbound_numa(struct workqueue_struct *wq, int cpu,
+				   bool online)
+{
+	int node = cpu_to_node(cpu);
+	int cpu_off = online ? -1 : cpu;
+	struct pool_workqueue *old_pwq = NULL, *pwq;
+	struct workqueue_attrs *target_attrs;
+	cpumask_t *cpumask;
+
+	lockdep_assert_held(&wq_pool_mutex);
+
+	if (!wq_numa_enabled || !(wq->flags & WQ_UNBOUND) ||
+	    wq->unbound_attrs->no_numa)
+		return;
+
+	/*
+	 * We don't wanna alloc/free wq_attrs for each wq for each CPU.
+	 * Let's use a preallocated one.  The following buf is protected by
+	 * CPU hotplug exclusion.
+	 */
+	target_attrs = wq_update_unbound_numa_attrs_buf;
+	cpumask = target_attrs->cpumask;
+
+	copy_workqueue_attrs(target_attrs, wq->unbound_attrs);
+	pwq = unbound_pwq_by_node(wq, node);
+
+	/*
+	 * Let's determine what needs to be done.  If the target cpumask is
+	 * different from the default pwq's, we need to compare it to @pwq's
+	 * and create a new one if they don't match.  If the target cpumask
+	 * equals the default pwq's, the default pwq should be used.
+	 */
+	if (wq_calc_node_cpumask(wq->dfl_pwq->pool->attrs, node, cpu_off, cpumask)) {
+		if (cpumask_equal(cpumask, pwq->pool->attrs->cpumask))
+			return;
+	} else {
+		goto use_dfl_pwq;
+	}
+
+	/* create a new pwq */
+	pwq = alloc_unbound_pwq(wq, target_attrs);
+	if (!pwq) {
+		pr_warn("workqueue: allocation failed while updating NUMA affinity of \"%s\"\n",
+			wq->name);
+		goto use_dfl_pwq;
+	}
+
+	/* Install the new pwq. */
+	mutex_lock(&wq->mutex);
+	old_pwq = numa_pwq_tbl_install(wq, node, pwq);
+	goto out_unlock;
+
+use_dfl_pwq:
+	mutex_lock(&wq->mutex);
+	raw_spin_lock_irq(&wq->dfl_pwq->pool->lock);
+	get_pwq(wq->dfl_pwq);
+	raw_spin_unlock_irq(&wq->dfl_pwq->pool->lock);
+	old_pwq = numa_pwq_tbl_install(wq, node, wq->dfl_pwq);
+out_unlock:
+	mutex_unlock(&wq->mutex);
+	put_pwq_unlocked(old_pwq);
+}
 
 static int alloc_and_link_pwqs(struct workqueue_struct *wq)
 {
@@ -5725,97 +5725,97 @@ static void workqueue_sysfs_unregister(struct workqueue_struct *wq)	{ }
 // * "workqueue.watchdog_thresh" which can be updated at runtime through the
 // * corresponding sysfs parameter file.
 // */
-//#ifdef CONFIG_WQ_WATCHDOG
-//
-//static unsigned long wq_watchdog_thresh = 30;
-//static struct timer_list wq_watchdog_timer;
-//
-//static unsigned long wq_watchdog_touched = INITIAL_JIFFIES;
-//static DEFINE_PER_CPU(unsigned long, wq_watchdog_touched_cpu) = INITIAL_JIFFIES;
-//
-//static void wq_watchdog_reset_touched(void)
-//{
-//	int cpu;
-//
-//	wq_watchdog_touched = jiffies;
-//	for_each_possible_cpu(cpu)
-//		per_cpu(wq_watchdog_touched_cpu, cpu) = jiffies;
-//}
-//
-//static void wq_watchdog_timer_fn(struct timer_list *unused)
-//{
-//	unsigned long thresh = READ_ONCE(wq_watchdog_thresh) * HZ;
-//	bool lockup_detected = false;
-//	struct worker_pool *pool;
-//	int pi;
-//
-//	if (!thresh)
-//		return;
-//
-//	rcu_read_lock();
-//
-//	for_each_pool(pool, pi) {
-//		unsigned long pool_ts, touched, ts;
-//
-//		if (list_empty(&pool->worklist))
-//			continue;
-//
-//		/* get the latest of pool and touched timestamps */
-//		pool_ts = READ_ONCE(pool->watchdog_ts);
-//		touched = READ_ONCE(wq_watchdog_touched);
-//
-//		if (time_after(pool_ts, touched))
-//			ts = pool_ts;
-//		else
-//			ts = touched;
-//
-//		if (pool->cpu >= 0) {
-//			unsigned long cpu_touched =
-//				READ_ONCE(per_cpu(wq_watchdog_touched_cpu,
-//						  pool->cpu));
-//			if (time_after(cpu_touched, ts))
-//				ts = cpu_touched;
-//		}
-//
-//		/* did we stall? */
-//		if (time_after(jiffies, ts + thresh)) {
-//			lockup_detected = true;
-//			pr_emerg("BUG: workqueue lockup - pool");
-//			pr_cont_pool_info(pool);
-//			pr_cont(" stuck for %us!\n",
-//				jiffies_to_msecs(jiffies - pool_ts) / 1000);
-//		}
-//	}
-//
-//	rcu_read_unlock();
-//
-//	if (lockup_detected)
-//		show_workqueue_state();
-//
-//	wq_watchdog_reset_touched();
-//	mod_timer(&wq_watchdog_timer, jiffies + thresh);
-//}
-//
-//notrace void wq_watchdog_touch(int cpu)
-//{
-//	if (cpu >= 0)
-//		per_cpu(wq_watchdog_touched_cpu, cpu) = jiffies;
-//	else
-//		wq_watchdog_touched = jiffies;
-//}
-//
-//static void wq_watchdog_set_thresh(unsigned long thresh)
-//{
-//	wq_watchdog_thresh = 0;
-//	del_timer_sync(&wq_watchdog_timer);
-//
-//	if (thresh) {
-//		wq_watchdog_thresh = thresh;
-//		wq_watchdog_reset_touched();
-//		mod_timer(&wq_watchdog_timer, jiffies + thresh * HZ);
-//	}
-//}
-//
+#ifdef CONFIG_WQ_WATCHDOG
+
+static unsigned long wq_watchdog_thresh = 30;
+static struct timer_list wq_watchdog_timer;
+
+static unsigned long wq_watchdog_touched = INITIAL_JIFFIES;
+static DEFINE_PER_CPU(unsigned long, wq_watchdog_touched_cpu) = INITIAL_JIFFIES;
+
+static void wq_watchdog_reset_touched(void)
+{
+	int cpu;
+
+	wq_watchdog_touched = jiffies;
+	for_each_possible_cpu(cpu)
+		per_cpu(wq_watchdog_touched_cpu, cpu) = jiffies;
+}
+
+static void wq_watchdog_timer_fn(struct timer_list *unused)
+{
+	unsigned long thresh = READ_ONCE(wq_watchdog_thresh) * HZ;
+	bool lockup_detected = false;
+	struct worker_pool *pool;
+	int pi;
+
+	if (!thresh)
+		return;
+
+	rcu_read_lock();
+
+	for_each_pool(pool, pi) {
+		unsigned long pool_ts, touched, ts;
+
+		if (list_empty(&pool->worklist))
+			continue;
+
+		/* get the latest of pool and touched timestamps */
+		pool_ts = READ_ONCE(pool->watchdog_ts);
+		touched = READ_ONCE(wq_watchdog_touched);
+
+		if (time_after(pool_ts, touched))
+			ts = pool_ts;
+		else
+			ts = touched;
+
+		if (pool->cpu >= 0) {
+			unsigned long cpu_touched =
+				READ_ONCE(per_cpu(wq_watchdog_touched_cpu,
+						  pool->cpu));
+			if (time_after(cpu_touched, ts))
+				ts = cpu_touched;
+		}
+
+		/* did we stall? */
+		if (time_after(jiffies, ts + thresh)) {
+			lockup_detected = true;
+			pr_emerg("BUG: workqueue lockup - pool");
+			pr_cont_pool_info(pool);
+			pr_cont(" stuck for %us!\n",
+				jiffies_to_msecs(jiffies - pool_ts) / 1000);
+		}
+	}
+
+	rcu_read_unlock();
+
+	if (lockup_detected)
+		show_workqueue_state();
+
+	wq_watchdog_reset_touched();
+	mod_timer(&wq_watchdog_timer, jiffies + thresh);
+}
+
+notrace void wq_watchdog_touch(int cpu)
+{
+	if (cpu >= 0)
+		per_cpu(wq_watchdog_touched_cpu, cpu) = jiffies;
+	else
+		wq_watchdog_touched = jiffies;
+}
+
+static void wq_watchdog_set_thresh(unsigned long thresh)
+{
+	wq_watchdog_thresh = 0;
+	del_timer_sync(&wq_watchdog_timer);
+
+	if (thresh) {
+		wq_watchdog_thresh = thresh;
+		wq_watchdog_reset_touched();
+		mod_timer(&wq_watchdog_timer, jiffies + thresh * HZ);
+	}
+}
+
 //static int wq_watchdog_param_set_thresh(const char *val,
 //					const struct kernel_param *kp)
 //{
@@ -5841,60 +5841,60 @@ static void workqueue_sysfs_unregister(struct workqueue_struct *wq)	{ }
 //
 //module_param_cb(watchdog_thresh, &wq_watchdog_thresh_ops, &wq_watchdog_thresh,
 //		0644);
-//
-//static void wq_watchdog_init(void)
-//{
-//	timer_setup(&wq_watchdog_timer, wq_watchdog_timer_fn, TIMER_DEFERRABLE);
-//	wq_watchdog_set_thresh(wq_watchdog_thresh);
-//}
-//
-//#else	/* CONFIG_WQ_WATCHDOG */
-//
-//static inline void wq_watchdog_init(void) { }
-//
-//#endif	/* CONFIG_WQ_WATCHDOG */
-//
-//static void __init wq_numa_init(void)
-//{
-//	cpumask_var_t *tbl;
-//	int node, cpu;
-//
-//	if (num_possible_nodes() <= 1)
-//		return;
-//
-//	if (wq_disable_numa) {
-//		pr_info("workqueue: NUMA affinity support disabled\n");
-//		return;
-//	}
-//
-//	wq_update_unbound_numa_attrs_buf = alloc_workqueue_attrs();
-//	BUG_ON(!wq_update_unbound_numa_attrs_buf);
-//
-//	/*
-//	 * We want masks of possible CPUs of each node which isn't readily
-//	 * available.  Build one from cpu_to_node() which should have been
-//	 * fully initialized by now.
-//	 */
-//	tbl = kcalloc(nr_node_ids, sizeof(tbl[0]), GFP_KERNEL);
-//	BUG_ON(!tbl);
-//
-//	for_each_node(node)
-//		BUG_ON(!zalloc_cpumask_var_node(&tbl[node], GFP_KERNEL,
-//				node_online(node) ? node : NUMA_NO_NODE));
-//
-//	for_each_possible_cpu(cpu) {
-//		node = cpu_to_node(cpu);
-//		if (WARN_ON(node == NUMA_NO_NODE)) {
-//			pr_warn("workqueue: NUMA node mapping not available for cpu%d, disabling NUMA support\n", cpu);
-//			/* happens iff arch is bonkers, let's just proceed */
-//			return;
-//		}
-//		cpumask_set_cpu(cpu, tbl[node]);
-//	}
-//
-//	wq_numa_possible_cpumask = tbl;
-//	wq_numa_enabled = true;
-//}
+
+static void wq_watchdog_init(void)
+{
+	timer_setup(&wq_watchdog_timer, wq_watchdog_timer_fn, TIMER_DEFERRABLE);
+	wq_watchdog_set_thresh(wq_watchdog_thresh);
+}
+
+#else	/* CONFIG_WQ_WATCHDOG */
+
+static inline void wq_watchdog_init(void) { }
+
+#endif	/* CONFIG_WQ_WATCHDOG */
+
+static void __init wq_numa_init(void)
+{
+	cpumask_var_t *tbl;
+	int node, cpu;
+
+	if (num_possible_nodes() <= 1)
+		return;
+
+	if (wq_disable_numa) {
+		pr_info("workqueue: NUMA affinity support disabled\n");
+		return;
+	}
+
+	wq_update_unbound_numa_attrs_buf = alloc_workqueue_attrs();
+	BUG_ON(!wq_update_unbound_numa_attrs_buf);
+
+	/*
+	 * We want masks of possible CPUs of each node which isn't readily
+	 * available.  Build one from cpu_to_node() which should have been
+	 * fully initialized by now.
+	 */
+	tbl = kcalloc(nr_node_ids, sizeof(tbl[0]), GFP_KERNEL);
+	BUG_ON(!tbl);
+
+	for_each_node(node)
+		BUG_ON(!zalloc_cpumask_var_node(&tbl[node], GFP_KERNEL,
+				node_online(node) ? node : NUMA_NO_NODE));
+
+	for_each_possible_cpu(cpu) {
+		node = cpu_to_node(cpu);
+		if (WARN_ON(node == NUMA_NO_NODE)) {
+			pr_warn("workqueue: NUMA node mapping not available for cpu%d, disabling NUMA support\n", cpu);
+			/* happens iff arch is bonkers, let's just proceed */
+			return;
+		}
+		cpumask_set_cpu(cpu, tbl[node]);
+	}
+
+	wq_numa_possible_cpumask = tbl;
+	wq_numa_enabled = true;
+}
 
 /**
  * workqueue_init_early - early init for workqueue subsystem
@@ -5976,60 +5976,61 @@ void __init workqueue_init_early(void)
 }
 EXPORT_SYMBOL(workqueue_init_early);
 
-///**
-// * workqueue_init - bring workqueue subsystem fully online
-// *
-// * This is the latter half of two-staged workqueue subsystem initialization
-// * and invoked as soon as kthreads can be created and scheduled.
-// * Workqueues have been created and work items queued on them, but there
-// * are no kworkers executing the work items yet.  Populate the worker pools
-// * with the initial workers and enable future kworker creations.
-// */
-//void __init workqueue_init(void)
-//{
-//	struct workqueue_struct *wq;
-//	struct worker_pool *pool;
-//	int cpu, bkt;
-//
-//	/*
-//	 * It'd be simpler to initialize NUMA in workqueue_init_early() but
-//	 * CPU to node mapping may not be available that early on some
-//	 * archs such as power and arm64.  As per-cpu pools created
-//	 * previously could be missing node hint and unbound pools NUMA
-//	 * affinity, fix them up.
-//	 *
-//	 * Also, while iterating workqueues, create rescuers if requested.
-//	 */
-//	wq_numa_init();
-//
-//	mutex_lock(&wq_pool_mutex);
-//
-//	for_each_possible_cpu(cpu) {
-//		for_each_cpu_worker_pool(pool, cpu) {
-//			pool->node = cpu_to_node(cpu);
-//		}
-//	}
-//
-//	list_for_each_entry(wq, &workqueues, list) {
-//		wq_update_unbound_numa(wq, smp_processor_id(), true);
-//		WARN(init_rescuer(wq),
-//		     "workqueue: failed to create early rescuer for %s",
-//		     wq->name);
-//	}
-//
-//	mutex_unlock(&wq_pool_mutex);
-//
-//	/* create the initial workers */
-//	for_each_online_cpu(cpu) {
-//		for_each_cpu_worker_pool(pool, cpu) {
-//			pool->flags &= ~POOL_DISASSOCIATED;
-//			BUG_ON(!create_worker(pool));
-//		}
-//	}
-//
-//	hash_for_each(unbound_pool_hash, bkt, pool, hash_node)
-//		BUG_ON(!create_worker(pool));
-//
-//	wq_online = true;
-//	wq_watchdog_init();
-//}
+/**
+ * workqueue_init - bring workqueue subsystem fully online
+ *
+ * This is the latter half of two-staged workqueue subsystem initialization
+ * and invoked as soon as kthreads can be created and scheduled.
+ * Workqueues have been created and work items queued on them, but there
+ * are no kworkers executing the work items yet.  Populate the worker pools
+ * with the initial workers and enable future kworker creations.
+ */
+void __init workqueue_init(void)
+{
+	struct workqueue_struct *wq;
+	struct worker_pool *pool;
+	int cpu, bkt;
+
+	/*
+	 * It'd be simpler to initialize NUMA in workqueue_init_early() but
+	 * CPU to node mapping may not be available that early on some
+	 * archs such as power and arm64.  As per-cpu pools created
+	 * previously could be missing node hint and unbound pools NUMA
+	 * affinity, fix them up.
+	 *
+	 * Also, while iterating workqueues, create rescuers if requested.
+	 */
+	wq_numa_init();
+
+	mutex_lock(&wq_pool_mutex);
+
+	for_each_possible_cpu(cpu) {
+		for_each_cpu_worker_pool(pool, cpu) {
+			pool->node = cpu_to_node(cpu);
+		}
+	}
+
+	list_for_each_entry(wq, &workqueues, list) {
+		wq_update_unbound_numa(wq, smp_processor_id(), true);
+		WARN(init_rescuer(wq),
+		     "workqueue: failed to create early rescuer for %s",
+		     wq->name);
+	}
+
+	mutex_unlock(&wq_pool_mutex);
+
+	/* create the initial workers */
+	for_each_online_cpu(cpu) {
+		for_each_cpu_worker_pool(pool, cpu) {
+			pool->flags &= ~POOL_DISASSOCIATED;
+			BUG_ON(!create_worker(pool));
+		}
+	}
+
+	hash_for_each(unbound_pool_hash, bkt, pool, hash_node)
+		BUG_ON(!create_worker(pool));
+
+	wq_online = true;
+	wq_watchdog_init();
+}
+EXPORT_SYMBOL(workqueue_init);

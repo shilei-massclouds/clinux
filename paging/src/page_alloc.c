@@ -75,6 +75,7 @@
 #include <asm/tlbflush.h>
 #include <asm/div64.h>
 #include "internal.h"
+
 //#include "shuffle.h"
 //#include "page_reporting.h"
 
@@ -130,11 +131,13 @@ nodemask_t node_states[NR_NODE_STATES] __read_mostly = {
 };
 EXPORT_SYMBOL(node_states);
 
-//atomic_long_t _totalram_pages __read_mostly;
-//EXPORT_SYMBOL(_totalram_pages);
-//unsigned long totalreserve_pages __read_mostly;
-//unsigned long totalcma_pages __read_mostly;
-//
+atomic_long_t _totalram_pages __read_mostly;
+EXPORT_SYMBOL(_totalram_pages);
+unsigned long totalreserve_pages __read_mostly;
+EXPORT_SYMBOL(totalreserve_pages);
+unsigned long totalcma_pages __read_mostly;
+EXPORT_SYMBOL(totalcma_pages);
+
 //int percpu_pagelist_fraction;
 //gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
 //#ifdef CONFIG_INIT_ON_ALLOC_DEFAULT_ON
@@ -303,18 +306,19 @@ static char * const zone_names[MAX_NR_ZONES] = {
 //	"Isolate",
 //#endif
 //};
-//
-//compound_page_dtor * const compound_page_dtors[NR_COMPOUND_DTORS] = {
-//	[NULL_COMPOUND_DTOR] = NULL,
-//	[COMPOUND_PAGE_DTOR] = free_compound_page,
-//#ifdef CONFIG_HUGETLB_PAGE
-//	[HUGETLB_PAGE_DTOR] = free_huge_page,
-//#endif
-//#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-//	[TRANSHUGE_PAGE_DTOR] = free_transhuge_page,
-//#endif
-//};
-//
+
+compound_page_dtor * const compound_page_dtors[NR_COMPOUND_DTORS] = {
+	[NULL_COMPOUND_DTOR] = NULL,
+	[COMPOUND_PAGE_DTOR] = free_compound_page,
+#ifdef CONFIG_HUGETLB_PAGE
+	[HUGETLB_PAGE_DTOR] = free_huge_page,
+#endif
+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+	[TRANSHUGE_PAGE_DTOR] = free_transhuge_page,
+#endif
+};
+EXPORT_SYMBOL(compound_page_dtors);
+
 //int min_free_kbytes = 1024;
 //int user_min_free_kbytes = -1;
 //#ifdef CONFIG_DISCONTIGMEM
@@ -8830,3 +8834,9 @@ EXPORT_SYMBOL(free_area_init);
 //	return hwpoisoned;
 //}
 //#endif
+
+bool _debug_pagealloc_enabled_early __read_mostly
+			= IS_ENABLED(CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT);
+EXPORT_SYMBOL(_debug_pagealloc_enabled_early);
+DEFINE_STATIC_KEY_FALSE(_debug_pagealloc_enabled);
+EXPORT_SYMBOL(_debug_pagealloc_enabled);

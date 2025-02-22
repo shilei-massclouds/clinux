@@ -92,11 +92,6 @@ void show_mem(unsigned int filter, nodemask_t *nodemask)
 }
 */
 
-long congestion_wait(int sync, long timeout)
-{
-    booter_panic("No impl 'page_init_poison'.");
-}
-EXPORT_SYMBOL(congestion_wait);
 
 /*
  * Serializes oom killer invocations (out_of_memory()) from all contexts to

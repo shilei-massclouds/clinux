@@ -43,6 +43,10 @@
 #include <asm/bugs.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
+
+#define CREATE_TRACE_POINTS
+#include <trace/events/initcall.h>
+
 #include <cl_hook.h>
 #include <cl_types.h>
 #include "../../booter/src/booter.h"
@@ -52,6 +56,17 @@
  */
 #define MAX_INIT_ARGS CONFIG_INIT_ENV_ARG_LIMIT
 #define MAX_INIT_ENVS CONFIG_INIT_ENV_ARG_LIMIT
+
+extern initcall_entry_t __initcall_start[];
+extern initcall_entry_t __initcall0_start[];
+extern initcall_entry_t __initcall1_start[];
+extern initcall_entry_t __initcall2_start[];
+extern initcall_entry_t __initcall3_start[];
+extern initcall_entry_t __initcall4_start[];
+extern initcall_entry_t __initcall5_start[];
+extern initcall_entry_t __initcall6_start[];
+extern initcall_entry_t __initcall7_start[];
+extern initcall_entry_t __initcall_end[];
 
 /* Untouched saved command line (eg. for /proc) */
 extern char *saved_command_line;
@@ -496,9 +511,73 @@ void __init __weak poking_init(void) { }
 
 void __init __weak arch_post_acpi_subsys_init(void) { }
 
+static noinline void __init kernel_init_freeable(void);
+
 static int __ref kernel_init(void *unused)
 {
-    booter_panic("kernel_init!\n");
+    int ret;
+
+    kernel_init_freeable();
+    printk("%s: ============ 1\n", __func__);
+    /* need to finish all async __init code before freeing the memory */
+//    async_synchronize_full();
+//    kprobe_free_init_mem();
+//    ftrace_free_init_mem();
+//    free_initmem();
+//    mark_readonly();
+
+//    /*
+//     * Kernel mappings are now finalized - update the userspace page-table
+//     * to finalize PTI.
+//     */
+//    pti_finalize();
+//
+//    system_state = SYSTEM_RUNNING;
+//    numa_default_policy();
+//
+//    rcu_end_inkernel_boot();
+//
+//    do_sysctl_args();
+//
+//    if (ramdisk_execute_command) {
+//        ret = run_init_process(ramdisk_execute_command);
+//        if (!ret)
+//            return 0;
+//        pr_err("Failed to execute %s (error %d)\n",
+//               ramdisk_execute_command, ret);
+//    }
+//
+//    /*
+//     * We try each of these until one succeeds.
+//     *
+//     * The Bourne shell can be used instead of init if we are
+//     * trying to recover a really broken machine.
+//     */
+//    if (execute_command) {
+//        ret = run_init_process(execute_command);
+//        if (!ret)
+//            return 0;
+//        panic("Requested init %s failed (error %d).",
+//              execute_command, ret);
+//    }
+//
+//    if (CONFIG_DEFAULT_INIT[0] != '\0') {
+//        ret = run_init_process(CONFIG_DEFAULT_INIT);
+//        if (ret)
+//            pr_err("Default init %s failed (error %d)\n",
+//                   CONFIG_DEFAULT_INIT, ret);
+//        else
+//            return 0;
+//    }
+//
+//    if (!try_to_run_init_process("/sbin/init") ||
+//        !try_to_run_init_process("/etc/init") ||
+//        !try_to_run_init_process("/bin/init") ||
+//        !try_to_run_init_process("/bin/sh"))
+//        return 0;
+
+    panic("No working init found.  Try passing init= option to kernel. "
+          "See Linux Documentation/admin-guide/init.rst for guidance.");
 }
 
 /*
@@ -564,6 +643,78 @@ noinline void __ref rest_init(void)
 void __init __weak arch_call_rest_init(void)
 {
     rest_init();
+}
+
+static void __init do_pre_smp_initcalls(void)
+{
+    initcall_entry_t *fn;
+
+    trace_initcall_level("early");
+    for (fn = __initcall_start; fn < __initcall0_start; fn++)
+        do_one_initcall(initcall_from_entry(fn));
+}
+
+static noinline void __init kernel_init_freeable(void)
+{
+    /*
+     * Wait until kthreadd is all set-up.
+     */
+    wait_for_completion(&kthreadd_done);
+
+    /* Now the scheduler is fully set up and can do blocking allocations */
+    gfp_allowed_mask = __GFP_BITS_MASK;
+
+    /*
+     * init can allocate pages on any node
+     */
+    set_mems_allowed(node_states[N_MEMORY]);
+
+    cad_pid = task_pid(current);
+
+    smp_prepare_cpus(setup_max_cpus);
+
+    workqueue_init();
+
+    printk("%s: ============ 1 \n", __func__);
+    init_mm_internals();
+
+    printk("%s: ============ 2 \n", __func__);
+    //do_pre_smp_initcalls();
+    //lockup_detector_init();
+
+    printk("%s: ============ 3 \n", __func__);
+//    smp_init();
+//    sched_init_smp();
+//
+//    padata_init();
+//    page_alloc_init_late();
+//    /* Initialize page ext after all struct pages are initialized. */
+//    page_ext_init();
+//
+//    do_basic_setup();
+//
+//    console_on_rootfs();
+//
+//    /*
+//     * check if there is an early userspace init.  If yes, let it do all
+//     * the work
+//     */
+//    if (init_eaccess(ramdisk_execute_command) != 0) {
+//        ramdisk_execute_command = NULL;
+//        prepare_namespace();
+//    }
+//
+//    /*
+//     * Ok, we have completed the initial bootup, and
+//     * we're essentially up and running. Get rid of the
+//     * initmem segments and start the user-mode stuff..
+//     *
+//     * rootfs is available now, try loading the public keys
+//     * and default modules
+//     */
+//
+//    integrity_load_keys();
+    panic("kernel_init_freeable end!\n");
 }
 
 int
@@ -808,8 +959,6 @@ cl_top_linux_init(void)
     arch_call_rest_init();
 
     prevent_tail_call_optimization();
-
-    sbi_puts("module[top_linux]: init end!\n");
     return 0;
 }
 EXPORT_SYMBOL(cl_top_linux_init);

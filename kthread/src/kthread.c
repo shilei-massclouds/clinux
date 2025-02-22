@@ -336,7 +336,6 @@ struct task_struct *__kthread_create_on_node(int (*threadfn)(void *data),
 	struct kthread_create_info *create = kmalloc(sizeof(*create),
 						     GFP_KERNEL);
 
-    printk("========= %s\n", __func__);
 	if (!create)
 		return ERR_PTR(-ENOMEM);
 	create->threadfn = threadfn;
