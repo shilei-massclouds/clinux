@@ -7644,18 +7644,9 @@ static void cpu_cgroup_css_free(struct cgroup_subsys_state *css)
  * This is called before wake_up_new_task(), therefore we really only
  * have to set its group bits, all the other stuff does not apply.
  */
-static void cpu_cgroup_fork(struct task_struct *task)
+__weak void cpu_cgroup_fork(struct task_struct *task)
 {
     booter_panic("No impl in cgroup.");
-//	struct rq_flags rf;
-//	struct rq *rq;
-//
-//	rq = task_rq_lock(task, &rf);
-//
-//	update_rq_clock(rq);
-//	sched_change_group(task, TASK_SET_GROUP);
-//
-//	task_rq_unlock(rq, task, &rf);
 }
 
 static int cpu_cgroup_can_attach(struct cgroup_taskset *tset)

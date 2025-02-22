@@ -3302,10 +3302,10 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
 	return 0;
 }
 
-//void sched_post_fork(struct task_struct *p)
-//{
-//	uclamp_post_fork(p);
-//}
+void sched_post_fork(struct task_struct *p)
+{
+	uclamp_post_fork(p);
+}
 
 unsigned long to_ratio(u64 period, u64 runtime)
 {
@@ -7506,29 +7506,29 @@ EXPORT_SYMBOL(sched_init);
 //	list_del_rcu(&tg->siblings);
 //	spin_unlock_irqrestore(&task_group_lock, flags);
 //}
-//
-//static void sched_change_group(struct task_struct *tsk, int type)
-//{
-//	struct task_group *tg;
-//
-//	/*
-//	 * All callers are synchronized by task_rq_lock(); we do not use RCU
-//	 * which is pointless here. Thus, we pass "true" to task_css_check()
-//	 * to prevent lockdep warnings.
-//	 */
-//	tg = container_of(task_css_check(tsk, cpu_cgrp_id, true),
-//			  struct task_group, css);
-//	tg = autogroup_task_group(tsk, tg);
-//	tsk->sched_task_group = tg;
-//
-//#ifdef CONFIG_FAIR_GROUP_SCHED
-//	if (tsk->sched_class->task_change_group)
-//		tsk->sched_class->task_change_group(tsk, type);
-//	else
-//#endif
-//		set_task_rq(tsk, task_cpu(tsk));
-//}
-//
+
+static void sched_change_group(struct task_struct *tsk, int type)
+{
+	struct task_group *tg;
+
+	/*
+	 * All callers are synchronized by task_rq_lock(); we do not use RCU
+	 * which is pointless here. Thus, we pass "true" to task_css_check()
+	 * to prevent lockdep warnings.
+	 */
+	tg = container_of(task_css_check(tsk, cpu_cgrp_id, true),
+			  struct task_group, css);
+	tg = autogroup_task_group(tsk, tg);
+	tsk->sched_task_group = tg;
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	if (tsk->sched_class->task_change_group)
+		tsk->sched_class->task_change_group(tsk, type);
+	else
+#endif
+		set_task_rq(tsk, task_cpu(tsk));
+}
+
 ///*
 // * Change task's runqueue when it moves between groups.
 // *
@@ -7627,24 +7627,24 @@ EXPORT_SYMBOL(sched_init);
 //	 */
 //	sched_free_group(tg);
 //}
-//
-///*
-// * This is called before wake_up_new_task(), therefore we really only
-// * have to set its group bits, all the other stuff does not apply.
-// */
-//static void cpu_cgroup_fork(struct task_struct *task)
-//{
-//	struct rq_flags rf;
-//	struct rq *rq;
-//
-//	rq = task_rq_lock(task, &rf);
-//
-//	update_rq_clock(rq);
-//	sched_change_group(task, TASK_SET_GROUP);
-//
-//	task_rq_unlock(rq, task, &rf);
-//}
-//
+
+/*
+ * This is called before wake_up_new_task(), therefore we really only
+ * have to set its group bits, all the other stuff does not apply.
+ */
+void cpu_cgroup_fork(struct task_struct *task)
+{
+	struct rq_flags rf;
+	struct rq *rq;
+
+	rq = task_rq_lock(task, &rf);
+
+	update_rq_clock(rq);
+	sched_change_group(task, TASK_SET_GROUP);
+
+	task_rq_unlock(rq, task, &rf);
+}
+
 //static int cpu_cgroup_can_attach(struct cgroup_taskset *tset)
 //{
 //	struct task_struct *task;

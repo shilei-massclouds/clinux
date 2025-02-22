@@ -2266,10 +2266,11 @@ static __latent_entropy struct task_struct *copy_process(
 	syscall_tracepoint_update(p);
 	write_unlock_irq(&tasklist_lock);
 
-    printk("=================== %s\n", __func__);
 	proc_fork_connector(p);
 	sched_post_fork(p);
+    printk("=================== %s\n", __func__);
 	cgroup_post_fork(p, args);
+    printk("=================== %s\n", __func__);
 	perf_event_fork(p);
 
     printk("=================== %s\n", __func__);
