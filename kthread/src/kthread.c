@@ -34,6 +34,7 @@
 static DEFINE_SPINLOCK(kthread_create_lock);
 static LIST_HEAD(kthread_create_list);
 struct task_struct *kthreadd_task;
+EXPORT_SYMBOL(kthreadd_task);
 
 struct kthread_create_info
 {
@@ -635,6 +636,7 @@ int kthreadd(void *unused)
 
 	return 0;
 }
+EXPORT_SYMBOL_GPL(kthreadd);
 
 void __kthread_init_worker(struct kthread_worker *worker,
 				const char *name,

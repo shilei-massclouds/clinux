@@ -368,6 +368,7 @@ void cpu_startup_entry(enum cpuhp_state state)
 	while (1)
 		do_idle();
 }
+EXPORT_SYMBOL_GPL(cpu_startup_entry);
 
 /*
  * idle-task scheduling class.

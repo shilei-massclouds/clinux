@@ -501,6 +501,17 @@ static int __ref kernel_init(void *unused)
     booter_panic("kernel_init!\n");
 }
 
+/*
+ * We need to finalize in a non-__init function or else race conditions
+ * between the root thread and the init thread may cause start_kernel to
+ * be reaped by free_initmem before the root thread has proceeded to
+ * cpu_idle.
+ *
+ * gcc-3.4 accidentally inlines this function, so use noinline.
+ */
+
+static __initdata DECLARE_COMPLETION(kthreadd_done);
+
 noinline void __ref rest_init(void)
 {
     struct task_struct *tsk;
@@ -514,41 +525,41 @@ noinline void __ref rest_init(void)
      * we schedule it before we create kthreadd, will OOPS.
      */
     pid = kernel_thread(kernel_init, NULL, CLONE_FS);
+    /*
+     * Pin init on the boot CPU. Task migration is not properly working
+     * until sched_init_smp() has been run. It will set the allowed
+     * CPUs for init to the non isolated CPUs.
+     */
+    rcu_read_lock();
+    tsk = find_task_by_pid_ns(pid, &init_pid_ns);
+    set_cpus_allowed_ptr(tsk, cpumask_of(smp_processor_id()));
+    rcu_read_unlock();
+
+    numa_default_policy();
+    pid = kernel_thread(kthreadd, NULL, CLONE_FS | CLONE_FILES);
+    rcu_read_lock();
+    kthreadd_task = find_task_by_pid_ns(pid, &init_pid_ns);
+    rcu_read_unlock();
+
+    /*
+     * Enable might_sleep() and smp_processor_id() checks.
+     * They cannot be enabled earlier because with CONFIG_PREEMPTION=y
+     * kernel_thread() would trigger might_sleep() splats. With
+     * CONFIG_PREEMPT_VOLUNTARY=y the init task might have scheduled
+     * already, but it's stuck on the kthreadd_done completion.
+     */
+    system_state = SYSTEM_SCHEDULING;
+
+    complete(&kthreadd_done);
+
     sbi_puts("rest_init 1\n");
-//    /*
-//     * Pin init on the boot CPU. Task migration is not properly working
-//     * until sched_init_smp() has been run. It will set the allowed
-//     * CPUs for init to the non isolated CPUs.
-//     */
-//    rcu_read_lock();
-//    tsk = find_task_by_pid_ns(pid, &init_pid_ns);
-//    set_cpus_allowed_ptr(tsk, cpumask_of(smp_processor_id()));
-//    rcu_read_unlock();
-//
-//    numa_default_policy();
-//    pid = kernel_thread(kthreadd, NULL, CLONE_FS | CLONE_FILES);
-//    rcu_read_lock();
-//    kthreadd_task = find_task_by_pid_ns(pid, &init_pid_ns);
-//    rcu_read_unlock();
-//
-//    /*
-//     * Enable might_sleep() and smp_processor_id() checks.
-//     * They cannot be enabled earlier because with CONFIG_PREEMPTION=y
-//     * kernel_thread() would trigger might_sleep() splats. With
-//     * CONFIG_PREEMPT_VOLUNTARY=y the init task might have scheduled
-//     * already, but it's stuck on the kthreadd_done completion.
-//     */
-//    system_state = SYSTEM_SCHEDULING;
-//
-//    complete(&kthreadd_done);
-//
-//    /*
-//     * The boot idle thread must execute schedule()
-//     * at least once to get things moving:
-//     */
-//    schedule_preempt_disabled();
-//    /* Call into cpu_idle with preempt disabled */
-//    cpu_startup_entry(CPUHP_ONLINE);
+    /*
+     * The boot idle thread must execute schedule()
+     * at least once to get things moving:
+     */
+    schedule_preempt_disabled();
+    /* Call into cpu_idle with preempt disabled */
+    cpu_startup_entry(CPUHP_ONLINE);
     sbi_puts("module[top_linux]: rest_init ok!\n");
 }
 
