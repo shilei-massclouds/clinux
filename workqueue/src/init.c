@@ -58,11 +58,6 @@ int device_register(struct device *dev)
 }
 */
 
-void kthread_bind_mask(struct task_struct *p, const struct cpumask *mask)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
-
 /*
 struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
                        void *data, int node,
@@ -84,12 +79,6 @@ void init_timer_key(struct timer_list *timer,
 
 int bitmap_parse(const char *start, unsigned int buflen,
         unsigned long *maskp, int nmaskbits)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
-
-
-void *kthread_probe_data(struct task_struct *task)
 {
     booter_panic("No impl in 'workqueue'.");
 }

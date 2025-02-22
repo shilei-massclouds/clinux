@@ -496,6 +496,66 @@ void __init __weak poking_init(void) { }
 
 void __init __weak arch_post_acpi_subsys_init(void) { }
 
+static int __ref kernel_init(void *unused)
+{
+    booter_panic("kernel_init!\n");
+}
+
+noinline void __ref rest_init(void)
+{
+    struct task_struct *tsk;
+    int pid;
+
+    sbi_puts("module[top_linux]: enter rest_init ...\n");
+    rcu_scheduler_starting();
+    /*
+     * We need to spawn init first so that it obtains pid 1, however
+     * the init task will end up wanting to create kthreads, which, if
+     * we schedule it before we create kthreadd, will OOPS.
+     */
+    pid = kernel_thread(kernel_init, NULL, CLONE_FS);
+//    /*
+//     * Pin init on the boot CPU. Task migration is not properly working
+//     * until sched_init_smp() has been run. It will set the allowed
+//     * CPUs for init to the non isolated CPUs.
+//     */
+//    rcu_read_lock();
+//    tsk = find_task_by_pid_ns(pid, &init_pid_ns);
+//    set_cpus_allowed_ptr(tsk, cpumask_of(smp_processor_id()));
+//    rcu_read_unlock();
+//
+//    numa_default_policy();
+//    pid = kernel_thread(kthreadd, NULL, CLONE_FS | CLONE_FILES);
+//    rcu_read_lock();
+//    kthreadd_task = find_task_by_pid_ns(pid, &init_pid_ns);
+//    rcu_read_unlock();
+//
+//    /*
+//     * Enable might_sleep() and smp_processor_id() checks.
+//     * They cannot be enabled earlier because with CONFIG_PREEMPTION=y
+//     * kernel_thread() would trigger might_sleep() splats. With
+//     * CONFIG_PREEMPT_VOLUNTARY=y the init task might have scheduled
+//     * already, but it's stuck on the kthreadd_done completion.
+//     */
+//    system_state = SYSTEM_SCHEDULING;
+//
+//    complete(&kthreadd_done);
+//
+//    /*
+//     * The boot idle thread must execute schedule()
+//     * at least once to get things moving:
+//     */
+//    schedule_preempt_disabled();
+//    /* Call into cpu_idle with preempt disabled */
+//    cpu_startup_entry(CPUHP_ONLINE);
+    sbi_puts("module[top_linux]: rest_init ok!\n");
+}
+
+void __init __weak arch_call_rest_init(void)
+{
+    rest_init();
+}
+
 int
 cl_top_linux_init(void)
 {
@@ -513,6 +573,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(fs_namespace);
     REQUIRE_COMPONENT(proc);
     REQUIRE_COMPONENT(namei);
+    REQUIRE_COMPONENT(kthread);
 
     //
     // start_kernel (init/main.c)
@@ -731,9 +792,8 @@ cl_top_linux_init(void)
     sfi_init_late();
     kcsan_init();
 
-    sbi_puts("module[top_linux]: enter rest_init ...\n");
-    ///* Do the rest non-__init'ed, we're now alive */
-    //arch_call_rest_init();
+    /* Do the rest non-__init'ed, we're now alive */
+    arch_call_rest_init();
 
     prevent_tail_call_optimization();
 

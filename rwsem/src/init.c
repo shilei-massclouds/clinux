@@ -14,27 +14,3 @@ cl_rwsem_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_rwsem_init);
-
-/*
-void wake_q_add(struct wake_q_head *head, struct task_struct *task)
-{
-    booter_panic("No impl 'rwsem'.");
-}
-*/
-
-void wake_q_add_safe(struct wake_q_head *head, struct task_struct *task)
-{
-    booter_panic("No impl 'rwsem'.");
-}
-
-/*
-void wake_up_q(struct wake_q_head *head)
-{
-    booter_panic("No impl 'rwsem'.");
-}
-
-asmlinkage __visible void __sched schedule(void)
-{
-    booter_panic("No impl 'rwsem'.");
-}
-*/

@@ -85,6 +85,7 @@ struct pid init_struct_pid = {
         .ns     = &init_pid_ns,
     }, }
 };
+EXPORT_SYMBOL(init_struct_pid);
 
 /*
  * PID-map pages start out as NULL, they get allocated upon
@@ -139,6 +140,7 @@ struct ipc_namespace init_ipc_ns = {
     .ns.ops = &ipcns_operations,
 #endif
 };
+EXPORT_SYMBOL(init_ipc_ns);
 
 /* cgroup namespace for init task */
 struct cgroup_namespace init_cgroup_ns = {
@@ -277,3 +279,7 @@ EXPORT_SYMBOL(print_fatal_signals);
 /* Untouched saved command line (eg. for /proc) */
 char *saved_command_line;
 EXPORT_SYMBOL(saved_command_line);
+
+/* SLAB cache for fs_struct structures (tsk->fs) */
+struct kmem_cache *fs_cachep;
+EXPORT_SYMBOL(fs_cachep);

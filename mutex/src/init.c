@@ -14,32 +14,3 @@ cl_mutex_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_mutex_init);
-
-/*
-void wake_q_add(struct wake_q_head *head, struct task_struct *task)
-{
-    booter_panic("in mutex!");
-}
-
-void wake_up_q(struct wake_q_head *head)
-{
-    booter_panic("in mutex!");
-}
-*/
-
-void __sched schedule_preempt_disabled(void)
-{
-    booter_panic("in mutex!");
-}
-
-/*
-void io_schedule_finish(int token)
-{
-    booter_panic("in mutex!");
-}
-
-int io_schedule_prepare(void)
-{
-    booter_panic("in mutex!");
-}
-*/

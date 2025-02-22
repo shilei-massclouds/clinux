@@ -93,6 +93,7 @@ void free_fs_struct(struct fs_struct *fs)
 	path_put(&fs->pwd);
 	kmem_cache_free(fs_cachep, fs);
 }
+EXPORT_SYMBOL(free_fs_struct);
 
 void exit_fs(struct task_struct *tsk)
 {
@@ -110,6 +111,7 @@ void exit_fs(struct task_struct *tsk)
 			free_fs_struct(fs);
 	}
 }
+EXPORT_SYMBOL(exit_fs);
 
 struct fs_struct *copy_fs_struct(struct fs_struct *old)
 {
@@ -131,6 +133,7 @@ struct fs_struct *copy_fs_struct(struct fs_struct *old)
 	}
 	return fs;
 }
+EXPORT_SYMBOL(copy_fs_struct);
 
 int unshare_fs_struct(void)
 {

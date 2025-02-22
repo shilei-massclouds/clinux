@@ -178,6 +178,7 @@ void exit_creds(struct task_struct *tsk)
 	tsk->cached_requested_key = NULL;
 #endif
 }
+EXPORT_SYMBOL(exit_creds);
 
 /**
  * get_task_cred - Get another task's objective credentials
@@ -392,6 +393,7 @@ error_put:
 	put_cred(new);
 	return ret;
 }
+EXPORT_SYMBOL(copy_creds);
 
 static bool cred_cap_issubset(const struct cred *set, const struct cred *subset)
 {

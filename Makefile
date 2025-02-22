@@ -51,15 +51,16 @@ components := \
 	jump_label extable vdso utsname keys ucount \
 	early_sched sched \
 	percpu percpu_refcount workqueue_itf workqueue notifier \
-	memblock bootmem paging rmap backing_dev \
+	memblock bootmem paging rmap backing_dev riscv_mm_context \
 	page_alloc slub vmalloc mm_util vmscan \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
+	ipc_sem \
 	inode dcache file_table do_mounts \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs \
 	fs_context fs_parser fs_struct namei libfs \
 	net_namespace \
-	fork mmap filemap \
+	fork mmap filemap kthread \
 	buffer swap \
 	signal sysctl \
 	early_printk printk panic dump_stack show_mem

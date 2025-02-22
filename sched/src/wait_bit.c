@@ -185,7 +185,6 @@ void wake_up_var(void *var)
 {
 	__wake_up_bit(__var_waitqueue(var), var, -1);
 }
-EXPORT_SYMBOL(wake_up_var);
 
 __sched int bit_wait(struct wait_bit_key *word, int mode)
 {

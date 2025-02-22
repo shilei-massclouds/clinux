@@ -5896,6 +5896,7 @@ void cgroup_fork(struct task_struct *child)
 	RCU_INIT_POINTER(child->cgroups, &init_css_set);
 	INIT_LIST_HEAD(&child->cg_list);
 }
+EXPORT_SYMBOL(cgroup_fork);
 
 static struct cgroup *cgroup_get_from_file(struct file *f)
 {
@@ -6081,6 +6082,7 @@ out_revert:
 
 	return ret;
 }
+EXPORT_SYMBOL(cgroup_can_fork);
 
 /**
  * cgroup_cancel_fork - called if a fork failed after cgroup_can_fork()
@@ -6103,6 +6105,7 @@ void cgroup_cancel_fork(struct task_struct *child,
 
 	cgroup_css_set_put_fork(kargs);
 }
+EXPORT_SYMBOL(cgroup_cancel_fork);
 
 /**
  * cgroup_post_fork - finalize cgroup setup for the child process
@@ -6175,6 +6178,7 @@ void cgroup_post_fork(struct task_struct *child,
 
 	cgroup_css_set_put_fork(kargs);
 }
+EXPORT_SYMBOL(cgroup_post_fork);
 
 /**
  * cgroup_exit - detach cgroup from exiting task
@@ -6229,6 +6233,7 @@ void cgroup_free(struct task_struct *task)
 	struct css_set *cset = task_css_set(task);
 	put_css_set(cset);
 }
+EXPORT_SYMBOL(cgroup_free);
 
 static int __init cgroup_disable(char *str)
 {

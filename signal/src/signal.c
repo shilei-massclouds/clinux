@@ -184,7 +184,6 @@ void recalc_sigpending(void)
 		clear_thread_flag(TIF_SIGPENDING);
 
 }
-EXPORT_SYMBOL(recalc_sigpending);
 
 void calculate_sigpending(void)
 {

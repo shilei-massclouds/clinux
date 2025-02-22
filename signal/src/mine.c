@@ -1,8 +1,7 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(cgroup_enter_frozen)
-CL_MINE(cgroup_leave_frozen)
+//CL_MINE(cgroup_leave_frozen)
 CL_MINE(do_coredump)
 CL_MINE(do_group_exit)
 //CL_MINE(__fdget)

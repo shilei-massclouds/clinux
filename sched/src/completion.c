@@ -243,7 +243,6 @@ int __sched wait_for_completion_killable(struct completion *x)
 		return t;
 	return 0;
 }
-EXPORT_SYMBOL(wait_for_completion_killable);
 
 /**
  * wait_for_completion_killable_timeout: - waits for completion of a task (w/(to,killable))

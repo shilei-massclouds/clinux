@@ -156,6 +156,7 @@ void free_pid(struct pid *pid)
 
 	call_rcu(&pid->rcu, delayed_put_pid);
 }
+EXPORT_SYMBOL(free_pid);
 
 struct pid *alloc_pid(struct pid_namespace *ns, pid_t *set_tid,
 		      size_t set_tid_size)
@@ -299,6 +300,7 @@ out_free:
 	kmem_cache_free(ns->pid_cachep, pid);
 	return ERR_PTR(retval);
 }
+EXPORT_SYMBOL(alloc_pid);
 
 void disable_pid_allocation(struct pid_namespace *ns)
 {
@@ -334,6 +336,7 @@ void attach_pid(struct task_struct *task, enum pid_type type)
 	struct pid *pid = *task_pid_ptr(task, type);
 	hlist_add_head_rcu(&task->pid_links[type], &pid->tasks[type]);
 }
+EXPORT_SYMBOL(attach_pid);
 
 static void __change_pid(struct task_struct *task, enum pid_type type,
 			struct pid *new)

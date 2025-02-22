@@ -171,6 +171,7 @@ int unshare_userns(unsigned long unshare_flags, struct cred **new_cred)
 
 	return err;
 }
+EXPORT_SYMBOL(unshare_userns);
 
 static void free_user_ns(struct work_struct *work)
 {

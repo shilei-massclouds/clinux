@@ -64,11 +64,6 @@ bool unhandled_signal(struct task_struct *tsk, int sig)
     booter_panic("No impl!\n");
 }
 */
-void __noreturn do_exit(long code)
-{
-    booter_panic("No impl!\n");
-    do {} while(1);
-}
 void oops_exit(void)
 {
     booter_panic("No impl!\n");

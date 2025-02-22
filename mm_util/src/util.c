@@ -728,13 +728,13 @@ EXPORT_SYMBOL(page_mapping);
 //}
 //EXPORT_SYMBOL_GPL(__page_mapcount);
 //
-//int sysctl_overcommit_memory __read_mostly = OVERCOMMIT_GUESS;
-//int sysctl_overcommit_ratio __read_mostly = 50;
-//unsigned long sysctl_overcommit_kbytes __read_mostly;
-//int sysctl_max_map_count __read_mostly = DEFAULT_MAX_MAP_COUNT;
-//unsigned long sysctl_user_reserve_kbytes __read_mostly = 1UL << 17; /* 128MB */
-//unsigned long sysctl_admin_reserve_kbytes __read_mostly = 1UL << 13; /* 8MB */
-//
+int sysctl_overcommit_memory __read_mostly = OVERCOMMIT_GUESS;
+int sysctl_overcommit_ratio __read_mostly = 50;
+unsigned long sysctl_overcommit_kbytes __read_mostly;
+int sysctl_max_map_count __read_mostly = DEFAULT_MAX_MAP_COUNT;
+unsigned long sysctl_user_reserve_kbytes __read_mostly = 1UL << 17; /* 128MB */
+unsigned long sysctl_admin_reserve_kbytes __read_mostly = 1UL << 13; /* 8MB */
+
 //int overcommit_ratio_handler(struct ctl_table *table, int write, void *buffer,
 //		size_t *lenp, loff_t *ppos)
 //{
@@ -797,23 +797,23 @@ EXPORT_SYMBOL(page_mapping);
 //		sysctl_overcommit_ratio = 0;
 //	return ret;
 //}
-//
-///*
-// * Committed memory limit enforced when OVERCOMMIT_NEVER policy is used
-// */
-//unsigned long vm_commit_limit(void)
-//{
-//	unsigned long allowed;
-//
-//	if (sysctl_overcommit_kbytes)
-//		allowed = sysctl_overcommit_kbytes >> (PAGE_SHIFT - 10);
-//	else
-//		allowed = ((totalram_pages() - hugetlb_total_pages())
-//			   * sysctl_overcommit_ratio / 100);
-//	allowed += total_swap_pages;
-//
-//	return allowed;
-//}
+
+/*
+ * Committed memory limit enforced when OVERCOMMIT_NEVER policy is used
+ */
+unsigned long vm_commit_limit(void)
+{
+	unsigned long allowed;
+
+	if (sysctl_overcommit_kbytes)
+		allowed = sysctl_overcommit_kbytes >> (PAGE_SHIFT - 10);
+	else
+		allowed = ((totalram_pages() - hugetlb_total_pages())
+			   * sysctl_overcommit_ratio / 100);
+	allowed += total_swap_pages;
+
+	return allowed;
+}
 
 /*
  * Make sure vm_committed_as in one cacheline and not cacheline shared with
@@ -840,65 +840,66 @@ EXPORT_SYMBOL(vm_committed_as);
 //	return percpu_counter_sum_positive(&vm_committed_as);
 //}
 //EXPORT_SYMBOL_GPL(vm_memory_committed);
-//
-///*
-// * Check that a process has enough memory to allocate a new virtual
-// * mapping. 0 means there is enough memory for the allocation to
-// * succeed and -ENOMEM implies there is not.
-// *
-// * We currently support three overcommit policies, which are set via the
-// * vm.overcommit_memory sysctl.  See Documentation/vm/overcommit-accounting.rst
-// *
-// * Strict overcommit modes added 2002 Feb 26 by Alan Cox.
-// * Additional code 2002 Jul 20 by Robert Love.
-// *
-// * cap_sys_admin is 1 if the process has admin privileges, 0 otherwise.
-// *
-// * Note this is a helper function intended to be used by LSMs which
-// * wish to use this logic.
-// */
-//int __vm_enough_memory(struct mm_struct *mm, long pages, int cap_sys_admin)
-//{
-//	long allowed;
-//
-//	vm_acct_memory(pages);
-//
-//	/*
-//	 * Sometimes we want to use more memory than we have
-//	 */
-//	if (sysctl_overcommit_memory == OVERCOMMIT_ALWAYS)
-//		return 0;
-//
-//	if (sysctl_overcommit_memory == OVERCOMMIT_GUESS) {
-//		if (pages > totalram_pages() + total_swap_pages)
-//			goto error;
-//		return 0;
-//	}
-//
-//	allowed = vm_commit_limit();
-//	/*
-//	 * Reserve some for root
-//	 */
-//	if (!cap_sys_admin)
-//		allowed -= sysctl_admin_reserve_kbytes >> (PAGE_SHIFT - 10);
-//
-//	/*
-//	 * Don't let a single process grow so big a user can't recover
-//	 */
-//	if (mm) {
-//		long reserve = sysctl_user_reserve_kbytes >> (PAGE_SHIFT - 10);
-//
-//		allowed -= min_t(long, mm->total_vm / 32, reserve);
-//	}
-//
-//	if (percpu_counter_read_positive(&vm_committed_as) < allowed)
-//		return 0;
-//error:
-//	vm_unacct_memory(pages);
-//
-//	return -ENOMEM;
-//}
-//
+
+/*
+ * Check that a process has enough memory to allocate a new virtual
+ * mapping. 0 means there is enough memory for the allocation to
+ * succeed and -ENOMEM implies there is not.
+ *
+ * We currently support three overcommit policies, which are set via the
+ * vm.overcommit_memory sysctl.  See Documentation/vm/overcommit-accounting.rst
+ *
+ * Strict overcommit modes added 2002 Feb 26 by Alan Cox.
+ * Additional code 2002 Jul 20 by Robert Love.
+ *
+ * cap_sys_admin is 1 if the process has admin privileges, 0 otherwise.
+ *
+ * Note this is a helper function intended to be used by LSMs which
+ * wish to use this logic.
+ */
+int __vm_enough_memory(struct mm_struct *mm, long pages, int cap_sys_admin)
+{
+	long allowed;
+
+	vm_acct_memory(pages);
+
+	/*
+	 * Sometimes we want to use more memory than we have
+	 */
+	if (sysctl_overcommit_memory == OVERCOMMIT_ALWAYS)
+		return 0;
+
+	if (sysctl_overcommit_memory == OVERCOMMIT_GUESS) {
+		if (pages > totalram_pages() + total_swap_pages)
+			goto error;
+		return 0;
+	}
+
+	allowed = vm_commit_limit();
+	/*
+	 * Reserve some for root
+	 */
+	if (!cap_sys_admin)
+		allowed -= sysctl_admin_reserve_kbytes >> (PAGE_SHIFT - 10);
+
+	/*
+	 * Don't let a single process grow so big a user can't recover
+	 */
+	if (mm) {
+		long reserve = sysctl_user_reserve_kbytes >> (PAGE_SHIFT - 10);
+
+		allowed -= min_t(long, mm->total_vm / 32, reserve);
+	}
+
+	if (percpu_counter_read_positive(&vm_committed_as) < allowed)
+		return 0;
+error:
+	vm_unacct_memory(pages);
+
+	return -ENOMEM;
+}
+EXPORT_SYMBOL(__vm_enough_memory);
+
 ///**
 // * get_cmdline() - copy the cmdline value to a buffer.
 // * @task:     the task whose cmdline value to copy.

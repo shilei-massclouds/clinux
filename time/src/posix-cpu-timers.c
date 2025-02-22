@@ -28,6 +28,7 @@ void posix_cputimers_group_init(struct posix_cputimers *pct, u64 cpu_limit)
 		pct->timers_active = true;
 	}
 }
+EXPORT_SYMBOL(posix_cputimers_group_init);
 
 /*
  * Called after updating RLIMIT_CPU to run cpu timer and update

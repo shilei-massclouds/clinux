@@ -195,6 +195,7 @@ void __init rcu_scheduler_starting(void)
 {
 	rcu_scheduler_active = RCU_SCHEDULER_RUNNING;
 }
+EXPORT_SYMBOL_GPL(rcu_scheduler_starting);
 
 /*
  * Queue work for srcu_struct structures with early boot callbacks.

@@ -132,19 +132,19 @@ DEFINE_PER_CPU_ALIGNED(irq_cpustat_t, irq_stat);
 EXPORT_PER_CPU_SYMBOL(irq_stat);
 #endif
 
-void *kthread_data(struct task_struct *task)
+__weak void *kthread_data(struct task_struct *task)
 {
-    booter_panic("No impl in 'workqueue'.");
+    booter_panic("No impl.");
 }
 EXPORT_SYMBOL(kthread_data);
 
-int kthread_stop(struct task_struct *k)
+__weak int kthread_stop(struct task_struct *k)
 {
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(kthread_stop);
 
-struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
+__weak struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
                        void *data, int node,
                        const char namefmt[],
                        ...)
@@ -153,7 +153,7 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 }
 EXPORT_SYMBOL(kthread_create_on_node);
 
-void __put_task_struct(struct task_struct *tsk)
+__weak void __put_task_struct(struct task_struct *tsk)
 {
     booter_panic("No impl 'sched'.");
 }
@@ -751,7 +751,7 @@ __weak int kill_pid(struct pid *pid, int sig, int priv)
 }
 EXPORT_SYMBOL(kill_pid);
 
-struct pid *pidfd_pid(const struct file *file)
+__weak struct pid *pidfd_pid(const struct file *file)
 {
     booter_panic("No impl.\n");
 }
@@ -774,12 +774,6 @@ void *kvmalloc_node(size_t size, gfp_t flags, int node)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(kvmalloc_node);
-
-void __mmdrop(struct mm_struct *mm)
-{
-    booter_panic("No impl 'sched'.");
-}
-EXPORT_SYMBOL(__mmdrop);
 
 char *d_path(const struct path *path, char *buf, int buflen)
 {
@@ -892,3 +886,113 @@ bool cancel_work_sync(struct work_struct *work)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(cancel_work_sync);
+
+__weak u64 get_random_u64(void)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(get_random_u64);
+
+__weak void recalc_sigpending(void)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(recalc_sigpending);
+
+void cgroup_enter_frozen(void)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(cgroup_enter_frozen);
+
+__weak void ptrace_notify(int exit_code)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(ptrace_notify);
+
+__weak void task_join_group_stop(struct task_struct *task)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(task_join_group_stop);
+
+__weak void
+flush_signal_handlers(struct task_struct *t, int force_default)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(flush_signal_handlers);
+
+__weak bool task_set_jobctl_pending(struct task_struct *task, unsigned long mask)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(task_set_jobctl_pending);
+
+void cgroup_leave_frozen(bool always_leave)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(cgroup_leave_frozen);
+
+int cap_vm_enough_memory(struct mm_struct *mm, long pages)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(cap_vm_enough_memory);
+
+int get_unused_fd_flags(unsigned flags)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(get_unused_fd_flags);
+
+void put_unused_fd(unsigned int fd)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(put_unused_fd);
+
+void fd_install(unsigned int fd, struct file *file)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(fd_install);
+
+void __noreturn do_exit(long code)
+{
+    booter_panic("No impl!\n");
+    do {} while(1);
+}
+EXPORT_SYMBOL(do_exit);
+
+__weak void ignore_signals(struct task_struct *t)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(ignore_signals);
+
+__weak int tsk_fork_get_node(struct task_struct *tsk)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(tsk_fork_get_node);
+
+__weak void kthread_bind_mask(struct task_struct *p, const struct cpumask *mask)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(kthread_bind_mask);
+
+__weak void *kthread_probe_data(struct task_struct *task)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(kthread_probe_data);
+
+__weak void free_kthread_struct(struct task_struct *k)
+{
+    booter_panic("No impl in 'workqueue'.");
+}
+EXPORT_SYMBOL(free_kthread_struct);

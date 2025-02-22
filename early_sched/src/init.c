@@ -134,7 +134,7 @@ int __weak printk_deferred(const char *s, ...)
 }
 EXPORT_SYMBOL(printk_deferred);
 
-bool kthread_should_stop(void)
+__weak bool kthread_should_stop(void)
 {
     booter_panic("No impl in 'workqueue'.");
 }
@@ -374,3 +374,46 @@ __weak void __cgroup_account_cputime(struct cgroup *cgrp, u64 delta_exec)
     booter_panic("No impl 'sched'.");
 }
 EXPORT_SYMBOL(__cgroup_account_cputime);
+
+__weak int __sched wait_for_completion_killable(struct completion *x)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(wait_for_completion_killable);
+
+__weak void wake_up_var(void *var)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(wake_up_var);
+
+__weak void cputime_adjust(struct task_cputime *curr, struct prev_cputime *prev,
+		    u64 *ut, u64 *st)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL_GPL(cputime_adjust);
+
+__weak void init_idle(struct task_struct *idle, int cpu)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(init_idle);
+
+__weak void __sched schedule_preempt_disabled(void)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(schedule_preempt_disabled);
+
+__weak int sched_fork(unsigned long clone_flags, struct task_struct *p)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(sched_fork);
+
+__weak void wake_q_add_safe(struct wake_q_head *head, struct task_struct *task)
+{
+    booter_panic("No impl 'rwsem'.");
+}
+EXPORT_SYMBOL(wake_q_add_safe);

@@ -54,21 +54,17 @@ void io_wq_worker_running(struct task_struct *tsk)
     booter_panic("No impl 'sched'.");
 }
 
-void switch_mm(struct mm_struct *prev, struct mm_struct *next,
-    struct task_struct *task)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 void put_task_struct_rcu_user(struct task_struct *task)
 {
     booter_panic("No impl 'sched'.");
 }
 
+/*
 void put_task_stack(struct task_struct *tsk)
 {
     booter_panic("No impl 'sched'.");
 }
+*/
 
 void io_wq_worker_sleeping(struct task_struct *tsk)
 {

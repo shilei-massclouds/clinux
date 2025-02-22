@@ -13,15 +13,3 @@ cl_softirq_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_softirq_init);
-
-bool __kthread_should_park(struct task_struct *k)
-{
-    booter_panic("No impl in 'irq'.");
-}
-
-/*
-int idle_cpu(int cpu)
-{
-    booter_panic("No impl in 'irq'.");
-}
-*/

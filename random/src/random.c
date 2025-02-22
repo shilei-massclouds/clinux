@@ -2207,7 +2207,6 @@ u64 get_random_u64(void)
 	spin_unlock_irqrestore(&batch->batch_lock, flags);
 	return ret;
 }
-EXPORT_SYMBOL(get_random_u64);
 
 static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u32) = {
 	.batch_lock	= __SPIN_LOCK_UNLOCKED(batched_entropy_u32.lock),
