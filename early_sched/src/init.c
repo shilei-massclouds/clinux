@@ -423,3 +423,9 @@ __weak void sched_post_fork(struct task_struct *p)
     booter_panic("No impl 'rwsem'.");
 }
 EXPORT_SYMBOL(sched_post_fork);
+
+__weak void wake_up_new_task(struct task_struct *p)
+{
+    booter_panic("No impl 'rwsem'.");
+}
+EXPORT_SYMBOL(wake_up_new_task);

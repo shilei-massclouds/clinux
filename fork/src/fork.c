@@ -2272,16 +2272,12 @@ static __latent_entropy struct task_struct *copy_process(
 
 	proc_fork_connector(p);
 	sched_post_fork(p);
-    printk("=================== %s\n", __func__);
 	cgroup_post_fork(p, args);
-    printk("=================== %s\n", __func__);
 	perf_event_fork(p);
 
-    printk("=================== %s\n", __func__);
 	trace_task_newtask(p, clone_flags);
 	uprobe_copy_process(p, clone_flags);
 
-    printk("=================== %s\n", __func__);
 	return p;
 
 bad_fork_cancel_cgroup:

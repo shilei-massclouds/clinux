@@ -514,6 +514,7 @@ noinline void __ref rest_init(void)
      * we schedule it before we create kthreadd, will OOPS.
      */
     pid = kernel_thread(kernel_init, NULL, CLONE_FS);
+    sbi_puts("rest_init 1\n");
 //    /*
 //     * Pin init on the boot CPU. Task migration is not properly working
 //     * until sched_init_smp() has been run. It will set the allowed
