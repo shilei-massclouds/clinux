@@ -93,10 +93,6 @@ void inode_io_list_del(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
-void __mnt_drop_write_file(struct file *file)
-{
-    booter_panic("No impl!\n");
-}
 
 void __mark_inode_dirty(struct inode *inode, int flags)
 {

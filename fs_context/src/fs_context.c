@@ -305,6 +305,7 @@ void fc_drop_locked(struct fs_context *fc)
 	fc->root = NULL;
 	deactivate_locked_super(sb);
 }
+EXPORT_SYMBOL(fc_drop_locked);
 
 static void legacy_fs_context_free(struct fs_context *fc);
 

@@ -1355,3 +1355,4 @@ bool is_empty_dir_inode(struct inode *inode)
 	return (inode->i_fop == &empty_dir_operations) &&
 		(inode->i_op == &empty_dir_inode_operations);
 }
+EXPORT_SYMBOL(is_empty_dir_inode);

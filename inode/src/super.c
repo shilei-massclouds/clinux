@@ -488,6 +488,7 @@ bool mount_capable(struct fs_context *fc)
 	else
 		return ns_capable(fc->user_ns, CAP_SYS_ADMIN);
 }
+EXPORT_SYMBOL(mount_capable);
 
 /**
  * sget_fc - Find or create a superblock
@@ -985,6 +986,7 @@ cancel_readonly:
 	sb->s_readonly_remount = 0;
 	return retval;
 }
+EXPORT_SYMBOL(reconfigure_super);
 
 static void do_emergency_remount_callback(struct super_block *sb)
 {

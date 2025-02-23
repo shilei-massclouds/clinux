@@ -1259,7 +1259,7 @@ __weak int cap_inode_need_killpriv(struct dentry *dentry)
 }
 EXPORT_SYMBOL(cap_inode_need_killpriv);
 
-bool mnt_may_suid(struct vfsmount *mnt)
+__weak bool mnt_may_suid(struct vfsmount *mnt)
 {
     booter_panic("No impl!\n");
 }
@@ -1335,3 +1335,45 @@ __weak int __legitimize_mnt(struct vfsmount *bastard, unsigned seq)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__legitimize_mnt);
+
+__weak struct mount *__lookup_mnt(struct vfsmount *mnt, struct dentry *dentry)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__lookup_mnt);
+
+__weak struct vfsmount *lookup_mnt(const struct path *path)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(lookup_mnt);
+
+__weak int finish_automount(struct vfsmount *m, struct path *path)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(finish_automount);
+
+__weak bool legitimize_mnt(struct vfsmount *bastard, unsigned seq)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(legitimize_mnt);
+
+__weak bool __is_local_mountpoint(struct dentry *dentry)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__is_local_mountpoint);
+
+__weak bool current_chrooted(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(current_chrooted);
+
+__weak void __mnt_drop_write_file(struct file *file)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__mnt_drop_write_file);

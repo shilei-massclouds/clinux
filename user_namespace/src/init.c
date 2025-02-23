@@ -26,8 +26,4 @@ void *memdup_user_nul(const void __user *src, size_t len)
 }
 EXPORT_SYMBOL(memdup_user_nul);
 
-bool current_chrooted(void)
-{
-    booter_panic("No impl!\n");
-}
 

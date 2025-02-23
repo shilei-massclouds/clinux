@@ -3,6 +3,5 @@
 
 CL_MINE(chmod_common)
 CL_MINE(chown_common)
-CL_MINE(path_mount)
 CL_MINE(path_umount)
 CL_MINE(vfs_utimes)

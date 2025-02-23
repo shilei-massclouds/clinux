@@ -2,3 +2,5 @@
 
 obj_y := init.o
 obj_y += namespace.o
+
+obj_y += mine.o
