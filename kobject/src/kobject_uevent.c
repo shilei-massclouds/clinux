@@ -31,6 +31,8 @@
 
 
 u64 uevent_seqnum;
+EXPORT_SYMBOL(uevent_seqnum);
+
 #ifdef CONFIG_UEVENT_HELPER
 char uevent_helper[UEVENT_HELPER_PATH_LEN] = CONFIG_UEVENT_HELPER_PATH;
 #endif
