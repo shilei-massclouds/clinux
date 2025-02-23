@@ -20,11 +20,6 @@ ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_
 {
     booter_panic("No impl.\n");
 }
-struct class *__class_create(struct module *owner, const char *name,
-                 struct lock_class_key *key)
-{
-    booter_panic("No impl.\n");
-}
 int ptm_open_peer(struct file *master, struct tty_struct *tty, int flags)
 {
     booter_panic("No impl.\n");
@@ -95,12 +90,6 @@ void ldsem_up_read(struct ld_semaphore *sem)
     booter_panic("No impl.\n");
 }
 int __init vty_init(const struct file_operations *console_fops)
-{
-    booter_panic("No impl.\n");
-}
-struct device *class_find_device(struct class *class, struct device *start,
-                 const void *data,
-                 int (*match)(struct device *, const void *))
 {
     booter_panic("No impl.\n");
 }

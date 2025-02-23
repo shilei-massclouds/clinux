@@ -33,8 +33,8 @@ void __init driver_init(void)
     devtmpfs_init();
     devices_init();
     buses_init();
-    //classes_init();
-    //firmware_init();
+    classes_init();
+    firmware_init();
     //hypervisor_init();
 
     ///* These are also core pieces, but must come after the

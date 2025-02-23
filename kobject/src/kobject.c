@@ -832,6 +832,7 @@ void kset_init(struct kset *k)
 	INIT_LIST_HEAD(&k->list);
 	spin_lock_init(&k->list_lock);
 }
+EXPORT_SYMBOL_GPL(kset_init);
 
 /* default kobject attribute operations */
 static ssize_t kobj_attr_show(struct kobject *kobj, struct attribute *attr,
