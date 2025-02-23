@@ -1430,42 +1430,43 @@ rename_retry:
 //	return data.mounted;
 //}
 //EXPORT_SYMBOL(path_has_submounts);
-//
-///*
-// * Called by mount code to set a mountpoint and check if the mountpoint is
-// * reachable (e.g. NFS can unhash a directory dentry and then the complete
-// * subtree can become unreachable).
-// *
-// * Only one of d_invalidate() and d_set_mounted() must succeed.  For
-// * this reason take rename_lock and d_lock on dentry and ancestors.
-// */
-//int d_set_mounted(struct dentry *dentry)
-//{
-//	struct dentry *p;
-//	int ret = -ENOENT;
-//	write_seqlock(&rename_lock);
-//	for (p = dentry->d_parent; !IS_ROOT(p); p = p->d_parent) {
-//		/* Need exclusion wrt. d_invalidate() */
-//		spin_lock(&p->d_lock);
-//		if (unlikely(d_unhashed(p))) {
-//			spin_unlock(&p->d_lock);
-//			goto out;
-//		}
-//		spin_unlock(&p->d_lock);
-//	}
-//	spin_lock(&dentry->d_lock);
-//	if (!d_unlinked(dentry)) {
-//		ret = -EBUSY;
-//		if (!d_mountpoint(dentry)) {
-//			dentry->d_flags |= DCACHE_MOUNTED;
-//			ret = 0;
-//		}
-//	}
-// 	spin_unlock(&dentry->d_lock);
-//out:
-//	write_sequnlock(&rename_lock);
-//	return ret;
-//}
+
+/*
+ * Called by mount code to set a mountpoint and check if the mountpoint is
+ * reachable (e.g. NFS can unhash a directory dentry and then the complete
+ * subtree can become unreachable).
+ *
+ * Only one of d_invalidate() and d_set_mounted() must succeed.  For
+ * this reason take rename_lock and d_lock on dentry and ancestors.
+ */
+int d_set_mounted(struct dentry *dentry)
+{
+	struct dentry *p;
+	int ret = -ENOENT;
+	write_seqlock(&rename_lock);
+	for (p = dentry->d_parent; !IS_ROOT(p); p = p->d_parent) {
+		/* Need exclusion wrt. d_invalidate() */
+		spin_lock(&p->d_lock);
+		if (unlikely(d_unhashed(p))) {
+			spin_unlock(&p->d_lock);
+			goto out;
+		}
+		spin_unlock(&p->d_lock);
+	}
+	spin_lock(&dentry->d_lock);
+	if (!d_unlinked(dentry)) {
+		ret = -EBUSY;
+		if (!d_mountpoint(dentry)) {
+			dentry->d_flags |= DCACHE_MOUNTED;
+			ret = 0;
+		}
+	}
+ 	spin_unlock(&dentry->d_lock);
+out:
+	write_sequnlock(&rename_lock);
+	return ret;
+}
+EXPORT_SYMBOL(d_set_mounted);
 
 /*
  * Search the dentry child list of the specified parent,
