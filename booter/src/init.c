@@ -1329,3 +1329,9 @@ int vfs_getattr(const struct path *path, struct kstat *stat,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(vfs_getattr);
+
+__weak int __legitimize_mnt(struct vfsmount *bastard, unsigned seq)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__legitimize_mnt);
