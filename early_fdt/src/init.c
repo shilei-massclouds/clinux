@@ -58,3 +58,23 @@ __weak int of_property_read_variable_u32_array(const struct device_node *np,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(of_property_read_variable_u32_array);
+
+__weak bool of_device_is_available(const struct device_node *device)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(of_device_is_available);
+
+__weak struct device_node *of_find_matching_node_and_match(struct device_node *from,
+					const struct of_device_id *matches,
+					const struct of_device_id **match)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(of_find_matching_node_and_match);
+
+__weak struct device_node *of_find_node_opts_by_path(const char *path, const char **opts)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(of_find_node_opts_by_path);

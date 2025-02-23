@@ -60,12 +60,6 @@ int rtc_set_ntp_time(struct timespec64 now, unsigned long *target_nsec)
     booter_panic("No impl in 'time'.");
 }
 
-int device_register(struct device *dev)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(device_register);
-
 void register_syscore_ops(struct syscore_ops *ops)
 {
     booter_panic("No impl in 'time'.");
@@ -102,11 +96,6 @@ void run_posix_cpu_timers(void)
 }
 */
 
-int subsys_system_register(struct bus_type *subsys,
-               const struct attribute_group **groups)
-{
-    booter_panic("No impl in 'time'.");
-}
 void hrtimers_resume(void)
 {
     booter_panic("No impl in 'time'.");

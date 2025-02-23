@@ -625,7 +625,6 @@ bool of_device_is_available(const struct device_node *device)
 	return res;
 
 }
-EXPORT_SYMBOL(of_device_is_available);
 
 ///**
 // *  of_device_is_big_endian - check if a device has BE registers
@@ -955,7 +954,6 @@ struct device_node *of_find_node_opts_by_path(const char *path, const char **opt
 	raw_spin_unlock_irqrestore(&devtree_lock, flags);
 	return np;
 }
-EXPORT_SYMBOL(of_find_node_opts_by_path);
 
 ///**
 // *	of_find_node_by_name - Find a node by its "name" property
@@ -1157,7 +1155,6 @@ struct device_node *of_find_matching_node_and_match(struct device_node *from,
 	raw_spin_unlock_irqrestore(&devtree_lock, flags);
 	return np;
 }
-EXPORT_SYMBOL(of_find_matching_node_and_match);
 
 ///**
 // * of_modalias_node - Lookup appropriate modalias for a device node

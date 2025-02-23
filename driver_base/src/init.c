@@ -8,7 +8,7 @@
 #include <linux/memory.h>
 #include <linux/of.h>
 
-#include "base.h"
+#include "../base.h"
 #include "../../booter/src/booter.h"
 
 int
@@ -32,7 +32,7 @@ void __init driver_init(void)
     /* These are the core pieces */
     devtmpfs_init();
     devices_init();
-    //buses_init();
+    buses_init();
     //classes_init();
     //firmware_init();
     //hypervisor_init();
@@ -57,11 +57,6 @@ void unlock_device_hotplug(void)
     booter_panic("No impl 'driver_base'.");
 }
 
-void device_remove_groups(struct device *dev,
-              const struct attribute_group **groups)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 
 /*
 void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
@@ -89,10 +84,6 @@ int device_online(struct device *dev)
     booter_panic("No impl 'driver_base'.");
 }
 void _dev_err(const struct device *dev, const char *fmt, ...)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-void bus_remove_device(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
 }
@@ -126,10 +117,6 @@ void device_remove_file(struct device *dev,
     booter_panic("No impl 'driver_base'.");
 }
 
-void kset_unregister(struct kset *k)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 bool of_dma_is_coherent(struct device_node *np)
 {
     booter_panic("No impl 'driver_base'.");

@@ -467,7 +467,6 @@ void sysfs_remove_file_ns(struct kobject *kobj, const struct attribute *attr,
 
 	kernfs_remove_by_name_ns(parent, attr->name, ns);
 }
-EXPORT_SYMBOL_GPL(sysfs_remove_file_ns);
 
 /**
  * sysfs_remove_file_self - remove an object attribute from its own method

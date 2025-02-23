@@ -28,8 +28,8 @@
 #include <linux/sched/signal.h>
 #include <linux/sysfs.h>
 
-#include "base.h"
-#include "power/power.h"
+#include "../base.h"
+#include "../power/power.h"
 
 //#ifdef CONFIG_SYSFS_DEPRECATED
 //#ifdef CONFIG_SYSFS_DEPRECATED_V2
@@ -2234,6 +2234,7 @@ static DEVICE_ATTR_RO(dev);
 
 /* /sys/devices/ */
 struct kset *devices_kset;
+EXPORT_SYMBOL(devices_kset);
 
 ///**
 // * devices_kset_move_before - Move device in the devices_kset's list.
@@ -2303,7 +2304,6 @@ int device_create_file(struct device *dev,
 
 	return error;
 }
-EXPORT_SYMBOL_GPL(device_create_file);
 
 ///**
 // * device_remove_file - remove sysfs attribute file.
@@ -2379,61 +2379,61 @@ static void klist_children_put(struct klist_node *n)
 	put_device(dev);
 }
 
-///**
-// * device_initialize - init device structure.
-// * @dev: device.
-// *
-// * This prepares the device for use by other layers by initializing
-// * its fields.
-// * It is the first half of device_register(), if called by
-// * that function, though it can also be called separately, so one
-// * may use @dev's fields. In particular, get_device()/put_device()
-// * may be used for reference counting of @dev after calling this
-// * function.
-// *
-// * All fields in @dev must be initialized by the caller to 0, except
-// * for those explicitly set to some other value.  The simplest
-// * approach is to use kzalloc() to allocate the structure containing
-// * @dev.
-// *
-// * NOTE: Use put_device() to give up your reference instead of freeing
-// * @dev directly once you have called this function.
-// */
-//void device_initialize(struct device *dev)
-//{
-//	dev->kobj.kset = devices_kset;
-//	kobject_init(&dev->kobj, &device_ktype);
-//	INIT_LIST_HEAD(&dev->dma_pools);
-//	mutex_init(&dev->mutex);
-//#ifdef CONFIG_PROVE_LOCKING
-//	mutex_init(&dev->lockdep_mutex);
-//#endif
-//	lockdep_set_novalidate_class(&dev->mutex);
-//	spin_lock_init(&dev->devres_lock);
-//	INIT_LIST_HEAD(&dev->devres_head);
-//	device_pm_init(dev);
-//	set_dev_node(dev, -1);
-//#ifdef CONFIG_GENERIC_MSI_IRQ
-//	INIT_LIST_HEAD(&dev->msi_list);
-//#endif
-//	INIT_LIST_HEAD(&dev->links.consumers);
-//	INIT_LIST_HEAD(&dev->links.suppliers);
-//	INIT_LIST_HEAD(&dev->links.needs_suppliers);
-//	INIT_LIST_HEAD(&dev->links.defer_hook);
-//	dev->links.status = DL_DEV_NO_DRIVER;
-//}
-//EXPORT_SYMBOL_GPL(device_initialize);
-//
-//struct kobject *virtual_device_parent(struct device *dev)
-//{
-//	static struct kobject *virtual_dir = NULL;
-//
-//	if (!virtual_dir)
-//		virtual_dir = kobject_create_and_add("virtual",
-//						     &devices_kset->kobj);
-//
-//	return virtual_dir;
-//}
+/**
+ * device_initialize - init device structure.
+ * @dev: device.
+ *
+ * This prepares the device for use by other layers by initializing
+ * its fields.
+ * It is the first half of device_register(), if called by
+ * that function, though it can also be called separately, so one
+ * may use @dev's fields. In particular, get_device()/put_device()
+ * may be used for reference counting of @dev after calling this
+ * function.
+ *
+ * All fields in @dev must be initialized by the caller to 0, except
+ * for those explicitly set to some other value.  The simplest
+ * approach is to use kzalloc() to allocate the structure containing
+ * @dev.
+ *
+ * NOTE: Use put_device() to give up your reference instead of freeing
+ * @dev directly once you have called this function.
+ */
+void device_initialize(struct device *dev)
+{
+	dev->kobj.kset = devices_kset;
+	kobject_init(&dev->kobj, &device_ktype);
+	INIT_LIST_HEAD(&dev->dma_pools);
+	mutex_init(&dev->mutex);
+#ifdef CONFIG_PROVE_LOCKING
+	mutex_init(&dev->lockdep_mutex);
+#endif
+	lockdep_set_novalidate_class(&dev->mutex);
+	spin_lock_init(&dev->devres_lock);
+	INIT_LIST_HEAD(&dev->devres_head);
+	device_pm_init(dev);
+	set_dev_node(dev, -1);
+#ifdef CONFIG_GENERIC_MSI_IRQ
+	INIT_LIST_HEAD(&dev->msi_list);
+#endif
+	INIT_LIST_HEAD(&dev->links.consumers);
+	INIT_LIST_HEAD(&dev->links.suppliers);
+	INIT_LIST_HEAD(&dev->links.needs_suppliers);
+	INIT_LIST_HEAD(&dev->links.defer_hook);
+	dev->links.status = DL_DEV_NO_DRIVER;
+}
+EXPORT_SYMBOL_GPL(device_initialize);
+
+struct kobject *virtual_device_parent(struct device *dev)
+{
+	static struct kobject *virtual_dir = NULL;
+
+	if (!virtual_dir)
+		virtual_dir = kobject_create_and_add("virtual",
+						     &devices_kset->kobj);
+
+	return virtual_dir;
+}
 
 struct class_dir {
 	struct kobject kobj;
@@ -2976,30 +2976,30 @@ name_error:
 }
 EXPORT_SYMBOL_GPL(device_add);
 
-///**
-// * device_register - register a device with the system.
-// * @dev: pointer to the device structure
-// *
-// * This happens in two clean steps - initialize the device
-// * and add it to the system. The two steps can be called
-// * separately, but this is the easiest and most common.
-// * I.e. you should only call the two helpers separately if
-// * have a clearly defined need to use and refcount the device
-// * before it is added to the hierarchy.
-// *
-// * For more information, see the kerneldoc for device_initialize()
-// * and device_add().
-// *
-// * NOTE: _Never_ directly free @dev after calling this function, even
-// * if it returned an error! Always use put_device() to give up the
-// * reference initialized in this function instead.
-// */
-//int device_register(struct device *dev)
-//{
-//	device_initialize(dev);
-//	return device_add(dev);
-//}
-//EXPORT_SYMBOL_GPL(device_register);
+/**
+ * device_register - register a device with the system.
+ * @dev: pointer to the device structure
+ *
+ * This happens in two clean steps - initialize the device
+ * and add it to the system. The two steps can be called
+ * separately, but this is the easiest and most common.
+ * I.e. you should only call the two helpers separately if
+ * have a clearly defined need to use and refcount the device
+ * before it is added to the hierarchy.
+ *
+ * For more information, see the kerneldoc for device_initialize()
+ * and device_add().
+ *
+ * NOTE: _Never_ directly free @dev after calling this function, even
+ * if it returned an error! Always use put_device() to give up the
+ * reference initialized in this function instead.
+ */
+int device_register(struct device *dev)
+{
+	device_initialize(dev);
+	return device_add(dev);
+}
+EXPORT_SYMBOL_GPL(device_register);
 
 /**
  * get_device - increment reference count for device.

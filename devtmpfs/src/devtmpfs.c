@@ -27,7 +27,7 @@
 #include <linux/kthread.h>
 #include <linux/init_syscalls.h>
 #include <uapi/linux/mount.h>
-#include "../driver_base/src/base.h"
+#include "../driver_base/base.h"
 
 static struct task_struct *thread;
 

@@ -178,11 +178,6 @@ __weak int sysfs_create_link(struct kobject *kobj, struct kobject *target,
 }
 EXPORT_SYMBOL(sysfs_create_link);
 
-/*
-const struct sysfs_ops kobj_sysfs_ops;
-EXPORT_SYMBOL(kobj_sysfs_ops);
-*/
-
 __weak bool capable(int cap)
 {
     booter_panic("No impl in 'time'.");
@@ -343,6 +338,13 @@ __weak int sysfs_create_file_ns(struct kobject *kobj, const struct attribute *at
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(sysfs_create_file_ns);
+
+__weak void sysfs_remove_file_ns(struct kobject *kobj, const struct attribute *attr,
+			  const void *ns)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(sysfs_remove_file_ns);
 
 __weak int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
 {
@@ -1449,3 +1451,9 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 }
 EXPORT_SYMBOL(__alloc_skb);
 
+__weak int device_create_file(struct device *dev,
+		       const struct device_attribute *attr)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(device_create_file);
