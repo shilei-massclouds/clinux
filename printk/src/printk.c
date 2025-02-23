@@ -2028,7 +2028,6 @@ asmlinkage int vprintk_emit(int facility, int level,
 		wake_up_klogd();
 	return printed_len;
 }
-EXPORT_SYMBOL(vprintk_emit);
 
 asmlinkage int vprintk(const char *fmt, va_list args)
 {

@@ -28,7 +28,6 @@ EXPORT_SYMBOL(cl_driver_base_init);
  */
 void __init driver_init(void)
 {
-    printk("%s: ==========\n", __func__);
     /* These are the core pieces */
     devtmpfs_init();
     devices_init();
@@ -41,13 +40,10 @@ void __init driver_init(void)
      * core core pieces.
      */
     of_core_init();
-    //platform_bus_init();
-    printk("%s: 1 ==========\n", __func__);
+    platform_bus_init();
     cpu_dev_init();
-    printk("%s: 2 ==========\n", __func__);
     memory_dev_init();
     container_dev_init();
-    printk("%s: ==========\n", __func__);
 }
 EXPORT_SYMBOL(driver_init);
 
@@ -60,10 +56,6 @@ void unlock_device_hotplug(void)
 }
 
 int device_online(struct device *dev)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-void _dev_err(const struct device *dev, const char *fmt, ...)
 {
     booter_panic("No impl 'driver_base'.");
 }

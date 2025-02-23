@@ -110,7 +110,7 @@ int kobject_uevent(struct kobject *kobj, enum kobject_action action)
 EXPORT_SYMBOL(kobject_uevent);
 */
 
-void dev_printk(const char *level, const struct device *dev,
+__weak void dev_printk(const char *level, const struct device *dev,
         const char *fmt, ...)
 {
     sbi_puts("[RAW_DEV_PRINTK]:");
@@ -1518,3 +1518,9 @@ __weak int device_add(struct device *dev)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL_GPL(device_add);
+
+__weak int __init platform_bus_init(void)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(platform_bus_init);

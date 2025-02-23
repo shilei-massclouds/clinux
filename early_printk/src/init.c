@@ -139,3 +139,11 @@ __weak asmlinkage int vprintk(const char *fmt, va_list args)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(vprintk);
+
+__weak asmlinkage int vprintk_emit(int facility, int level,
+			    const char *dict, size_t dictlen,
+			    const char *fmt, va_list args)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(vprintk_emit);

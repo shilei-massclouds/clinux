@@ -1,8 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(_dev_warn)
-
 CL_MINE(devres_release_all)
 CL_MINE(of_device_uevent)
 
