@@ -26,11 +26,6 @@ int groups_search(const struct group_info *group_info, kgid_t grp)
     booter_panic("No impl!\n");
 }
 
-bool refcount_dec_and_lock(refcount_t *r, spinlock_t *lock)
-{
-    booter_panic("No impl!\n");
-}
-
 //
 // Consider to add a standalone component 'cred_itf'.
 // Move functions below to it.

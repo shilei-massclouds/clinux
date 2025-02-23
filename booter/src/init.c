@@ -10,6 +10,7 @@
 #include <linux/module.h>
 #include <linux/fs.h>
 #include <linux/fs_context.h>
+#include <linux/ipc_namespace.h>
 #include <linux/user_namespace.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
@@ -1264,3 +1265,15 @@ bool mnt_may_suid(struct vfsmount *mnt)
 }
 EXPORT_SYMBOL(mnt_may_suid);
 
+bool refcount_dec_and_lock(refcount_t *r, spinlock_t *lock)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(refcount_dec_and_lock);
+
+__weak void free_ipcs(struct ipc_namespace *ns, struct ipc_ids *ids,
+	       void (*free)(struct ipc_namespace *, struct kern_ipc_perm *))
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(free_ipcs);

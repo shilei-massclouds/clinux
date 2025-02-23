@@ -59,7 +59,7 @@ components := \
 	cred user_namespace nsproxy fs_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
 	fs_context fs_parser fs_struct namei libfs \
-	net_namespace \
+	net_namespace ipc_namespace \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap \
 	signal sysctl kallsyms \

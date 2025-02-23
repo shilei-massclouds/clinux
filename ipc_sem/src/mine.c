@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(free_ipcs)
 CL_MINE(ipc_addid)
 CL_MINE(ipcctl_obtain_check)
 CL_MINE(ipcget)

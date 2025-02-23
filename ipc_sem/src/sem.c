@@ -253,6 +253,7 @@ void sem_init_ns(struct ipc_namespace *ns)
 	ns->used_sems = 0;
 	ipc_init_ids(&ns->ids[IPC_SEM_IDS]);
 }
+EXPORT_SYMBOL(sem_init_ns);
 
 #ifdef CONFIG_IPC_NS
 void sem_exit_ns(struct ipc_namespace *ns)
@@ -261,6 +262,7 @@ void sem_exit_ns(struct ipc_namespace *ns)
 	idr_destroy(&ns->ids[IPC_SEM_IDS].ipcs_idr);
 	rhashtable_destroy(&ns->ids[IPC_SEM_IDS].key_ht);
 }
+EXPORT_SYMBOL(sem_exit_ns);
 #endif
 
 void __init sem_init(void)
