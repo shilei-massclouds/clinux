@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(device_add_groups)
 CL_MINE(_dev_warn)
 
 CL_MINE(devres_release_all)
@@ -13,7 +12,6 @@ CL_MINE(device_driver_detach)
 CL_MINE(device_initial_probe)
 CL_MINE(device_match_name)
 CL_MINE(device_release_driver)
-CL_MINE(device_remove_groups)
 CL_MINE(driver_add_groups)
 CL_MINE(driver_attach)
 CL_MINE(driver_create_file)

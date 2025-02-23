@@ -2016,19 +2016,19 @@ static ssize_t online_store(struct device *dev, struct device_attribute *attr,
 }
 static DEVICE_ATTR_RW(online);
 
-//int device_add_groups(struct device *dev, const struct attribute_group **groups)
-//{
-//	return sysfs_create_groups(&dev->kobj, groups);
-//}
-//EXPORT_SYMBOL_GPL(device_add_groups);
-//
-//void device_remove_groups(struct device *dev,
-//			  const struct attribute_group **groups)
-//{
-//	sysfs_remove_groups(&dev->kobj, groups);
-//}
-//EXPORT_SYMBOL_GPL(device_remove_groups);
-//
+int device_add_groups(struct device *dev, const struct attribute_group **groups)
+{
+	return sysfs_create_groups(&dev->kobj, groups);
+}
+EXPORT_SYMBOL_GPL(device_add_groups);
+
+void device_remove_groups(struct device *dev,
+			  const struct attribute_group **groups)
+{
+	sysfs_remove_groups(&dev->kobj, groups);
+}
+EXPORT_SYMBOL_GPL(device_remove_groups);
+
 //union device_attr_group_devres {
 //	const struct attribute_group *group;
 //	const struct attribute_group **groups;
