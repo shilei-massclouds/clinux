@@ -2082,6 +2082,7 @@ out_ret:
 	putname(filename);
 	return retval;
 }
+EXPORT_SYMBOL(kernel_execve);
 
 static int do_execve(struct filename *filename,
 	const char __user *const __user *__argv,

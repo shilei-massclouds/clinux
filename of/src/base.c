@@ -532,7 +532,6 @@ int of_device_is_compatible(const struct device_node *device,
 	raw_spin_unlock_irqrestore(&devtree_lock, flags);
 	return res;
 }
-EXPORT_SYMBOL(of_device_is_compatible);
 
 ///** Checks if the device is compatible with any of the entries in
 // *  a NULL terminated array of strings. Returns the best match

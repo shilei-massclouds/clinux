@@ -880,11 +880,6 @@ static void __init do_initcalls(void)
     kfree(command_line);
 }
 
-void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
-{
-    pr_warn("===================== %s\n", __func__);
-}
-
 /*
  * Ok, the machine is now initialized. None of the devices
  * have been touched yet, but the CPU subsystem is up and
@@ -897,9 +892,9 @@ static void __init do_basic_setup(void)
     cpuset_init_smp();
     printk("%s: ==========\n", __func__);
     driver_init();
-    //init_irq_proc();
-    //do_ctors();
-    //usermodehelper_enable();
+    init_irq_proc();
+    do_ctors();
+    usermodehelper_enable();
     //do_initcalls();
     printk("%s: ==========\n", __func__);
 }

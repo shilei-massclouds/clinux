@@ -315,21 +315,11 @@ __weak bool try_module_get(struct module *module)
 }
 EXPORT_SYMBOL(try_module_get);
 
-int call_usermodehelper_exec(struct subprocess_info *sub_info, int wait)
+__weak int call_usermodehelper_exec(struct subprocess_info *sub_info, int wait)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(call_usermodehelper_exec);
-
-struct subprocess_info *call_usermodehelper_setup(const char *path, char **argv,
-        char **envp, gfp_t gfp_mask,
-        int (*init)(struct subprocess_info *info, struct cred *new),
-        void (*cleanup)(struct subprocess_info *info),
-        void *data)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(call_usermodehelper_setup);
 
 __weak struct proc_dir_entry *proc_create_single_data(const char *name, umode_t mode,
         struct proc_dir_entry *parent,
@@ -1524,3 +1514,19 @@ __weak int __init platform_bus_init(void)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(platform_bus_init);
+
+__weak struct subprocess_info *call_usermodehelper_setup(const char *path, char **argv,
+        char **envp, gfp_t gfp_mask,
+        int (*init)(struct subprocess_info *info, struct cred *new),
+        void (*cleanup)(struct subprocess_info *info),
+        void *data)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(call_usermodehelper_setup);
+
+__weak int call_usermodehelper(const char *path, char **argv, char **envp, int wait)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(call_usermodehelper);

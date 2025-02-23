@@ -426,7 +426,6 @@ int of_property_read_string(const struct device_node *np, const char *propname,
 	*out_string = prop->value;
 	return 0;
 }
-EXPORT_SYMBOL_GPL(of_property_read_string);
 
 /**
  * of_property_match_string() - Find string in a list and return index

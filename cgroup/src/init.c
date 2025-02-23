@@ -15,8 +15,3 @@ cl_cgroup_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_cgroup_init);
-
-int call_usermodehelper(const char *path, char **argv, char **envp, int wait)
-{
-    booter_panic("No impl.\n");
-}

@@ -96,3 +96,17 @@ __weak struct device_node *of_get_cpu_node(int cpu, unsigned int *thread)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(of_get_cpu_node);
+
+__weak int of_property_read_string(const struct device_node *np, const char *propname,
+				const char **out_string)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(of_property_read_string);
+
+__weak int of_device_is_compatible(const struct device_node *device,
+		const char *compat)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(of_device_is_compatible);

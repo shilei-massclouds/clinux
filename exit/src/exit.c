@@ -1641,6 +1641,7 @@ int kernel_wait(pid_t pid, int *stat)
 	put_pid(wo.wo_pid);
 	return ret;
 }
+EXPORT_SYMBOL(kernel_wait);
 
 SYSCALL_DEFINE4(wait4, pid_t, upid, int __user *, stat_addr,
 		int, options, struct rusage __user *, ru)
