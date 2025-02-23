@@ -47,6 +47,7 @@ const struct dentry_operations ns_dentry_operations =
 	.d_delete	= always_delete_dentry,
 	.d_dname	= ns_dname,
 };
+EXPORT_SYMBOL(ns_dentry_operations);
 
 static void nsfs_evict(struct inode *inode)
 {

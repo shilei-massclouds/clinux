@@ -3071,48 +3071,48 @@ out:
 }
 EXPORT_SYMBOL(d_splice_alias);
 
-///*
-// * Test whether new_dentry is a subdirectory of old_dentry.
-// *
-// * Trivially implemented using the dcache structure
-// */
-//
-///**
-// * is_subdir - is new dentry a subdirectory of old_dentry
-// * @new_dentry: new dentry
-// * @old_dentry: old dentry
-// *
-// * Returns true if new_dentry is a subdirectory of the parent (at any depth).
-// * Returns false otherwise.
-// * Caller must ensure that "new_dentry" is pinned before calling is_subdir()
-// */
-//  
-//bool is_subdir(struct dentry *new_dentry, struct dentry *old_dentry)
-//{
-//	bool result;
-//	unsigned seq;
-//
-//	if (new_dentry == old_dentry)
-//		return true;
-//
-//	do {
-//		/* for restarting inner loop in case of seq retry */
-//		seq = read_seqbegin(&rename_lock);
-//		/*
-//		 * Need rcu_readlock to protect against the d_parent trashing
-//		 * due to d_move
-//		 */
-//		rcu_read_lock();
-//		if (d_ancestor(old_dentry, new_dentry))
-//			result = true;
-//		else
-//			result = false;
-//		rcu_read_unlock();
-//	} while (read_seqretry(&rename_lock, seq));
-//
-//	return result;
-//}
-//EXPORT_SYMBOL(is_subdir);
+/*
+ * Test whether new_dentry is a subdirectory of old_dentry.
+ *
+ * Trivially implemented using the dcache structure
+ */
+
+/**
+ * is_subdir - is new dentry a subdirectory of old_dentry
+ * @new_dentry: new dentry
+ * @old_dentry: old dentry
+ *
+ * Returns true if new_dentry is a subdirectory of the parent (at any depth).
+ * Returns false otherwise.
+ * Caller must ensure that "new_dentry" is pinned before calling is_subdir()
+ */
+  
+bool is_subdir(struct dentry *new_dentry, struct dentry *old_dentry)
+{
+	bool result;
+	unsigned seq;
+
+	if (new_dentry == old_dentry)
+		return true;
+
+	do {
+		/* for restarting inner loop in case of seq retry */
+		seq = read_seqbegin(&rename_lock);
+		/*
+		 * Need rcu_readlock to protect against the d_parent trashing
+		 * due to d_move
+		 */
+		rcu_read_lock();
+		if (d_ancestor(old_dentry, new_dentry))
+			result = true;
+		else
+			result = false;
+		rcu_read_unlock();
+	} while (read_seqretry(&rename_lock, seq));
+
+	return result;
+}
+EXPORT_SYMBOL(is_subdir);
 
 static enum d_walk_ret d_genocide_kill(void *data, struct dentry *dentry)
 {
