@@ -383,7 +383,6 @@ void __init files_init(void)
 			SLAB_HWCACHE_ALIGN | SLAB_PANIC | SLAB_ACCOUNT, NULL);
 	percpu_counter_init(&nr_files, 0, GFP_KERNEL);
 }
-EXPORT_SYMBOL(files_init);
 
 /*
  * One file with associated inode and dcache is very roughly 1K. Per default

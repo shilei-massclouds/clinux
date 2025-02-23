@@ -153,4 +153,3 @@ struct kobj_map *kobj_map_init(kobj_probe_t *base_probe, struct mutex *lock)
 	p->lock = lock;
 	return p;
 }
-EXPORT_SYMBOL(kobj_map_init);

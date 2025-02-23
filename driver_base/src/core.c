@@ -3113,7 +3113,6 @@ void device_del(struct device *dev)
 	cleanup_glue_dir(dev, glue_dir);
 	put_device(parent);
 }
-EXPORT_SYMBOL_GPL(device_del);
 
 /**
  * device_unregister - unregister device from system.

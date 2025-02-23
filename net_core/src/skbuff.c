@@ -256,7 +256,6 @@ nodata:
 	skb = NULL;
 	goto out;
 }
-EXPORT_SYMBOL(__alloc_skb);
 
 /* Caller must provide SKB that is memset cleared */
 static struct sk_buff *__build_skb_around(struct sk_buff *skb,
@@ -695,7 +694,6 @@ void kfree_skb(struct sk_buff *skb)
 	trace_kfree_skb(skb, __builtin_return_address(0));
 	__kfree_skb(skb);
 }
-EXPORT_SYMBOL(kfree_skb);
 
 void kfree_skb_list(struct sk_buff *segs)
 {
@@ -1774,7 +1772,6 @@ struct sk_buff *skb_copy_expand(const struct sk_buff *skb,
 
 	return n;
 }
-EXPORT_SYMBOL(skb_copy_expand);
 
 /**
  *	__skb_pad		-	zero pad the tail of an skb
@@ -1867,7 +1864,6 @@ void *skb_put(struct sk_buff *skb, unsigned int len)
 		skb_over_panic(skb, len, __builtin_return_address(0));
 	return tmp;
 }
-EXPORT_SYMBOL(skb_put);
 
 /**
  *	skb_push - add data to the start of a buffer
@@ -1902,7 +1898,6 @@ void *skb_pull(struct sk_buff *skb, unsigned int len)
 {
 	return skb_pull_inline(skb, len);
 }
-EXPORT_SYMBOL(skb_pull);
 
 /**
  *	skb_trim - remove end from a buffer

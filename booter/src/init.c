@@ -4,6 +4,7 @@
 #include <linux/cache.h>
 #include <linux/jiffies.h>
 #include <linux/kobject.h>
+#include <linux/netlink.h>
 #include <linux/device.h>
 #include <linux/irq.h>
 #include <linux/tty.h>
@@ -12,6 +13,7 @@
 #include <linux/fs_context.h>
 #include <linux/ipc_namespace.h>
 #include <linux/user_namespace.h>
+#include <linux/kobj_map.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -101,14 +103,6 @@ __weak void sysfs_delete_link(struct kobject *kobj, struct kobject *targ,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(sysfs_delete_link);
-
-/*
-int kobject_uevent(struct kobject *kobj, enum kobject_action action)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-EXPORT_SYMBOL(kobject_uevent);
-*/
 
 __weak void dev_printk(const char *level, const struct device *dev,
         const char *fmt, ...)
@@ -1490,6 +1484,12 @@ __weak struct kernfs_node *kernfs_find_and_get_ns(struct kernfs_node *parent,
 }
 EXPORT_SYMBOL_GPL(kernfs_find_and_get_ns);
 
+__weak struct kobj_map *kobj_map_init(kobj_probe_t *base_probe, struct mutex *lock)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(kobj_map_init);
+
 struct kobj_map;
 __weak void kobj_unmap(struct kobj_map *domain, dev_t dev, unsigned long range)
 {
@@ -1508,6 +1508,12 @@ __weak int device_add(struct device *dev)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL_GPL(device_add);
+
+__weak void device_del(struct device *dev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(device_del);
 
 __weak int __init platform_bus_init(void)
 {
@@ -1530,3 +1536,79 @@ __weak int call_usermodehelper(const char *path, char **argv, char **envp, int w
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(call_usermodehelper);
+
+__weak void *skb_put(struct sk_buff *skb, unsigned int len)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(skb_put);
+
+__weak void kfree_skb(struct sk_buff *skb)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(kfree_skb);
+
+__weak struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
+			    int flags, int node)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(__alloc_skb);
+
+__weak void __init files_init(void)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(files_init);
+
+__weak struct sk_buff *skb_copy_expand(const struct sk_buff *skb,
+				int newheadroom, int newtailroom,
+				gfp_t gfp_mask)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(skb_copy_expand);
+
+__weak void *skb_pull(struct sk_buff *skb, unsigned int len)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(skb_pull);
+
+struct sock *
+__netlink_kernel_create(struct net *net, int unit, struct module *module,
+            struct netlink_kernel_cfg *cfg)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(__netlink_kernel_create);
+
+int netlink_broadcast(struct sock *ssk, struct sk_buff *skb, u32 portid,
+              u32 group, gfp_t allocation)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(netlink_broadcast);
+
+int netlink_rcv_skb(struct sk_buff *skb, int (*cb)(struct sk_buff *,
+                           struct nlmsghdr *,
+                           struct netlink_ext_ack *))
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(netlink_rcv_skb);
+
+void
+netlink_kernel_release(struct sock *sk)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(netlink_kernel_release);
+
+bool netlink_ns_capable(const struct sk_buff *skb,
+            struct user_namespace *user_ns, int cap)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(netlink_ns_capable);
