@@ -90,3 +90,9 @@ __weak struct device_node *of_get_next_cpu_node(struct device_node *prev)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(of_get_next_cpu_node);
+
+__weak struct device_node *of_get_cpu_node(int cpu, unsigned int *thread)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(of_get_cpu_node);

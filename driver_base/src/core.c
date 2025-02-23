@@ -2974,7 +2974,6 @@ name_error:
 	dev->p = NULL;
 	goto done;
 }
-EXPORT_SYMBOL_GPL(device_add);
 
 /**
  * device_register - register a device with the system.
@@ -2999,7 +2998,6 @@ int device_register(struct device *dev)
 	device_initialize(dev);
 	return device_add(dev);
 }
-EXPORT_SYMBOL_GPL(device_register);
 
 /**
  * get_device - increment reference count for device.
@@ -3134,7 +3132,6 @@ void device_unregister(struct device *dev)
 	device_del(dev);
 	put_device(dev);
 }
-EXPORT_SYMBOL_GPL(device_unregister);
 
 static struct device *prev_device(struct klist_iter *i)
 {

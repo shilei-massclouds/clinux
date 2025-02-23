@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(kobject_get_path)
 CL_MINE(netlink_broadcast)
 CL_MINE(netlink_has_listeners)
 CL_MINE(__netlink_kernel_create)

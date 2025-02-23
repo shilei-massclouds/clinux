@@ -92,7 +92,6 @@ void kobj_unmap(struct kobj_map *domain, dev_t dev, unsigned long range)
 	mutex_unlock(domain->lock);
 	kfree(found);
 }
-EXPORT_SYMBOL(kobj_unmap);
 
 struct kobject *kobj_lookup(struct kobj_map *domain, dev_t dev, int *index)
 {
@@ -133,7 +132,6 @@ retry:
 	mutex_unlock(domain->lock);
 	return NULL;
 }
-EXPORT_SYMBOL(kobj_lookup);
 
 struct kobj_map *kobj_map_init(kobj_probe_t *base_probe, struct mutex *lock)
 {

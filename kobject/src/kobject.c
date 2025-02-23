@@ -127,64 +127,64 @@ static int create_dir(struct kobject *kobj)
 	return 0;
 }
 
-//static int get_kobj_path_length(struct kobject *kobj)
-//{
-//	int length = 1;
-//	struct kobject *parent = kobj;
-//
-//	/* walk up the ancestors until we hit the one pointing to the
-//	 * root.
-//	 * Add 1 to strlen for leading '/' of each level.
-//	 */
-//	do {
-//		if (kobject_name(parent) == NULL)
-//			return 0;
-//		length += strlen(kobject_name(parent)) + 1;
-//		parent = parent->parent;
-//	} while (parent);
-//	return length;
-//}
-//
-//static void fill_kobj_path(struct kobject *kobj, char *path, int length)
-//{
-//	struct kobject *parent;
-//
-//	--length;
-//	for (parent = kobj; parent; parent = parent->parent) {
-//		int cur = strlen(kobject_name(parent));
-//		/* back up enough to print this name with '/' */
-//		length -= cur;
-//		memcpy(path + length, kobject_name(parent), cur);
-//		*(path + --length) = '/';
-//	}
-//
-//	pr_debug("kobject: '%s' (%p): %s: path = '%s'\n", kobject_name(kobj),
-//		 kobj, __func__, path);
-//}
-//
-///**
-// * kobject_get_path() - Allocate memory and fill in the path for @kobj.
-// * @kobj:	kobject in question, with which to build the path
-// * @gfp_mask:	the allocation type used to allocate the path
-// *
-// * Return: The newly allocated memory, caller must free with kfree().
-// */
-//char *kobject_get_path(struct kobject *kobj, gfp_t gfp_mask)
-//{
-//	char *path;
-//	int len;
-//
-//	len = get_kobj_path_length(kobj);
-//	if (len == 0)
-//		return NULL;
-//	path = kzalloc(len, gfp_mask);
-//	if (!path)
-//		return NULL;
-//	fill_kobj_path(kobj, path, len);
-//
-//	return path;
-//}
-//EXPORT_SYMBOL_GPL(kobject_get_path);
+static int get_kobj_path_length(struct kobject *kobj)
+{
+	int length = 1;
+	struct kobject *parent = kobj;
+
+	/* walk up the ancestors until we hit the one pointing to the
+	 * root.
+	 * Add 1 to strlen for leading '/' of each level.
+	 */
+	do {
+		if (kobject_name(parent) == NULL)
+			return 0;
+		length += strlen(kobject_name(parent)) + 1;
+		parent = parent->parent;
+	} while (parent);
+	return length;
+}
+
+static void fill_kobj_path(struct kobject *kobj, char *path, int length)
+{
+	struct kobject *parent;
+
+	--length;
+	for (parent = kobj; parent; parent = parent->parent) {
+		int cur = strlen(kobject_name(parent));
+		/* back up enough to print this name with '/' */
+		length -= cur;
+		memcpy(path + length, kobject_name(parent), cur);
+		*(path + --length) = '/';
+	}
+
+	pr_debug("kobject: '%s' (%p): %s: path = '%s'\n", kobject_name(kobj),
+		 kobj, __func__, path);
+}
+
+/**
+ * kobject_get_path() - Allocate memory and fill in the path for @kobj.
+ * @kobj:	kobject in question, with which to build the path
+ * @gfp_mask:	the allocation type used to allocate the path
+ *
+ * Return: The newly allocated memory, caller must free with kfree().
+ */
+char *kobject_get_path(struct kobject *kobj, gfp_t gfp_mask)
+{
+	char *path;
+	int len;
+
+	len = get_kobj_path_length(kobj);
+	if (len == 0)
+		return NULL;
+	path = kzalloc(len, gfp_mask);
+	if (!path)
+		return NULL;
+	fill_kobj_path(kobj, path, len);
+
+	return path;
+}
+EXPORT_SYMBOL_GPL(kobject_get_path);
 
 /* add the kobject to its kset's list */
 static void kobj_kset_join(struct kobject *kobj)

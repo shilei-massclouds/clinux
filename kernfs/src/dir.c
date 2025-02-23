@@ -910,7 +910,6 @@ struct kernfs_node *kernfs_find_and_get_ns(struct kernfs_node *parent,
 
 	return kn;
 }
-EXPORT_SYMBOL_GPL(kernfs_find_and_get_ns);
 
 /**
  * kernfs_walk_and_get_ns - find and get kernfs_node with the given path

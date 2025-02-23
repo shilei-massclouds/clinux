@@ -1464,3 +1464,55 @@ __weak int device_create_file(struct device *dev,
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL_GPL(device_create_file);
+
+__weak int device_register(struct device *dev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(device_register);
+
+__weak int subsys_system_register(struct bus_type *subsys,
+			   const struct attribute_group **groups)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(subsys_system_register);
+
+__weak void device_unregister(struct device *dev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(device_unregister);
+
+__weak int sysfs_create_bin_file(struct kobject *kobj,
+			  const struct bin_attribute *attr)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(sysfs_create_bin_file);
+
+__weak struct kernfs_node *kernfs_find_and_get_ns(struct kernfs_node *parent,
+					   const char *name, const void *ns)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(kernfs_find_and_get_ns);
+
+struct kobj_map;
+__weak void kobj_unmap(struct kobj_map *domain, dev_t dev, unsigned long range)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(kobj_unmap);
+
+__weak struct kobject *kobj_lookup(struct kobj_map *domain, dev_t dev, int *index)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(kobj_lookup);
+
+__weak int device_add(struct device *dev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(device_add);

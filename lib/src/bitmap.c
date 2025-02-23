@@ -458,33 +458,33 @@ EXPORT_SYMBOL(bitmap_find_next_zero_area_off);
 //	return ret;
 //}
 //EXPORT_SYMBOL(bitmap_parse_user);
-//
-///**
-// * bitmap_print_to_pagebuf - convert bitmap to list or hex format ASCII string
-// * @list: indicates whether the bitmap must be list
-// * @buf: page aligned buffer into which string is placed
-// * @maskp: pointer to bitmap to convert
-// * @nmaskbits: size of bitmap, in bits
-// *
-// * Output format is a comma-separated list of decimal numbers and
-// * ranges if list is specified or hex digits grouped into comma-separated
-// * sets of 8 digits/set. Returns the number of characters written to buf.
-// *
-// * It is assumed that @buf is a pointer into a PAGE_SIZE, page-aligned
-// * area and that sufficient storage remains at @buf to accommodate the
-// * bitmap_print_to_pagebuf() output. Returns the number of characters
-// * actually printed to @buf, excluding terminating '\0'.
-// */
-//int bitmap_print_to_pagebuf(bool list, char *buf, const unsigned long *maskp,
-//			    int nmaskbits)
-//{
-//	ptrdiff_t len = PAGE_SIZE - offset_in_page(buf);
-//
-//	return list ? scnprintf(buf, len, "%*pbl\n", nmaskbits, maskp) :
-//		      scnprintf(buf, len, "%*pb\n", nmaskbits, maskp);
-//}
-//EXPORT_SYMBOL(bitmap_print_to_pagebuf);
-//
+
+/**
+ * bitmap_print_to_pagebuf - convert bitmap to list or hex format ASCII string
+ * @list: indicates whether the bitmap must be list
+ * @buf: page aligned buffer into which string is placed
+ * @maskp: pointer to bitmap to convert
+ * @nmaskbits: size of bitmap, in bits
+ *
+ * Output format is a comma-separated list of decimal numbers and
+ * ranges if list is specified or hex digits grouped into comma-separated
+ * sets of 8 digits/set. Returns the number of characters written to buf.
+ *
+ * It is assumed that @buf is a pointer into a PAGE_SIZE, page-aligned
+ * area and that sufficient storage remains at @buf to accommodate the
+ * bitmap_print_to_pagebuf() output. Returns the number of characters
+ * actually printed to @buf, excluding terminating '\0'.
+ */
+int bitmap_print_to_pagebuf(bool list, char *buf, const unsigned long *maskp,
+			    int nmaskbits)
+{
+	ptrdiff_t len = PAGE_SIZE - offset_in_page(buf);
+
+	return list ? scnprintf(buf, len, "%*pbl\n", nmaskbits, maskp) :
+		      scnprintf(buf, len, "%*pb\n", nmaskbits, maskp);
+}
+EXPORT_SYMBOL(bitmap_print_to_pagebuf);
+
 ///*
 // * Region 9-38:4/10 describes the following bitmap structure:
 // * 0	   9  12    18			38

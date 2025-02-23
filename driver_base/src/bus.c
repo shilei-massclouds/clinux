@@ -1160,7 +1160,6 @@ int subsys_system_register(struct bus_type *subsys,
 {
 	return subsys_register(subsys, groups, &system_kset->kobj);
 }
-EXPORT_SYMBOL_GPL(subsys_system_register);
 
 /**
  * subsys_virtual_register - register a subsystem at /sys/devices/virtual/

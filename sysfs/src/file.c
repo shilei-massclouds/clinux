@@ -544,7 +544,6 @@ int sysfs_create_bin_file(struct kobject *kobj,
 	return sysfs_add_file_mode_ns(kobj->sd, &attr->attr, true,
 				      attr->attr.mode, uid, gid, NULL);
 }
-EXPORT_SYMBOL_GPL(sysfs_create_bin_file);
 
 /**
  *	sysfs_remove_bin_file - remove binary file for object.
