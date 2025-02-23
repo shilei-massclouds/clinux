@@ -894,8 +894,8 @@ void __usermodehelper_set_disable_depth(enum umh_disable_depth depth)
  */
 static void __init do_basic_setup(void)
 {
-    printk("%s: ==========\n", __func__);
     cpuset_init_smp();
+    printk("%s: ==========\n", __func__);
     driver_init();
     //init_irq_proc();
     //do_ctors();
@@ -938,10 +938,9 @@ static noinline void __init kernel_init_freeable(void)
     /* Initialize page ext after all struct pages are initialized. */
     page_ext_init();
 
-    printk("%s: ============ 1 \n", __func__);
     do_basic_setup();
 
-    printk("%s: ============ 3 \n", __func__);
+    printk("%s: ============ 1 \n", __func__);
 //    console_on_rootfs();
 //
 //    /*

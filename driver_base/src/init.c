@@ -31,7 +31,7 @@ void __init driver_init(void)
     printk("%s: ==========\n", __func__);
     /* These are the core pieces */
     devtmpfs_init();
-    //devices_init();
+    devices_init();
     //buses_init();
     //classes_init();
     //firmware_init();

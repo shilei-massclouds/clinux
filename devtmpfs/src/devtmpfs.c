@@ -406,9 +406,7 @@ static int __init devtmpfs_setup(void *p)
 {
 	int err;
 
-    printk("%s: ============> \n", __func__);
 	err = ksys_unshare(CLONE_NEWNS);
-    printk("%s: ============> \n", __func__);
 	if (err)
 		goto out;
 	err = init_mount("devtmpfs", "/", "devtmpfs", MS_SILENT, NULL);

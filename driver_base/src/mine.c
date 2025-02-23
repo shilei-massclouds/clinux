@@ -8,3 +8,7 @@ CL_MINE(_dev_warn)
 CL_MINE(klist_add_tail)
 CL_MINE(klist_init)
 CL_MINE(virtual_device_parent)
+
+CL_MINE(add_uevent_var)
+CL_MINE(devres_release_all)
+CL_MINE(of_device_uevent)
