@@ -78,3 +78,15 @@ __weak struct device_node *of_find_node_opts_by_path(const char *path, const cha
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(of_find_node_opts_by_path);
+
+__weak void __init of_core_init(void)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(of_core_init);
+
+__weak struct device_node *of_get_next_cpu_node(struct device_node *prev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(of_get_next_cpu_node);

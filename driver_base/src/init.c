@@ -35,12 +35,12 @@ void __init driver_init(void)
     buses_init();
     classes_init();
     firmware_init();
-    //hypervisor_init();
+    hypervisor_init();
 
-    ///* These are also core pieces, but must come after the
-    // * core core pieces.
-    // */
-    //of_core_init();
+    /* These are also core pieces, but must come after the
+     * core core pieces.
+     */
+    of_core_init();
     //platform_bus_init();
     //cpu_dev_init();
     //memory_dev_init();

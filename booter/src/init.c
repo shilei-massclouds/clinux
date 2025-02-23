@@ -191,6 +191,13 @@ int proc_dointvec(struct ctl_table *table, int write, void *buffer,
 }
 EXPORT_SYMBOL(proc_dointvec);
 
+__weak struct proc_dir_entry *proc_symlink(const char *name,
+		struct proc_dir_entry *parent, const char *dest)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(proc_symlink);
+
 bool __weak irq_work_needs_cpu(void)
 {
     booter_panic("No impl in 'booter'.");

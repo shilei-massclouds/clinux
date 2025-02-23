@@ -39,16 +39,16 @@ struct device_node *of_chosen;
 struct device_node *of_aliases;
 struct device_node *of_stdout;
 static const char *of_stdout_options;
-//
-//struct kset *of_kset;
-//
-///*
-// * Used to protect the of_aliases, to hold off addition of nodes to sysfs.
-// * This mutex must be held whenever modifications are being made to the
-// * device tree. The of_{attach,detach}_node() and
-// * of_{add,remove,update}_property() helpers make sure this happens.
-// */
-//DEFINE_MUTEX(of_mutex);
+
+struct kset *of_kset;
+
+/*
+ * Used to protect the of_aliases, to hold off addition of nodes to sysfs.
+ * This mutex must be held whenever modifications are being made to the
+ * device tree. The of_{attach,detach}_node() and
+ * of_{add,remove,update}_property() helpers make sure this happens.
+ */
+DEFINE_MUTEX(of_mutex);
 
 /* use when traversing tree through the child, sibling,
  * or parent members of struct device_node.
@@ -162,31 +162,31 @@ static u32 of_phandle_cache_hash(phandle handle)
 //	if (np && handle == np->phandle)
 //		phandle_cache[handle_hash] = NULL;
 //}
-//
-//void __init of_core_init(void)
-//{
-//	struct device_node *np;
-//
-//
-//	/* Create the kset, and register existing nodes */
-//	mutex_lock(&of_mutex);
-//	of_kset = kset_create_and_add("devicetree", NULL, firmware_kobj);
-//	if (!of_kset) {
-//		mutex_unlock(&of_mutex);
-//		pr_err("failed to register existing nodes\n");
-//		return;
-//	}
-//	for_each_of_allnodes(np) {
-//		__of_attach_node_sysfs(np);
-//		if (np->phandle && !phandle_cache[of_phandle_cache_hash(np->phandle)])
-//			phandle_cache[of_phandle_cache_hash(np->phandle)] = np;
-//	}
-//	mutex_unlock(&of_mutex);
-//
-//	/* Symlink in /proc as required by userspace ABI */
-//	if (of_root)
-//		proc_symlink("device-tree", NULL, "/sys/firmware/devicetree/base");
-//}
+
+void __init of_core_init(void)
+{
+	struct device_node *np;
+
+
+	/* Create the kset, and register existing nodes */
+	mutex_lock(&of_mutex);
+	of_kset = kset_create_and_add("devicetree", NULL, firmware_kobj);
+	if (!of_kset) {
+		mutex_unlock(&of_mutex);
+		pr_err("failed to register existing nodes\n");
+		return;
+	}
+	for_each_of_allnodes(np) {
+		__of_attach_node_sysfs(np);
+		if (np->phandle && !phandle_cache[of_phandle_cache_hash(np->phandle)])
+			phandle_cache[of_phandle_cache_hash(np->phandle)] = np;
+	}
+	mutex_unlock(&of_mutex);
+
+	/* Symlink in /proc as required by userspace ABI */
+	if (of_root)
+		proc_symlink("device-tree", NULL, "/sys/firmware/devicetree/base");
+}
 
 static struct property *__of_find_property(const struct device_node *np,
 					   const char *name, int *lenp)
@@ -805,7 +805,6 @@ struct device_node *of_get_next_cpu_node(struct device_node *prev)
 	raw_spin_unlock_irqrestore(&devtree_lock, flags);
 	return next;
 }
-EXPORT_SYMBOL(of_get_next_cpu_node);
 
 /**
  * of_get_compatible_child - Find compatible child node
