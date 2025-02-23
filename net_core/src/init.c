@@ -27,6 +27,6 @@ int sysctl_tstamp_allow_data __read_mostly = 1;
 struct pipe_buf_operations;
 const struct pipe_buf_operations nosteal_pipe_buf_ops;
 const struct nla_policy nda_policy[1];
-DECLARE_WAIT_QUEUE_HEAD(netdev_unregistering_wq);
 const struct dst_metrics dst_default_metrics;
-DEFINE_RWLOCK(dev_base_lock);
+DEFINE_STATIC_KEY_FALSE(bpf_stats_enabled_key);
+struct pernet_operations __net_initdata loopback_net_ops;

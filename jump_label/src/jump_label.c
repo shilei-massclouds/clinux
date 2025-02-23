@@ -210,13 +210,13 @@ void static_key_disable_cpuslocked(struct static_key *key)
 }
 EXPORT_SYMBOL_GPL(static_key_disable_cpuslocked);
 
-//void static_key_disable(struct static_key *key)
-//{
-//	cpus_read_lock();
-//	static_key_disable_cpuslocked(key);
-//	cpus_read_unlock();
-//}
-//EXPORT_SYMBOL_GPL(static_key_disable);
+void static_key_disable(struct static_key *key)
+{
+	cpus_read_lock();
+	static_key_disable_cpuslocked(key);
+	cpus_read_unlock();
+}
+EXPORT_SYMBOL_GPL(static_key_disable);
 
 static bool static_key_slow_try_dec(struct static_key *key)
 {

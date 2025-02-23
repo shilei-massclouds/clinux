@@ -1612,3 +1612,15 @@ bool netlink_ns_capable(const struct sk_buff *skb,
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(netlink_ns_capable);
+
+__weak void __raise_softirq_irqoff(unsigned int nr)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(__raise_softirq_irqoff);
+
+__weak asmlinkage __visible void do_softirq(void)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(do_softirq);

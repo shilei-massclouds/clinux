@@ -119,3 +119,9 @@ __weak void free_compound_page(struct page *page)
     booter_panic("No impl 'page_init_poison'.");
 }
 EXPORT_SYMBOL(free_compound_page);
+
+__weak unsigned long get_zeroed_page(gfp_t gfp_mask)
+{
+    booter_panic("No impl 'page_init_poison'.");
+}
+EXPORT_SYMBOL(get_zeroed_page);
