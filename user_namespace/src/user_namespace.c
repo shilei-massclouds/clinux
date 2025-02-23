@@ -1233,6 +1233,7 @@ bool in_userns(const struct user_namespace *ancestor,
 		;
 	return (ns == ancestor);
 }
+EXPORT_SYMBOL_GPL(in_userns);
 
 bool current_in_userns(const struct user_namespace *target_ns)
 {

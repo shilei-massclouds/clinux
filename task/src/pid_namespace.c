@@ -449,6 +449,7 @@ const struct proc_ns_operations pidns_operations = {
 	.owner		= pidns_owner,
 	.get_parent	= pidns_get_parent,
 };
+EXPORT_SYMBOL(pidns_operations);
 
 //const struct proc_ns_operations pidns_for_children_operations = {
 //	.name		= "pid_for_children",

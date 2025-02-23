@@ -61,6 +61,7 @@ struct pid init_struct_pid = {
 */
 
 int pid_max = PID_MAX_DEFAULT;
+EXPORT_SYMBOL(pid_max);
 
 #define RESERVED_PIDS		300
 
@@ -308,6 +309,7 @@ void disable_pid_allocation(struct pid_namespace *ns)
 	ns->pid_allocated &= ~PIDNS_ADDING;
 	spin_unlock_irq(&pidmap_lock);
 }
+EXPORT_SYMBOL(disable_pid_allocation);
 
 struct pid *find_pid_ns(int nr, struct pid_namespace *ns)
 {

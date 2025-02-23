@@ -1277,3 +1277,22 @@ __weak void free_ipcs(struct ipc_namespace *ns, struct ipc_ids *ids,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(free_ipcs);
+
+__weak void put_pid_ns(struct pid_namespace *ns)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(put_pid_ns);
+
+__weak struct pid_namespace *copy_pid_ns(unsigned long flags,
+	struct user_namespace *user_ns, struct pid_namespace *old_ns)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(copy_pid_ns);
+
+__weak void zap_pid_ns_processes(struct pid_namespace *pid_ns)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(zap_pid_ns_processes);

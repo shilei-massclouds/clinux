@@ -989,6 +989,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(module);
     REQUIRE_COMPONENT(devtmpfs);
     REQUIRE_COMPONENT(security);
+    REQUIRE_COMPONENT(pid_namespace);
 
     //
     // start_kernel (init/main.c)

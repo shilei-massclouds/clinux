@@ -1624,6 +1624,7 @@ long kernel_wait4(pid_t upid, int __user *stat_addr, int options,
 
 	return ret;
 }
+EXPORT_SYMBOL(kernel_wait4);
 
 int kernel_wait(pid_t pid, int *stat)
 {
