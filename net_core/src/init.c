@@ -6,6 +6,8 @@
 #include <linux/cache.h>
 #include <linux/fs.h>
 #include <linux/splice.h>
+#include <net/dst.h>
+#include <net/netlink.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -24,3 +26,7 @@ int sysctl_tstamp_allow_data __read_mostly = 1;
 
 struct pipe_buf_operations;
 const struct pipe_buf_operations nosteal_pipe_buf_ops;
+const struct nla_policy nda_policy[1];
+DECLARE_WAIT_QUEUE_HEAD(netdev_unregistering_wq);
+const struct dst_metrics dst_default_metrics;
+DEFINE_RWLOCK(dev_base_lock);

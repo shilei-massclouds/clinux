@@ -895,7 +895,7 @@ static void __init do_basic_setup(void)
     init_irq_proc();
     do_ctors();
     usermodehelper_enable();
-    //do_initcalls();
+    do_initcalls();
     printk("%s: ==========\n", __func__);
 }
 
