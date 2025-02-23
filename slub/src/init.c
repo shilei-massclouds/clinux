@@ -15,49 +15,8 @@ cl_slub_init(void)
 }
 EXPORT_SYMBOL(cl_slub_init);
 
-/*
-long copy_from_kernel_nofault(void *dst, const void *src, size_t size)
-{
-    booter_panic("No impl 'slub'.");
-}
-*/
-
-void print_hex_dump(const char *level, const char *prefix_str, int prefix_type,
-            int rowsize, int groupsize,
-            const void *buf, size_t len, bool ascii)
-{
-    booter_panic("No impl 'slub'.");
-}
-
 unsigned int stack_trace_save(unsigned long *store, unsigned int size,
                   unsigned int skipnr)
 {
     booter_panic("No impl 'slub'.");
 }
-
-/*
-void call_rcu(struct rcu_head *head, rcu_callback_t func)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(call_rcu);
-
-void on_each_cpu_cond(smp_cond_func_t cond_func, smp_call_func_t func,
-              void *info, bool wait)
-{
-    booter_panic("No impl 'slub'.");
-}
-*/
-
-/*
-int sysfs_create_link(struct kobject *kobj, struct kobject *target,
-              const char *name)
-{
-    booter_panic("No impl 'slub'.");
-}
-
-const char *kstrdup_const(const char *s, gfp_t gfp)
-{
-    booter_panic("No impl 'slub'.");
-}
-*/

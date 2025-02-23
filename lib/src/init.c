@@ -63,3 +63,8 @@ __weak void __warn_printk(const char *fmt, ...)
     sbi_puts(printk_skip_level(fmt));
 }
 EXPORT_SYMBOL(__warn_printk);
+
+const char hex_asc[] = "0123456789abcdef";
+EXPORT_SYMBOL(hex_asc);
+const char hex_asc_upper[] = "0123456789ABCDEF";
+EXPORT_SYMBOL(hex_asc_upper);

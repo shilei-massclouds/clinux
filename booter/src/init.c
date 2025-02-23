@@ -1445,6 +1445,7 @@ __weak kgid_t make_kgid(struct user_namespace *ns, gid_t gid)
 }
 EXPORT_SYMBOL(make_kgid);
 
+/*
 void kfree_skb(struct sk_buff *skb)
 {
     booter_panic("No impl.\n");
@@ -1457,6 +1458,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(__alloc_skb);
+*/
 
 __weak int device_create_file(struct device *dev,
 		       const struct device_attribute *attr)
