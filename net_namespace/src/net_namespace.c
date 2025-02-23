@@ -1262,7 +1262,6 @@ int register_pernet_subsys(struct pernet_operations *ops)
 	up_write(&pernet_ops_rwsem);
 	return error;
 }
-EXPORT_SYMBOL_GPL(register_pernet_subsys);
 
 /**
  *      unregister_pernet_subsys - unregister a network namespace subsystem

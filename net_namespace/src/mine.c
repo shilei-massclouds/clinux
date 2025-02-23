@@ -1,8 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(__alloc_skb)
-CL_MINE(kfree_skb)
 CL_MINE(netlink_strict_get_check)
 CL_MINE(__nla_parse)
 CL_MINE(nla_put)

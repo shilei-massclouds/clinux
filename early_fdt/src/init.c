@@ -50,3 +50,11 @@ int __init __weak of_setup_earlycon(const struct earlycon_id *match,
 EXPORT_SYMBOL_GPL(of_setup_earlycon);
 
 #endif
+
+__weak int of_property_read_variable_u32_array(const struct device_node *np,
+			       const char *propname, u32 *out_values,
+			       size_t sz_min, size_t sz_max)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(of_property_read_variable_u32_array);

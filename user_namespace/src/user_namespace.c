@@ -390,7 +390,6 @@ kuid_t make_kuid(struct user_namespace *ns, uid_t uid)
 	/* Map the uid to a global kernel uid */
 	return KUIDT_INIT(map_id_down(&ns->uid_map, uid));
 }
-EXPORT_SYMBOL(make_kuid);
 
 /**
  *	from_kuid - Create a uid from a kuid user-namespace pair.
@@ -457,7 +456,6 @@ kgid_t make_kgid(struct user_namespace *ns, gid_t gid)
 	/* Map the gid to a global kernel gid */
 	return KGIDT_INIT(map_id_down(&ns->gid_map, gid));
 }
-EXPORT_SYMBOL(make_kgid);
 
 /**
  *	from_kgid - Create a gid from a kgid user-namespace pair.

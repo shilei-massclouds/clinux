@@ -147,7 +147,6 @@ int device_is_dependent(struct device *dev, void *target)
 	}
 	return ret;
 }
-EXPORT_SYMBOL(device_is_dependent);
 
 //static void device_link_init_status(struct device_link *link,
 //				    struct device *consumer,
@@ -3014,7 +3013,6 @@ struct device *get_device(struct device *dev)
 {
 	return dev ? kobj_to_dev(kobject_get(&dev->kobj)) : NULL;
 }
-EXPORT_SYMBOL_GPL(get_device);
 
 /**
  * put_device - decrement reference count.
@@ -3026,7 +3024,6 @@ void put_device(struct device *dev)
 	if (dev)
 		kobject_put(&dev->kobj);
 }
-EXPORT_SYMBOL_GPL(put_device);
 
 //bool kill_device(struct device *dev)
 //{

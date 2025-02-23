@@ -102,11 +102,13 @@ __weak void sysfs_delete_link(struct kobject *kobj, struct kobject *targ,
 }
 EXPORT_SYMBOL(sysfs_delete_link);
 
+/*
 int kobject_uevent(struct kobject *kobj, enum kobject_action action)
 {
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(kobject_uevent);
+*/
 
 void dev_printk(const char *level, const struct device *dev,
         const char *fmt, ...)
@@ -1379,3 +1381,71 @@ __weak void __mnt_drop_write_file(struct file *file)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__mnt_drop_write_file);
+
+__weak void kobject_init(struct kobject *kobj, struct kobj_type *ktype)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kobject_init);
+
+__weak void *kmem_cache_alloc(struct kmem_cache *s, gfp_t gfpflags)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(kmem_cache_alloc);
+
+struct kmem_cache *
+kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1] __ro_after_init =
+{ /* initialization for https://bugs.llvm.org/show_bug.cgi?id=42570 */ };
+EXPORT_SYMBOL(kmalloc_caches);
+
+__weak struct device *get_device(struct device *dev)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(get_device);
+
+__weak void put_device(struct device *dev)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(put_device);
+
+__weak int device_is_dependent(struct device *dev, void *target)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(device_is_dependent);
+
+struct pernet_operations;
+__weak int register_pernet_subsys(struct pernet_operations *ops)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(register_pernet_subsys);
+
+__weak kuid_t make_kuid(struct user_namespace *ns, uid_t uid)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(make_kuid);
+
+__weak kgid_t make_kgid(struct user_namespace *ns, gid_t gid)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(make_kgid);
+
+void kfree_skb(struct sk_buff *skb)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(kfree_skb);
+
+struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
+                int flags, int node)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(__alloc_skb);
+

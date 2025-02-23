@@ -321,7 +321,6 @@ int of_property_read_variable_u32_array(const struct device_node *np,
 
 	return sz;
 }
-EXPORT_SYMBOL_GPL(of_property_read_variable_u32_array);
 
 /**
  * of_property_read_u64 - Find and read a 64 bit integer from a property

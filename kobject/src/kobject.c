@@ -375,7 +375,6 @@ error:
 	pr_err("kobject (%p): %s\n", kobj, err_str);
 	dump_stack();
 }
-EXPORT_SYMBOL(kobject_init);
 
 static __printf(3, 0) int kobject_add_varg(struct kobject *kobj,
 					   struct kobject *parent,
