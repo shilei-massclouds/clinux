@@ -437,3 +437,15 @@ __weak bool completion_done(struct completion *x)
     booter_panic("No impl 'rwsem'.");
 }
 EXPORT_SYMBOL(completion_done);
+
+__weak void add_wait_queue_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry)
+{
+    booter_panic("No impl 'rwsem'.");
+}
+EXPORT_SYMBOL(add_wait_queue_exclusive);
+
+__weak void __put_net(struct net *net)
+{
+    booter_panic("No impl 'rwsem'.");
+}
+EXPORT_SYMBOL_GPL(__put_net);

@@ -1576,22 +1576,14 @@ __weak void *skb_pull(struct sk_buff *skb, unsigned int len)
 }
 EXPORT_SYMBOL(skb_pull);
 
-struct sock *
-__netlink_kernel_create(struct net *net, int unit, struct module *module,
-            struct netlink_kernel_cfg *cfg)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-EXPORT_SYMBOL(__netlink_kernel_create);
-
-int netlink_broadcast(struct sock *ssk, struct sk_buff *skb, u32 portid,
+__weak int netlink_broadcast(struct sock *ssk, struct sk_buff *skb, u32 portid,
               u32 group, gfp_t allocation)
 {
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(netlink_broadcast);
 
-int netlink_rcv_skb(struct sk_buff *skb, int (*cb)(struct sk_buff *,
+__weak int netlink_rcv_skb(struct sk_buff *skb, int (*cb)(struct sk_buff *,
                            struct nlmsghdr *,
                            struct netlink_ext_ack *))
 {
@@ -1599,14 +1591,14 @@ int netlink_rcv_skb(struct sk_buff *skb, int (*cb)(struct sk_buff *,
 }
 EXPORT_SYMBOL(netlink_rcv_skb);
 
-void
+__weak void
 netlink_kernel_release(struct sock *sk)
 {
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(netlink_kernel_release);
 
-bool netlink_ns_capable(const struct sk_buff *skb,
+__weak bool netlink_ns_capable(const struct sk_buff *skb,
             struct user_namespace *user_ns, int cap)
 {
     booter_panic("No impl 'driver_base'.");
@@ -1624,3 +1616,36 @@ __weak asmlinkage __visible void do_softirq(void)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(do_softirq);
+
+__weak struct sock *
+__netlink_kernel_create(struct net *net, int unit, struct module *module,
+			struct netlink_kernel_cfg *cfg)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(__netlink_kernel_create);
+
+__weak struct mm_struct *mm_access(struct task_struct *task, unsigned int mode)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(mm_access);
+
+__weak struct net *copy_net_ns(unsigned long flags,
+			struct user_namespace *user_ns, struct net *old_net)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(copy_net_ns);
+
+__weak void rhashtable_destroy(struct rhashtable *ht)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(rhashtable_destroy);
+
+__weak int netlink_has_listeners(struct sock *sk, unsigned int group)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(netlink_has_listeners);

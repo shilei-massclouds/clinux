@@ -985,6 +985,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(security);
     REQUIRE_COMPONENT(pid_namespace);
     REQUIRE_COMPONENT(platform);
+    REQUIRE_COMPONENT(net_core);
 
     //
     // start_kernel (init/main.c)

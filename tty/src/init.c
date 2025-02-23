@@ -28,10 +28,6 @@ int __sched ldsem_down_write(struct ld_semaphore *sem, long timeout)
 {
     booter_panic("No impl.\n");
 }
-void *vzalloc(unsigned long size)
-{
-    booter_panic("No impl.\n");
-}
 
 /*
 int iterate_fd(struct files_struct *files, unsigned n,

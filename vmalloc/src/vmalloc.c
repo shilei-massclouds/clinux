@@ -2570,101 +2570,101 @@ void *__vmalloc(unsigned long size, gfp_t gfp_mask)
 				__builtin_return_address(0));
 }
 
-///**
-// * vmalloc - allocate virtually contiguous memory
-// * @size:    allocation size
-// *
-// * Allocate enough pages to cover @size from the page level
-// * allocator and map them into contiguous kernel virtual space.
-// *
-// * For tight control over page level allocator and protection flags
-// * use __vmalloc() instead.
-// *
-// * Return: pointer to the allocated memory or %NULL on error
-// */
-//void *vmalloc(unsigned long size)
-//{
-//	return __vmalloc_node(size, 1, GFP_KERNEL, NUMA_NO_NODE,
-//				__builtin_return_address(0));
-//}
-//EXPORT_SYMBOL(vmalloc);
-//
-///**
-// * vzalloc - allocate virtually contiguous memory with zero fill
-// * @size:    allocation size
-// *
-// * Allocate enough pages to cover @size from the page level
-// * allocator and map them into contiguous kernel virtual space.
-// * The memory allocated is set to zero.
-// *
-// * For tight control over page level allocator and protection flags
-// * use __vmalloc() instead.
-// *
-// * Return: pointer to the allocated memory or %NULL on error
-// */
-//void *vzalloc(unsigned long size)
-//{
-//	return __vmalloc_node(size, 1, GFP_KERNEL | __GFP_ZERO, NUMA_NO_NODE,
-//				__builtin_return_address(0));
-//}
-//EXPORT_SYMBOL(vzalloc);
-//
-///**
-// * vmalloc_user - allocate zeroed virtually contiguous memory for userspace
-// * @size: allocation size
-// *
-// * The resulting memory area is zeroed so it can be mapped to userspace
-// * without leaking data.
-// *
-// * Return: pointer to the allocated memory or %NULL on error
-// */
-//void *vmalloc_user(unsigned long size)
-//{
-//	return __vmalloc_node_range(size, SHMLBA,  VMALLOC_START, VMALLOC_END,
-//				    GFP_KERNEL | __GFP_ZERO, PAGE_KERNEL,
-//				    VM_USERMAP, NUMA_NO_NODE,
-//				    __builtin_return_address(0));
-//}
-//EXPORT_SYMBOL(vmalloc_user);
-//
-///**
-// * vmalloc_node - allocate memory on a specific node
-// * @size:	  allocation size
-// * @node:	  numa node
-// *
-// * Allocate enough pages to cover @size from the page level
-// * allocator and map them into contiguous kernel virtual space.
-// *
-// * For tight control over page level allocator and protection flags
-// * use __vmalloc() instead.
-// *
-// * Return: pointer to the allocated memory or %NULL on error
-// */
-//void *vmalloc_node(unsigned long size, int node)
-//{
-//	return __vmalloc_node(size, 1, GFP_KERNEL, node,
-//			__builtin_return_address(0));
-//}
-//EXPORT_SYMBOL(vmalloc_node);
-//
-///**
-// * vzalloc_node - allocate memory on a specific node with zero fill
-// * @size:	allocation size
-// * @node:	numa node
-// *
-// * Allocate enough pages to cover @size from the page level
-// * allocator and map them into contiguous kernel virtual space.
-// * The memory allocated is set to zero.
-// *
-// * Return: pointer to the allocated memory or %NULL on error
-// */
-//void *vzalloc_node(unsigned long size, int node)
-//{
-//	return __vmalloc_node(size, 1, GFP_KERNEL | __GFP_ZERO, node,
-//				__builtin_return_address(0));
-//}
-//EXPORT_SYMBOL(vzalloc_node);
-//
+/**
+ * vmalloc - allocate virtually contiguous memory
+ * @size:    allocation size
+ *
+ * Allocate enough pages to cover @size from the page level
+ * allocator and map them into contiguous kernel virtual space.
+ *
+ * For tight control over page level allocator and protection flags
+ * use __vmalloc() instead.
+ *
+ * Return: pointer to the allocated memory or %NULL on error
+ */
+void *vmalloc(unsigned long size)
+{
+	return __vmalloc_node(size, 1, GFP_KERNEL, NUMA_NO_NODE,
+				__builtin_return_address(0));
+}
+EXPORT_SYMBOL(vmalloc);
+
+/**
+ * vzalloc - allocate virtually contiguous memory with zero fill
+ * @size:    allocation size
+ *
+ * Allocate enough pages to cover @size from the page level
+ * allocator and map them into contiguous kernel virtual space.
+ * The memory allocated is set to zero.
+ *
+ * For tight control over page level allocator and protection flags
+ * use __vmalloc() instead.
+ *
+ * Return: pointer to the allocated memory or %NULL on error
+ */
+void *vzalloc(unsigned long size)
+{
+	return __vmalloc_node(size, 1, GFP_KERNEL | __GFP_ZERO, NUMA_NO_NODE,
+				__builtin_return_address(0));
+}
+EXPORT_SYMBOL(vzalloc);
+
+/**
+ * vmalloc_user - allocate zeroed virtually contiguous memory for userspace
+ * @size: allocation size
+ *
+ * The resulting memory area is zeroed so it can be mapped to userspace
+ * without leaking data.
+ *
+ * Return: pointer to the allocated memory or %NULL on error
+ */
+void *vmalloc_user(unsigned long size)
+{
+	return __vmalloc_node_range(size, SHMLBA,  VMALLOC_START, VMALLOC_END,
+				    GFP_KERNEL | __GFP_ZERO, PAGE_KERNEL,
+				    VM_USERMAP, NUMA_NO_NODE,
+				    __builtin_return_address(0));
+}
+EXPORT_SYMBOL(vmalloc_user);
+
+/**
+ * vmalloc_node - allocate memory on a specific node
+ * @size:	  allocation size
+ * @node:	  numa node
+ *
+ * Allocate enough pages to cover @size from the page level
+ * allocator and map them into contiguous kernel virtual space.
+ *
+ * For tight control over page level allocator and protection flags
+ * use __vmalloc() instead.
+ *
+ * Return: pointer to the allocated memory or %NULL on error
+ */
+void *vmalloc_node(unsigned long size, int node)
+{
+	return __vmalloc_node(size, 1, GFP_KERNEL, node,
+			__builtin_return_address(0));
+}
+EXPORT_SYMBOL(vmalloc_node);
+
+/**
+ * vzalloc_node - allocate memory on a specific node with zero fill
+ * @size:	allocation size
+ * @node:	numa node
+ *
+ * Allocate enough pages to cover @size from the page level
+ * allocator and map them into contiguous kernel virtual space.
+ * The memory allocated is set to zero.
+ *
+ * Return: pointer to the allocated memory or %NULL on error
+ */
+void *vzalloc_node(unsigned long size, int node)
+{
+	return __vmalloc_node(size, 1, GFP_KERNEL | __GFP_ZERO, node,
+				__builtin_return_address(0));
+}
+EXPORT_SYMBOL(vzalloc_node);
+
 //#if defined(CONFIG_64BIT) && defined(CONFIG_ZONE_DMA32)
 //#define GFP_VMALLOC32 (GFP_DMA32 | GFP_KERNEL)
 //#elif defined(CONFIG_64BIT) && defined(CONFIG_ZONE_DMA)

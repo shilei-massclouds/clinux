@@ -496,7 +496,6 @@ dec_ucounts:
 	}
 	return net;
 }
-EXPORT_SYMBOL(copy_net_ns);
 
 /**
  * net_ns_get_ownership - get sysfs ownership data for @net
@@ -650,7 +649,6 @@ void __put_net(struct net *net)
 	if (llist_add(&net->cleanup_list, &cleanup_list))
 		queue_work(netns_wq, &net_cleanup_work);
 }
-EXPORT_SYMBOL_GPL(__put_net);
 
 struct net *get_net_ns_by_fd(int fd)
 {
