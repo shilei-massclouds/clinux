@@ -1668,3 +1668,9 @@ __weak void *__vmalloc_node(unsigned long size, unsigned long align,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__vmalloc_node);
+
+__weak int is_valid_bugaddr(unsigned long pc)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(is_valid_bugaddr);

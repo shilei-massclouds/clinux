@@ -155,6 +155,7 @@ const struct proc_ns_operations cgroupns_operations = {
 
 static __init int cgroup_namespaces_init(void)
 {
+    printk("%s: ...\n", __func__);
 	return 0;
 }
 subsys_initcall(cgroup_namespaces_init);

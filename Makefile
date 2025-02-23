@@ -64,7 +64,7 @@ components := \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap \
 	signal sysctl kallsyms \
-	early_printk printk panic dump_stack show_mem
+	early_printk printk panic bug dump_stack show_mem
 	#partitions \
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)

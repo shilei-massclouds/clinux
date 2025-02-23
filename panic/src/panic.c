@@ -535,29 +535,29 @@ EXPORT_SYMBOL(test_taint);
 //	if (sysctl_oops_all_cpu_backtrace)
 //		trigger_all_cpu_backtrace();
 //}
-//
-///*
-// * 64-bit random ID for oopses:
-// */
-//static u64 oops_id;
-//
-//static int init_oops_id(void)
-//{
-//	if (!oops_id)
-//		get_random_bytes(&oops_id, sizeof(oops_id));
-//	else
-//		oops_id++;
-//
-//	return 0;
-//}
-//late_initcall(init_oops_id);
-//
-//static void print_oops_end_marker(void)
-//{
-//	init_oops_id();
-//	pr_warn("---[ end trace %016llx ]---\n", (unsigned long long)oops_id);
-//}
-//
+
+/*
+ * 64-bit random ID for oopses:
+ */
+static u64 oops_id;
+
+static int init_oops_id(void)
+{
+	if (!oops_id)
+		get_random_bytes(&oops_id, sizeof(oops_id));
+	else
+		oops_id++;
+
+	return 0;
+}
+late_initcall(init_oops_id);
+
+static void print_oops_end_marker(void)
+{
+	init_oops_id();
+	pr_warn("---[ end trace %016llx ]---\n", (unsigned long long)oops_id);
+}
+
 ///*
 // * Called when the architecture exits its oops handler, after printing
 // * everything.
@@ -568,53 +568,54 @@ EXPORT_SYMBOL(test_taint);
 //	print_oops_end_marker();
 //	kmsg_dump(KMSG_DUMP_OOPS);
 //}
-//
-//struct warn_args {
-//	const char *fmt;
-//	va_list args;
-//};
-//
-//void __warn(const char *file, int line, void *caller, unsigned taint,
-//	    struct pt_regs *regs, struct warn_args *args)
-//{
-//	disable_trace_on_warning();
-//
-//	if (file)
-//		pr_warn("WARNING: CPU: %d PID: %d at %s:%d %pS\n",
-//			raw_smp_processor_id(), current->pid, file, line,
-//			caller);
-//	else
-//		pr_warn("WARNING: CPU: %d PID: %d at %pS\n",
-//			raw_smp_processor_id(), current->pid, caller);
-//
-//	if (args)
-//		vprintk(args->fmt, args->args);
-//
-//	if (panic_on_warn) {
-//		/*
-//		 * This thread may hit another WARN() in the panic path.
-//		 * Resetting this prevents additional WARN() from panicking the
-//		 * system on this thread.  Other threads are blocked by the
-//		 * panic_mutex in panic().
-//		 */
-//		panic_on_warn = 0;
-//		panic("panic_on_warn set ...\n");
-//	}
-//
-//	print_modules();
-//
-//	if (regs)
-//		show_regs(regs);
-//	else
-//		dump_stack();
-//
-//	print_irqtrace_events(current);
-//
-//	print_oops_end_marker();
-//
-//	/* Just a warning, don't kill lockdep. */
-//	add_taint(taint, LOCKDEP_STILL_OK);
-//}
+
+struct warn_args {
+	const char *fmt;
+	va_list args;
+};
+
+void __warn(const char *file, int line, void *caller, unsigned taint,
+	    struct pt_regs *regs, struct warn_args *args)
+{
+	disable_trace_on_warning();
+
+	if (file)
+		pr_warn("WARNING: CPU: %d PID: %d at %s:%d %pS\n",
+			raw_smp_processor_id(), current->pid, file, line,
+			caller);
+	else
+		pr_warn("WARNING: CPU: %d PID: %d at %pS\n",
+			raw_smp_processor_id(), current->pid, caller);
+
+	if (args)
+		vprintk(args->fmt, args->args);
+
+	if (panic_on_warn) {
+		/*
+		 * This thread may hit another WARN() in the panic path.
+		 * Resetting this prevents additional WARN() from panicking the
+		 * system on this thread.  Other threads are blocked by the
+		 * panic_mutex in panic().
+		 */
+		panic_on_warn = 0;
+		panic("panic_on_warn set ...\n");
+	}
+
+	print_modules();
+
+	if (regs)
+		show_regs(regs);
+	else
+		dump_stack();
+
+	print_irqtrace_events(current);
+
+	print_oops_end_marker();
+
+	/* Just a warning, don't kill lockdep. */
+	add_taint(taint, LOCKDEP_STILL_OK);
+}
+EXPORT_SYMBOL(__warn);
 
 #ifndef __WARN_FLAGS
 void warn_slowpath_fmt(const char *file, int line, unsigned taint,

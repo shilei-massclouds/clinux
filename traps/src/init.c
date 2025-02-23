@@ -80,11 +80,13 @@ void print_vma_addr(char *prefix, unsigned long rip)
 {
     booter_panic("No impl!\n");
 }
+/*
 enum bug_trap_type report_bug(unsigned long bug_addr,
                         struct pt_regs *regs)
 {
     booter_panic("No impl!\n");
 }
+*/
 asmlinkage void do_syscall_trace_exit(void)
 {
     booter_panic("No impl!\n");

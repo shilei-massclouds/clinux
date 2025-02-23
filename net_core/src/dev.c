@@ -11013,6 +11013,7 @@ static int __init net_dev_init(void)
 {
 	int i, rc = -ENOMEM;
 
+    printk("%s: ...\n", __func__);
 	BUG_ON(!dev_boot_phase);
 
 	if (dev_proc_init())

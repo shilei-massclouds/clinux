@@ -1327,6 +1327,7 @@ const struct proc_ns_operations userns_operations = {
 
 static __init int user_namespaces_init(void)
 {
+    printk("%s: ...\n", __func__);
 	user_ns_cachep = KMEM_CACHE(user_namespace, SLAB_PANIC);
 	return 0;
 }

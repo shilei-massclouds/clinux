@@ -228,6 +228,7 @@ EXPORT_SYMBOL(dec_ucount);
 
 static __init int user_namespace_sysctl_init(void)
 {
+    printk("%s: ...\n", __func__);
 #ifdef CONFIG_SYSCTL
 	static struct ctl_table_header *user_header;
 	static struct ctl_table empty[1];
