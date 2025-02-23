@@ -59,28 +59,6 @@ void unlock_device_hotplug(void)
     booter_panic("No impl 'driver_base'.");
 }
 
-
-/*
-void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
-           rcu_callback_t func)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-*/
-
-void klist_del(struct klist_node *n)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-
-/*
-int blocking_notifier_call_chain(struct blocking_notifier_head *nh,
-        unsigned long val, void *v)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-*/
-
 int device_online(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
@@ -98,12 +76,6 @@ bool kill_device(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
 }
-/*
-void kobject_del(struct kobject *kobj)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-*/
 int device_offline(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");

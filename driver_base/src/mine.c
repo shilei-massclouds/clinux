@@ -3,8 +3,6 @@
 
 CL_MINE(device_add_groups)
 CL_MINE(_dev_warn)
-CL_MINE(klist_add_tail)
-CL_MINE(klist_init)
 
 CL_MINE(devres_release_all)
 CL_MINE(of_device_uevent)
@@ -22,8 +20,6 @@ CL_MINE(driver_create_file)
 CL_MINE(driver_detach)
 CL_MINE(driver_remove_file)
 CL_MINE(driver_remove_groups)
-CL_MINE(klist_node_attached)
-CL_MINE(klist_remove)
 CL_MINE(kset_unregister)
 CL_MINE(module_add_driver)
 CL_MINE(module_remove_driver)
