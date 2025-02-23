@@ -225,48 +225,48 @@ out_free_cache:
 	return NULL;
 }
 
-///*
-// * Most r/o checks on a fs are for operations that take
-// * discrete amounts of time, like a write() or unlink().
-// * We must keep track of when those operations start
-// * (for permission checks) and when they end, so that
-// * we can determine when writes are able to occur to
-// * a filesystem.
-// */
-///*
-// * __mnt_is_readonly: check whether a mount is read-only
-// * @mnt: the mount to check for its write status
-// *
-// * This shouldn't be used directly ouside of the VFS.
-// * It does not guarantee that the filesystem will stay
-// * r/w, just that it is right *now*.  This can not and
-// * should not be used in place of IS_RDONLY(inode).
-// * mnt_want/drop_write() will _keep_ the filesystem
-// * r/w.
-// */
-//bool __mnt_is_readonly(struct vfsmount *mnt)
-//{
-//	return (mnt->mnt_flags & MNT_READONLY) || sb_rdonly(mnt->mnt_sb);
-//}
-//EXPORT_SYMBOL_GPL(__mnt_is_readonly);
-//
-//static inline void mnt_inc_writers(struct mount *mnt)
-//{
-//#ifdef CONFIG_SMP
-//	this_cpu_inc(mnt->mnt_pcp->mnt_writers);
-//#else
-//	mnt->mnt_writers++;
-//#endif
-//}
-//
-//static inline void mnt_dec_writers(struct mount *mnt)
-//{
-//#ifdef CONFIG_SMP
-//	this_cpu_dec(mnt->mnt_pcp->mnt_writers);
-//#else
-//	mnt->mnt_writers--;
-//#endif
-//}
+/*
+ * Most r/o checks on a fs are for operations that take
+ * discrete amounts of time, like a write() or unlink().
+ * We must keep track of when those operations start
+ * (for permission checks) and when they end, so that
+ * we can determine when writes are able to occur to
+ * a filesystem.
+ */
+/*
+ * __mnt_is_readonly: check whether a mount is read-only
+ * @mnt: the mount to check for its write status
+ *
+ * This shouldn't be used directly ouside of the VFS.
+ * It does not guarantee that the filesystem will stay
+ * r/w, just that it is right *now*.  This can not and
+ * should not be used in place of IS_RDONLY(inode).
+ * mnt_want/drop_write() will _keep_ the filesystem
+ * r/w.
+ */
+bool __mnt_is_readonly(struct vfsmount *mnt)
+{
+	return (mnt->mnt_flags & MNT_READONLY) || sb_rdonly(mnt->mnt_sb);
+}
+EXPORT_SYMBOL_GPL(__mnt_is_readonly);
+
+static inline void mnt_inc_writers(struct mount *mnt)
+{
+#ifdef CONFIG_SMP
+	this_cpu_inc(mnt->mnt_pcp->mnt_writers);
+#else
+	mnt->mnt_writers++;
+#endif
+}
+
+static inline void mnt_dec_writers(struct mount *mnt)
+{
+#ifdef CONFIG_SMP
+	this_cpu_dec(mnt->mnt_pcp->mnt_writers);
+#else
+	mnt->mnt_writers--;
+#endif
+}
 
 static unsigned int mnt_get_writers(struct mount *mnt)
 {
@@ -284,82 +284,81 @@ static unsigned int mnt_get_writers(struct mount *mnt)
 #endif
 }
 
-//static int mnt_is_readonly(struct vfsmount *mnt)
-//{
-//	if (mnt->mnt_sb->s_readonly_remount)
-//		return 1;
-//	/* Order wrt setting s_flags/s_readonly_remount in do_remount() */
-//	smp_rmb();
-//	return __mnt_is_readonly(mnt);
-//}
-//
-///*
-// * Most r/o & frozen checks on a fs are for operations that take discrete
-// * amounts of time, like a write() or unlink().  We must keep track of when
-// * those operations start (for permission checks) and when they end, so that we
-// * can determine when writes are able to occur to a filesystem.
-// */
-///**
-// * __mnt_want_write - get write access to a mount without freeze protection
-// * @m: the mount on which to take a write
-// *
-// * This tells the low-level filesystem that a write is about to be performed to
-// * it, and makes sure that writes are allowed (mnt it read-write) before
-// * returning success. This operation does not protect against filesystem being
-// * frozen. When the write operation is finished, __mnt_drop_write() must be
-// * called. This is effectively a refcount.
-// */
-//int __mnt_want_write(struct vfsmount *m)
-//{
-//	struct mount *mnt = real_mount(m);
-//	int ret = 0;
-//
-//	preempt_disable();
-//	mnt_inc_writers(mnt);
-//	/*
-//	 * The store to mnt_inc_writers must be visible before we pass
-//	 * MNT_WRITE_HOLD loop below, so that the slowpath can see our
-//	 * incremented count after it has set MNT_WRITE_HOLD.
-//	 */
-//	smp_mb();
-//	while (READ_ONCE(mnt->mnt.mnt_flags) & MNT_WRITE_HOLD)
-//		cpu_relax();
-//	/*
-//	 * After the slowpath clears MNT_WRITE_HOLD, mnt_is_readonly will
-//	 * be set to match its requirements. So we must not load that until
-//	 * MNT_WRITE_HOLD is cleared.
-//	 */
-//	smp_rmb();
-//	if (mnt_is_readonly(m)) {
-//		mnt_dec_writers(mnt);
-//		ret = -EROFS;
-//	}
-//	preempt_enable();
-//
-//	return ret;
-//}
-//
-///**
-// * mnt_want_write - get write access to a mount
-// * @m: the mount on which to take a write
-// *
-// * This tells the low-level filesystem that a write is about to be performed to
-// * it, and makes sure that writes are allowed (mount is read-write, filesystem
-// * is not frozen) before returning success.  When the write operation is
-// * finished, mnt_drop_write() must be called.  This is effectively a refcount.
-// */
-//int mnt_want_write(struct vfsmount *m)
-//{
-//	int ret;
-//
-//	sb_start_write(m->mnt_sb);
-//	ret = __mnt_want_write(m);
-//	if (ret)
-//		sb_end_write(m->mnt_sb);
-//	return ret;
-//}
-//EXPORT_SYMBOL_GPL(mnt_want_write);
-//
+static int mnt_is_readonly(struct vfsmount *mnt)
+{
+	if (mnt->mnt_sb->s_readonly_remount)
+		return 1;
+	/* Order wrt setting s_flags/s_readonly_remount in do_remount() */
+	smp_rmb();
+	return __mnt_is_readonly(mnt);
+}
+
+/*
+ * Most r/o & frozen checks on a fs are for operations that take discrete
+ * amounts of time, like a write() or unlink().  We must keep track of when
+ * those operations start (for permission checks) and when they end, so that we
+ * can determine when writes are able to occur to a filesystem.
+ */
+/**
+ * __mnt_want_write - get write access to a mount without freeze protection
+ * @m: the mount on which to take a write
+ *
+ * This tells the low-level filesystem that a write is about to be performed to
+ * it, and makes sure that writes are allowed (mnt it read-write) before
+ * returning success. This operation does not protect against filesystem being
+ * frozen. When the write operation is finished, __mnt_drop_write() must be
+ * called. This is effectively a refcount.
+ */
+int __mnt_want_write(struct vfsmount *m)
+{
+	struct mount *mnt = real_mount(m);
+	int ret = 0;
+
+	preempt_disable();
+	mnt_inc_writers(mnt);
+	/*
+	 * The store to mnt_inc_writers must be visible before we pass
+	 * MNT_WRITE_HOLD loop below, so that the slowpath can see our
+	 * incremented count after it has set MNT_WRITE_HOLD.
+	 */
+	smp_mb();
+	while (READ_ONCE(mnt->mnt.mnt_flags) & MNT_WRITE_HOLD)
+		cpu_relax();
+	/*
+	 * After the slowpath clears MNT_WRITE_HOLD, mnt_is_readonly will
+	 * be set to match its requirements. So we must not load that until
+	 * MNT_WRITE_HOLD is cleared.
+	 */
+	smp_rmb();
+	if (mnt_is_readonly(m)) {
+		mnt_dec_writers(mnt);
+		ret = -EROFS;
+	}
+	preempt_enable();
+
+	return ret;
+}
+
+/**
+ * mnt_want_write - get write access to a mount
+ * @m: the mount on which to take a write
+ *
+ * This tells the low-level filesystem that a write is about to be performed to
+ * it, and makes sure that writes are allowed (mount is read-write, filesystem
+ * is not frozen) before returning success.  When the write operation is
+ * finished, mnt_drop_write() must be called.  This is effectively a refcount.
+ */
+int mnt_want_write(struct vfsmount *m)
+{
+	int ret;
+
+	sb_start_write(m->mnt_sb);
+	ret = __mnt_want_write(m);
+	if (ret)
+		sb_end_write(m->mnt_sb);
+	return ret;
+}
+
 ///**
 // * mnt_clone_write - get write access to a mount
 // * @mnt: the mount on which to take a write
@@ -417,37 +416,36 @@ static unsigned int mnt_get_writers(struct mount *mnt)
 //	return ret;
 //}
 //EXPORT_SYMBOL_GPL(mnt_want_write_file);
-//
-///**
-// * __mnt_drop_write - give up write access to a mount
-// * @mnt: the mount on which to give up write access
-// *
-// * Tells the low-level filesystem that we are done
-// * performing writes to it.  Must be matched with
-// * __mnt_want_write() call above.
-// */
-//void __mnt_drop_write(struct vfsmount *mnt)
-//{
-//	preempt_disable();
-//	mnt_dec_writers(real_mount(mnt));
-//	preempt_enable();
-//}
-//
-///**
-// * mnt_drop_write - give up write access to a mount
-// * @mnt: the mount on which to give up write access
-// *
-// * Tells the low-level filesystem that we are done performing writes to it and
-// * also allows filesystem to be frozen again.  Must be matched with
-// * mnt_want_write() call above.
-// */
-//void mnt_drop_write(struct vfsmount *mnt)
-//{
-//	__mnt_drop_write(mnt);
-//	sb_end_write(mnt->mnt_sb);
-//}
-//EXPORT_SYMBOL_GPL(mnt_drop_write);
-//
+
+/**
+ * __mnt_drop_write - give up write access to a mount
+ * @mnt: the mount on which to give up write access
+ *
+ * Tells the low-level filesystem that we are done
+ * performing writes to it.  Must be matched with
+ * __mnt_want_write() call above.
+ */
+void __mnt_drop_write(struct vfsmount *mnt)
+{
+	preempt_disable();
+	mnt_dec_writers(real_mount(mnt));
+	preempt_enable();
+}
+
+/**
+ * mnt_drop_write - give up write access to a mount
+ * @mnt: the mount on which to give up write access
+ *
+ * Tells the low-level filesystem that we are done performing writes to it and
+ * also allows filesystem to be frozen again.  Must be matched with
+ * mnt_want_write() call above.
+ */
+void mnt_drop_write(struct vfsmount *mnt)
+{
+	__mnt_drop_write(mnt);
+	sb_end_write(mnt->mnt_sb);
+}
+
 //void __mnt_drop_write_file(struct file *file)
 //{
 //	__mnt_drop_write(file->f_path.mnt);
@@ -3347,7 +3345,6 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
 
 	return new_ns;
 }
-EXPORT_SYMBOL(copy_mnt_ns);
 
 //struct dentry *mount_subtree(struct vfsmount *m, const char *name)
 //{

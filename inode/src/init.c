@@ -47,10 +47,12 @@ int fsnotify(__u32 mask, const void *data, int data_type, struct inode *dir,
 }
 EXPORT_SYMBOL(fsnotify);
 
+/*
 int __mnt_want_write(struct vfsmount *m)
 {
     booter_panic("No impl!\n");
 }
+*/
 
 int in_group_p(kgid_t grp)
 {

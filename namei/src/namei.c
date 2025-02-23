@@ -1047,6 +1047,7 @@ int may_linkat(struct path *link)
 	audit_log_path_denied(AUDIT_ANOM_LINK, "linkat");
 	return -EPERM;
 }
+EXPORT_SYMBOL(may_linkat);
 
 /**
  * may_create_in_sticky - Check whether an O_CREAT open in a sticky directory
@@ -3787,6 +3788,7 @@ exit1:
 	putname(name);
 	return error;
 }
+EXPORT_SYMBOL(do_rmdir);
 
 SYSCALL_DEFINE1(rmdir, const char __user *, pathname)
 {
@@ -3928,6 +3930,7 @@ slashes:
 		error = -ENOTDIR;
 	goto exit2;
 }
+EXPORT_SYMBOL(do_unlinkat);
 
 SYSCALL_DEFINE3(unlinkat, int, dfd, const char __user *, pathname, int, flag)
 {

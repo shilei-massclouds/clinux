@@ -1023,7 +1023,7 @@ __weak int unshare_fd(unsigned long unshare_flags, unsigned int max_fds,
 }
 EXPORT_SYMBOL(unshare_fd);
 
-void __mnt_drop_write(struct vfsmount *mnt)
+__weak void __mnt_drop_write(struct vfsmount *mnt)
 {
     booter_panic("No impl in 'workqueue'.");
 }
@@ -1296,3 +1296,36 @@ __weak void zap_pid_ns_processes(struct pid_namespace *pid_ns)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(zap_pid_ns_processes);
+
+__weak int mnt_want_write(struct vfsmount *m)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(mnt_want_write);
+
+__weak __latent_entropy
+struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
+		struct user_namespace *user_ns, struct fs_struct *new_fs)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(copy_mnt_ns);
+
+__weak void mnt_drop_write(struct vfsmount *mnt)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(mnt_drop_write);
+
+__weak int __mnt_want_write(struct vfsmount *m)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__mnt_want_write);
+
+int vfs_getattr(const struct path *path, struct kstat *stat,
+        u32 request_mask, unsigned int query_flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(vfs_getattr);
