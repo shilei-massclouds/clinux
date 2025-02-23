@@ -931,11 +931,13 @@ void cgroup_leave_frozen(bool always_leave)
 }
 EXPORT_SYMBOL(cgroup_leave_frozen);
 
+/*
 int cap_vm_enough_memory(struct mm_struct *mm, long pages)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(cap_vm_enough_memory);
+*/
 
 __weak void __noreturn do_exit(long code)
 {
@@ -1195,9 +1197,70 @@ int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **de
 }
 EXPORT_SYMBOL(notify_change);
 
-int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
+__weak int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
         int cap, unsigned int opts)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(cap_capable);
+
+__weak int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(cap_settime);
+
+__weak bool file_ns_capable(const struct file *file, struct user_namespace *ns,
+		     int cap)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(file_ns_capable);
+
+__weak bool capable_wrt_inode_uidgid(const struct inode *inode, int cap)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(capable_wrt_inode_uidgid);
+
+__weak bool has_capability_noaudit(struct task_struct *t, int cap)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(has_capability_noaudit);
+
+const kernel_cap_t __cap_empty_set = CAP_EMPTY_SET;
+EXPORT_SYMBOL(__cap_empty_set);
+
+int file_caps_enabled = 1;
+EXPORT_SYMBOL(file_caps_enabled);
+
+__weak int cap_capget(struct task_struct *target, kernel_cap_t *effective,
+           kernel_cap_t *inheritable, kernel_cap_t *permitted)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(cap_capget);
+
+__weak int cap_capset(struct cred *new,
+           const struct cred *old,
+           const kernel_cap_t *effective,
+           const kernel_cap_t *inheritable,
+           const kernel_cap_t *permitted)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(cap_capset);
+
+__weak int cap_inode_need_killpriv(struct dentry *dentry)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(cap_inode_need_killpriv);
+
+bool mnt_may_suid(struct vfsmount *mnt)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(mnt_may_suid);
+

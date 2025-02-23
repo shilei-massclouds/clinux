@@ -60,11 +60,6 @@ int rtc_set_ntp_time(struct timespec64 now, unsigned long *target_nsec)
     booter_panic("No impl in 'time'.");
 }
 
-int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
-{
-    booter_panic("No impl in 'time'.");
-}
-
 int device_register(struct device *dev)
 {
     booter_panic("No impl in 'time'.");

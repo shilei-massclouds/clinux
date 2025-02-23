@@ -24,10 +24,14 @@
  * Leveraged for setting/resetting capabilities
  */
 
+/*
 const kernel_cap_t __cap_empty_set = CAP_EMPTY_SET;
 EXPORT_SYMBOL(__cap_empty_set);
 
 int file_caps_enabled = 1;
+EXPORT_SYMBOL(file_caps_enabled);
+*/
+
 
 static int __init file_caps_disable(char *str)
 {
@@ -302,6 +306,7 @@ bool has_ns_capability(struct task_struct *t,
 
 	return (ret == 0);
 }
+EXPORT_SYMBOL(has_ns_capability);
 
 /**
  * has_capability - Does a task have a capability in init_user_ns
@@ -360,7 +365,6 @@ bool has_capability_noaudit(struct task_struct *t, int cap)
 {
 	return has_ns_capability_noaudit(t, &init_user_ns, cap);
 }
-EXPORT_SYMBOL(has_capability_noaudit);
 
 static bool ns_capable_common(struct user_namespace *ns,
 			      int cap,
@@ -474,7 +478,6 @@ bool file_ns_capable(const struct file *file, struct user_namespace *ns,
 
 	return false;
 }
-EXPORT_SYMBOL(file_ns_capable);
 
 /**
  * privileged_wrt_inode_uidgid - Do capabilities in the namespace work over the inode?
@@ -505,7 +508,6 @@ bool capable_wrt_inode_uidgid(const struct inode *inode, int cap)
 
 	return ns_capable(ns, cap) && privileged_wrt_inode_uidgid(ns, inode);
 }
-EXPORT_SYMBOL(capable_wrt_inode_uidgid);
 
 /**
  * ptracer_capable - Determine if the ptracer holds CAP_SYS_PTRACE in the namespace
@@ -528,3 +530,4 @@ bool ptracer_capable(struct task_struct *tsk, struct user_namespace *ns)
 	rcu_read_unlock();
 	return (ret == 0);
 }
+EXPORT_SYMBOL(ptracer_capable);

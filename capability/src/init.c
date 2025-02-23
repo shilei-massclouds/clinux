@@ -4,6 +4,7 @@
 #include <linux/export.h>
 #include <linux/capability.h>
 #include <linux/cred.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -15,16 +16,4 @@ cl_capability_init(void)
 }
 EXPORT_SYMBOL(cl_capability_init);
 
-int cap_capget(struct task_struct *target, kernel_cap_t *effective,
-           kernel_cap_t *inheritable, kernel_cap_t *permitted)
-{
-    booter_panic("No impl 'slub'.");
-}
-int cap_capset(struct cred *new,
-           const struct cred *old,
-           const kernel_cap_t *effective,
-           const kernel_cap_t *inheritable,
-           const kernel_cap_t *permitted)
-{
-    booter_panic("No impl 'slub'.");
-}
+DEFINE_ENABLE_FUNC(capability);
