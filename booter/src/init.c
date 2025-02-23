@@ -176,8 +176,10 @@ __weak int sysfs_create_link(struct kobject *kobj, struct kobject *target,
 }
 EXPORT_SYMBOL(sysfs_create_link);
 
+/*
 const struct sysfs_ops kobj_sysfs_ops;
 EXPORT_SYMBOL(kobj_sysfs_ops);
+*/
 
 __weak bool capable(int cap)
 {

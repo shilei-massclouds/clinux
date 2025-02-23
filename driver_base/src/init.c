@@ -150,12 +150,6 @@ int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
 {
     booter_panic("No impl 'driver_base'.");
 }
-struct kset *kset_create_and_add(const char *name,
-                 const struct kset_uevent_ops *uevent_ops,
-                 struct kobject *parent_kobj)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 
 int __weak of_irq_get(struct device_node *dev, int index)
 {
