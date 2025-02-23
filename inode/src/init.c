@@ -64,11 +64,13 @@ void truncate_inode_pages_final(struct address_space *mapping)
 }
 EXPORT_SYMBOL(truncate_inode_pages_final);
 
+/*
 bool capable_wrt_inode_uidgid(const struct inode *inode, int cap)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(capable_wrt_inode_uidgid);
+*/
 
 int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
 {

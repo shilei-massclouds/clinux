@@ -178,7 +178,7 @@ EXPORT_SYMBOL(sysfs_create_link);
 const struct sysfs_ops kobj_sysfs_ops;
 EXPORT_SYMBOL(kobj_sysfs_ops);
 
-bool capable(int cap)
+__weak bool capable(int cap)
 {
     booter_panic("No impl in 'time'.");
 }
@@ -783,12 +783,11 @@ __weak void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
 }
 EXPORT_SYMBOL(__set_task_comm);
 
-bool file_ns_capable(const struct file *file, struct user_namespace *ns,
-             int cap)
+__weak bool ns_capable(struct user_namespace *ns, int cap)
 {
-    booter_panic("No impl!\n");
+    booter_panic("No impl 'ns_capable'.");
 }
-EXPORT_SYMBOL(file_ns_capable);
+EXPORT_SYMBOL(ns_capable);
 
 __weak unsigned int full_name_hash(const void *salt, const char *name, unsigned int len)
 {
@@ -1195,3 +1194,10 @@ int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **de
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(notify_change);
+
+int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
+        int cap, unsigned int opts)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(cap_capable);

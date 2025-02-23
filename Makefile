@@ -45,7 +45,7 @@ components := \
 	kobject driver_base \
 	of of_irq irq_work tty vt earlycon \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
-	early_fdt params module patch maccess \
+	early_fdt params module patch maccess capability \
 	clocksource pid seq_file \
 	cpu task cgroup resource dma up \
 	jump_label extable vdso utsname keys ucount \

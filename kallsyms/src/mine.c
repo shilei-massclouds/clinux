@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(cap_capable)
 CL_MINE(kallsyms_markers)
 CL_MINE(kallsyms_names)
 CL_MINE(kallsyms_num_syms)

@@ -57,12 +57,6 @@ __weak const char *print_tainted(void)
 }
 EXPORT_SYMBOL(print_tainted);
 
-bool ns_capable(struct user_namespace *ns, int cap)
-{
-    booter_panic("No impl 'ns_capable'.");
-}
-EXPORT_SYMBOL(ns_capable);
-
 __weak void __warn_printk(const char *fmt, ...)
 {
     sbi_puts("[RAW_WARN] ");
