@@ -43,8 +43,8 @@ void __init driver_init(void)
     of_core_init();
     //platform_bus_init();
     //cpu_dev_init();
-    //memory_dev_init();
-    //container_dev_init();
+    memory_dev_init();
+    container_dev_init();
     printk("%s: ==========\n", __func__);
 }
 EXPORT_SYMBOL(driver_init);

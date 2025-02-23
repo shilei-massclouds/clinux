@@ -8,5 +8,6 @@ obj_y += map.o
 obj_y += bus.o
 obj_y += class.o
 obj_y += firmware.o
+obj_y += container.o
 
 obj_y += mine.o
