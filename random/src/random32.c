@@ -203,6 +203,7 @@ static int __init prandom_init(void)
 {
 	int i;
 
+    printk("%s: ...\n", __func__);
 	prandom_state_selftest();
 
 	for_each_possible_cpu(i) {

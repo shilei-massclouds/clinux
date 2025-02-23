@@ -1229,6 +1229,7 @@ int cgroup1_get_tree(struct fs_context *fc)
 
 static int __init cgroup1_wq_init(void)
 {
+    printk("%s: ...\n", __func__);
 	/*
 	 * Used to destroy pidlists and separate to serve as flush domain.
 	 * Cap @max_active to 1 too.

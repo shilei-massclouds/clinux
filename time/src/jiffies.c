@@ -80,6 +80,7 @@ EXPORT_SYMBOL(jiffies);
 
 static int __init init_jiffies_clocksource(void)
 {
+    printk("%s: ...\n", __func__);
 	return __clocksource_register(&clocksource_jiffies);
 }
 

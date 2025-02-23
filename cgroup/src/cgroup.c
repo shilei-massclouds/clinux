@@ -5781,6 +5781,7 @@ EXPORT_SYMBOL(cgroup_init);
 
 static int __init cgroup_wq_init(void)
 {
+    printk("%s: ...\n", __func__);
 	/*
 	 * There isn't much point in executing destruction path in
 	 * parallel.  Good chunk is serialized with cgroup_mutex anyway.
@@ -6470,6 +6471,7 @@ void cgroup_sk_alloc(struct sock_cgroup_data *skcd)
 
 	rcu_read_unlock();
 }
+EXPORT_SYMBOL(cgroup_sk_alloc);
 
 void cgroup_sk_clone(struct sock_cgroup_data *skcd)
 {
@@ -6485,6 +6487,7 @@ void cgroup_sk_clone(struct sock_cgroup_data *skcd)
 		cgroup_bpf_get(sock_cgroup_ptr(skcd));
 	}
 }
+EXPORT_SYMBOL(cgroup_sk_clone);
 
 void cgroup_sk_free(struct sock_cgroup_data *skcd)
 {
@@ -6495,6 +6498,7 @@ void cgroup_sk_free(struct sock_cgroup_data *skcd)
 	cgroup_bpf_put(cgrp);
 	cgroup_put(cgrp);
 }
+EXPORT_SYMBOL(cgroup_sk_free);
 
 #endif	/* CONFIG_SOCK_CGROUP_DATA */
 

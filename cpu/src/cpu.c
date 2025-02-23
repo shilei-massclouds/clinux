@@ -1443,6 +1443,7 @@ out:
 
 static int __init alloc_frozen_cpus(void)
 {
+    printk("%s: ...\n", __func__);
 	if (!alloc_cpumask_var(&frozen_cpus, GFP_KERNEL|__GFP_ZERO))
 		return -ENOMEM;
 	return 0;
@@ -1486,6 +1487,7 @@ cpu_hotplug_pm_callback(struct notifier_block *nb,
 
 static int __init cpu_hotplug_pm_sync_init(void)
 {
+    printk("%s: ...\n", __func__);
 	/*
 	 * cpu_hotplug_pm_callback has higher priority than x86
 	 * bsp_pm_callback which depends on cpu_hotplug_pm_callback

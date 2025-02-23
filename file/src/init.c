@@ -15,8 +15,10 @@ cl_file_init(void)
 }
 EXPORT_SYMBOL(cl_file_init);
 
+/*
 void __receive_sock(struct file *file)
 {
     booter_panic("No impl.\n");
 }
+*/
 

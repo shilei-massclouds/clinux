@@ -763,12 +763,6 @@ __weak int is_current_pgrp_orphaned(void)
 }
 EXPORT_SYMBOL(is_current_pgrp_orphaned);
 
-void *kvmalloc_node(size_t size, gfp_t flags, int node)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(kvmalloc_node);
-
 char *d_path(const struct path *path, char *buf, int buflen)
 {
     booter_panic("No impl 'sched'.");
@@ -1649,3 +1643,28 @@ __weak int netlink_has_listeners(struct sock *sk, unsigned int group)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL_GPL(netlink_has_listeners);
+
+__weak void __receive_sock(struct file *file)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(__receive_sock);
+
+void kfree_sensitive(const void *p)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kfree_sensitive);
+
+void kmem_cache_destroy(struct kmem_cache *s)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kmem_cache_destroy);
+
+__weak void *__vmalloc_node(unsigned long size, unsigned long align,
+			    gfp_t gfp_mask, int node, const void *caller)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__vmalloc_node);

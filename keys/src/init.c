@@ -16,11 +16,6 @@ cl_keys_init(void)
 }
 EXPORT_SYMBOL(cl_keys_init);
 
-void kfree_sensitive(const void *p)
-{
-    booter_panic("No impl!\n");
-}
-
 int groups_search(const struct group_info *group_info, kgid_t grp)
 {
     booter_panic("No impl!\n");

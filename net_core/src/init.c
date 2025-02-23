@@ -22,11 +22,6 @@ EXPORT_SYMBOL(cl_net_core_init);
 
 DEFINE_ENABLE_FUNC(net_core);
 
-DEFINE_STATIC_KEY_FALSE(memalloc_socks_key);
-EXPORT_SYMBOL_GPL(memalloc_socks_key);
-
-int sysctl_tstamp_allow_data __read_mostly = 1;
-
 struct pipe_buf_operations;
 const struct pipe_buf_operations nosteal_pipe_buf_ops;
 const struct nla_policy nda_policy[1];
@@ -36,3 +31,9 @@ struct pernet_operations __net_initdata loopback_net_ops;
 
 atomic_t genl_sk_destructing_cnt = ATOMIC_INIT(0);
 DECLARE_WAIT_QUEUE_HEAD(genl_sk_destructing_waitq);
+
+struct net_protocol __rcu *inet_protos[1] __read_mostly;
+EXPORT_SYMBOL(inet_protos);
+
+unsigned int sysctl_net_busy_read __read_mostly;
+

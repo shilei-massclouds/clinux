@@ -242,6 +242,7 @@ void rcu_test_sync_prims(void)
  */
 static int __init rcu_set_runtime_mode(void)
 {
+    printk("%s: ...\n", __func__);
 	rcu_test_sync_prims();
 	rcu_scheduler_active = RCU_SCHEDULER_RUNNING;
 	kfree_rcu_scheduler_running();

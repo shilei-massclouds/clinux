@@ -385,6 +385,7 @@ static struct pernet_operations net_defaults_ops = {
 
 static __init int net_defaults_init(void)
 {
+    printk("%s: ...\n", __func__);
 	if (register_pernet_subsys(&net_defaults_ops))
 		panic("Cannot initialize net default settings");
 
@@ -1086,6 +1087,7 @@ static int __init net_ns_init(void)
 {
 	struct net_generic *ng;
 
+    printk("%s: ...\n", __func__);
 #ifdef CONFIG_NET_NS
 	net_cachep = kmem_cache_create("net_namespace", sizeof(struct net),
 					SMP_CACHE_BYTES,

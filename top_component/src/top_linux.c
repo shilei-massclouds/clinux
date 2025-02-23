@@ -650,14 +650,15 @@ int __init_or_module do_one_initcall(initcall_t fn)
     int count = preempt_count();
     char msgbuf[64];
     int ret;
-    printk("%s: ================ step1\n", __func__);
 
     if (initcall_blacklisted(fn))
         return -EPERM;
 
+    printk("=================\n");
     do_trace_initcall_start(fn);
     ret = fn();
     do_trace_initcall_finish(fn, ret);
+    printk("=================\n");
 
     msgbuf[0] = 0;
 
@@ -672,7 +673,6 @@ int __init_or_module do_one_initcall(initcall_t fn)
     WARN(msgbuf[0], "initcall %pS returned with %s\n", fn, msgbuf);
 
     add_latent_entropy();
-    printk("%s: ================ stepn\n", __func__);
     return ret;
 }
 
@@ -850,6 +850,7 @@ static void __init do_initcall_level(int level, char *command_line)
 {
     initcall_entry_t *fn;
 
+    printk("%s: %s\n", __func__, initcall_level_names[level]);
     parse_args(initcall_level_names[level],
            command_line, __start___param,
            __stop___param - __start___param,

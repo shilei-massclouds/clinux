@@ -888,6 +888,7 @@ int software_node_notify(struct device *dev, unsigned long action)
 
 static int __init software_node_init(void)
 {
+    printk("%s: ...\n", __func__);
 	swnode_kset = kset_create_and_add("software_nodes", NULL, kernel_kobj);
 	if (!swnode_kset)
 		return -ENOMEM;

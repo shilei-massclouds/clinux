@@ -40,7 +40,7 @@ QEMU_ARGS += \
 components := \
 	prebuilt booter lib math flex_proportions \
 	radix_tree idr xarray assoc_array list_lru klist \
-	kasprintf random crypto uuid \
+	kasprintf random crypto uuid rhashtable \
 	traps irq softirq \
 	kobject driver_base \
 	of of_irq irq_work tty vt earlycon \

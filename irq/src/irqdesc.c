@@ -312,6 +312,7 @@ static int __init irq_sysfs_init(void)
 	struct irq_desc *desc;
 	int irq;
 
+    printk("%s: ...\n", __func__);
 	/* Prevent concurrent irq alloc/free */
 	irq_lock_sparse();
 

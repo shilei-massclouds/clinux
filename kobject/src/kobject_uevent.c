@@ -807,7 +807,9 @@ static struct pernet_operations uevent_net_ops = {
 
 static int __init kobject_uevent_init(void)
 {
-	return register_pernet_subsys(&uevent_net_ops);
+    printk("%s: ==============> Disable this postcore_initcall temporarily.\n", __func__);
+    return 0;
+	//return register_pernet_subsys(&uevent_net_ops);
 }
 
 

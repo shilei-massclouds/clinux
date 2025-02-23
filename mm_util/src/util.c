@@ -525,66 +525,66 @@ EXPORT_SYMBOL(kmemdup_nul);
 //	return vm_mmap_pgoff(file, addr, len, prot, flag, offset >> PAGE_SHIFT);
 //}
 //EXPORT_SYMBOL(vm_mmap);
-//
-///**
-// * kvmalloc_node - attempt to allocate physically contiguous memory, but upon
-// * failure, fall back to non-contiguous (vmalloc) allocation.
-// * @size: size of the request.
-// * @flags: gfp mask for the allocation - must be compatible (superset) with GFP_KERNEL.
-// * @node: numa node to allocate from
-// *
-// * Uses kmalloc to get the memory but if the allocation fails then falls back
-// * to the vmalloc allocator. Use kvfree for freeing the memory.
-// *
-// * Reclaim modifiers - __GFP_NORETRY and __GFP_NOFAIL are not supported.
-// * __GFP_RETRY_MAYFAIL is supported, and it should be used only if kmalloc is
-// * preferable to the vmalloc fallback, due to visible performance drawbacks.
-// *
-// * Please note that any use of gfp flags outside of GFP_KERNEL is careful to not
-// * fall back to vmalloc.
-// *
-// * Return: pointer to the allocated memory of %NULL in case of failure
-// */
-//void *kvmalloc_node(size_t size, gfp_t flags, int node)
-//{
-//	gfp_t kmalloc_flags = flags;
-//	void *ret;
-//
-//	/*
-//	 * vmalloc uses GFP_KERNEL for some internal allocations (e.g page tables)
-//	 * so the given set of flags has to be compatible.
-//	 */
-//	if ((flags & GFP_KERNEL) != GFP_KERNEL)
-//		return kmalloc_node(size, flags, node);
-//
-//	/*
-//	 * We want to attempt a large physically contiguous block first because
-//	 * it is less likely to fragment multiple larger blocks and therefore
-//	 * contribute to a long term fragmentation less than vmalloc fallback.
-//	 * However make sure that larger requests are not too disruptive - no
-//	 * OOM killer and no allocation failure warnings as we have a fallback.
-//	 */
-//	if (size > PAGE_SIZE) {
-//		kmalloc_flags |= __GFP_NOWARN;
-//
-//		if (!(kmalloc_flags & __GFP_RETRY_MAYFAIL))
-//			kmalloc_flags |= __GFP_NORETRY;
-//	}
-//
-//	ret = kmalloc_node(size, kmalloc_flags, node);
-//
-//	/*
-//	 * It doesn't really make sense to fallback to vmalloc for sub page
-//	 * requests
-//	 */
-//	if (ret || size <= PAGE_SIZE)
-//		return ret;
-//
-//	return __vmalloc_node(size, 1, flags, node,
-//			__builtin_return_address(0));
-//}
-//EXPORT_SYMBOL(kvmalloc_node);
-//
+
+/**
+ * kvmalloc_node - attempt to allocate physically contiguous memory, but upon
+ * failure, fall back to non-contiguous (vmalloc) allocation.
+ * @size: size of the request.
+ * @flags: gfp mask for the allocation - must be compatible (superset) with GFP_KERNEL.
+ * @node: numa node to allocate from
+ *
+ * Uses kmalloc to get the memory but if the allocation fails then falls back
+ * to the vmalloc allocator. Use kvfree for freeing the memory.
+ *
+ * Reclaim modifiers - __GFP_NORETRY and __GFP_NOFAIL are not supported.
+ * __GFP_RETRY_MAYFAIL is supported, and it should be used only if kmalloc is
+ * preferable to the vmalloc fallback, due to visible performance drawbacks.
+ *
+ * Please note that any use of gfp flags outside of GFP_KERNEL is careful to not
+ * fall back to vmalloc.
+ *
+ * Return: pointer to the allocated memory of %NULL in case of failure
+ */
+void *kvmalloc_node(size_t size, gfp_t flags, int node)
+{
+	gfp_t kmalloc_flags = flags;
+	void *ret;
+
+	/*
+	 * vmalloc uses GFP_KERNEL for some internal allocations (e.g page tables)
+	 * so the given set of flags has to be compatible.
+	 */
+	if ((flags & GFP_KERNEL) != GFP_KERNEL)
+		return kmalloc_node(size, flags, node);
+
+	/*
+	 * We want to attempt a large physically contiguous block first because
+	 * it is less likely to fragment multiple larger blocks and therefore
+	 * contribute to a long term fragmentation less than vmalloc fallback.
+	 * However make sure that larger requests are not too disruptive - no
+	 * OOM killer and no allocation failure warnings as we have a fallback.
+	 */
+	if (size > PAGE_SIZE) {
+		kmalloc_flags |= __GFP_NOWARN;
+
+		if (!(kmalloc_flags & __GFP_RETRY_MAYFAIL))
+			kmalloc_flags |= __GFP_NORETRY;
+	}
+
+	ret = kmalloc_node(size, kmalloc_flags, node);
+
+	/*
+	 * It doesn't really make sense to fallback to vmalloc for sub page
+	 * requests
+	 */
+	if (ret || size <= PAGE_SIZE)
+		return ret;
+
+	return __vmalloc_node(size, 1, flags, node,
+			__builtin_return_address(0));
+}
+EXPORT_SYMBOL(kvmalloc_node);
+
 ///**
 // * kvfree() - Free memory.
 // * @addr: Pointer to allocated memory.
