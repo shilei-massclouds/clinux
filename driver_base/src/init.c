@@ -72,12 +72,6 @@ int lock_device_hotplug_sysfs(void)
     booter_panic("No impl 'driver_base'.");
 }
 
-void device_remove_file(struct device *dev,
-            const struct device_attribute *attr)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-
 bool of_dma_is_coherent(struct device_node *np)
 {
     booter_panic("No impl 'driver_base'.");

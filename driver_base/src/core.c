@@ -910,142 +910,142 @@ int device_links_check_suppliers(struct device *dev)
 	return ret;
 }
 
-///**
-// * __device_links_queue_sync_state - Queue a device for sync_state() callback
-// * @dev: Device to call sync_state() on
-// * @list: List head to queue the @dev on
-// *
-// * Queues a device for a sync_state() callback when the device links write lock
-// * isn't held. This allows the sync_state() execution flow to use device links
-// * APIs.  The caller must ensure this function is called with
-// * device_links_write_lock() held.
-// *
-// * This function does a get_device() to make sure the device is not freed while
-// * on this list.
-// *
-// * So the caller must also ensure that device_links_flush_sync_list() is called
-// * as soon as the caller releases device_links_write_lock().  This is necessary
-// * to make sure the sync_state() is called in a timely fashion and the
-// * put_device() is called on this device.
-// */
-//static void __device_links_queue_sync_state(struct device *dev,
-//					    struct list_head *list)
-//{
-//	struct device_link *link;
-//
-//	if (!dev_has_sync_state(dev))
-//		return;
-//	if (dev->state_synced)
-//		return;
-//
-//	list_for_each_entry(link, &dev->links.consumers, s_node) {
-//		if (!(link->flags & DL_FLAG_MANAGED))
-//			continue;
-//		if (link->status != DL_STATE_ACTIVE)
-//			return;
-//	}
-//
-//	/*
-//	 * Set the flag here to avoid adding the same device to a list more
-//	 * than once. This can happen if new consumers get added to the device
-//	 * and probed before the list is flushed.
-//	 */
-//	dev->state_synced = true;
-//
-//	if (WARN_ON(!list_empty(&dev->links.defer_hook)))
-//		return;
-//
-//	get_device(dev);
-//	list_add_tail(&dev->links.defer_hook, list);
-//}
-//
-///**
-// * device_links_flush_sync_list - Call sync_state() on a list of devices
-// * @list: List of devices to call sync_state() on
-// * @dont_lock_dev: Device for which lock is already held by the caller
-// *
-// * Calls sync_state() on all the devices that have been queued for it. This
-// * function is used in conjunction with __device_links_queue_sync_state(). The
-// * @dont_lock_dev parameter is useful when this function is called from a
-// * context where a device lock is already held.
-// */
-//static void device_links_flush_sync_list(struct list_head *list,
-//					 struct device *dont_lock_dev)
-//{
-//	struct device *dev, *tmp;
-//
-//	list_for_each_entry_safe(dev, tmp, list, links.defer_hook) {
-//		list_del_init(&dev->links.defer_hook);
-//
-//		if (dev != dont_lock_dev)
-//			device_lock(dev);
-//
-//		if (dev->bus->sync_state)
-//			dev->bus->sync_state(dev);
-//		else if (dev->driver && dev->driver->sync_state)
-//			dev->driver->sync_state(dev);
-//
-//		if (dev != dont_lock_dev)
-//			device_unlock(dev);
-//
-//		put_device(dev);
-//	}
-//}
-//
-//void device_links_supplier_sync_state_pause(void)
-//{
-//	device_links_write_lock();
-//	defer_sync_state_count++;
-//	device_links_write_unlock();
-//}
-//
-//void device_links_supplier_sync_state_resume(void)
-//{
-//	struct device *dev, *tmp;
-//	LIST_HEAD(sync_list);
-//
-//	device_links_write_lock();
-//	if (!defer_sync_state_count) {
-//		WARN(true, "Unmatched sync_state pause/resume!");
-//		goto out;
-//	}
-//	defer_sync_state_count--;
-//	if (defer_sync_state_count)
-//		goto out;
-//
-//	list_for_each_entry_safe(dev, tmp, &deferred_sync, links.defer_hook) {
-//		/*
-//		 * Delete from deferred_sync list before queuing it to
-//		 * sync_list because defer_hook is used for both lists.
-//		 */
-//		list_del_init(&dev->links.defer_hook);
-//		__device_links_queue_sync_state(dev, &sync_list);
-//	}
-//out:
-//	device_links_write_unlock();
-//
-//	device_links_flush_sync_list(&sync_list, NULL);
-//}
-//
-//static int sync_state_resume_initcall(void)
-//{
-//	device_links_supplier_sync_state_resume();
-//	return 0;
-//}
-//late_initcall(sync_state_resume_initcall);
-//
-//static void __device_links_supplier_defer_sync(struct device *sup)
-//{
-//	if (list_empty(&sup->links.defer_hook) && dev_has_sync_state(sup))
-//		list_add_tail(&sup->links.defer_hook, &deferred_sync);
-//}
-//
-//static void device_link_drop_managed(struct device_link *link)
-//{
-//	link->flags &= ~DL_FLAG_MANAGED;
-//	WRITE_ONCE(link->status, DL_STATE_NONE);
-//	kref_put(&link->kref, __device_link_del);
-//}
+/**
+ * __device_links_queue_sync_state - Queue a device for sync_state() callback
+ * @dev: Device to call sync_state() on
+ * @list: List head to queue the @dev on
+ *
+ * Queues a device for a sync_state() callback when the device links write lock
+ * isn't held. This allows the sync_state() execution flow to use device links
+ * APIs.  The caller must ensure this function is called with
+ * device_links_write_lock() held.
+ *
+ * This function does a get_device() to make sure the device is not freed while
+ * on this list.
+ *
+ * So the caller must also ensure that device_links_flush_sync_list() is called
+ * as soon as the caller releases device_links_write_lock().  This is necessary
+ * to make sure the sync_state() is called in a timely fashion and the
+ * put_device() is called on this device.
+ */
+static void __device_links_queue_sync_state(struct device *dev,
+					    struct list_head *list)
+{
+	struct device_link *link;
+
+	if (!dev_has_sync_state(dev))
+		return;
+	if (dev->state_synced)
+		return;
+
+	list_for_each_entry(link, &dev->links.consumers, s_node) {
+		if (!(link->flags & DL_FLAG_MANAGED))
+			continue;
+		if (link->status != DL_STATE_ACTIVE)
+			return;
+	}
+
+	/*
+	 * Set the flag here to avoid adding the same device to a list more
+	 * than once. This can happen if new consumers get added to the device
+	 * and probed before the list is flushed.
+	 */
+	dev->state_synced = true;
+
+	if (WARN_ON(!list_empty(&dev->links.defer_hook)))
+		return;
+
+	get_device(dev);
+	list_add_tail(&dev->links.defer_hook, list);
+}
+
+/**
+ * device_links_flush_sync_list - Call sync_state() on a list of devices
+ * @list: List of devices to call sync_state() on
+ * @dont_lock_dev: Device for which lock is already held by the caller
+ *
+ * Calls sync_state() on all the devices that have been queued for it. This
+ * function is used in conjunction with __device_links_queue_sync_state(). The
+ * @dont_lock_dev parameter is useful when this function is called from a
+ * context where a device lock is already held.
+ */
+static void device_links_flush_sync_list(struct list_head *list,
+					 struct device *dont_lock_dev)
+{
+	struct device *dev, *tmp;
+
+	list_for_each_entry_safe(dev, tmp, list, links.defer_hook) {
+		list_del_init(&dev->links.defer_hook);
+
+		if (dev != dont_lock_dev)
+			device_lock(dev);
+
+		if (dev->bus->sync_state)
+			dev->bus->sync_state(dev);
+		else if (dev->driver && dev->driver->sync_state)
+			dev->driver->sync_state(dev);
+
+		if (dev != dont_lock_dev)
+			device_unlock(dev);
+
+		put_device(dev);
+	}
+}
+
+void device_links_supplier_sync_state_pause(void)
+{
+	device_links_write_lock();
+	defer_sync_state_count++;
+	device_links_write_unlock();
+}
+
+void device_links_supplier_sync_state_resume(void)
+{
+	struct device *dev, *tmp;
+	LIST_HEAD(sync_list);
+
+	device_links_write_lock();
+	if (!defer_sync_state_count) {
+		WARN(true, "Unmatched sync_state pause/resume!");
+		goto out;
+	}
+	defer_sync_state_count--;
+	if (defer_sync_state_count)
+		goto out;
+
+	list_for_each_entry_safe(dev, tmp, &deferred_sync, links.defer_hook) {
+		/*
+		 * Delete from deferred_sync list before queuing it to
+		 * sync_list because defer_hook is used for both lists.
+		 */
+		list_del_init(&dev->links.defer_hook);
+		__device_links_queue_sync_state(dev, &sync_list);
+	}
+out:
+	device_links_write_unlock();
+
+	device_links_flush_sync_list(&sync_list, NULL);
+}
+
+static int sync_state_resume_initcall(void)
+{
+	device_links_supplier_sync_state_resume();
+	return 0;
+}
+late_initcall(sync_state_resume_initcall);
+
+static void __device_links_supplier_defer_sync(struct device *sup)
+{
+	if (list_empty(&sup->links.defer_hook) && dev_has_sync_state(sup))
+		list_add_tail(&sup->links.defer_hook, &deferred_sync);
+}
+
+static void device_link_drop_managed(struct device_link *link)
+{
+	link->flags &= ~DL_FLAG_MANAGED;
+	WRITE_ONCE(link->status, DL_STATE_NONE);
+	kref_put(&link->kref, __device_link_del);
+}
 
 static ssize_t waiting_for_supplier_show(struct device *dev,
 					 struct device_attribute *attr,
@@ -1063,98 +1063,98 @@ static ssize_t waiting_for_supplier_show(struct device *dev,
 }
 static DEVICE_ATTR_RO(waiting_for_supplier);
 
-///**
-// * device_links_driver_bound - Update device links after probing its driver.
-// * @dev: Device to update the links for.
-// *
-// * The probe has been successful, so update links from this device to any
-// * consumers by changing their status to "available".
-// *
-// * Also change the status of @dev's links to suppliers to "active".
-// *
-// * Links without the DL_FLAG_MANAGED flag set are ignored.
-// */
-//void device_links_driver_bound(struct device *dev)
-//{
-//	struct device_link *link, *ln;
-//	LIST_HEAD(sync_list);
-//
-//	/*
-//	 * If a device probes successfully, it's expected to have created all
-//	 * the device links it needs to or make new device links as it needs
-//	 * them. So, it no longer needs to wait on any suppliers.
-//	 */
-//	mutex_lock(&wfs_lock);
-//	list_del_init(&dev->links.needs_suppliers);
-//	mutex_unlock(&wfs_lock);
-//	device_remove_file(dev, &dev_attr_waiting_for_supplier);
-//
-//	device_links_write_lock();
-//
-//	list_for_each_entry(link, &dev->links.consumers, s_node) {
-//		if (!(link->flags & DL_FLAG_MANAGED))
-//			continue;
-//
-//		/*
-//		 * Links created during consumer probe may be in the "consumer
-//		 * probe" state to start with if the supplier is still probing
-//		 * when they are created and they may become "active" if the
-//		 * consumer probe returns first.  Skip them here.
-//		 */
-//		if (link->status == DL_STATE_CONSUMER_PROBE ||
-//		    link->status == DL_STATE_ACTIVE)
-//			continue;
-//
-//		WARN_ON(link->status != DL_STATE_DORMANT);
-//		WRITE_ONCE(link->status, DL_STATE_AVAILABLE);
-//
-//		if (link->flags & DL_FLAG_AUTOPROBE_CONSUMER)
-//			driver_deferred_probe_add(link->consumer);
-//	}
-//
-//	if (defer_sync_state_count)
-//		__device_links_supplier_defer_sync(dev);
-//	else
-//		__device_links_queue_sync_state(dev, &sync_list);
-//
-//	list_for_each_entry_safe(link, ln, &dev->links.suppliers, c_node) {
-//		struct device *supplier;
-//
-//		if (!(link->flags & DL_FLAG_MANAGED))
-//			continue;
-//
-//		supplier = link->supplier;
-//		if (link->flags & DL_FLAG_SYNC_STATE_ONLY) {
-//			/*
-//			 * When DL_FLAG_SYNC_STATE_ONLY is set, it means no
-//			 * other DL_MANAGED_LINK_FLAGS have been set. So, it's
-//			 * save to drop the managed link completely.
-//			 */
-//			device_link_drop_managed(link);
-//		} else {
-//			WARN_ON(link->status != DL_STATE_CONSUMER_PROBE);
-//			WRITE_ONCE(link->status, DL_STATE_ACTIVE);
-//		}
-//
-//		/*
-//		 * This needs to be done even for the deleted
-//		 * DL_FLAG_SYNC_STATE_ONLY device link in case it was the last
-//		 * device link that was preventing the supplier from getting a
-//		 * sync_state() call.
-//		 */
-//		if (defer_sync_state_count)
-//			__device_links_supplier_defer_sync(supplier);
-//		else
-//			__device_links_queue_sync_state(supplier, &sync_list);
-//	}
-//
-//	dev->links.status = DL_DEV_DRIVER_BOUND;
-//
-//	device_links_write_unlock();
-//
-//	device_links_flush_sync_list(&sync_list, dev);
-//}
-//
+/**
+ * device_links_driver_bound - Update device links after probing its driver.
+ * @dev: Device to update the links for.
+ *
+ * The probe has been successful, so update links from this device to any
+ * consumers by changing their status to "available".
+ *
+ * Also change the status of @dev's links to suppliers to "active".
+ *
+ * Links without the DL_FLAG_MANAGED flag set are ignored.
+ */
+void device_links_driver_bound(struct device *dev)
+{
+	struct device_link *link, *ln;
+	LIST_HEAD(sync_list);
+
+	/*
+	 * If a device probes successfully, it's expected to have created all
+	 * the device links it needs to or make new device links as it needs
+	 * them. So, it no longer needs to wait on any suppliers.
+	 */
+	mutex_lock(&wfs_lock);
+	list_del_init(&dev->links.needs_suppliers);
+	mutex_unlock(&wfs_lock);
+	device_remove_file(dev, &dev_attr_waiting_for_supplier);
+
+	device_links_write_lock();
+
+	list_for_each_entry(link, &dev->links.consumers, s_node) {
+		if (!(link->flags & DL_FLAG_MANAGED))
+			continue;
+
+		/*
+		 * Links created during consumer probe may be in the "consumer
+		 * probe" state to start with if the supplier is still probing
+		 * when they are created and they may become "active" if the
+		 * consumer probe returns first.  Skip them here.
+		 */
+		if (link->status == DL_STATE_CONSUMER_PROBE ||
+		    link->status == DL_STATE_ACTIVE)
+			continue;
+
+		WARN_ON(link->status != DL_STATE_DORMANT);
+		WRITE_ONCE(link->status, DL_STATE_AVAILABLE);
+
+		if (link->flags & DL_FLAG_AUTOPROBE_CONSUMER)
+			driver_deferred_probe_add(link->consumer);
+	}
+
+	if (defer_sync_state_count)
+		__device_links_supplier_defer_sync(dev);
+	else
+		__device_links_queue_sync_state(dev, &sync_list);
+
+	list_for_each_entry_safe(link, ln, &dev->links.suppliers, c_node) {
+		struct device *supplier;
+
+		if (!(link->flags & DL_FLAG_MANAGED))
+			continue;
+
+		supplier = link->supplier;
+		if (link->flags & DL_FLAG_SYNC_STATE_ONLY) {
+			/*
+			 * When DL_FLAG_SYNC_STATE_ONLY is set, it means no
+			 * other DL_MANAGED_LINK_FLAGS have been set. So, it's
+			 * save to drop the managed link completely.
+			 */
+			device_link_drop_managed(link);
+		} else {
+			WARN_ON(link->status != DL_STATE_CONSUMER_PROBE);
+			WRITE_ONCE(link->status, DL_STATE_ACTIVE);
+		}
+
+		/*
+		 * This needs to be done even for the deleted
+		 * DL_FLAG_SYNC_STATE_ONLY device link in case it was the last
+		 * device link that was preventing the supplier from getting a
+		 * sync_state() call.
+		 */
+		if (defer_sync_state_count)
+			__device_links_supplier_defer_sync(supplier);
+		else
+			__device_links_queue_sync_state(supplier, &sync_list);
+	}
+
+	dev->links.status = DL_DEV_DRIVER_BOUND;
+
+	device_links_write_unlock();
+
+	device_links_flush_sync_list(&sync_list, dev);
+}
+
 ///**
 // * __device_links_no_driver - Update links of a device without a driver.
 // * @dev: Device without a drvier.
@@ -2305,19 +2305,19 @@ int device_create_file(struct device *dev,
 	return error;
 }
 
-///**
-// * device_remove_file - remove sysfs attribute file.
-// * @dev: device.
-// * @attr: device attribute descriptor.
-// */
-//void device_remove_file(struct device *dev,
-//			const struct device_attribute *attr)
-//{
-//	if (dev)
-//		sysfs_remove_file(&dev->kobj, &attr->attr);
-//}
-//EXPORT_SYMBOL_GPL(device_remove_file);
-//
+/**
+ * device_remove_file - remove sysfs attribute file.
+ * @dev: device.
+ * @attr: device attribute descriptor.
+ */
+void device_remove_file(struct device *dev,
+			const struct device_attribute *attr)
+{
+	if (dev)
+		sysfs_remove_file(&dev->kobj, &attr->attr);
+}
+EXPORT_SYMBOL_GPL(device_remove_file);
+
 ///**
 // * device_remove_file_self - remove sysfs attribute file from its own method.
 // * @dev: device.
