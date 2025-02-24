@@ -15,6 +15,3 @@ cl_exec_init(void)
 EXPORT_SYMBOL(cl_exec_init);
 
 DEFINE_ENABLE_FUNC(exec);
-
-/* amount of vm to protect from userspace access by both DAC and the LSM*/
-unsigned long mmap_min_addr;

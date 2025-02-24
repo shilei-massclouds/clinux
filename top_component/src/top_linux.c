@@ -989,6 +989,8 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(net_core);
     REQUIRE_COMPONENT(ksysfs);
     REQUIRE_COMPONENT(debugfs);
+    REQUIRE_COMPONENT(riscv_fault);
+    REQUIRE_COMPONENT(mmap);
 
     //
     // start_kernel (init/main.c)

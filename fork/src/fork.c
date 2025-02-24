@@ -343,7 +343,6 @@ struct vm_area_struct *vm_area_alloc(struct mm_struct *mm)
 		vma_init(vma, mm);
 	return vma;
 }
-EXPORT_SYMBOL(vm_area_alloc);
 
 struct vm_area_struct *vm_area_dup(struct vm_area_struct *orig)
 {
@@ -367,7 +366,6 @@ void vm_area_free(struct vm_area_struct *vma)
 {
 	kmem_cache_free(vm_area_cachep, vma);
 }
-EXPORT_SYMBOL(vm_area_free);
 
 static void account_kernel_stack(struct task_struct *tsk, int account)
 {

@@ -18,17 +18,7 @@ cl_traps_init(void)
 }
 EXPORT_SYMBOL(cl_traps_init);
 
-asmlinkage void do_page_fault(struct pt_regs *regs)
-{
-    booter_panic("No impl!\n");
-}
-
 __visible int do_syscall_trace_enter(struct pt_regs *regs)
-{
-    booter_panic("No impl!\n");
-}
-
-int fixup_exception(struct pt_regs *regs)
 {
     booter_panic("No impl!\n");
 }

@@ -1738,3 +1738,61 @@ u32 fsnotify_get_cookie(void)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(fsnotify_get_cookie);
+
+__weak int expand_stack(struct vm_area_struct *vma, unsigned long address)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(expand_stack);
+
+__weak void __init mmap_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(mmap_init);
+
+int fixup_exception(struct pt_regs *regs)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fixup_exception);
+
+__weak void do_trap(struct pt_regs *regs, int signo, int code, unsigned long addr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(do_trap);
+
+__weak asmlinkage void do_page_fault(struct pt_regs *regs)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(do_page_fault);
+
+__weak void vm_stat_account(struct mm_struct *mm, vm_flags_t flags, long npages)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(vm_stat_account);
+
+int locks_mandatory_locked(struct file *file)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(locks_mandatory_locked);
+
+__weak struct vm_area_struct *vm_area_alloc(struct mm_struct *mm)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(vm_area_alloc);
+
+__weak void vm_area_free(struct vm_area_struct *vma)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(vm_area_free);
+
+/* amount of vm to protect from userspace access by both DAC and the LSM*/
+unsigned long mmap_min_addr;
+EXPORT_SYMBOL(mmap_min_addr);

@@ -55,6 +55,7 @@ void die(struct pt_regs *regs, const char *str)
 	if (ret != NOTIFY_STOP)
 		do_exit(SIGSEGV);
 }
+EXPORT_SYMBOL(die);
 
 void do_trap(struct pt_regs *regs, int signo, int code, unsigned long addr)
 {
