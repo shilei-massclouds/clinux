@@ -40,7 +40,7 @@ QEMU_ARGS += \
 components := \
 	prebuilt booter lib math flex_proportions \
 	radix_tree idr xarray assoc_array list_lru klist \
-	kasprintf random crypto uuid rhashtable \
+	kasprintf random crypto uuid rhashtable iov_iter checksum \
 	traps irq softirq \
 	kobject driver_base \
 	of of_irq irq_work tty vt earlycon \
@@ -59,7 +59,7 @@ components := \
 	cred user_namespace nsproxy fs_namespace pid_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
 	fs_context fs_parser fs_struct namei libfs debugfs \
-	ipc_namespace \
+	ipc_namespace drv_char \
 	net_core platform \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap riscv_fault \

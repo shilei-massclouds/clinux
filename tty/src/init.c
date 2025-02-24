@@ -30,19 +30,14 @@ int __sched ldsem_down_write(struct ld_semaphore *sem, long timeout)
 }
 
 /*
-int iterate_fd(struct files_struct *files, unsigned n,
-        int (*f)(const void *, struct file *, unsigned),
-        const void *p)
-{
-    booter_panic("No impl.\n");
-}
-*/
-
 struct device *device_create(struct class *class, struct device *parent,
                  dev_t devt, void *drvdata, const char *fmt, ...)
 {
     booter_panic("No impl.\n");
 }
+EXPORT_SYMBOL(device_create);
+*/
+
 struct tty_driver *console_device(int *index)
 {
     booter_panic("No impl.\n");

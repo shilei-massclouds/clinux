@@ -3513,4 +3513,5 @@ int __init tty_init(void)
 #endif
 	return 0;
 }
+EXPORT_SYMBOL(tty_init);
 

@@ -1995,6 +1995,7 @@ const struct file_operations random_fops = {
 	.fasync = random_fasync,
 	.llseek = noop_llseek,
 };
+EXPORT_SYMBOL(random_fops);
 
 const struct file_operations urandom_fops = {
 	.read  = urandom_read,
@@ -2004,6 +2005,7 @@ const struct file_operations urandom_fops = {
 	.fasync = random_fasync,
 	.llseek = noop_llseek,
 };
+EXPORT_SYMBOL(urandom_fops);
 
 SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
 		unsigned int, flags)

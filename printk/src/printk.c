@@ -85,123 +85,123 @@ static DEFINE_SEMAPHORE(console_sem);
  */
 //int __read_mostly suppress_printk;
 
-//#ifdef CONFIG_LOCKDEP
-//static struct lockdep_map console_lock_dep_map = {
-//	.name = "console_lock"
-//};
-//#endif
-//
-//enum devkmsg_log_bits {
-//	__DEVKMSG_LOG_BIT_ON = 0,
-//	__DEVKMSG_LOG_BIT_OFF,
-//	__DEVKMSG_LOG_BIT_LOCK,
-//};
-//
-//enum devkmsg_log_masks {
-//	DEVKMSG_LOG_MASK_ON             = BIT(__DEVKMSG_LOG_BIT_ON),
-//	DEVKMSG_LOG_MASK_OFF            = BIT(__DEVKMSG_LOG_BIT_OFF),
-//	DEVKMSG_LOG_MASK_LOCK           = BIT(__DEVKMSG_LOG_BIT_LOCK),
-//};
-//
-///* Keep both the 'on' and 'off' bits clear, i.e. ratelimit by default: */
-//#define DEVKMSG_LOG_MASK_DEFAULT	0
-//
-//static unsigned int __read_mostly devkmsg_log = DEVKMSG_LOG_MASK_DEFAULT;
-//
-//static int __control_devkmsg(char *str)
-//{
-//	size_t len;
-//
-//	if (!str)
-//		return -EINVAL;
-//
-//	len = str_has_prefix(str, "on");
-//	if (len) {
-//		devkmsg_log = DEVKMSG_LOG_MASK_ON;
-//		return len;
-//	}
-//
-//	len = str_has_prefix(str, "off");
-//	if (len) {
-//		devkmsg_log = DEVKMSG_LOG_MASK_OFF;
-//		return len;
-//	}
-//
-//	len = str_has_prefix(str, "ratelimit");
-//	if (len) {
-//		devkmsg_log = DEVKMSG_LOG_MASK_DEFAULT;
-//		return len;
-//	}
-//
-//	return -EINVAL;
-//}
-//
-//static int __init control_devkmsg(char *str)
-//{
-//	if (__control_devkmsg(str) < 0)
-//		return 1;
-//
-//	/*
-//	 * Set sysctl string accordingly:
-//	 */
-//	if (devkmsg_log == DEVKMSG_LOG_MASK_ON)
-//		strcpy(devkmsg_log_str, "on");
-//	else if (devkmsg_log == DEVKMSG_LOG_MASK_OFF)
-//		strcpy(devkmsg_log_str, "off");
-//	/* else "ratelimit" which is set by default. */
-//
-//	/*
-//	 * Sysctl cannot change it anymore. The kernel command line setting of
-//	 * this parameter is to force the setting to be permanent throughout the
-//	 * runtime of the system. This is a precation measure against userspace
-//	 * trying to be a smarta** and attempting to change it up on us.
-//	 */
-//	devkmsg_log |= DEVKMSG_LOG_MASK_LOCK;
-//
-//	return 0;
-//}
-//__setup("printk.devkmsg=", control_devkmsg);
-//
-//char devkmsg_log_str[DEVKMSG_STR_MAX_SIZE] = "ratelimit";
-//
-//int devkmsg_sysctl_set_loglvl(struct ctl_table *table, int write,
-//			      void *buffer, size_t *lenp, loff_t *ppos)
-//{
-//	char old_str[DEVKMSG_STR_MAX_SIZE];
-//	unsigned int old;
-//	int err;
-//
-//	if (write) {
-//		if (devkmsg_log & DEVKMSG_LOG_MASK_LOCK)
-//			return -EINVAL;
-//
-//		old = devkmsg_log;
-//		strncpy(old_str, devkmsg_log_str, DEVKMSG_STR_MAX_SIZE);
-//	}
-//
-//	err = proc_dostring(table, write, buffer, lenp, ppos);
-//	if (err)
-//		return err;
-//
-//	if (write) {
-//		err = __control_devkmsg(devkmsg_log_str);
-//
-//		/*
-//		 * Do not accept an unknown string OR a known string with
-//		 * trailing crap...
-//		 */
-//		if (err < 0 || (err + 1 != *lenp)) {
-//
-//			/* ... and restore old setting. */
-//			devkmsg_log = old;
-//			strncpy(devkmsg_log_str, old_str, DEVKMSG_STR_MAX_SIZE);
-//
-//			return -EINVAL;
-//		}
-//	}
-//
-//	return 0;
-//}
+#ifdef CONFIG_LOCKDEP
+static struct lockdep_map console_lock_dep_map = {
+	.name = "console_lock"
+};
+#endif
+
+enum devkmsg_log_bits {
+	__DEVKMSG_LOG_BIT_ON = 0,
+	__DEVKMSG_LOG_BIT_OFF,
+	__DEVKMSG_LOG_BIT_LOCK,
+};
+
+enum devkmsg_log_masks {
+	DEVKMSG_LOG_MASK_ON             = BIT(__DEVKMSG_LOG_BIT_ON),
+	DEVKMSG_LOG_MASK_OFF            = BIT(__DEVKMSG_LOG_BIT_OFF),
+	DEVKMSG_LOG_MASK_LOCK           = BIT(__DEVKMSG_LOG_BIT_LOCK),
+};
+
+/* Keep both the 'on' and 'off' bits clear, i.e. ratelimit by default: */
+#define DEVKMSG_LOG_MASK_DEFAULT	0
+
+static unsigned int __read_mostly devkmsg_log = DEVKMSG_LOG_MASK_DEFAULT;
+
+static int __control_devkmsg(char *str)
+{
+	size_t len;
+
+	if (!str)
+		return -EINVAL;
+
+	len = str_has_prefix(str, "on");
+	if (len) {
+		devkmsg_log = DEVKMSG_LOG_MASK_ON;
+		return len;
+	}
+
+	len = str_has_prefix(str, "off");
+	if (len) {
+		devkmsg_log = DEVKMSG_LOG_MASK_OFF;
+		return len;
+	}
+
+	len = str_has_prefix(str, "ratelimit");
+	if (len) {
+		devkmsg_log = DEVKMSG_LOG_MASK_DEFAULT;
+		return len;
+	}
+
+	return -EINVAL;
+}
+
+static int __init control_devkmsg(char *str)
+{
+	if (__control_devkmsg(str) < 0)
+		return 1;
+
+	/*
+	 * Set sysctl string accordingly:
+	 */
+	if (devkmsg_log == DEVKMSG_LOG_MASK_ON)
+		strcpy(devkmsg_log_str, "on");
+	else if (devkmsg_log == DEVKMSG_LOG_MASK_OFF)
+		strcpy(devkmsg_log_str, "off");
+	/* else "ratelimit" which is set by default. */
+
+	/*
+	 * Sysctl cannot change it anymore. The kernel command line setting of
+	 * this parameter is to force the setting to be permanent throughout the
+	 * runtime of the system. This is a precation measure against userspace
+	 * trying to be a smarta** and attempting to change it up on us.
+	 */
+	devkmsg_log |= DEVKMSG_LOG_MASK_LOCK;
+
+	return 0;
+}
+__setup("printk.devkmsg=", control_devkmsg);
+
+char devkmsg_log_str[DEVKMSG_STR_MAX_SIZE] = "ratelimit";
+
+int devkmsg_sysctl_set_loglvl(struct ctl_table *table, int write,
+			      void *buffer, size_t *lenp, loff_t *ppos)
+{
+	char old_str[DEVKMSG_STR_MAX_SIZE];
+	unsigned int old;
+	int err;
+
+	if (write) {
+		if (devkmsg_log & DEVKMSG_LOG_MASK_LOCK)
+			return -EINVAL;
+
+		old = devkmsg_log;
+		strncpy(old_str, devkmsg_log_str, DEVKMSG_STR_MAX_SIZE);
+	}
+
+	err = proc_dostring(table, write, buffer, lenp, ppos);
+	if (err)
+		return err;
+
+	if (write) {
+		err = __control_devkmsg(devkmsg_log_str);
+
+		/*
+		 * Do not accept an unknown string OR a known string with
+		 * trailing crap...
+		 */
+		if (err < 0 || (err + 1 != *lenp)) {
+
+			/* ... and restore old setting. */
+			devkmsg_log = old;
+			strncpy(devkmsg_log_str, old_str, DEVKMSG_STR_MAX_SIZE);
+
+			return -EINVAL;
+		}
+	}
+
+	return 0;
+}
 
 /* Number of registered extended console drivers. */
 static int nr_ext_console_drivers;
@@ -382,21 +382,21 @@ __packed __aligned(4)
  */
 DEFINE_RAW_SPINLOCK(logbuf_lock);
 
-///*
-// * Helper macros to lock/unlock logbuf_lock and switch between
-// * printk-safe/unsafe modes.
-// */
-//#define logbuf_lock_irq()				\
-//	do {						\
-//		printk_safe_enter_irq();		\
-//		raw_spin_lock(&logbuf_lock);		\
-//	} while (0)
-//
-//#define logbuf_unlock_irq()				\
-//	do {						\
-//		raw_spin_unlock(&logbuf_lock);		\
-//		printk_safe_exit_irq();			\
-//	} while (0)
+/*
+ * Helper macros to lock/unlock logbuf_lock and switch between
+ * printk-safe/unsafe modes.
+ */
+#define logbuf_lock_irq()				\
+	do {						\
+		printk_safe_enter_irq();		\
+		raw_spin_lock(&logbuf_lock);		\
+	} while (0)
+
+#define logbuf_unlock_irq()				\
+	do {						\
+		raw_spin_unlock(&logbuf_lock);		\
+		printk_safe_exit_irq();			\
+	} while (0)
 
 #define logbuf_lock_irqsave(flags)			\
 	do {						\
@@ -667,48 +667,48 @@ static int log_store(u32 caller_id, int facility, int level,
 	return msg->text_len;
 }
 
-//int dmesg_restrict = IS_ENABLED(CONFIG_SECURITY_DMESG_RESTRICT);
-//
-//static int syslog_action_restricted(int type)
-//{
-//	if (dmesg_restrict)
-//		return 1;
-//	/*
-//	 * Unless restricted, we allow "read all" and "get buffer size"
-//	 * for everybody.
-//	 */
-//	return type != SYSLOG_ACTION_READ_ALL &&
-//	       type != SYSLOG_ACTION_SIZE_BUFFER;
-//}
-//
-//static int check_syslog_permissions(int type, int source)
-//{
-//	/*
-//	 * If this is from /proc/kmsg and we've already opened it, then we've
-//	 * already done the capabilities checks at open time.
-//	 */
-//	if (source == SYSLOG_FROM_PROC && type != SYSLOG_ACTION_OPEN)
-//		goto ok;
-//
-//	if (syslog_action_restricted(type)) {
-//		if (capable(CAP_SYSLOG))
-//			goto ok;
-//		/*
-//		 * For historical reasons, accept CAP_SYS_ADMIN too, with
-//		 * a warning.
-//		 */
-//		if (capable(CAP_SYS_ADMIN)) {
-//			pr_warn_once("%s (%d): Attempt to access syslog with "
-//				     "CAP_SYS_ADMIN but no CAP_SYSLOG "
-//				     "(deprecated).\n",
-//				 current->comm, task_pid_nr(current));
-//			goto ok;
-//		}
-//		return -EPERM;
-//	}
-//ok:
-//	return security_syslog(type);
-//}
+int dmesg_restrict = IS_ENABLED(CONFIG_SECURITY_DMESG_RESTRICT);
+
+static int syslog_action_restricted(int type)
+{
+	if (dmesg_restrict)
+		return 1;
+	/*
+	 * Unless restricted, we allow "read all" and "get buffer size"
+	 * for everybody.
+	 */
+	return type != SYSLOG_ACTION_READ_ALL &&
+	       type != SYSLOG_ACTION_SIZE_BUFFER;
+}
+
+static int check_syslog_permissions(int type, int source)
+{
+	/*
+	 * If this is from /proc/kmsg and we've already opened it, then we've
+	 * already done the capabilities checks at open time.
+	 */
+	if (source == SYSLOG_FROM_PROC && type != SYSLOG_ACTION_OPEN)
+		goto ok;
+
+	if (syslog_action_restricted(type)) {
+		if (capable(CAP_SYSLOG))
+			goto ok;
+		/*
+		 * For historical reasons, accept CAP_SYS_ADMIN too, with
+		 * a warning.
+		 */
+		if (capable(CAP_SYS_ADMIN)) {
+			pr_warn_once("%s (%d): Attempt to access syslog with "
+				     "CAP_SYS_ADMIN but no CAP_SYSLOG "
+				     "(deprecated).\n",
+				 current->comm, task_pid_nr(current));
+			goto ok;
+		}
+		return -EPERM;
+	}
+ok:
+	return security_syslog(type);
+}
 
 static void append_char(char **pp, char *e, char c)
 {
@@ -784,284 +784,285 @@ static ssize_t msg_print_ext_body(char *buf, size_t size,
 
 	return p - buf;
 }
-//
-///* /dev/kmsg - userspace message inject/listen interface */
-//struct devkmsg_user {
-//	u64 seq;
-//	u32 idx;
-//	struct ratelimit_state rs;
-//	struct mutex lock;
-//	char buf[CONSOLE_EXT_LOG_MAX];
-//};
-//
-//static __printf(3, 4) __cold
-//int devkmsg_emit(int facility, int level, const char *fmt, ...)
-//{
-//	va_list args;
-//	int r;
-//
-//	va_start(args, fmt);
-//	r = vprintk_emit(facility, level, NULL, 0, fmt, args);
-//	va_end(args);
-//
-//	return r;
-//}
-//
-//static ssize_t devkmsg_write(struct kiocb *iocb, struct iov_iter *from)
-//{
-//	char *buf, *line;
-//	int level = default_message_loglevel;
-//	int facility = 1;	/* LOG_USER */
-//	struct file *file = iocb->ki_filp;
-//	struct devkmsg_user *user = file->private_data;
-//	size_t len = iov_iter_count(from);
-//	ssize_t ret = len;
-//
-//	if (!user || len > LOG_LINE_MAX)
-//		return -EINVAL;
-//
-//	/* Ignore when user logging is disabled. */
-//	if (devkmsg_log & DEVKMSG_LOG_MASK_OFF)
-//		return len;
-//
-//	/* Ratelimit when not explicitly enabled. */
-//	if (!(devkmsg_log & DEVKMSG_LOG_MASK_ON)) {
-//		if (!___ratelimit(&user->rs, current->comm))
-//			return ret;
-//	}
-//
-//	buf = kmalloc(len+1, GFP_KERNEL);
-//	if (buf == NULL)
-//		return -ENOMEM;
-//
-//	buf[len] = '\0';
-//	if (!copy_from_iter_full(buf, len, from)) {
-//		kfree(buf);
-//		return -EFAULT;
-//	}
-//
-//	/*
-//	 * Extract and skip the syslog prefix <[0-9]*>. Coming from userspace
-//	 * the decimal value represents 32bit, the lower 3 bit are the log
-//	 * level, the rest are the log facility.
-//	 *
-//	 * If no prefix or no userspace facility is specified, we
-//	 * enforce LOG_USER, to be able to reliably distinguish
-//	 * kernel-generated messages from userspace-injected ones.
-//	 */
-//	line = buf;
-//	if (line[0] == '<') {
-//		char *endp = NULL;
-//		unsigned int u;
-//
-//		u = simple_strtoul(line + 1, &endp, 10);
-//		if (endp && endp[0] == '>') {
-//			level = LOG_LEVEL(u);
-//			if (LOG_FACILITY(u) != 0)
-//				facility = LOG_FACILITY(u);
-//			endp++;
-//			len -= endp - line;
-//			line = endp;
-//		}
-//	}
-//
-//	devkmsg_emit(facility, level, "%s", line);
-//	kfree(buf);
-//	return ret;
-//}
-//
-//static ssize_t devkmsg_read(struct file *file, char __user *buf,
-//			    size_t count, loff_t *ppos)
-//{
-//	struct devkmsg_user *user = file->private_data;
-//	struct printk_log *msg;
-//	size_t len;
-//	ssize_t ret;
-//
-//	if (!user)
-//		return -EBADF;
-//
-//	ret = mutex_lock_interruptible(&user->lock);
-//	if (ret)
-//		return ret;
-//
-//	logbuf_lock_irq();
-//	while (user->seq == log_next_seq) {
-//		if (file->f_flags & O_NONBLOCK) {
-//			ret = -EAGAIN;
-//			logbuf_unlock_irq();
-//			goto out;
-//		}
-//
-//		logbuf_unlock_irq();
-//		ret = wait_event_interruptible(log_wait,
-//					       user->seq != log_next_seq);
-//		if (ret)
-//			goto out;
-//		logbuf_lock_irq();
-//	}
-//
-//	if (user->seq < log_first_seq) {
-//		/* our last seen message is gone, return error and reset */
-//		user->idx = log_first_idx;
-//		user->seq = log_first_seq;
-//		ret = -EPIPE;
-//		logbuf_unlock_irq();
-//		goto out;
-//	}
-//
-//	msg = log_from_idx(user->idx);
-//	len = msg_print_ext_header(user->buf, sizeof(user->buf),
-//				   msg, user->seq);
-//	len += msg_print_ext_body(user->buf + len, sizeof(user->buf) - len,
-//				  log_dict(msg), msg->dict_len,
-//				  log_text(msg), msg->text_len);
-//
-//	user->idx = log_next(user->idx);
-//	user->seq++;
-//	logbuf_unlock_irq();
-//
-//	if (len > count) {
-//		ret = -EINVAL;
-//		goto out;
-//	}
-//
-//	if (copy_to_user(buf, user->buf, len)) {
-//		ret = -EFAULT;
-//		goto out;
-//	}
-//	ret = len;
-//out:
-//	mutex_unlock(&user->lock);
-//	return ret;
-//}
-//
-///*
-// * Be careful when modifying this function!!!
-// *
-// * Only few operations are supported because the device works only with the
-// * entire variable length messages (records). Non-standard values are
-// * returned in the other cases and has been this way for quite some time.
-// * User space applications might depend on this behavior.
-// */
-//static loff_t devkmsg_llseek(struct file *file, loff_t offset, int whence)
-//{
-//	struct devkmsg_user *user = file->private_data;
-//	loff_t ret = 0;
-//
-//	if (!user)
-//		return -EBADF;
-//	if (offset)
-//		return -ESPIPE;
-//
-//	logbuf_lock_irq();
-//	switch (whence) {
-//	case SEEK_SET:
-//		/* the first record */
-//		user->idx = log_first_idx;
-//		user->seq = log_first_seq;
-//		break;
-//	case SEEK_DATA:
-//		/*
-//		 * The first record after the last SYSLOG_ACTION_CLEAR,
-//		 * like issued by 'dmesg -c'. Reading /dev/kmsg itself
-//		 * changes no global state, and does not clear anything.
-//		 */
-//		user->idx = clear_idx;
-//		user->seq = clear_seq;
-//		break;
-//	case SEEK_END:
-//		/* after the last record */
-//		user->idx = log_next_idx;
-//		user->seq = log_next_seq;
-//		break;
-//	default:
-//		ret = -EINVAL;
-//	}
-//	logbuf_unlock_irq();
-//	return ret;
-//}
-//
-//static __poll_t devkmsg_poll(struct file *file, poll_table *wait)
-//{
-//	struct devkmsg_user *user = file->private_data;
-//	__poll_t ret = 0;
-//
-//	if (!user)
-//		return EPOLLERR|EPOLLNVAL;
-//
-//	poll_wait(file, &log_wait, wait);
-//
-//	logbuf_lock_irq();
-//	if (user->seq < log_next_seq) {
-//		/* return error when data has vanished underneath us */
-//		if (user->seq < log_first_seq)
-//			ret = EPOLLIN|EPOLLRDNORM|EPOLLERR|EPOLLPRI;
-//		else
-//			ret = EPOLLIN|EPOLLRDNORM;
-//	}
-//	logbuf_unlock_irq();
-//
-//	return ret;
-//}
-//
-//static int devkmsg_open(struct inode *inode, struct file *file)
-//{
-//	struct devkmsg_user *user;
-//	int err;
-//
-//	if (devkmsg_log & DEVKMSG_LOG_MASK_OFF)
-//		return -EPERM;
-//
-//	/* write-only does not need any file context */
-//	if ((file->f_flags & O_ACCMODE) != O_WRONLY) {
-//		err = check_syslog_permissions(SYSLOG_ACTION_READ_ALL,
-//					       SYSLOG_FROM_READER);
-//		if (err)
-//			return err;
-//	}
-//
-//	user = kmalloc(sizeof(struct devkmsg_user), GFP_KERNEL);
-//	if (!user)
-//		return -ENOMEM;
-//
-//	ratelimit_default_init(&user->rs);
-//	ratelimit_set_flags(&user->rs, RATELIMIT_MSG_ON_RELEASE);
-//
-//	mutex_init(&user->lock);
-//
-//	logbuf_lock_irq();
-//	user->idx = log_first_idx;
-//	user->seq = log_first_seq;
-//	logbuf_unlock_irq();
-//
-//	file->private_data = user;
-//	return 0;
-//}
-//
-//static int devkmsg_release(struct inode *inode, struct file *file)
-//{
-//	struct devkmsg_user *user = file->private_data;
-//
-//	if (!user)
-//		return 0;
-//
-//	ratelimit_state_exit(&user->rs);
-//
-//	mutex_destroy(&user->lock);
-//	kfree(user);
-//	return 0;
-//}
-//
-//const struct file_operations kmsg_fops = {
-//	.open = devkmsg_open,
-//	.read = devkmsg_read,
-//	.write_iter = devkmsg_write,
-//	.llseek = devkmsg_llseek,
-//	.poll = devkmsg_poll,
-//	.release = devkmsg_release,
-//};
-//
+
+/* /dev/kmsg - userspace message inject/listen interface */
+struct devkmsg_user {
+	u64 seq;
+	u32 idx;
+	struct ratelimit_state rs;
+	struct mutex lock;
+	char buf[CONSOLE_EXT_LOG_MAX];
+};
+
+static __printf(3, 4) __cold
+int devkmsg_emit(int facility, int level, const char *fmt, ...)
+{
+	va_list args;
+	int r;
+
+	va_start(args, fmt);
+	r = vprintk_emit(facility, level, NULL, 0, fmt, args);
+	va_end(args);
+
+	return r;
+}
+
+static ssize_t devkmsg_write(struct kiocb *iocb, struct iov_iter *from)
+{
+	char *buf, *line;
+	int level = default_message_loglevel;
+	int facility = 1;	/* LOG_USER */
+	struct file *file = iocb->ki_filp;
+	struct devkmsg_user *user = file->private_data;
+	size_t len = iov_iter_count(from);
+	ssize_t ret = len;
+
+	if (!user || len > LOG_LINE_MAX)
+		return -EINVAL;
+
+	/* Ignore when user logging is disabled. */
+	if (devkmsg_log & DEVKMSG_LOG_MASK_OFF)
+		return len;
+
+	/* Ratelimit when not explicitly enabled. */
+	if (!(devkmsg_log & DEVKMSG_LOG_MASK_ON)) {
+		if (!___ratelimit(&user->rs, current->comm))
+			return ret;
+	}
+
+	buf = kmalloc(len+1, GFP_KERNEL);
+	if (buf == NULL)
+		return -ENOMEM;
+
+	buf[len] = '\0';
+	if (!copy_from_iter_full(buf, len, from)) {
+		kfree(buf);
+		return -EFAULT;
+	}
+
+	/*
+	 * Extract and skip the syslog prefix <[0-9]*>. Coming from userspace
+	 * the decimal value represents 32bit, the lower 3 bit are the log
+	 * level, the rest are the log facility.
+	 *
+	 * If no prefix or no userspace facility is specified, we
+	 * enforce LOG_USER, to be able to reliably distinguish
+	 * kernel-generated messages from userspace-injected ones.
+	 */
+	line = buf;
+	if (line[0] == '<') {
+		char *endp = NULL;
+		unsigned int u;
+
+		u = simple_strtoul(line + 1, &endp, 10);
+		if (endp && endp[0] == '>') {
+			level = LOG_LEVEL(u);
+			if (LOG_FACILITY(u) != 0)
+				facility = LOG_FACILITY(u);
+			endp++;
+			len -= endp - line;
+			line = endp;
+		}
+	}
+
+	devkmsg_emit(facility, level, "%s", line);
+	kfree(buf);
+	return ret;
+}
+
+static ssize_t devkmsg_read(struct file *file, char __user *buf,
+			    size_t count, loff_t *ppos)
+{
+	struct devkmsg_user *user = file->private_data;
+	struct printk_log *msg;
+	size_t len;
+	ssize_t ret;
+
+	if (!user)
+		return -EBADF;
+
+	ret = mutex_lock_interruptible(&user->lock);
+	if (ret)
+		return ret;
+
+	logbuf_lock_irq();
+	while (user->seq == log_next_seq) {
+		if (file->f_flags & O_NONBLOCK) {
+			ret = -EAGAIN;
+			logbuf_unlock_irq();
+			goto out;
+		}
+
+		logbuf_unlock_irq();
+		ret = wait_event_interruptible(log_wait,
+					       user->seq != log_next_seq);
+		if (ret)
+			goto out;
+		logbuf_lock_irq();
+	}
+
+	if (user->seq < log_first_seq) {
+		/* our last seen message is gone, return error and reset */
+		user->idx = log_first_idx;
+		user->seq = log_first_seq;
+		ret = -EPIPE;
+		logbuf_unlock_irq();
+		goto out;
+	}
+
+	msg = log_from_idx(user->idx);
+	len = msg_print_ext_header(user->buf, sizeof(user->buf),
+				   msg, user->seq);
+	len += msg_print_ext_body(user->buf + len, sizeof(user->buf) - len,
+				  log_dict(msg), msg->dict_len,
+				  log_text(msg), msg->text_len);
+
+	user->idx = log_next(user->idx);
+	user->seq++;
+	logbuf_unlock_irq();
+
+	if (len > count) {
+		ret = -EINVAL;
+		goto out;
+	}
+
+	if (copy_to_user(buf, user->buf, len)) {
+		ret = -EFAULT;
+		goto out;
+	}
+	ret = len;
+out:
+	mutex_unlock(&user->lock);
+	return ret;
+}
+
+/*
+ * Be careful when modifying this function!!!
+ *
+ * Only few operations are supported because the device works only with the
+ * entire variable length messages (records). Non-standard values are
+ * returned in the other cases and has been this way for quite some time.
+ * User space applications might depend on this behavior.
+ */
+static loff_t devkmsg_llseek(struct file *file, loff_t offset, int whence)
+{
+	struct devkmsg_user *user = file->private_data;
+	loff_t ret = 0;
+
+	if (!user)
+		return -EBADF;
+	if (offset)
+		return -ESPIPE;
+
+	logbuf_lock_irq();
+	switch (whence) {
+	case SEEK_SET:
+		/* the first record */
+		user->idx = log_first_idx;
+		user->seq = log_first_seq;
+		break;
+	case SEEK_DATA:
+		/*
+		 * The first record after the last SYSLOG_ACTION_CLEAR,
+		 * like issued by 'dmesg -c'. Reading /dev/kmsg itself
+		 * changes no global state, and does not clear anything.
+		 */
+		user->idx = clear_idx;
+		user->seq = clear_seq;
+		break;
+	case SEEK_END:
+		/* after the last record */
+		user->idx = log_next_idx;
+		user->seq = log_next_seq;
+		break;
+	default:
+		ret = -EINVAL;
+	}
+	logbuf_unlock_irq();
+	return ret;
+}
+
+static __poll_t devkmsg_poll(struct file *file, poll_table *wait)
+{
+	struct devkmsg_user *user = file->private_data;
+	__poll_t ret = 0;
+
+	if (!user)
+		return EPOLLERR|EPOLLNVAL;
+
+	poll_wait(file, &log_wait, wait);
+
+	logbuf_lock_irq();
+	if (user->seq < log_next_seq) {
+		/* return error when data has vanished underneath us */
+		if (user->seq < log_first_seq)
+			ret = EPOLLIN|EPOLLRDNORM|EPOLLERR|EPOLLPRI;
+		else
+			ret = EPOLLIN|EPOLLRDNORM;
+	}
+	logbuf_unlock_irq();
+
+	return ret;
+}
+
+static int devkmsg_open(struct inode *inode, struct file *file)
+{
+	struct devkmsg_user *user;
+	int err;
+
+	if (devkmsg_log & DEVKMSG_LOG_MASK_OFF)
+		return -EPERM;
+
+	/* write-only does not need any file context */
+	if ((file->f_flags & O_ACCMODE) != O_WRONLY) {
+		err = check_syslog_permissions(SYSLOG_ACTION_READ_ALL,
+					       SYSLOG_FROM_READER);
+		if (err)
+			return err;
+	}
+
+	user = kmalloc(sizeof(struct devkmsg_user), GFP_KERNEL);
+	if (!user)
+		return -ENOMEM;
+
+	ratelimit_default_init(&user->rs);
+	ratelimit_set_flags(&user->rs, RATELIMIT_MSG_ON_RELEASE);
+
+	mutex_init(&user->lock);
+
+	logbuf_lock_irq();
+	user->idx = log_first_idx;
+	user->seq = log_first_seq;
+	logbuf_unlock_irq();
+
+	file->private_data = user;
+	return 0;
+}
+
+static int devkmsg_release(struct inode *inode, struct file *file)
+{
+	struct devkmsg_user *user = file->private_data;
+
+	if (!user)
+		return 0;
+
+	ratelimit_state_exit(&user->rs);
+
+	mutex_destroy(&user->lock);
+	kfree(user);
+	return 0;
+}
+
+const struct file_operations kmsg_fops = {
+	.open = devkmsg_open,
+	.read = devkmsg_read,
+	.write_iter = devkmsg_write,
+	.llseek = devkmsg_llseek,
+	.poll = devkmsg_poll,
+	.release = devkmsg_release,
+};
+EXPORT_SYMBOL(kmsg_fops);
+
 //#ifdef CONFIG_CRASH_CORE
 ///*
 // * This appends the listed symbols to /proc/vmcore

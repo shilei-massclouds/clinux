@@ -633,13 +633,6 @@ __weak bool shmem_mapping(struct address_space *mapping)
 }
 EXPORT_SYMBOL(shmem_mapping);
 
-size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
-             struct iov_iter *i)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(copy_page_to_iter);
-
 errseq_t errseq_set(errseq_t *eseq, int err)
 {
     booter_panic("No impl!\n");

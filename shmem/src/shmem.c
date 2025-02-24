@@ -2199,6 +2199,7 @@ unsigned long shmem_get_unmapped_area(struct file *file,
 		return addr;
 	return inflated_addr;
 }
+EXPORT_SYMBOL(shmem_get_unmapped_area);
 
 #ifdef CONFIG_NUMA
 static int shmem_set_policy(struct vm_area_struct *vma, struct mempolicy *mpol)
@@ -4280,6 +4281,7 @@ int shmem_zero_setup(struct vm_area_struct *vma)
 
 	return 0;
 }
+EXPORT_SYMBOL(shmem_zero_setup);
 
 /**
  * shmem_read_mapping_page_gfp - read into page cache, using specified page allocation flags.
