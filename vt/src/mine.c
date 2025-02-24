@@ -1,0 +1,22 @@
+#include <linux/types.h>
+#include "../../booter/src/booter.h"
+
+CL_MINE(kbd_init)
+CL_MINE(paste_selection)
+CL_MINE(reset_palette)
+CL_MINE(reset_vc)
+CL_MINE(sel_loadlut)
+CL_MINE(set_selection_user)
+CL_MINE(tty_port_init)
+CL_MINE(tty_port_install)
+CL_MINE(tty_port_put)
+CL_MINE(vc_SAK)
+CL_MINE(vcs_init)
+CL_MINE(vcs_make_sysfs)
+CL_MINE(vcs_remove_sysfs)
+CL_MINE(vt_clr_kbd_mode_bit)
+CL_MINE(vt_get_kbd_mode_bit)
+CL_MINE(vt_get_shift_state)
+CL_MINE(vt_ioctl)
+CL_MINE(vt_reset_keyboard)
+CL_MINE(vt_set_kbd_mode_bit)

@@ -6,3 +6,5 @@ obj_y += keyboard.o
 obj_y += defkeymap.o
 obj_y += consolemap.o
 obj_y += consolemap_deftbl.o
+
+obj_y += mine.o

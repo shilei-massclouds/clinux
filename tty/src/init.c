@@ -64,10 +64,6 @@ void ldsem_up_read(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");
 }
-int __init vty_init(const struct file_operations *console_fops)
-{
-    booter_panic("No impl.\n");
-}
 void __init_ldsem(struct ld_semaphore *sem, const char *name,
           struct lock_class_key *key)
 {
@@ -75,9 +71,7 @@ void __init_ldsem(struct ld_semaphore *sem, const char *name,
 }
 
 struct tty_driver *console_driver;
-
-int fg_console;
-EXPORT_SYMBOL(fg_console);
+EXPORT_SYMBOL(console_driver);
 
 // From kernel/printk/printk.c
 struct console *console_drivers;
@@ -94,3 +88,18 @@ void __weak console_unlock(void)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(console_unlock);
+
+/*
+ * fg_console is the current virtual console,
+ * last_console is the last used one,
+ * want_console is the console we want to switch to,
+ * saved_* variants are for save/restore around kernel debugger enter/leave
+ */
+int fg_console;
+EXPORT_SYMBOL(fg_console);
+
+__weak int __init vty_init(const struct file_operations *console_fops)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(vty_init);
