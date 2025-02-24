@@ -502,7 +502,6 @@ int simple_setattr(struct dentry *dentry, struct iattr *iattr)
 	mark_inode_dirty(inode);
 	return 0;
 }
-EXPORT_SYMBOL(simple_setattr);
 
 int simple_readpage(struct file *file, struct page *page)
 {

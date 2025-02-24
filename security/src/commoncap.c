@@ -318,6 +318,7 @@ int cap_inode_killpriv(struct dentry *dentry)
 		error = 0;
 	return error;
 }
+EXPORT_SYMBOL(cap_inode_killpriv);
 
 static bool rootid_owns_currentns(kuid_t kroot)
 {

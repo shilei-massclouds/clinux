@@ -589,7 +589,7 @@ loff_t noop_llseek(struct file *file, loff_t offset, int whence)
 }
 EXPORT_SYMBOL(noop_llseek);
 
-int setattr_prepare(struct dentry *dentry, struct iattr *attr)
+__weak int setattr_prepare(struct dentry *dentry, struct iattr *attr)
 {
     booter_panic("No impl!\n");
 }
@@ -601,11 +601,13 @@ void generic_fillattr(struct inode *inode, struct kstat *stat)
 }
 EXPORT_SYMBOL(generic_fillattr);
 
+/*
 void setattr_copy(struct inode *inode, const struct iattr *attr)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(setattr_copy);
+*/
 
 __weak struct pseudo_fs_context *init_pseudo(struct fs_context *fc,
 					unsigned long magic)
@@ -1161,12 +1163,6 @@ __weak int __init devtmpfs_init(void)
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(devtmpfs_init);
-
-__weak int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(notify_change);
 
 __weak int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
         int cap, unsigned int opts)
@@ -1890,3 +1886,15 @@ __weak void fsnotify_sb_delete(struct super_block *sb)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(fsnotify_sb_delete);
+
+__weak int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(notify_change);
+
+__weak int simple_setattr(struct dentry *dentry, struct iattr *iattr)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(simple_setattr);
