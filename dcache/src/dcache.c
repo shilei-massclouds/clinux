@@ -283,31 +283,31 @@ static inline int dname_external(const struct dentry *dentry)
 	return dentry->d_name.name != dentry->d_iname;
 }
 
-//void take_dentry_name_snapshot(struct name_snapshot *name, struct dentry *dentry)
-//{
-//	spin_lock(&dentry->d_lock);
-//	name->name = dentry->d_name;
-//	if (unlikely(dname_external(dentry))) {
-//		atomic_inc(&external_name(dentry)->u.count);
-//	} else {
-//		memcpy(name->inline_name, dentry->d_iname,
-//		       dentry->d_name.len + 1);
-//		name->name.name = name->inline_name;
-//	}
-//	spin_unlock(&dentry->d_lock);
-//}
-//EXPORT_SYMBOL(take_dentry_name_snapshot);
-//
-//void release_dentry_name_snapshot(struct name_snapshot *name)
-//{
-//	if (unlikely(name->name.name != name->inline_name)) {
-//		struct external_name *p;
-//		p = container_of(name->name.name, struct external_name, name[0]);
-//		if (unlikely(atomic_dec_and_test(&p->u.count)))
-//			kfree_rcu(p, u.head);
-//	}
-//}
-//EXPORT_SYMBOL(release_dentry_name_snapshot);
+void take_dentry_name_snapshot(struct name_snapshot *name, struct dentry *dentry)
+{
+	spin_lock(&dentry->d_lock);
+	name->name = dentry->d_name;
+	if (unlikely(dname_external(dentry))) {
+		atomic_inc(&external_name(dentry)->u.count);
+	} else {
+		memcpy(name->inline_name, dentry->d_iname,
+		       dentry->d_name.len + 1);
+		name->name.name = name->inline_name;
+	}
+	spin_unlock(&dentry->d_lock);
+}
+EXPORT_SYMBOL(take_dentry_name_snapshot);
+
+void release_dentry_name_snapshot(struct name_snapshot *name)
+{
+	if (unlikely(name->name.name != name->inline_name)) {
+		struct external_name *p;
+		p = container_of(name->name.name, struct external_name, name[0]);
+		if (unlikely(atomic_dec_and_test(&p->u.count)))
+			kfree_rcu(p, u.head);
+	}
+}
+EXPORT_SYMBOL(release_dentry_name_snapshot);
 
 static inline void __d_set_inode_and_type(struct dentry *dentry,
 					  struct inode *inode,
@@ -2904,23 +2904,23 @@ static void __d_move(struct dentry *dentry, struct dentry *target,
 	spin_unlock(&dentry->d_lock);
 }
 
-///*
-// * d_move - move a dentry
-// * @dentry: entry to move
-// * @target: new dentry
-// *
-// * Update the dcache to reflect the move of a file name. Negative
-// * dcache entries should not be moved in this way. See the locking
-// * requirements for __d_move.
-// */
-//void d_move(struct dentry *dentry, struct dentry *target)
-//{
-//	write_seqlock(&rename_lock);
-//	__d_move(dentry, target, false);
-//	write_sequnlock(&rename_lock);
-//}
-//EXPORT_SYMBOL(d_move);
-//
+/*
+ * d_move - move a dentry
+ * @dentry: entry to move
+ * @target: new dentry
+ *
+ * Update the dcache to reflect the move of a file name. Negative
+ * dcache entries should not be moved in this way. See the locking
+ * requirements for __d_move.
+ */
+void d_move(struct dentry *dentry, struct dentry *target)
+{
+	write_seqlock(&rename_lock);
+	__d_move(dentry, target, false);
+	write_sequnlock(&rename_lock);
+}
+EXPORT_SYMBOL(d_move);
+
 ///*
 // * d_exchange - exchange two dentries
 // * @dentry1: first dentry

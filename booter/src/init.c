@@ -1677,12 +1677,6 @@ __weak int is_valid_bugaddr(unsigned long pc)
 }
 EXPORT_SYMBOL(is_valid_bugaddr);
 
-void debugfs_remove(struct dentry *dentry)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(debugfs_remove);
-
 bool initcall_debug;
 //core_param(initcall_debug, initcall_debug, bool, 0644);
 EXPORT_SYMBOL(initcall_debug);
@@ -1718,3 +1712,29 @@ __weak void rotate_reclaimable_page(struct page *page)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(rotate_reclaimable_page);
+
+__weak void debugfs_remove(struct dentry *dentry)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(debugfs_remove);
+
+__weak struct dentry *debugfs_create_file(const char *name, umode_t mode,
+				   struct dentry *parent, void *data,
+				   const struct file_operations *fops)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(debugfs_create_file);
+
+loff_t default_llseek(struct file *file, loff_t offset, int whence)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(default_llseek);
+
+u32 fsnotify_get_cookie(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(fsnotify_get_cookie);

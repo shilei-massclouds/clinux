@@ -60,14 +60,6 @@ int rtc_set_ntp_time(struct timespec64 now, unsigned long *target_nsec)
     booter_panic("No impl in 'time'.");
 }
 
-struct dentry *debugfs_create_file(const char *name, umode_t mode,
-                   struct dentry *parent, void *data,
-                   const struct file_operations *fops)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(debugfs_create_file);
-
 void __weak scheduler_tick(void)
 {
     booter_panic("No impl in 'time'.");
@@ -122,24 +114,6 @@ int nanosleep_copyout(struct restart_block *restart, struct timespec64 *ts)
     booter_panic("No impl in 'time'.");
 }
 
-/*
-pid_t __task_pid_nr_ns(struct task_struct *task, enum pid_type type,
-            struct pid_namespace *ns)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(__task_pid_nr_ns);
-
-struct task_struct *pid_task(struct pid *pid, enum pid_type type)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(pid_task);
-*/
-
-/*
-*/
-
 int posix_timer_event(struct k_itimer *timr, int si_private)
 {
     booter_panic("No impl in 'time'.");
@@ -150,17 +124,3 @@ unsigned long long task_sched_runtime(struct task_struct *p)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(task_sched_runtime);
-
-/*
-struct pid *find_vpid(int nr)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(find_vpid);
-
-void put_pid(struct pid *pid)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(put_pid);
-*/

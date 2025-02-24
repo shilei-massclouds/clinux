@@ -27,22 +27,12 @@ __weak struct task_struct *__switch_to(struct task_struct *,
 EXPORT_SYMBOL(__switch_to);
 
 /*
-void __put_task_struct(struct task_struct *tsk)
-{
-    booter_panic("No impl 'sched'.");
-}
-
-void __init generic_sched_clock_init(void)
-{
-    booter_panic("No impl 'sched'.");
-}
-*/
-
 struct dentry *debugfs_create_bool(const char *name, umode_t mode,
                    struct dentry *parent, bool *value)
 {
     booter_panic("No impl 'sched'.");
 }
+*/
 
 void io_wq_worker_running(struct task_struct *tsk)
 {

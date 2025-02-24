@@ -58,7 +58,7 @@ components := \
 	fs inode dcache file_table do_mounts file \
 	cred user_namespace nsproxy fs_namespace pid_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
-	fs_context fs_parser fs_struct namei libfs \
+	fs_context fs_parser fs_struct namei libfs debugfs \
 	ipc_namespace \
 	net_core platform \
 	fork mmap filemap kthread riscv_process exit exec \

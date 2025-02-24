@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(access_remote_vm)
-CL_MINE(default_llseek)
 CL_MINE(find_lock_task_mm)
 CL_MINE(__genradix_free)
 CL_MINE(__genradix_ptr)
