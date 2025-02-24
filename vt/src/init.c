@@ -18,11 +18,6 @@ cl_vt_init(void)
 }
 EXPORT_SYMBOL(cl_vt_init);
 
-void __tasklet_schedule(struct tasklet_struct *t)
-{
-    booter_panic("No impl!\n");
-}
-
 void ctrl_alt_del(void)
 {
     booter_panic("No impl!\n");
