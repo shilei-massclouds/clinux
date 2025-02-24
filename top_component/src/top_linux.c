@@ -101,8 +101,8 @@ static bool initargs_found;
 # define initargs_found false
 #endif
 
-bool initcall_debug;
-core_param(initcall_debug, initcall_debug, bool, 0644);
+//bool initcall_debug;
+//core_param(initcall_debug, initcall_debug, bool, 0644);
 
 extern void setup_vm_final(void);
 extern void free_area_init(unsigned long *max_zone_pfn);

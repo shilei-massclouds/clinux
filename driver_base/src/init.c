@@ -49,17 +49,12 @@ EXPORT_SYMBOL(driver_init);
 
 struct device_type part_type;
 
-
 void unlock_device_hotplug(void)
 {
     booter_panic("No impl 'driver_base'.");
 }
 
 int device_online(struct device *dev)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-void driver_deferred_probe_del(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");
 }

@@ -1674,3 +1674,13 @@ __weak int is_valid_bugaddr(unsigned long pc)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(is_valid_bugaddr);
+
+void debugfs_remove(struct dentry *dentry)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(debugfs_remove);
+
+bool initcall_debug;
+//core_param(initcall_debug, initcall_debug, bool, 0644);
+EXPORT_SYMBOL(initcall_debug);

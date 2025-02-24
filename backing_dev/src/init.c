@@ -19,14 +19,3 @@ bool flush_delayed_work(struct delayed_work *dwork)
 {
     booter_panic("No impl!\n");
 }
-void debugfs_remove(struct dentry *dentry)
-{
-    booter_panic("No impl!\n");
-}
-/*
-bool mod_delayed_work_on(int cpu, struct workqueue_struct *wq,
-             struct delayed_work *dwork, unsigned long delay)
-{
-    booter_panic("No impl!\n");
-}
-*/
