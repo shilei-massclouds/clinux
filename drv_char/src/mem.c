@@ -1042,6 +1042,7 @@ static int __init chr_dev_init(void)
 {
 	int minor;
 
+    printk("%s: ...\n", __func__);
 	if (register_chrdev(MEM_MAJOR, "mem", &memory_fops))
 		printk("unable to get major %d for memory devs\n", MEM_MAJOR);
 
