@@ -143,3 +143,10 @@ __weak void free_unref_page(struct page *page)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(free_unref_page);
+
+__weak bool zone_watermark_ok_safe(struct zone *z, unsigned int order,
+			unsigned long mark, int highest_zoneidx)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(zone_watermark_ok_safe);

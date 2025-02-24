@@ -3632,17 +3632,17 @@ static inline bool zone_watermark_fast(struct zone *z, unsigned int order,
 	return false;
 }
 
-//bool zone_watermark_ok_safe(struct zone *z, unsigned int order,
-//			unsigned long mark, int highest_zoneidx)
-//{
-//	long free_pages = zone_page_state(z, NR_FREE_PAGES);
-//
-//	if (z->percpu_drift_mark && free_pages < z->percpu_drift_mark)
-//		free_pages = zone_page_state_snapshot(z, NR_FREE_PAGES);
-//
-//	return __zone_watermark_ok(z, order, mark, highest_zoneidx, 0,
-//								free_pages);
-//}
+bool zone_watermark_ok_safe(struct zone *z, unsigned int order,
+			unsigned long mark, int highest_zoneidx)
+{
+	long free_pages = zone_page_state(z, NR_FREE_PAGES);
+
+	if (z->percpu_drift_mark && free_pages < z->percpu_drift_mark)
+		free_pages = zone_page_state_snapshot(z, NR_FREE_PAGES);
+
+	return __zone_watermark_ok(z, order, mark, highest_zoneidx, 0,
+								free_pages);
+}
 
 #ifdef CONFIG_NUMA
 static bool zone_allows_reclaim(struct zone *local_zone, struct zone *zone)

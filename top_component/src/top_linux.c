@@ -954,6 +954,7 @@ static noinline void __init kernel_init_freeable(void)
     printk("%s: ============ 1 \n", __func__);
     console_on_rootfs();
 
+    printk("%s: ============ 2 \n", __func__);
 //    /*
 //     * check if there is an early userspace init.  If yes, let it do all
 //     * the work
