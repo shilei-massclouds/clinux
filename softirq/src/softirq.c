@@ -473,14 +473,14 @@ void raise_softirq_irqoff(unsigned int nr)
 		wakeup_softirqd();
 }
 
-//void raise_softirq(unsigned int nr)
-//{
-//	unsigned long flags;
-//
-//	local_irq_save(flags);
-//	raise_softirq_irqoff(nr);
-//	local_irq_restore(flags);
-//}
+void raise_softirq(unsigned int nr)
+{
+	unsigned long flags;
+
+	local_irq_save(flags);
+	raise_softirq_irqoff(nr);
+	local_irq_restore(flags);
+}
 
 void __raise_softirq_irqoff(unsigned int nr)
 {

@@ -755,6 +755,7 @@ int __close_range(unsigned fd, unsigned max_fd, unsigned int flags)
 
 	return 0;
 }
+EXPORT_SYMBOL(__close_range);
 
 /*
  * variant of __close_fd that gets a ref on the file for later fput.

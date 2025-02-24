@@ -3402,7 +3402,6 @@ struct file *do_filp_open(int dfd, struct filename *pathname,
 	restore_nameidata();
 	return filp;
 }
-EXPORT_SYMBOL_GPL(do_filp_open);
 
 struct file *do_file_open_root(struct dentry *dentry, struct vfsmount *mnt,
 		const char *name, const struct open_flags *op)
@@ -3432,6 +3431,7 @@ struct file *do_file_open_root(struct dentry *dentry, struct vfsmount *mnt,
 	putname(filename);
 	return file;
 }
+EXPORT_SYMBOL(do_file_open_root);
 
 static struct dentry *filename_create(int dfd, struct filename *name,
 				struct path *path, unsigned int lookup_flags)

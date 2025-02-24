@@ -266,3 +266,4 @@ int __init init_dup(struct file *file)
 	fd_install(fd, get_file(file));
 	return 0;
 }
+EXPORT_SYMBOL(init_dup);

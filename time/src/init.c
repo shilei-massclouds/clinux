@@ -76,17 +76,6 @@ int proc_dointvec_minmax(struct ctl_table *table, int write,
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(proc_dointvec_minmax);
-void raise_softirq(unsigned int nr)
-{
-    booter_panic("No impl in 'time'.");
-}
-
-/*
-void on_each_cpu(smp_call_func_t func, void *info, int wait)
-{
-    booter_panic("No impl in 'time'.");
-}
-*/
 
 unsigned long nr_iowait_cpu(int cpu)
 {

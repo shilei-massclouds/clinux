@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(arch_pick_mmap_layout)
-CL_MINE(filp_open)
 CL_MINE(free_pgd_range)
 CL_MINE(get_user_pages_remote)
 CL_MINE(insert_vm_struct)

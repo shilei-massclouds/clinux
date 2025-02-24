@@ -20,6 +20,7 @@
 #include <asm/current.h>
 #include <cl_hook.h>
 #include "booter.h"
+#include "../fs/internal.h"
 
 #define UL_STR_SIZE 19  /* prefix with '0x' and end with '\0' */
 
@@ -574,12 +575,6 @@ __weak void kfree_link(void *p)
 }
 EXPORT_SYMBOL(kfree_link);
 
-int nonseekable_open(struct inode *inode, struct file *filp)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(nonseekable_open);
-
 loff_t
 generic_file_llseek_size(struct file *file, loff_t offset, int whence,
         loff_t maxsize, loff_t eof)
@@ -1022,12 +1017,6 @@ __weak void __mnt_drop_write(struct vfsmount *mnt)
 }
 EXPORT_SYMBOL(__mnt_drop_write);
 
-int filp_close(struct file *filp, fl_owner_t id)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(filp_close);
-
 void exit_io_context(struct task_struct *task)
 {
     booter_panic("No impl.\n");
@@ -1113,12 +1102,14 @@ struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 }
 EXPORT_SYMBOL_GPL(find_vma);
 
+/*
 struct file *file_open_root(struct dentry *dentry, struct vfsmount *mnt,
                 const char *filename, int flags, umode_t mode)
 {
     booter_panic("No impl in 'workqueue'.");
 }
 EXPORT_SYMBOL(file_open_root);
+*/
 
 __weak void global_dirty_limits(unsigned long *pbackground, unsigned long *pdirty)
 {
@@ -1823,3 +1814,67 @@ __weak void raise_softirq_irqoff(unsigned int nr)
     booter_panic("No impl in 'rcu'.");
 }
 EXPORT_SYMBOL(raise_softirq_irqoff);
+
+__weak struct file *filp_open(const char *filename, int flags, umode_t mode)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(filp_open);
+
+__weak int filp_close(struct file *filp, fl_owner_t id)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(filp_close);
+
+__weak int nonseekable_open(struct inode *inode, struct file *filp)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(nonseekable_open);
+
+__weak int finish_open(struct file *file, struct dentry *dentry,
+		int (*open)(struct inode *, struct file *))
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(finish_open);
+
+__weak int vfs_open(const struct path *path, struct file *file)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(vfs_open);
+
+__weak int do_truncate(struct dentry *dentry, loff_t length, unsigned int time_attrs,
+	struct file *filp)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(do_truncate);
+
+__weak struct file *do_filp_open(int dfd, struct filename *pathname,
+		const struct open_flags *op)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL_GPL(do_filp_open);
+
+__weak char *file_path(struct file *filp, char *buf, int buflen)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(file_path);
+
+__weak struct file *dentry_open(const struct path *path, int flags,
+			 const struct cred *cred)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(dentry_open);
+
+__weak void raise_softirq(unsigned int nr)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(raise_softirq);

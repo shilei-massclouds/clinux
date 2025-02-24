@@ -58,111 +58,112 @@ static inline void file_free(struct file *f)
 	call_rcu(&f->f_u.fu_rcuhead, file_free_rcu);
 }
 
-///*
-// * Return the total number of open files in the system
-// */
-//static long get_nr_files(void)
-//{
-//	return percpu_counter_read_positive(&nr_files);
-//}
-//
-///*
-// * Return the maximum number of open files in the system
-// */
-//unsigned long get_max_files(void)
-//{
-//	return files_stat.max_files;
-//}
-//EXPORT_SYMBOL_GPL(get_max_files);
-//
-///*
-// * Handle nr_files sysctl
-// */
-//#if defined(CONFIG_SYSCTL) && defined(CONFIG_PROC_FS)
-//int proc_nr_files(struct ctl_table *table, int write,
-//                     void *buffer, size_t *lenp, loff_t *ppos)
-//{
-//	files_stat.nr_files = get_nr_files();
-//	return proc_doulongvec_minmax(table, write, buffer, lenp, ppos);
-//}
-//#else
-//int proc_nr_files(struct ctl_table *table, int write,
-//                     void *buffer, size_t *lenp, loff_t *ppos)
-//{
-//	return -ENOSYS;
-//}
-//#endif
-//
-//static struct file *__alloc_file(int flags, const struct cred *cred)
-//{
-//	struct file *f;
-//	int error;
-//
-//	f = kmem_cache_zalloc(filp_cachep, GFP_KERNEL);
-//	if (unlikely(!f))
-//		return ERR_PTR(-ENOMEM);
-//
-//	f->f_cred = get_cred(cred);
-//	error = security_file_alloc(f);
-//	if (unlikely(error)) {
-//		file_free_rcu(&f->f_u.fu_rcuhead);
-//		return ERR_PTR(error);
-//	}
-//
-//	atomic_long_set(&f->f_count, 1);
-//	rwlock_init(&f->f_owner.lock);
-//	spin_lock_init(&f->f_lock);
-//	mutex_init(&f->f_pos_lock);
-//	eventpoll_init_file(f);
-//	f->f_flags = flags;
-//	f->f_mode = OPEN_FMODE(flags);
-//	/* f->f_version: 0 */
-//
-//	return f;
-//}
-//
-///* Find an unused file structure and return a pointer to it.
-// * Returns an error pointer if some error happend e.g. we over file
-// * structures limit, run out of memory or operation is not permitted.
-// *
-// * Be very careful using this.  You are responsible for
-// * getting write access to any mount that you might assign
-// * to this filp, if it is opened for write.  If this is not
-// * done, you will imbalance int the mount's writer count
-// * and a warning at __fput() time.
-// */
-//struct file *alloc_empty_file(int flags, const struct cred *cred)
-//{
-//	static long old_max;
-//	struct file *f;
-//
-//	/*
-//	 * Privileged users can go above max_files
-//	 */
-//	if (get_nr_files() >= files_stat.max_files && !capable(CAP_SYS_ADMIN)) {
-//		/*
-//		 * percpu_counters are inaccurate.  Do an expensive check before
-//		 * we go and fail.
-//		 */
-//		if (percpu_counter_sum_positive(&nr_files) >= files_stat.max_files)
-//			goto over;
-//	}
-//
-//	f = __alloc_file(flags, cred);
-//	if (!IS_ERR(f))
-//		percpu_counter_inc(&nr_files);
-//
-//	return f;
-//
-//over:
-//	/* Ran out of filps - report that */
-//	if (get_nr_files() > old_max) {
-//		pr_info("VFS: file-max limit %lu reached\n", get_max_files());
-//		old_max = get_nr_files();
-//	}
-//	return ERR_PTR(-ENFILE);
-//}
-//
+/*
+ * Return the total number of open files in the system
+ */
+static long get_nr_files(void)
+{
+	return percpu_counter_read_positive(&nr_files);
+}
+
+/*
+ * Return the maximum number of open files in the system
+ */
+unsigned long get_max_files(void)
+{
+	return files_stat.max_files;
+}
+EXPORT_SYMBOL_GPL(get_max_files);
+
+/*
+ * Handle nr_files sysctl
+ */
+#if defined(CONFIG_SYSCTL) && defined(CONFIG_PROC_FS)
+int proc_nr_files(struct ctl_table *table, int write,
+                     void *buffer, size_t *lenp, loff_t *ppos)
+{
+	files_stat.nr_files = get_nr_files();
+	return proc_doulongvec_minmax(table, write, buffer, lenp, ppos);
+}
+#else
+int proc_nr_files(struct ctl_table *table, int write,
+                     void *buffer, size_t *lenp, loff_t *ppos)
+{
+	return -ENOSYS;
+}
+#endif
+
+static struct file *__alloc_file(int flags, const struct cred *cred)
+{
+	struct file *f;
+	int error;
+
+	f = kmem_cache_zalloc(filp_cachep, GFP_KERNEL);
+	if (unlikely(!f))
+		return ERR_PTR(-ENOMEM);
+
+	f->f_cred = get_cred(cred);
+	error = security_file_alloc(f);
+	if (unlikely(error)) {
+		file_free_rcu(&f->f_u.fu_rcuhead);
+		return ERR_PTR(error);
+	}
+
+	atomic_long_set(&f->f_count, 1);
+	rwlock_init(&f->f_owner.lock);
+	spin_lock_init(&f->f_lock);
+	mutex_init(&f->f_pos_lock);
+	eventpoll_init_file(f);
+	f->f_flags = flags;
+	f->f_mode = OPEN_FMODE(flags);
+	/* f->f_version: 0 */
+
+	return f;
+}
+
+/* Find an unused file structure and return a pointer to it.
+ * Returns an error pointer if some error happend e.g. we over file
+ * structures limit, run out of memory or operation is not permitted.
+ *
+ * Be very careful using this.  You are responsible for
+ * getting write access to any mount that you might assign
+ * to this filp, if it is opened for write.  If this is not
+ * done, you will imbalance int the mount's writer count
+ * and a warning at __fput() time.
+ */
+struct file *alloc_empty_file(int flags, const struct cred *cred)
+{
+	static long old_max;
+	struct file *f;
+
+	/*
+	 * Privileged users can go above max_files
+	 */
+	if (get_nr_files() >= files_stat.max_files && !capable(CAP_SYS_ADMIN)) {
+		/*
+		 * percpu_counters are inaccurate.  Do an expensive check before
+		 * we go and fail.
+		 */
+		if (percpu_counter_sum_positive(&nr_files) >= files_stat.max_files)
+			goto over;
+	}
+
+	f = __alloc_file(flags, cred);
+	if (!IS_ERR(f))
+		percpu_counter_inc(&nr_files);
+
+	return f;
+
+over:
+	/* Ran out of filps - report that */
+	if (get_nr_files() > old_max) {
+		pr_info("VFS: file-max limit %lu reached\n", get_max_files());
+		old_max = get_nr_files();
+	}
+	return ERR_PTR(-ENFILE);
+}
+EXPORT_SYMBOL(alloc_empty_file);
+
 ///*
 // * Variant of alloc_empty_file() that doesn't check and modify nr_files.
 // *

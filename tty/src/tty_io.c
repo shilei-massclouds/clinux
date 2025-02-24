@@ -719,6 +719,7 @@ void tty_vhangup_self(void)
 		tty_kref_put(tty);
 	}
 }
+EXPORT_SYMBOL(tty_vhangup_self);
 
 /**
  *	tty_vhangup_session		-	hangup session leader exit

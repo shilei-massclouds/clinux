@@ -42,6 +42,7 @@
 #include <linux/utsname.h>
 #include <linux/buffer_head.h>
 #include <linux/kgdb.h>
+#include <linux/init_syscalls.h>
 #include <asm/bugs.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
@@ -879,6 +880,7 @@ static void __init do_initcalls(void)
     }
 
     kfree(command_line);
+    printk("%s: ========== END!\n", __func__);
 }
 
 /*
@@ -891,13 +893,26 @@ static void __init do_initcalls(void)
 static void __init do_basic_setup(void)
 {
     cpuset_init_smp();
-    printk("%s: ==========\n", __func__);
     driver_init();
     init_irq_proc();
     do_ctors();
     usermodehelper_enable();
     do_initcalls();
-    printk("%s: ==========\n", __func__);
+}
+
+/* Open /dev/console, for stdin/stdout/stderr, this should never fail */
+void __init console_on_rootfs(void)
+{
+    struct file *file = filp_open("/dev/console", O_RDWR, 0);
+
+    if (IS_ERR(file)) {
+        pr_err("Warning: unable to open an initial console.\n");
+        return;
+    }
+    init_dup(file);
+    init_dup(file);
+    init_dup(file);
+    fput(file);
 }
 
 static noinline void __init kernel_init_freeable(void)
@@ -937,8 +952,8 @@ static noinline void __init kernel_init_freeable(void)
     do_basic_setup();
 
     printk("%s: ============ 1 \n", __func__);
-//    console_on_rootfs();
-//
+    console_on_rootfs();
+
 //    /*
 //     * check if there is an early userspace init.  If yes, let it do all
 //     * the work
