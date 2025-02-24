@@ -3,8 +3,6 @@
 
 CL_MINE(devm_ioremap_resource)
 CL_MINE(devm_ioremap_resource_wc)
-CL_MINE(driver_register)
-CL_MINE(driver_unregister)
 CL_MINE(insert_resource)
 CL_MINE(kstrndup)
 CL_MINE(of_clk_set_defaults)

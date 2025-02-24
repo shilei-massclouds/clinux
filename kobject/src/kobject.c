@@ -447,37 +447,37 @@ int kobject_add(struct kobject *kobj, struct kobject *parent,
 }
 EXPORT_SYMBOL(kobject_add);
 
-///**
-// * kobject_init_and_add() - Initialize a kobject structure and add it to
-// *                          the kobject hierarchy.
-// * @kobj: pointer to the kobject to initialize
-// * @ktype: pointer to the ktype for this kobject.
-// * @parent: pointer to the parent of this kobject.
-// * @fmt: the name of the kobject.
-// *
-// * This function combines the call to kobject_init() and kobject_add().
-// *
-// * If this function returns an error, kobject_put() must be called to
-// * properly clean up the memory associated with the object.  This is the
-// * same type of error handling after a call to kobject_add() and kobject
-// * lifetime rules are the same here.
-// */
-//int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
-//			 struct kobject *parent, const char *fmt, ...)
-//{
-//	va_list args;
-//	int retval;
-//
-//	kobject_init(kobj, ktype);
-//
-//	va_start(args, fmt);
-//	retval = kobject_add_varg(kobj, parent, fmt, args);
-//	va_end(args);
-//
-//	return retval;
-//}
-//EXPORT_SYMBOL_GPL(kobject_init_and_add);
-//
+/**
+ * kobject_init_and_add() - Initialize a kobject structure and add it to
+ *                          the kobject hierarchy.
+ * @kobj: pointer to the kobject to initialize
+ * @ktype: pointer to the ktype for this kobject.
+ * @parent: pointer to the parent of this kobject.
+ * @fmt: the name of the kobject.
+ *
+ * This function combines the call to kobject_init() and kobject_add().
+ *
+ * If this function returns an error, kobject_put() must be called to
+ * properly clean up the memory associated with the object.  This is the
+ * same type of error handling after a call to kobject_add() and kobject
+ * lifetime rules are the same here.
+ */
+int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
+			 struct kobject *parent, const char *fmt, ...)
+{
+	va_list args;
+	int retval;
+
+	kobject_init(kobj, ktype);
+
+	va_start(args, fmt);
+	retval = kobject_add_varg(kobj, parent, fmt, args);
+	va_end(args);
+
+	return retval;
+}
+EXPORT_SYMBOL_GPL(kobject_init_and_add);
+
 ///**
 // * kobject_rename() - Change the name of an object.
 // * @kobj: object in question.
@@ -885,46 +885,46 @@ int kset_register(struct kset *k)
 }
 EXPORT_SYMBOL(kset_register);
 
-///**
-// * kset_unregister() - Remove a kset.
-// * @k: kset.
-// */
-//void kset_unregister(struct kset *k)
-//{
-//	if (!k)
-//		return;
-//	kobject_del(&k->kobj);
-//	kobject_put(&k->kobj);
-//}
-//EXPORT_SYMBOL(kset_unregister);
-//
-///**
-// * kset_find_obj() - Search for object in kset.
-// * @kset: kset we're looking in.
-// * @name: object's name.
-// *
-// * Lock kset via @kset->subsys, and iterate over @kset->list,
-// * looking for a matching kobject. If matching object is found
-// * take a reference and return the object.
-// */
-//struct kobject *kset_find_obj(struct kset *kset, const char *name)
-//{
-//	struct kobject *k;
-//	struct kobject *ret = NULL;
-//
-//	spin_lock(&kset->list_lock);
-//
-//	list_for_each_entry(k, &kset->list, entry) {
-//		if (kobject_name(k) && !strcmp(kobject_name(k), name)) {
-//			ret = kobject_get_unless_zero(k);
-//			break;
-//		}
-//	}
-//
-//	spin_unlock(&kset->list_lock);
-//	return ret;
-//}
-//EXPORT_SYMBOL_GPL(kset_find_obj);
+/**
+ * kset_unregister() - Remove a kset.
+ * @k: kset.
+ */
+void kset_unregister(struct kset *k)
+{
+	if (!k)
+		return;
+	kobject_del(&k->kobj);
+	kobject_put(&k->kobj);
+}
+EXPORT_SYMBOL(kset_unregister);
+
+/**
+ * kset_find_obj() - Search for object in kset.
+ * @kset: kset we're looking in.
+ * @name: object's name.
+ *
+ * Lock kset via @kset->subsys, and iterate over @kset->list,
+ * looking for a matching kobject. If matching object is found
+ * take a reference and return the object.
+ */
+struct kobject *kset_find_obj(struct kset *kset, const char *name)
+{
+	struct kobject *k;
+	struct kobject *ret = NULL;
+
+	spin_lock(&kset->list_lock);
+
+	list_for_each_entry(k, &kset->list, entry) {
+		if (kobject_name(k) && !strcmp(kobject_name(k), name)) {
+			ret = kobject_get_unless_zero(k);
+			break;
+		}
+	}
+
+	spin_unlock(&kset->list_lock);
+	return ret;
+}
+EXPORT_SYMBOL_GPL(kset_find_obj);
 
 static void kset_release(struct kobject *kobj)
 {

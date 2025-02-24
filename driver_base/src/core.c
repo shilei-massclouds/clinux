@@ -839,77 +839,77 @@ static void __device_link_del(struct kref *kref)
 //	device_links_write_unlock();
 //}
 //EXPORT_SYMBOL_GPL(device_link_remove);
-//
-//static void device_links_missing_supplier(struct device *dev)
-//{
-//	struct device_link *link;
-//
-//	list_for_each_entry(link, &dev->links.suppliers, c_node) {
-//		if (link->status != DL_STATE_CONSUMER_PROBE)
-//			continue;
-//
-//		if (link->supplier->links.status == DL_DEV_DRIVER_BOUND) {
-//			WRITE_ONCE(link->status, DL_STATE_AVAILABLE);
-//		} else {
-//			WARN_ON(!(link->flags & DL_FLAG_SYNC_STATE_ONLY));
-//			WRITE_ONCE(link->status, DL_STATE_DORMANT);
-//		}
-//	}
-//}
-//
-///**
-// * device_links_check_suppliers - Check presence of supplier drivers.
-// * @dev: Consumer device.
-// *
-// * Check links from this device to any suppliers.  Walk the list of the device's
-// * links to suppliers and see if all of them are available.  If not, simply
-// * return -EPROBE_DEFER.
-// *
-// * We need to guarantee that the supplier will not go away after the check has
-// * been positive here.  It only can go away in __device_release_driver() and
-// * that function  checks the device's links to consumers.  This means we need to
-// * mark the link as "consumer probe in progress" to make the supplier removal
-// * wait for us to complete (or bad things may happen).
-// *
-// * Links without the DL_FLAG_MANAGED flag set are ignored.
-// */
-//int device_links_check_suppliers(struct device *dev)
-//{
-//	struct device_link *link;
-//	int ret = 0;
-//
-//	/*
-//	 * Device waiting for supplier to become available is not allowed to
-//	 * probe.
-//	 */
-//	mutex_lock(&wfs_lock);
-//	if (!list_empty(&dev->links.needs_suppliers) &&
-//	    dev->links.need_for_probe) {
-//		mutex_unlock(&wfs_lock);
-//		return -EPROBE_DEFER;
-//	}
-//	mutex_unlock(&wfs_lock);
-//
-//	device_links_write_lock();
-//
-//	list_for_each_entry(link, &dev->links.suppliers, c_node) {
-//		if (!(link->flags & DL_FLAG_MANAGED))
-//			continue;
-//
-//		if (link->status != DL_STATE_AVAILABLE &&
-//		    !(link->flags & DL_FLAG_SYNC_STATE_ONLY)) {
-//			device_links_missing_supplier(dev);
-//			ret = -EPROBE_DEFER;
-//			break;
-//		}
-//		WRITE_ONCE(link->status, DL_STATE_CONSUMER_PROBE);
-//	}
-//	dev->links.status = DL_DEV_PROBING;
-//
-//	device_links_write_unlock();
-//	return ret;
-//}
-//
+
+static void device_links_missing_supplier(struct device *dev)
+{
+	struct device_link *link;
+
+	list_for_each_entry(link, &dev->links.suppliers, c_node) {
+		if (link->status != DL_STATE_CONSUMER_PROBE)
+			continue;
+
+		if (link->supplier->links.status == DL_DEV_DRIVER_BOUND) {
+			WRITE_ONCE(link->status, DL_STATE_AVAILABLE);
+		} else {
+			WARN_ON(!(link->flags & DL_FLAG_SYNC_STATE_ONLY));
+			WRITE_ONCE(link->status, DL_STATE_DORMANT);
+		}
+	}
+}
+
+/**
+ * device_links_check_suppliers - Check presence of supplier drivers.
+ * @dev: Consumer device.
+ *
+ * Check links from this device to any suppliers.  Walk the list of the device's
+ * links to suppliers and see if all of them are available.  If not, simply
+ * return -EPROBE_DEFER.
+ *
+ * We need to guarantee that the supplier will not go away after the check has
+ * been positive here.  It only can go away in __device_release_driver() and
+ * that function  checks the device's links to consumers.  This means we need to
+ * mark the link as "consumer probe in progress" to make the supplier removal
+ * wait for us to complete (or bad things may happen).
+ *
+ * Links without the DL_FLAG_MANAGED flag set are ignored.
+ */
+int device_links_check_suppliers(struct device *dev)
+{
+	struct device_link *link;
+	int ret = 0;
+
+	/*
+	 * Device waiting for supplier to become available is not allowed to
+	 * probe.
+	 */
+	mutex_lock(&wfs_lock);
+	if (!list_empty(&dev->links.needs_suppliers) &&
+	    dev->links.need_for_probe) {
+		mutex_unlock(&wfs_lock);
+		return -EPROBE_DEFER;
+	}
+	mutex_unlock(&wfs_lock);
+
+	device_links_write_lock();
+
+	list_for_each_entry(link, &dev->links.suppliers, c_node) {
+		if (!(link->flags & DL_FLAG_MANAGED))
+			continue;
+
+		if (link->status != DL_STATE_AVAILABLE &&
+		    !(link->flags & DL_FLAG_SYNC_STATE_ONLY)) {
+			device_links_missing_supplier(dev);
+			ret = -EPROBE_DEFER;
+			break;
+		}
+		WRITE_ONCE(link->status, DL_STATE_CONSUMER_PROBE);
+	}
+	dev->links.status = DL_DEV_PROBING;
+
+	device_links_write_unlock();
+	return ret;
+}
+
 ///**
 // * __device_links_queue_sync_state - Queue a device for sync_state() callback
 // * @dev: Device to call sync_state() on

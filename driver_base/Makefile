@@ -12,5 +12,6 @@ obj_y += cpu.o
 obj_y += container.o
 obj_y += dd.o
 obj_y += syscore.o
+obj_y += driver.o
 
 obj_y += mine.o

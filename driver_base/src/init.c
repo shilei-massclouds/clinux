@@ -82,18 +82,6 @@ bool of_dma_is_coherent(struct device_node *np)
 {
     booter_panic("No impl 'driver_base'.");
 }
-/*
-int sysfs_create_link(struct kobject *kobj, struct kobject *target,
-              const char *name)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-*/
-int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
-             struct kobject *parent, const char *fmt, ...)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 
 int __weak of_irq_get(struct device_node *dev, int index)
 {
