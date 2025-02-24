@@ -25,11 +25,6 @@ void print_modules(void)
 }
 */
 
-void lru_add_drain_cpu(int cpu)
-{
-    booter_panic("No impl 'page_alloc'.");
-}
-
 void __dump_page(struct page *page, const char *reason)
 {
     booter_panic("No impl 'page_alloc'.");

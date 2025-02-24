@@ -3,6 +3,7 @@
 #include <linux/export.h>
 #include <linux/cache.h>
 #include <linux/jiffies.h>
+#include <linux/swap.h>
 #include <linux/kobject.h>
 #include <linux/netlink.h>
 #include <linux/syscore_ops.h>
@@ -438,7 +439,7 @@ __weak unsigned long zone_reclaimable_pages(struct zone *zone)
 }
 EXPORT_SYMBOL(zone_reclaimable_pages);
 
-void __put_page(struct page *page)
+__weak void __put_page(struct page *page)
 {
     booter_panic("No impl in 'booter'.");
 }
@@ -1087,7 +1088,7 @@ __weak char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *tsk
 }
 EXPORT_SYMBOL_GPL(__get_task_comm);
 
-void lru_add_drain(void)
+__weak void lru_add_drain(void)
 {
     booter_panic("No impl.\n");
 }
@@ -1691,3 +1692,29 @@ __weak void register_syscore_ops(struct syscore_ops *ops)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(register_syscore_ops);
+
+struct address_space *swapper_spaces[MAX_SWAPFILES] __read_mostly;
+EXPORT_SYMBOL(swapper_spaces);
+
+long total_swap_pages;
+EXPORT_SYMBOL_GPL(total_swap_pages);
+
+__weak void lru_cache_add(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(lru_cache_add);
+
+__weak unsigned pagevec_lookup_range_tag(struct pagevec *pvec,
+		struct address_space *mapping, pgoff_t *index, pgoff_t end,
+		xa_mark_t tag)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(pagevec_lookup_range_tag);
+
+__weak void rotate_reclaimable_page(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rotate_reclaimable_page);

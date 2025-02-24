@@ -3,3 +3,6 @@
 obj_y := init.o
 obj_y += swap_state.o
 obj_y += swapfile.o
+obj_y += swap.o
+
+obj_y += mine.o

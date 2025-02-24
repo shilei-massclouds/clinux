@@ -125,3 +125,21 @@ __weak unsigned long get_zeroed_page(gfp_t gfp_mask)
     booter_panic("No impl 'page_init_poison'.");
 }
 EXPORT_SYMBOL(get_zeroed_page);
+
+__weak void free_unref_page_list(struct list_head *list)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(free_unref_page_list);
+
+__weak void drain_local_pages(struct zone *zone)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(drain_local_pages);
+
+__weak void free_unref_page(struct page *page)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(free_unref_page);
