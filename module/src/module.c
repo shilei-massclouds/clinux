@@ -805,9 +805,9 @@ static void module_assert_mutex_or_preempt(void)
 //
 //MODINFO_ATTR(version);
 //MODINFO_ATTR(srcversion);
-//
-//static char last_unloaded_module[MODULE_NAME_LEN+1];
-//
+
+static char last_unloaded_module[MODULE_NAME_LEN+1];
+
 #ifdef CONFIG_MODULE_UNLOAD
 //
 //EXPORT_TRACEPOINT_SYMBOL(module_get);
@@ -1178,20 +1178,20 @@ void module_put(struct module *module)
 //	return 0;
 //}
 #endif /* CONFIG_MODULE_UNLOAD */
-//
-//static size_t module_flags_taint(struct module *mod, char *buf)
-//{
-//	size_t l = 0;
-//	int i;
-//
-//	for (i = 0; i < TAINT_FLAGS_COUNT; i++) {
-//		if (taint_flags[i].module && test_bit(i, &mod->taints))
-//			buf[l++] = taint_flags[i].c_true;
-//	}
-//
-//	return l;
-//}
-//
+
+static size_t module_flags_taint(struct module *mod, char *buf)
+{
+	size_t l = 0;
+	int i;
+
+	for (i = 0; i < TAINT_FLAGS_COUNT; i++) {
+		if (taint_flags[i].module && test_bit(i, &mod->taints))
+			buf[l++] = taint_flags[i].c_true;
+	}
+
+	return l;
+}
+
 //static ssize_t show_initstate(struct module_attribute *mattr,
 //			      struct module_kobject *mk, char *buffer)
 //{
@@ -4321,34 +4321,34 @@ void module_put(struct module *module)
 //	return 0;
 //}
 //#endif /* CONFIG_KALLSYMS */
-//
-///* Maximum number of characters written by module_flags() */
-//#define MODULE_FLAGS_BUF_SIZE (TAINT_FLAGS_COUNT + 4)
-//
-///* Keep in sync with MODULE_FLAGS_BUF_SIZE !!! */
-//static char *module_flags(struct module *mod, char *buf)
-//{
-//	int bx = 0;
-//
-//	BUG_ON(mod->state == MODULE_STATE_UNFORMED);
-//	if (mod->taints ||
-//	    mod->state == MODULE_STATE_GOING ||
-//	    mod->state == MODULE_STATE_COMING) {
-//		buf[bx++] = '(';
-//		bx += module_flags_taint(mod, buf + bx);
-//		/* Show a - for module-is-being-unloaded */
-//		if (mod->state == MODULE_STATE_GOING)
-//			buf[bx++] = '-';
-//		/* Show a + for module-is-being-loaded */
-//		if (mod->state == MODULE_STATE_COMING)
-//			buf[bx++] = '+';
-//		buf[bx++] = ')';
-//	}
-//	buf[bx] = '\0';
-//
-//	return buf;
-//}
-//
+
+/* Maximum number of characters written by module_flags() */
+#define MODULE_FLAGS_BUF_SIZE (TAINT_FLAGS_COUNT + 4)
+
+/* Keep in sync with MODULE_FLAGS_BUF_SIZE !!! */
+static char *module_flags(struct module *mod, char *buf)
+{
+	int bx = 0;
+
+	BUG_ON(mod->state == MODULE_STATE_UNFORMED);
+	if (mod->taints ||
+	    mod->state == MODULE_STATE_GOING ||
+	    mod->state == MODULE_STATE_COMING) {
+		buf[bx++] = '(';
+		bx += module_flags_taint(mod, buf + bx);
+		/* Show a - for module-is-being-unloaded */
+		if (mod->state == MODULE_STATE_GOING)
+			buf[bx++] = '-';
+		/* Show a + for module-is-being-loaded */
+		if (mod->state == MODULE_STATE_COMING)
+			buf[bx++] = '+';
+		buf[bx++] = ')';
+	}
+	buf[bx] = '\0';
+
+	return buf;
+}
+
 //#ifdef CONFIG_PROC_FS
 ///* Called by the /proc file system to return a list of modules. */
 //static void *m_start(struct seq_file *m, loff_t *pos)
@@ -4552,27 +4552,27 @@ struct module *__module_address(unsigned long addr)
 //	}
 //	return mod;
 //}
-//
-///* Don't grab lock, we're oopsing. */
-//void print_modules(void)
-//{
-//	struct module *mod;
-//	char buf[MODULE_FLAGS_BUF_SIZE];
-//
-//	printk(KERN_DEFAULT "Modules linked in:");
-//	/* Most callers should already have preempt disabled, but make sure */
-//	preempt_disable();
-//	list_for_each_entry_rcu(mod, &modules, list) {
-//		if (mod->state == MODULE_STATE_UNFORMED)
-//			continue;
-//		pr_cont(" %s%s", mod->name, module_flags(mod, buf));
-//	}
-//	preempt_enable();
-//	if (last_unloaded_module[0])
-//		pr_cont(" [last unloaded: %s]", last_unloaded_module);
-//	pr_cont("\n");
-//}
-//
+
+/* Don't grab lock, we're oopsing. */
+void print_modules(void)
+{
+	struct module *mod;
+	char buf[MODULE_FLAGS_BUF_SIZE];
+
+	printk(KERN_DEFAULT "Modules linked in:");
+	/* Most callers should already have preempt disabled, but make sure */
+	preempt_disable();
+	list_for_each_entry_rcu(mod, &modules, list) {
+		if (mod->state == MODULE_STATE_UNFORMED)
+			continue;
+		pr_cont(" %s%s", mod->name, module_flags(mod, buf));
+	}
+	preempt_enable();
+	if (last_unloaded_module[0])
+		pr_cont(" [last unloaded: %s]", last_unloaded_module);
+	pr_cont("\n");
+}
+
 //#ifdef CONFIG_MODVERSIONS
 ///* Generate the signature for all relevant module structures here.
 // * If these change, we don't want to try to parse the module. */

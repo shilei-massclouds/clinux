@@ -390,6 +390,7 @@ const struct taint_flag taint_flags[TAINT_FLAGS_COUNT] = {
 	[ TAINT_AUX ]			= { 'X', ' ', true },
 	[ TAINT_RANDSTRUCT ]		= { 'T', ' ', true },
 };
+EXPORT_SYMBOL(taint_flags);
 
 /**
  * print_tainted - return a string to represent the kernel taint state.

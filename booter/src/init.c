@@ -1805,3 +1805,9 @@ __weak const struct exception_table_entry *search_module_extables(unsigned long 
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(search_module_extables);
+
+__weak void print_modules(void)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(print_modules);

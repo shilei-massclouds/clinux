@@ -72,12 +72,6 @@ void wake_up_q(struct wake_q_head *head)
 }
 EXPORT_SYMBOL(wake_up_q);
 
-void print_modules(void)
-{
-    booter_panic("No impl 'sched'.");
-}
-EXPORT_SYMBOL(print_modules);
-
 void __weak io_schedule_finish(int token)
 {
     booter_panic("in mutex!");
