@@ -22,11 +22,13 @@ int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
 }
 EXPORT_SYMBOL(__break_lease);
 
+/*
 void __fsnotify_inode_delete(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__fsnotify_inode_delete);
+*/
 
 unsigned long invalidate_mapping_pages(struct address_space *mapping,
         pgoff_t start, pgoff_t end)
@@ -39,20 +41,6 @@ int __mnt_want_write_file(struct file *file)
 {
     booter_panic("No impl!\n");
 }
-
-int fsnotify(__u32 mask, const void *data, int data_type, struct inode *dir,
-         const struct qstr *file_name, struct inode *inode, u32 cookie)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(fsnotify);
-
-/*
-int __mnt_want_write(struct vfsmount *m)
-{
-    booter_panic("No impl!\n");
-}
-*/
 
 int in_group_p(kgid_t grp)
 {

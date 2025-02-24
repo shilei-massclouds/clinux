@@ -1008,6 +1008,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(riscv_fault);
     REQUIRE_COMPONENT(mmap);
     REQUIRE_COMPONENT(drv_char);
+    REQUIRE_COMPONENT(notify);
 
     //
     // start_kernel (init/main.c)

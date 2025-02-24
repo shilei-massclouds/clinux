@@ -36,12 +36,6 @@ __weak int __init shmem_init(void)
     booter_panic("No impl!\n");
 }
 
-
-void __fsnotify_vfsmount_delete(struct vfsmount *mnt)
-{
-    booter_panic("No impl!\n");
-}
-
 void mnt_pin_kill(struct mount *m)
 {
     booter_panic("No impl!\n");

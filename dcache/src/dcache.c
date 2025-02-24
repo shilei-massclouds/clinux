@@ -918,47 +918,47 @@ static inline void __dget(struct dentry *dentry)
 	lockref_get(&dentry->d_lockref);
 }
 
-//struct dentry *dget_parent(struct dentry *dentry)
-//{
-//	int gotref;
-//	struct dentry *ret;
-//	unsigned seq;
-//
-//	/*
-//	 * Do optimistic parent lookup without any
-//	 * locking.
-//	 */
-//	rcu_read_lock();
-//	seq = raw_seqcount_begin(&dentry->d_seq);
-//	ret = READ_ONCE(dentry->d_parent);
-//	gotref = lockref_get_not_zero(&ret->d_lockref);
-//	rcu_read_unlock();
-//	if (likely(gotref)) {
-//		if (!read_seqcount_retry(&dentry->d_seq, seq))
-//			return ret;
-//		dput(ret);
-//	}
-//
-//repeat:
-//	/*
-//	 * Don't need rcu_dereference because we re-check it was correct under
-//	 * the lock.
-//	 */
-//	rcu_read_lock();
-//	ret = dentry->d_parent;
-//	spin_lock(&ret->d_lock);
-//	if (unlikely(ret != dentry->d_parent)) {
-//		spin_unlock(&ret->d_lock);
-//		rcu_read_unlock();
-//		goto repeat;
-//	}
-//	rcu_read_unlock();
-//	BUG_ON(!ret->d_lockref.count);
-//	ret->d_lockref.count++;
-//	spin_unlock(&ret->d_lock);
-//	return ret;
-//}
-//EXPORT_SYMBOL(dget_parent);
+struct dentry *dget_parent(struct dentry *dentry)
+{
+	int gotref;
+	struct dentry *ret;
+	unsigned seq;
+
+	/*
+	 * Do optimistic parent lookup without any
+	 * locking.
+	 */
+	rcu_read_lock();
+	seq = raw_seqcount_begin(&dentry->d_seq);
+	ret = READ_ONCE(dentry->d_parent);
+	gotref = lockref_get_not_zero(&ret->d_lockref);
+	rcu_read_unlock();
+	if (likely(gotref)) {
+		if (!read_seqcount_retry(&dentry->d_seq, seq))
+			return ret;
+		dput(ret);
+	}
+
+repeat:
+	/*
+	 * Don't need rcu_dereference because we re-check it was correct under
+	 * the lock.
+	 */
+	rcu_read_lock();
+	ret = dentry->d_parent;
+	spin_lock(&ret->d_lock);
+	if (unlikely(ret != dentry->d_parent)) {
+		spin_unlock(&ret->d_lock);
+		rcu_read_unlock();
+		goto repeat;
+	}
+	rcu_read_unlock();
+	BUG_ON(!ret->d_lockref.count);
+	ret->d_lockref.count++;
+	spin_unlock(&ret->d_lock);
+	return ret;
+}
+EXPORT_SYMBOL(dget_parent);
 
 static struct dentry * __d_find_any_alias(struct inode *inode)
 {

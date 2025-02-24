@@ -1082,13 +1082,6 @@ __weak bool path_noexec(const struct path *path)
 }
 EXPORT_SYMBOL_GPL(path_noexec);
 
-int __fsnotify_parent(struct dentry *dentry, __u32 mask, const void *data,
-              int data_type)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
-EXPORT_SYMBOL_GPL(__fsnotify_parent);
-
 struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 {
     booter_panic("No impl in 'workqueue'.");
@@ -1169,7 +1162,7 @@ __weak int __init devtmpfs_init(void)
 }
 EXPORT_SYMBOL(devtmpfs_init);
 
-int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
+__weak int notify_change(struct dentry * dentry, struct iattr * attr, struct inode **delegated_inode)
 {
     booter_panic("No impl!\n");
 }
@@ -1871,3 +1864,29 @@ __weak void raise_softirq(unsigned int nr)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(raise_softirq);
+
+__weak void __fsnotify_inode_delete(struct inode *inode)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL_GPL(__fsnotify_inode_delete);
+
+__weak int fsnotify(__u32 mask, const void *data, int data_type, struct inode *dir,
+	     const struct qstr *file_name, struct inode *inode, u32 cookie)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL_GPL(fsnotify);
+
+__weak int __fsnotify_parent(struct dentry *dentry, __u32 mask, const void *data,
+		      int data_type)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL_GPL(__fsnotify_parent);
+
+__weak void fsnotify_sb_delete(struct super_block *sb)
+{
+    booter_panic("No impl in 'time'.");
+}
+EXPORT_SYMBOL(fsnotify_sb_delete);
