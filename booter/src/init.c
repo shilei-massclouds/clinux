@@ -5,6 +5,7 @@
 #include <linux/jiffies.h>
 #include <linux/kobject.h>
 #include <linux/netlink.h>
+#include <linux/syscore_ops.h>
 #include <linux/device.h>
 #include <linux/irq.h>
 #include <linux/tty.h>
@@ -1684,3 +1685,9 @@ EXPORT_SYMBOL(debugfs_remove);
 bool initcall_debug;
 //core_param(initcall_debug, initcall_debug, bool, 0644);
 EXPORT_SYMBOL(initcall_debug);
+
+__weak void register_syscore_ops(struct syscore_ops *ops)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(register_syscore_ops);

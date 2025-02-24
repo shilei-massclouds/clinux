@@ -60,21 +60,6 @@ int rtc_set_ntp_time(struct timespec64 now, unsigned long *target_nsec)
     booter_panic("No impl in 'time'.");
 }
 
-void register_syscore_ops(struct syscore_ops *ops)
-{
-    booter_panic("No impl in 'time'.");
-}
-/*
-void irq_work_tick(void)
-{
-    booter_panic("No impl in 'time'.");
-}
-ssize_t seq_read(struct file *file, char __user *buf, size_t size, loff_t *ppos)
-{
-    booter_panic("No impl in 'time'.");
-}
-EXPORT_SYMBOL(seq_read);
-*/
 struct dentry *debugfs_create_file(const char *name, umode_t mode,
                    struct dentry *parent, void *data,
                    const struct file_operations *fops)
@@ -88,13 +73,6 @@ void __weak scheduler_tick(void)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(scheduler_tick);
-
-/*
-void run_posix_cpu_timers(void)
-{
-    booter_panic("No impl in 'time'.");
-}
-*/
 
 void hrtimers_resume(void)
 {
