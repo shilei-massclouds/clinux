@@ -2562,7 +2562,6 @@ void console_unblank(void)
 			c->unblank();
 	console_unlock();
 }
-EXPORT_SYMBOL(console_unblank);
 
 /**
  * console_flush_on_panic - flush console content on panic

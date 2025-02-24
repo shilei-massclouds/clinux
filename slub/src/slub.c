@@ -4073,24 +4073,24 @@ void *__kmalloc(size_t size, gfp_t flags)
 //	usercopy_abort("SLUB object", s->name, to_user, offset, n);
 //}
 //#endif /* CONFIG_HARDENED_USERCOPY */
-//
-//size_t __ksize(const void *object)
-//{
-//	struct page *page;
-//
-//	if (unlikely(object == ZERO_SIZE_PTR))
-//		return 0;
-//
-//	page = virt_to_head_page(object);
-//
-//	if (unlikely(!PageSlab(page))) {
-//		WARN_ON(!PageCompound(page));
-//		return page_size(page);
-//	}
-//
-//	return slab_ksize(page->slab_cache);
-//}
-//EXPORT_SYMBOL(__ksize);
+
+size_t __ksize(const void *object)
+{
+	struct page *page;
+
+	if (unlikely(object == ZERO_SIZE_PTR))
+		return 0;
+
+	page = virt_to_head_page(object);
+
+	if (unlikely(!PageSlab(page))) {
+		WARN_ON(!PageCompound(page));
+		return page_size(page);
+	}
+
+	return slab_ksize(page->slab_cache);
+}
+EXPORT_SYMBOL(__ksize);
 
 void kfree(const void *x)
 {

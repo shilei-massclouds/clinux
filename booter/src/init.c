@@ -1911,11 +1911,28 @@ __weak int groups_search(const struct group_info *group_info, kgid_t grp)
 }
 EXPORT_SYMBOL(groups_search);
 
-/*
-int uart_parse_earlycon(char *p, unsigned char *iotype, resource_size_t *addr,
-            char **options)
+__weak void *krealloc(const void *p, size_t new_size, gfp_t flags)
 {
     booter_panic("No impl!\n");
 }
-EXPORT_SYMBOL(uart_parse_earlycon);
-*/
+EXPORT_SYMBOL(krealloc);
+
+__weak void udelay(unsigned long usecs)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(udelay);
+
+__weak int sysfs_create_group(struct kobject *kobj,
+		       const struct attribute_group *grp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(sysfs_create_group);
+
+__weak void sysfs_remove_group(struct kobject *kobj,
+			const struct attribute_group *grp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(sysfs_remove_group);

@@ -174,7 +174,6 @@ int sysfs_create_group(struct kobject *kobj,
 {
 	return internal_create_group(kobj, 0, grp);
 }
-EXPORT_SYMBOL_GPL(sysfs_create_group);
 
 static int internal_create_groups(struct kobject *kobj, int update,
 				  const struct attribute_group **groups)
@@ -291,7 +290,6 @@ void sysfs_remove_group(struct kobject *kobj,
 
 	kernfs_put(kn);
 }
-EXPORT_SYMBOL_GPL(sysfs_remove_group);
 
 /**
  * sysfs_remove_groups - remove a list of groups

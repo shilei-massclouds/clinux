@@ -61,13 +61,3 @@ void __init parse_early_param(void)
     done = 1;
 }
 EXPORT_SYMBOL(parse_early_param);
-
-void kernel_param_lock(struct module *mod)
-{
-    booter_panic("No impl 'kernel_param_lock'.");
-}
-
-void kernel_param_unlock(struct module *mod)
-{
-    booter_panic("No impl 'kernel_param_unlock'.");
-}

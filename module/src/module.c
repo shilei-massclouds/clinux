@@ -1192,43 +1192,46 @@ static size_t module_flags_taint(struct module *mod, char *buf)
 	return l;
 }
 
-//static ssize_t show_initstate(struct module_attribute *mattr,
-//			      struct module_kobject *mk, char *buffer)
-//{
-//	const char *state = "unknown";
-//
-//	switch (mk->mod->state) {
-//	case MODULE_STATE_LIVE:
-//		state = "live";
-//		break;
-//	case MODULE_STATE_COMING:
-//		state = "coming";
-//		break;
-//	case MODULE_STATE_GOING:
-//		state = "going";
-//		break;
-//	default:
-//		BUG();
-//	}
-//	return sprintf(buffer, "%s\n", state);
-//}
-//
-//static struct module_attribute modinfo_initstate =
-//	__ATTR(initstate, 0444, show_initstate, NULL);
-//
-//static ssize_t store_uevent(struct module_attribute *mattr,
-//			    struct module_kobject *mk,
-//			    const char *buffer, size_t count)
-//{
-//	int rc;
-//
-//	rc = kobject_synth_uevent(&mk->kobj, buffer, count);
-//	return rc ? rc : count;
-//}
-//
-//struct module_attribute module_uevent =
-//	__ATTR(uevent, 0200, NULL, store_uevent);
-//
+static ssize_t show_initstate(struct module_attribute *mattr,
+			      struct module_kobject *mk, char *buffer)
+{
+	const char *state = "unknown";
+
+	switch (mk->mod->state) {
+	case MODULE_STATE_LIVE:
+		state = "live";
+		break;
+	case MODULE_STATE_COMING:
+		state = "coming";
+		break;
+	case MODULE_STATE_GOING:
+		state = "going";
+		break;
+	default:
+		BUG();
+	}
+	return sprintf(buffer, "%s\n", state);
+}
+
+static struct module_attribute modinfo_initstate =
+	__ATTR(initstate, 0444, show_initstate, NULL);
+
+/*
+static ssize_t store_uevent(struct module_attribute *mattr,
+			    struct module_kobject *mk,
+			    const char *buffer, size_t count)
+{
+	int rc;
+
+	rc = kobject_synth_uevent(&mk->kobj, buffer, count);
+	return rc ? rc : count;
+}
+
+struct module_attribute module_uevent =
+	__ATTR(uevent, 0200, NULL, store_uevent);
+EXPORT_SYMBOL(module_uevent);
+*/
+
 //static ssize_t show_coresize(struct module_attribute *mattr,
 //			     struct module_kobject *mk, char *buffer)
 //{

@@ -3,9 +3,6 @@
 
 CL_MINE(devres_release_all)
 
-CL_MINE(module_add_driver)
-CL_MINE(module_remove_driver)
-
 CL_MINE(async_schedule_node)
 CL_MINE(async_synchronize_full)
 CL_MINE(device_links_busy)

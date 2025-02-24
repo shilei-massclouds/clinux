@@ -147,3 +147,9 @@ __weak asmlinkage int vprintk_emit(int facility, int level,
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(vprintk_emit);
+
+__weak void console_unblank(void)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(console_unblank);

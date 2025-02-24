@@ -93,7 +93,6 @@ void udelay(unsigned long usecs)
 
 	__delay(ucycles >> UDELAY_SHIFT);
 }
-EXPORT_SYMBOL(udelay);
 
 void ndelay(unsigned long nsecs)
 {
