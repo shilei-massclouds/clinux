@@ -200,45 +200,45 @@ const void *of_device_get_match_data(const struct device *dev)
 }
 EXPORT_SYMBOL(of_device_get_match_data);
 
-//static ssize_t of_device_get_modalias(struct device *dev, char *str, ssize_t len)
-//{
-//	const char *compat;
-//	char *c;
-//	struct property *p;
-//	ssize_t csize;
-//	ssize_t tsize;
-//
-//	if ((!dev) || (!dev->of_node))
-//		return -ENODEV;
-//
-//	/* Name & Type */
-//	/* %p eats all alphanum characters, so %c must be used here */
-//	csize = snprintf(str, len, "of:N%pOFn%c%s", dev->of_node, 'T',
-//			 of_node_get_device_type(dev->of_node));
-//	tsize = csize;
-//	len -= csize;
-//	if (str)
-//		str += csize;
-//
-//	of_property_for_each_string(dev->of_node, "compatible", p, compat) {
-//		csize = strlen(compat) + 1;
-//		tsize += csize;
-//		if (csize > len)
-//			continue;
-//
-//		csize = snprintf(str, len, "C%s", compat);
-//		for (c = str; c; ) {
-//			c = strchr(c, ' ');
-//			if (c)
-//				*c++ = '_';
-//		}
-//		len -= csize;
-//		str += csize;
-//	}
-//
-//	return tsize;
-//}
-//
+static ssize_t of_device_get_modalias(struct device *dev, char *str, ssize_t len)
+{
+	const char *compat;
+	char *c;
+	struct property *p;
+	ssize_t csize;
+	ssize_t tsize;
+
+	if ((!dev) || (!dev->of_node))
+		return -ENODEV;
+
+	/* Name & Type */
+	/* %p eats all alphanum characters, so %c must be used here */
+	csize = snprintf(str, len, "of:N%pOFn%c%s", dev->of_node, 'T',
+			 of_node_get_device_type(dev->of_node));
+	tsize = csize;
+	len -= csize;
+	if (str)
+		str += csize;
+
+	of_property_for_each_string(dev->of_node, "compatible", p, compat) {
+		csize = strlen(compat) + 1;
+		tsize += csize;
+		if (csize > len)
+			continue;
+
+		csize = snprintf(str, len, "C%s", compat);
+		for (c = str; c; ) {
+			c = strchr(c, ' ');
+			if (c)
+				*c++ = '_';
+		}
+		len -= csize;
+		str += csize;
+	}
+
+	return tsize;
+}
+
 //int of_device_request_module(struct device *dev)
 //{
 //	char *str;
@@ -319,23 +319,23 @@ void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
 	mutex_unlock(&of_mutex);
 }
 
-//int of_device_uevent_modalias(struct device *dev, struct kobj_uevent_env *env)
-//{
-//	int sl;
-//
-//	if ((!dev) || (!dev->of_node))
-//		return -ENODEV;
-//
-//	/* Devicetree modalias is tricky, we add it in 2 steps */
-//	if (add_uevent_var(env, "MODALIAS="))
-//		return -ENOMEM;
-//
-//	sl = of_device_get_modalias(dev, &env->buf[env->buflen-1],
-//				    sizeof(env->buf) - env->buflen);
-//	if (sl >= (sizeof(env->buf) - env->buflen))
-//		return -ENOMEM;
-//	env->buflen += sl;
-//
-//	return 0;
-//}
-//EXPORT_SYMBOL_GPL(of_device_uevent_modalias);
+int of_device_uevent_modalias(struct device *dev, struct kobj_uevent_env *env)
+{
+	int sl;
+
+	if ((!dev) || (!dev->of_node))
+		return -ENODEV;
+
+	/* Devicetree modalias is tricky, we add it in 2 steps */
+	if (add_uevent_var(env, "MODALIAS="))
+		return -ENOMEM;
+
+	sl = of_device_get_modalias(dev, &env->buf[env->buflen-1],
+				    sizeof(env->buf) - env->buflen);
+	if (sl >= (sizeof(env->buf) - env->buflen))
+		return -ENOMEM;
+	env->buflen += sl;
+
+	return 0;
+}
+EXPORT_SYMBOL_GPL(of_device_uevent_modalias);

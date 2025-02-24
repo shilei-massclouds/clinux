@@ -1911,9 +1911,11 @@ __weak int groups_search(const struct group_info *group_info, kgid_t grp)
 }
 EXPORT_SYMBOL(groups_search);
 
+/*
 int uart_parse_earlycon(char *p, unsigned char *iotype, resource_size_t *addr,
             char **options)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(uart_parse_earlycon);
+*/

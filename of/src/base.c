@@ -2116,30 +2116,30 @@ void of_alias_scan(void * (*dt_alloc)(u64 size, u64 align))
 //	return id;
 //}
 //EXPORT_SYMBOL_GPL(of_alias_get_highest_id);
-//
-///**
-// * of_console_check() - Test and setup console for DT setup
-// * @dn - Pointer to device node
-// * @name - Name to use for preferred console without index. ex. "ttyS"
-// * @index - Index to use for preferred console.
-// *
-// * Check if the given device node matches the stdout-path property in the
-// * /chosen node. If it does then register it as the preferred console and return
-// * TRUE. Otherwise return FALSE.
-// */
-//bool of_console_check(struct device_node *dn, char *name, int index)
-//{
-//	if (!dn || dn != of_stdout || console_set_on_cmdline)
-//		return false;
-//
-//	/*
-//	 * XXX: cast `options' to char pointer to suppress complication
-//	 * warnings: printk, UART and console drivers expect char pointer.
-//	 */
-//	return !add_preferred_console(name, index, (char *)of_stdout_options);
-//}
-//EXPORT_SYMBOL_GPL(of_console_check);
-//
+
+/**
+ * of_console_check() - Test and setup console for DT setup
+ * @dn - Pointer to device node
+ * @name - Name to use for preferred console without index. ex. "ttyS"
+ * @index - Index to use for preferred console.
+ *
+ * Check if the given device node matches the stdout-path property in the
+ * /chosen node. If it does then register it as the preferred console and return
+ * TRUE. Otherwise return FALSE.
+ */
+bool of_console_check(struct device_node *dn, char *name, int index)
+{
+	if (!dn || dn != of_stdout || console_set_on_cmdline)
+		return false;
+
+	/*
+	 * XXX: cast `options' to char pointer to suppress complication
+	 * warnings: printk, UART and console drivers expect char pointer.
+	 */
+	return !add_preferred_console(name, index, (char *)of_stdout_options);
+}
+EXPORT_SYMBOL_GPL(of_console_check);
+
 ///**
 // *	of_find_next_cache_node - Find a node's subsidiary cache
 // *	@np:	node of type "cpu" or "cache"
