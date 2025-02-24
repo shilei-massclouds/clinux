@@ -62,12 +62,6 @@ void __init parse_early_param(void)
 }
 EXPORT_SYMBOL(parse_early_param);
 
-void add_taint(unsigned flag, enum lockdep_ok lockdep_ok)
-{
-    booter_panic("No impl 'add_taint'.");
-}
-EXPORT_SYMBOL(add_taint);
-
 void kernel_param_lock(struct module *mod)
 {
     booter_panic("No impl 'kernel_param_lock'.");

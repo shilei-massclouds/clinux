@@ -26,10 +26,6 @@ __visible int do_syscall_trace_enter(struct pt_regs *regs)
 // NOTE: implement it!!!!!!!!!!!!!!!!
 void *sys_call_table[__NR_syscalls];
 
-void oops_exit(void)
-{
-    booter_panic("No impl!\n");
-}
 void do_notify_resume(struct pt_regs *regs)
 {
     booter_panic("No impl!\n");

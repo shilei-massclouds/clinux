@@ -1811,3 +1811,9 @@ __weak void print_modules(void)
     booter_panic("No impl 'sched'.");
 }
 EXPORT_SYMBOL(print_modules);
+
+__weak void add_taint(unsigned flag, enum lockdep_ok lockdep_ok)
+{
+    booter_panic("No impl 'add_taint'.");
+}
+EXPORT_SYMBOL(add_taint);
