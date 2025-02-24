@@ -17,10 +17,12 @@ EXPORT_SYMBOL(cl_cred_init);
 int suid_dumpable = 0;
 EXPORT_SYMBOL(suid_dumpable);
 
+/*
 void groups_free(struct group_info *group_info)
 {
     booter_panic("No impl.\n");
 }
+*/
 
 __weak void set_dumpable(struct mm_struct *mm, int value)
 {

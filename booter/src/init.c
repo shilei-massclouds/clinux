@@ -1898,3 +1898,15 @@ __weak int simple_setattr(struct dentry *dentry, struct iattr *iattr)
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(simple_setattr);
+
+__weak int in_group_p(kgid_t grp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(in_group_p);
+
+__weak int groups_search(const struct group_info *group_info, kgid_t grp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(groups_search);

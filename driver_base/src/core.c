@@ -3615,70 +3615,70 @@ struct device *device_create(struct class *class, struct device *parent,
 }
 EXPORT_SYMBOL_GPL(device_create);
 
-///**
-// * device_create_with_groups - creates a device and registers it with sysfs
-// * @class: pointer to the struct class that this device should be registered to
-// * @parent: pointer to the parent struct device of this new device, if any
-// * @devt: the dev_t for the char device to be added
-// * @drvdata: the data to be added to the device for callbacks
-// * @groups: NULL-terminated list of attribute groups to be created
-// * @fmt: string for the device's name
-// *
-// * This function can be used by char device classes.  A struct device
-// * will be created in sysfs, registered to the specified class.
-// * Additional attributes specified in the groups parameter will also
-// * be created automatically.
-// *
-// * A "dev" file will be created, showing the dev_t for the device, if
-// * the dev_t is not 0,0.
-// * If a pointer to a parent struct device is passed in, the newly created
-// * struct device will be a child of that device in sysfs.
-// * The pointer to the struct device will be returned from the call.
-// * Any further sysfs files that might be required can be created using this
-// * pointer.
-// *
-// * Returns &struct device pointer on success, or ERR_PTR() on error.
-// *
-// * Note: the struct class passed to this function must have previously
-// * been created with a call to class_create().
-// */
-//struct device *device_create_with_groups(struct class *class,
-//					 struct device *parent, dev_t devt,
-//					 void *drvdata,
-//					 const struct attribute_group **groups,
-//					 const char *fmt, ...)
-//{
-//	va_list vargs;
-//	struct device *dev;
-//
-//	va_start(vargs, fmt);
-//	dev = device_create_groups_vargs(class, parent, devt, drvdata, groups,
-//					 fmt, vargs);
-//	va_end(vargs);
-//	return dev;
-//}
-//EXPORT_SYMBOL_GPL(device_create_with_groups);
-//
-///**
-// * device_destroy - removes a device that was created with device_create()
-// * @class: pointer to the struct class that this device was registered with
-// * @devt: the dev_t of the device that was previously registered
-// *
-// * This call unregisters and cleans up a device that was created with a
-// * call to device_create().
-// */
-//void device_destroy(struct class *class, dev_t devt)
-//{
-//	struct device *dev;
-//
-//	dev = class_find_device_by_devt(class, devt);
-//	if (dev) {
-//		put_device(dev);
-//		device_unregister(dev);
-//	}
-//}
-//EXPORT_SYMBOL_GPL(device_destroy);
-//
+/**
+ * device_create_with_groups - creates a device and registers it with sysfs
+ * @class: pointer to the struct class that this device should be registered to
+ * @parent: pointer to the parent struct device of this new device, if any
+ * @devt: the dev_t for the char device to be added
+ * @drvdata: the data to be added to the device for callbacks
+ * @groups: NULL-terminated list of attribute groups to be created
+ * @fmt: string for the device's name
+ *
+ * This function can be used by char device classes.  A struct device
+ * will be created in sysfs, registered to the specified class.
+ * Additional attributes specified in the groups parameter will also
+ * be created automatically.
+ *
+ * A "dev" file will be created, showing the dev_t for the device, if
+ * the dev_t is not 0,0.
+ * If a pointer to a parent struct device is passed in, the newly created
+ * struct device will be a child of that device in sysfs.
+ * The pointer to the struct device will be returned from the call.
+ * Any further sysfs files that might be required can be created using this
+ * pointer.
+ *
+ * Returns &struct device pointer on success, or ERR_PTR() on error.
+ *
+ * Note: the struct class passed to this function must have previously
+ * been created with a call to class_create().
+ */
+struct device *device_create_with_groups(struct class *class,
+					 struct device *parent, dev_t devt,
+					 void *drvdata,
+					 const struct attribute_group **groups,
+					 const char *fmt, ...)
+{
+	va_list vargs;
+	struct device *dev;
+
+	va_start(vargs, fmt);
+	dev = device_create_groups_vargs(class, parent, devt, drvdata, groups,
+					 fmt, vargs);
+	va_end(vargs);
+	return dev;
+}
+EXPORT_SYMBOL_GPL(device_create_with_groups);
+
+/**
+ * device_destroy - removes a device that was created with device_create()
+ * @class: pointer to the struct class that this device was registered with
+ * @devt: the dev_t of the device that was previously registered
+ *
+ * This call unregisters and cleans up a device that was created with a
+ * call to device_create().
+ */
+void device_destroy(struct class *class, dev_t devt)
+{
+	struct device *dev;
+
+	dev = class_find_device_by_devt(class, devt);
+	if (dev) {
+		put_device(dev);
+		device_unregister(dev);
+	}
+}
+EXPORT_SYMBOL_GPL(device_destroy);
+
 ///**
 // * device_rename - renames a device
 // * @dev: the pointer to the struct device to be renamed
@@ -4298,46 +4298,46 @@ void set_secondary_fwnode(struct device *dev, struct fwnode_handle *fwnode)
 }
 EXPORT_SYMBOL_GPL(set_secondary_fwnode);
 
-///**
-// * device_set_of_node_from_dev - reuse device-tree node of another device
-// * @dev: device whose device-tree node is being set
-// * @dev2: device whose device-tree node is being reused
-// *
-// * Takes another reference to the new device-tree node after first dropping
-// * any reference held to the old node.
-// */
-//void device_set_of_node_from_dev(struct device *dev, const struct device *dev2)
-//{
-//	of_node_put(dev->of_node);
-//	dev->of_node = of_node_get(dev2->of_node);
-//	dev->of_node_reused = true;
-//}
-//EXPORT_SYMBOL_GPL(device_set_of_node_from_dev);
-//
-//int device_match_name(struct device *dev, const void *name)
-//{
-//	return sysfs_streq(dev_name(dev), name);
-//}
-//EXPORT_SYMBOL_GPL(device_match_name);
-//
-//int device_match_of_node(struct device *dev, const void *np)
-//{
-//	return dev->of_node == np;
-//}
-//EXPORT_SYMBOL_GPL(device_match_of_node);
-//
-//int device_match_fwnode(struct device *dev, const void *fwnode)
-//{
-//	return dev_fwnode(dev) == fwnode;
-//}
-//EXPORT_SYMBOL_GPL(device_match_fwnode);
-//
-//int device_match_devt(struct device *dev, const void *pdevt)
-//{
-//	return dev->devt == *(dev_t *)pdevt;
-//}
-//EXPORT_SYMBOL_GPL(device_match_devt);
-//
+/**
+ * device_set_of_node_from_dev - reuse device-tree node of another device
+ * @dev: device whose device-tree node is being set
+ * @dev2: device whose device-tree node is being reused
+ *
+ * Takes another reference to the new device-tree node after first dropping
+ * any reference held to the old node.
+ */
+void device_set_of_node_from_dev(struct device *dev, const struct device *dev2)
+{
+	of_node_put(dev->of_node);
+	dev->of_node = of_node_get(dev2->of_node);
+	dev->of_node_reused = true;
+}
+EXPORT_SYMBOL_GPL(device_set_of_node_from_dev);
+
+int device_match_name(struct device *dev, const void *name)
+{
+	return sysfs_streq(dev_name(dev), name);
+}
+EXPORT_SYMBOL_GPL(device_match_name);
+
+int device_match_of_node(struct device *dev, const void *np)
+{
+	return dev->of_node == np;
+}
+EXPORT_SYMBOL_GPL(device_match_of_node);
+
+int device_match_fwnode(struct device *dev, const void *fwnode)
+{
+	return dev_fwnode(dev) == fwnode;
+}
+EXPORT_SYMBOL_GPL(device_match_fwnode);
+
+int device_match_devt(struct device *dev, const void *pdevt)
+{
+	return dev->devt == *(dev_t *)pdevt;
+}
+EXPORT_SYMBOL_GPL(device_match_devt);
+
 //int device_match_acpi_dev(struct device *dev, const void *adev)
 //{
 //	return ACPI_COMPANION(dev) == adev;

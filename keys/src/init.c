@@ -16,10 +16,12 @@ cl_keys_init(void)
 }
 EXPORT_SYMBOL(cl_keys_init);
 
+/*
 int groups_search(const struct group_info *group_info, kgid_t grp)
 {
     booter_panic("No impl!\n");
 }
+*/
 
 //
 // Consider to add a standalone component 'cred_itf'.

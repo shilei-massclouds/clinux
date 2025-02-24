@@ -1009,6 +1009,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(mmap);
     REQUIRE_COMPONENT(drv_char);
     REQUIRE_COMPONENT(notify);
+    REQUIRE_COMPONENT(groups);
 
     //
     // start_kernel (init/main.c)

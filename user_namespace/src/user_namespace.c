@@ -1218,6 +1218,7 @@ bool userns_may_setgroups(const struct user_namespace *ns)
 
 	return allowed;
 }
+EXPORT_SYMBOL(userns_may_setgroups);
 
 /*
  * Returns true if @child is the same namespace or a descendant of

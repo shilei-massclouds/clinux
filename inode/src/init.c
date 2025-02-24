@@ -42,11 +42,8 @@ int __mnt_want_write_file(struct file *file)
     booter_panic("No impl!\n");
 }
 
-int in_group_p(kgid_t grp)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(in_group_p);
+/*
+*/
 
 void truncate_inode_pages_final(struct address_space *mapping)
 {

@@ -3,7 +3,6 @@
 
 CL_MINE(devres_release_all)
 
-CL_MINE(device_match_name)
 CL_MINE(driver_add_groups)
 CL_MINE(driver_create_file)
 CL_MINE(driver_remove_file)
