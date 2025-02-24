@@ -453,26 +453,26 @@ void irq_exit(void)
 }
 EXPORT_SYMBOL(irq_exit);
 
-///*
-// * This function must run with irqs disabled!
-// */
-//inline void raise_softirq_irqoff(unsigned int nr)
-//{
-//	__raise_softirq_irqoff(nr);
-//
-//	/*
-//	 * If we're in an interrupt or softirq, we're done
-//	 * (this also catches softirq-disabled code). We will
-//	 * actually run the softirq once we return from
-//	 * the irq or softirq.
-//	 *
-//	 * Otherwise we wake up ksoftirqd to make sure we
-//	 * schedule the softirq soon.
-//	 */
-//	if (!in_interrupt())
-//		wakeup_softirqd();
-//}
-//
+/*
+ * This function must run with irqs disabled!
+ */
+void raise_softirq_irqoff(unsigned int nr)
+{
+	__raise_softirq_irqoff(nr);
+
+	/*
+	 * If we're in an interrupt or softirq, we're done
+	 * (this also catches softirq-disabled code). We will
+	 * actually run the softirq once we return from
+	 * the irq or softirq.
+	 *
+	 * Otherwise we wake up ksoftirqd to make sure we
+	 * schedule the softirq soon.
+	 */
+	if (!in_interrupt())
+		wakeup_softirqd();
+}
+
 //void raise_softirq(unsigned int nr)
 //{
 //	unsigned long flags;

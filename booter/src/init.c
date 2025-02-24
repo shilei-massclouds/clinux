@@ -1817,3 +1817,9 @@ __weak void add_taint(unsigned flag, enum lockdep_ok lockdep_ok)
     booter_panic("No impl 'add_taint'.");
 }
 EXPORT_SYMBOL(add_taint);
+
+__weak void raise_softirq_irqoff(unsigned int nr)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL(raise_softirq_irqoff);
