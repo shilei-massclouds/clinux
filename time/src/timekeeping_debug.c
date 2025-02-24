@@ -37,8 +37,13 @@ DEFINE_SHOW_ATTRIBUTE(tk_debug_sleep_time);
 
 static int __init tk_debug_sleep_time_init(void)
 {
+    printk("%s: ==============> Disable this subsys_initcall temporarily.\n", __func__);
+
+    /*
+    printk("%s: ...\n", __func__);
 	debugfs_create_file("sleep_time", 0444, NULL, NULL,
 			    &tk_debug_sleep_time_fops);
+    */
 	return 0;
 }
 late_initcall(tk_debug_sleep_time_init);

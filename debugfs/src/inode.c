@@ -824,6 +824,7 @@ static int __init debugfs_init(void)
 {
 	int retval;
 
+    printk("%s: ...\n", __func__);
 	if (!(debugfs_allow & DEBUGFS_ALLOW_MOUNT))
 		return -EPERM;
 

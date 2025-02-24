@@ -569,6 +569,7 @@ static int rcu_verify_early_boot_tests(void)
 	int ret = 0;
 	int early_boot_test_counter = 0;
 
+    printk("%s: ...\n", __func__);
 	if (rcu_self_test) {
 		early_boot_test_counter++;
 		rcu_barrier();

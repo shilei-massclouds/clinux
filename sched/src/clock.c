@@ -215,6 +215,7 @@ EXPORT_SYMBOL(sched_clock_init);
  */
 static int __init sched_clock_init_late(void)
 {
+    printk("%s: ..\n", __func__);
 	static_branch_inc(&sched_clock_running);
 	/*
 	 * Ensure that it is impossible to not do a static_key update.

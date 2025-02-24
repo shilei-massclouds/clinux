@@ -173,12 +173,14 @@ __read_mostly bool sched_debug_enabled;
 
 static __init int sched_init_debug(void)
 {
-	debugfs_create_file("sched_features", 0644, NULL, NULL,
-			&sched_feat_fops);
-
-	debugfs_create_bool("sched_debug", 0644, NULL,
-			&sched_debug_enabled);
-
+    printk("%s: Disable this initcall temporarily.\n", __func__);
+//    printk("%s: ...\n", __func__);
+//	debugfs_create_file("sched_features", 0644, NULL, NULL,
+//			&sched_feat_fops);
+//
+//	debugfs_create_bool("sched_debug", 0644, NULL,
+//			&sched_debug_enabled);
+//
 	return 0;
 }
 late_initcall(sched_init_debug);

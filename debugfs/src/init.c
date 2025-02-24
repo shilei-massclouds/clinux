@@ -9,6 +9,7 @@ int
 cl_debugfs_init(void)
 {
     sbi_puts("module[debugfs]: init begin ...\n");
+    REQUIRE_COMPONENT(ksysfs);
     sbi_puts("module[debugfs]: init end!\n");
     return 0;
 }
