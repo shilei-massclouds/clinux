@@ -681,8 +681,9 @@ static int __ref kernel_init(void *unused)
 {
     int ret;
 
+    sbi_puts("kernel_init: ============ 0\n");
     kernel_init_freeable();
-    printk("%s: ============ 1\n", __func__);
+    sbi_puts("kernel_init: ============ 1\n");
     /* need to finish all async __init code before freeing the memory */
 //    async_synchronize_full();
 //    kprobe_free_init_mem();
@@ -851,7 +852,8 @@ static void __init do_initcall_level(int level, char *command_line)
 {
     initcall_entry_t *fn;
 
-    printk("%s: %s\n", __func__, initcall_level_names[level]);
+    sbi_puts(initcall_level_names[level]);
+    sbi_puts("\n");
     parse_args(initcall_level_names[level],
            command_line, __start___param,
            __stop___param - __start___param,
@@ -951,10 +953,10 @@ static noinline void __init kernel_init_freeable(void)
 
     do_basic_setup();
 
-    printk("%s: ============ 1 \n", __func__);
+    sbi_puts("kernel_init_freeable: ============ 1 \n");
     console_on_rootfs();
+    sbi_puts("kernel_init_freeable: ============ 2 \n");
 
-    printk("%s: ============ 2 \n", __func__);
 //    /*
 //     * check if there is an early userspace init.  If yes, let it do all
 //     * the work
@@ -1193,9 +1195,7 @@ cl_top_linux_init(void)
     acpi_early_init();
     if (late_time_init)
         late_time_init();
-    printk("%s: =======================> before sched_clock_init.\n", __func__);
     sched_clock_init();
-    printk("%s: =======================> after sched_clock_init.\n", __func__);
     calibrate_delay();
     pid_idr_init();
     anon_vma_init();
