@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(devres_release_all)
-CL_MINE(of_device_uevent)
 
 CL_MINE(device_attach)
 CL_MINE(device_driver_attach)

@@ -110,3 +110,9 @@ __weak int of_device_is_compatible(const struct device_node *device,
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(of_device_is_compatible);
+
+__weak void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL(of_device_uevent);

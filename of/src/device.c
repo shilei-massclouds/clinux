@@ -278,47 +278,47 @@ EXPORT_SYMBOL(of_device_get_match_data);
 //	return sl;
 //}
 //EXPORT_SYMBOL_GPL(of_device_modalias);
-//
-///**
-// * of_device_uevent - Display OF related uevent information
-// */
-//void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
-//{
-//	const char *compat, *type;
-//	struct alias_prop *app;
-//	struct property *p;
-//	int seen = 0;
-//
-//	if ((!dev) || (!dev->of_node))
-//		return;
-//
-//	add_uevent_var(env, "OF_NAME=%pOFn", dev->of_node);
-//	add_uevent_var(env, "OF_FULLNAME=%pOF", dev->of_node);
-//	type = of_node_get_device_type(dev->of_node);
-//	if (type)
-//		add_uevent_var(env, "OF_TYPE=%s", type);
-//
-//	/* Since the compatible field can contain pretty much anything
-//	 * it's not really legal to split it out with commas. We split it
-//	 * up using a number of environment variables instead. */
-//	of_property_for_each_string(dev->of_node, "compatible", p, compat) {
-//		add_uevent_var(env, "OF_COMPATIBLE_%d=%s", seen, compat);
-//		seen++;
-//	}
-//	add_uevent_var(env, "OF_COMPATIBLE_N=%d", seen);
-//
-//	seen = 0;
-//	mutex_lock(&of_mutex);
-//	list_for_each_entry(app, &aliases_lookup, link) {
-//		if (dev->of_node == app->np) {
-//			add_uevent_var(env, "OF_ALIAS_%d=%s", seen,
-//				       app->alias);
-//			seen++;
-//		}
-//	}
-//	mutex_unlock(&of_mutex);
-//}
-//
+
+/**
+ * of_device_uevent - Display OF related uevent information
+ */
+void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
+{
+	const char *compat, *type;
+	struct alias_prop *app;
+	struct property *p;
+	int seen = 0;
+
+	if ((!dev) || (!dev->of_node))
+		return;
+
+	add_uevent_var(env, "OF_NAME=%pOFn", dev->of_node);
+	add_uevent_var(env, "OF_FULLNAME=%pOF", dev->of_node);
+	type = of_node_get_device_type(dev->of_node);
+	if (type)
+		add_uevent_var(env, "OF_TYPE=%s", type);
+
+	/* Since the compatible field can contain pretty much anything
+	 * it's not really legal to split it out with commas. We split it
+	 * up using a number of environment variables instead. */
+	of_property_for_each_string(dev->of_node, "compatible", p, compat) {
+		add_uevent_var(env, "OF_COMPATIBLE_%d=%s", seen, compat);
+		seen++;
+	}
+	add_uevent_var(env, "OF_COMPATIBLE_N=%d", seen);
+
+	seen = 0;
+	mutex_lock(&of_mutex);
+	list_for_each_entry(app, &aliases_lookup, link) {
+		if (dev->of_node == app->np) {
+			add_uevent_var(env, "OF_ALIAS_%d=%s", seen,
+				       app->alias);
+			seen++;
+		}
+	}
+	mutex_unlock(&of_mutex);
+}
+
 //int of_device_uevent_modalias(struct device *dev, struct kobj_uevent_env *env)
 //{
 //	int sl;
