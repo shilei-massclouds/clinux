@@ -1603,6 +1603,7 @@ int __isolate_lru_page(struct page *page, isolate_mode_t mode)
 
 	return ret;
 }
+EXPORT_SYMBOL(__isolate_lru_page);
 
 
 /*

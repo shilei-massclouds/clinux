@@ -3201,7 +3201,6 @@ void split_page(struct page *page, unsigned int order)
 		set_page_refcounted(page + i);
 	split_page_owner(page, order);
 }
-EXPORT_SYMBOL_GPL(split_page);
 
 //int __isolate_free_page(struct page *page, unsigned int order)
 //{

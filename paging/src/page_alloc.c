@@ -545,6 +545,7 @@ void set_pfnblock_flags_mask(struct page *page, unsigned long flags,
 		word = old_word;
 	}
 }
+EXPORT_SYMBOL(set_pfnblock_flags_mask);
 
 void set_pageblock_migratetype(struct page *page, int migratetype)
 {

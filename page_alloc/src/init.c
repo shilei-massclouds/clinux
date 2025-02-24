@@ -43,42 +43,19 @@ void __kernel_map_pages(struct page *page, int numpages, int enable)
     booter_panic("No impl 'page_alloc'.");
 }
 
-bool compaction_zonelist_suitable(struct alloc_context *ac, int order,
-        int alloc_flags)
-{
-    booter_panic("No impl 'page_alloc'.");
-}
-
-void compaction_defer_reset(struct zone *zone, int order,
-        bool alloc_success)
-{
-    booter_panic("No impl 'page_alloc'.");
-}
-
-/*
-void wakeup_kswapd(struct zone *zone, gfp_t gfp_flags, int order,
-           enum zone_type highest_zoneidx)
-{
-    booter_panic("No impl 'page_alloc'.");
-}
-
-unsigned long zone_reclaimable_pages(struct zone *zone)
-{
-    booter_panic("No impl 'page_alloc'.");
-}
-*/
-
 bool out_of_memory(struct oom_control *oc)
 {
     booter_panic("No impl 'page_alloc'.");
 }
 
+/*
 enum compact_result try_to_compact_pages(gfp_t gfp_mask, unsigned int order,
         unsigned int alloc_flags, const struct alloc_context *ac,
         enum compact_priority prio, struct page **capture)
 {
     booter_panic("No impl 'page_alloc'.");
 }
+*/
 
 /*
 void show_mem(unsigned int filter, nodemask_t *nodemask)

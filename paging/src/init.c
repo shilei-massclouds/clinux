@@ -2,6 +2,8 @@
 
 #include <linux/types.h>
 #include <linux/export.h>
+#include <linux/mm.h>
+#include <linux/compaction.h>
 #include "internal.h"
 #include "../../booter/src/booter.h"
 
@@ -150,3 +152,36 @@ __weak bool zone_watermark_ok_safe(struct zone *z, unsigned int order,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(zone_watermark_ok_safe);
+
+__weak void split_page(struct page *page, unsigned int order)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(split_page);
+
+__weak void drain_all_pages(struct zone *zone)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(drain_all_pages);
+
+__weak void reset_isolation_suitable(pg_data_t *pgdat)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(reset_isolation_suitable);
+
+__weak void wakeup_kcompactd(pg_data_t *pgdat, int order, int highest_zoneidx)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(wakeup_kcompactd);
+
+__weak
+enum compact_result compaction_suitable(struct zone *zone, int order,
+					unsigned int alloc_flags,
+					int highest_zoneidx)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(compaction_suitable);

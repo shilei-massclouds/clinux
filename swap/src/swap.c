@@ -743,6 +743,7 @@ void lru_add_drain_cpu_zone(struct zone *zone)
 	drain_local_pages(zone);
 	local_unlock(&lru_pvecs.lock);
 }
+EXPORT_SYMBOL(lru_add_drain_cpu_zone);
 
 #ifdef CONFIG_SMP
 
@@ -816,6 +817,7 @@ void lru_add_drain_all(void)
 	lru_add_drain();
 }
 #endif
+EXPORT_SYMBOL(lru_add_drain_all);
 
 /**
  * release_pages - batched put_page()
