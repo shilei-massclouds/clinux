@@ -4444,34 +4444,34 @@ void module_put(struct module *module)
 //}
 //module_init(proc_modules_init);
 //#endif
-//
-///* Given an address, look for it in the module exception tables. */
-//const struct exception_table_entry *search_module_extables(unsigned long addr)
-//{
-//	const struct exception_table_entry *e = NULL;
-//	struct module *mod;
-//
-//	preempt_disable();
-//	mod = __module_address(addr);
-//	if (!mod)
-//		goto out;
-//
-//	if (!mod->num_exentries)
-//		goto out;
-//
-//	e = search_extable(mod->extable,
-//			   mod->num_exentries,
-//			   addr);
-//out:
-//	preempt_enable();
-//
-//	/*
-//	 * Now, if we found one, we are running inside it now, hence
-//	 * we cannot unload the module, hence no refcnt needed.
-//	 */
-//	return e;
-//}
-//
+
+/* Given an address, look for it in the module exception tables. */
+const struct exception_table_entry *search_module_extables(unsigned long addr)
+{
+	const struct exception_table_entry *e = NULL;
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	if (!mod)
+		goto out;
+
+	if (!mod->num_exentries)
+		goto out;
+
+	e = search_extable(mod->extable,
+			   mod->num_exentries,
+			   addr);
+out:
+	preempt_enable();
+
+	/*
+	 * Now, if we found one, we are running inside it now, hence
+	 * we cannot unload the module, hence no refcnt needed.
+	 */
+	return e;
+}
+
 ///*
 // * is_module_address - is this address inside a module?
 // * @addr: the address to check.

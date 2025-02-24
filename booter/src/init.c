@@ -1751,12 +1751,6 @@ __weak void __init mmap_init(void)
 }
 EXPORT_SYMBOL(mmap_init);
 
-int fixup_exception(struct pt_regs *regs)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(fixup_exception);
-
 __weak void do_trap(struct pt_regs *regs, int signo, int code, unsigned long addr)
 {
     booter_panic("No impl!\n");
@@ -1796,3 +1790,18 @@ EXPORT_SYMBOL(vm_area_free);
 /* amount of vm to protect from userspace access by both DAC and the LSM*/
 unsigned long mmap_min_addr;
 EXPORT_SYMBOL(mmap_min_addr);
+
+__weak const struct exception_table_entry *
+search_extable(const struct exception_table_entry *base,
+	       const size_t num,
+	       unsigned long value)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(search_extable);
+
+__weak const struct exception_table_entry *search_module_extables(unsigned long addr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(search_module_extables);
