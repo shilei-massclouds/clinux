@@ -2937,6 +2937,7 @@ void __do_SAK(struct tty_struct *tty)
 	read_unlock(&tasklist_lock);
 #endif
 }
+EXPORT_SYMBOL(__do_SAK);
 
 static void do_SAK_work(struct work_struct *work)
 {

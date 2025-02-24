@@ -1611,33 +1611,33 @@ static struct input_handler kbd_handler = {
 	.id_table	= kbd_ids,
 };
 
-//int __init kbd_init(void)
-//{
-//	int i;
-//	int error;
-//
-//	for (i = 0; i < MAX_NR_CONSOLES; i++) {
-//		kbd_table[i].ledflagstate = kbd_defleds();
-//		kbd_table[i].default_ledflagstate = kbd_defleds();
-//		kbd_table[i].ledmode = LED_SHOW_FLAGS;
-//		kbd_table[i].lockstate = KBD_DEFLOCK;
-//		kbd_table[i].slockstate = 0;
-//		kbd_table[i].modeflags = KBD_DEFMODE;
-//		kbd_table[i].kbdmode = default_utf8 ? VC_UNICODE : VC_XLATE;
-//	}
-//
-//	kbd_init_leds();
-//
-//	error = input_register_handler(&kbd_handler);
-//	if (error)
-//		return error;
-//
-//	tasklet_enable(&keyboard_tasklet);
-//	tasklet_schedule(&keyboard_tasklet);
-//
-//	return 0;
-//}
-//
+int __init kbd_init(void)
+{
+	int i;
+	int error;
+
+	for (i = 0; i < MAX_NR_CONSOLES; i++) {
+		kbd_table[i].ledflagstate = kbd_defleds();
+		kbd_table[i].default_ledflagstate = kbd_defleds();
+		kbd_table[i].ledmode = LED_SHOW_FLAGS;
+		kbd_table[i].lockstate = KBD_DEFLOCK;
+		kbd_table[i].slockstate = 0;
+		kbd_table[i].modeflags = KBD_DEFMODE;
+		kbd_table[i].kbdmode = default_utf8 ? VC_UNICODE : VC_XLATE;
+	}
+
+	kbd_init_leds();
+
+	error = input_register_handler(&kbd_handler);
+	if (error)
+		return error;
+
+	tasklet_enable(&keyboard_tasklet);
+	tasklet_schedule(&keyboard_tasklet);
+
+	return 0;
+}
+
 ///* Ioctl support code */
 //
 ///**
@@ -2196,62 +2196,62 @@ static struct input_handler kbd_handler = {
 //        /* Again a spot read so no locking */
 //	return vc_kbd_mode(kb, VC_META) ? K_ESCPREFIX : K_METABIT;
 //}
-//
-///**
-// *	vt_reset_unicode	-	reset the unicode status
-// *	@console: console being reset
-// *
-// *	Restore the unicode console state to its default
-// */
-//void vt_reset_unicode(int console)
-//{
-//	unsigned long flags;
-//
-//	spin_lock_irqsave(&kbd_event_lock, flags);
-//	kbd_table[console].kbdmode = default_utf8 ? VC_UNICODE : VC_XLATE;
-//	spin_unlock_irqrestore(&kbd_event_lock, flags);
-//}
-//
-///**
-// *	vt_get_shiftstate	-	shift bit state
-// *
-// *	Report the shift bits from the keyboard state. We have to export
-// *	this to support some oddities in the vt layer.
-// */
-//int vt_get_shift_state(void)
-//{
-//        /* Don't lock as this is a transient report */
-//        return shift_state;
-//}
-//
-///**
-// *	vt_reset_keyboard	-	reset keyboard state
-// *	@console: console to reset
-// *
-// *	Reset the keyboard bits for a console as part of a general console
-// *	reset event
-// */
-//void vt_reset_keyboard(int console)
-//{
-//	struct kbd_struct *kb = kbd_table + console;
-//	unsigned long flags;
-//
-//	spin_lock_irqsave(&kbd_event_lock, flags);
-//	set_vc_kbd_mode(kb, VC_REPEAT);
-//	clr_vc_kbd_mode(kb, VC_CKMODE);
-//	clr_vc_kbd_mode(kb, VC_APPLIC);
-//	clr_vc_kbd_mode(kb, VC_CRLF);
-//	kb->lockstate = 0;
-//	kb->slockstate = 0;
-//	spin_lock(&led_lock);
-//	kb->ledmode = LED_SHOW_FLAGS;
-//	kb->ledflagstate = kb->default_ledflagstate;
-//	spin_unlock(&led_lock);
-//	/* do not do set_leds here because this causes an endless tasklet loop
-//	   when the keyboard hasn't been initialized yet */
-//	spin_unlock_irqrestore(&kbd_event_lock, flags);
-//}
-//
+
+/**
+ *	vt_reset_unicode	-	reset the unicode status
+ *	@console: console being reset
+ *
+ *	Restore the unicode console state to its default
+ */
+void vt_reset_unicode(int console)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&kbd_event_lock, flags);
+	kbd_table[console].kbdmode = default_utf8 ? VC_UNICODE : VC_XLATE;
+	spin_unlock_irqrestore(&kbd_event_lock, flags);
+}
+
+/**
+ *	vt_get_shiftstate	-	shift bit state
+ *
+ *	Report the shift bits from the keyboard state. We have to export
+ *	this to support some oddities in the vt layer.
+ */
+int vt_get_shift_state(void)
+{
+        /* Don't lock as this is a transient report */
+        return shift_state;
+}
+
+/**
+ *	vt_reset_keyboard	-	reset keyboard state
+ *	@console: console to reset
+ *
+ *	Reset the keyboard bits for a console as part of a general console
+ *	reset event
+ */
+void vt_reset_keyboard(int console)
+{
+	struct kbd_struct *kb = kbd_table + console;
+	unsigned long flags;
+
+	spin_lock_irqsave(&kbd_event_lock, flags);
+	set_vc_kbd_mode(kb, VC_REPEAT);
+	clr_vc_kbd_mode(kb, VC_CKMODE);
+	clr_vc_kbd_mode(kb, VC_APPLIC);
+	clr_vc_kbd_mode(kb, VC_CRLF);
+	kb->lockstate = 0;
+	kb->slockstate = 0;
+	spin_lock(&led_lock);
+	kb->ledmode = LED_SHOW_FLAGS;
+	kb->ledflagstate = kb->default_ledflagstate;
+	spin_unlock(&led_lock);
+	/* do not do set_leds here because this causes an endless tasklet loop
+	   when the keyboard hasn't been initialized yet */
+	spin_unlock_irqrestore(&kbd_event_lock, flags);
+}
+
 ///**
 // *	vt_get_kbd_mode_bit	-	read keyboard status bits
 // *	@console: console to read from

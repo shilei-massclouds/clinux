@@ -1192,7 +1192,9 @@ cl_top_linux_init(void)
     acpi_early_init();
     if (late_time_init)
         late_time_init();
+    printk("%s: =======================> before sched_clock_init.\n", __func__);
     sched_clock_init();
+    printk("%s: =======================> after sched_clock_init.\n", __func__);
     calibrate_delay();
     pid_idr_init();
     anon_vma_init();

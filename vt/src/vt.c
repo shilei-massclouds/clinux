@@ -3444,7 +3444,9 @@ static int __init con_init(void)
 
 	if (!conswitchp)
 		conswitchp = &dummy_con;
+    printk("%s: step1\n", __func__);
 	display_desc = conswitchp->con_startup();
+    printk("%s: step2\n", __func__);
 	if (!display_desc) {
 		fg_console = 0;
 		console_unlock();
@@ -4518,18 +4520,18 @@ static void set_palette(struct vc_data *vc)
 //
 //	return 0;
 //}
-//
-//void reset_palette(struct vc_data *vc)
-//{
-//	int j, k;
-//	for (j=k=0; j<16; j++) {
-//		vc->vc_palette[k++] = default_red[j];
-//		vc->vc_palette[k++] = default_grn[j];
-//		vc->vc_palette[k++] = default_blu[j];
-//	}
-//	set_palette(vc);
-//}
-//
+
+void reset_palette(struct vc_data *vc)
+{
+	int j, k;
+	for (j=k=0; j<16; j++) {
+		vc->vc_palette[k++] = default_red[j];
+		vc->vc_palette[k++] = default_grn[j];
+		vc->vc_palette[k++] = default_blu[j];
+	}
+	set_palette(vc);
+}
+
 ///*
 // *  Font switching
 // *
@@ -4729,75 +4731,75 @@ static void set_palette(struct vc_data *vc)
 //	}
 //	return -ENOSYS;
 //}
-//
-///*
-// *	Interface exported to selection and vcs.
-// */
-//
-///* used by selection */
-//u16 screen_glyph(struct vc_data *vc, int offset)
-//{
-//	u16 w = scr_readw(screenpos(vc, offset, 1));
-//	u16 c = w & 0xff;
-//
-//	if (w & vc->vc_hi_font_mask)
-//		c |= 0x100;
-//	return c;
-//}
-//EXPORT_SYMBOL_GPL(screen_glyph);
-//
-//u32 screen_glyph_unicode(struct vc_data *vc, int n)
-//{
-//	struct uni_screen *uniscr = get_vc_uniscr(vc);
-//
-//	if (uniscr)
-//		return uniscr->lines[n / vc->vc_cols][n % vc->vc_cols];
-//	return inverse_translate(vc, screen_glyph(vc, n * 2), 1);
-//}
-//EXPORT_SYMBOL_GPL(screen_glyph_unicode);
-//
-///* used by vcs - note the word offset */
-//unsigned short *screen_pos(struct vc_data *vc, int w_offset, int viewed)
-//{
-//	return screenpos(vc, 2 * w_offset, viewed);
-//}
-//EXPORT_SYMBOL_GPL(screen_pos);
-//
-//void getconsxy(struct vc_data *vc, unsigned char *p)
-//{
-//	/* clamp values if they don't fit */
-//	p[0] = min(vc->state.x, 0xFFu);
-//	p[1] = min(vc->state.y, 0xFFu);
-//}
-//
-//void putconsxy(struct vc_data *vc, unsigned char *p)
-//{
-//	hide_cursor(vc);
-//	gotoxy(vc, p[0], p[1]);
-//	set_cursor(vc);
-//}
-//
-//u16 vcs_scr_readw(struct vc_data *vc, const u16 *org)
-//{
-//	if ((unsigned long)org == vc->vc_pos && softcursor_original != -1)
-//		return softcursor_original;
-//	return scr_readw(org);
-//}
-//
-//void vcs_scr_writew(struct vc_data *vc, u16 val, u16 *org)
-//{
-//	scr_writew(val, org);
-//	if ((unsigned long)org == vc->vc_pos) {
-//		softcursor_original = -1;
-//		add_softcursor(vc);
-//	}
-//}
-//
-//void vcs_scr_updated(struct vc_data *vc)
-//{
-//	notify_update(vc);
-//}
-//
+
+/*
+ *	Interface exported to selection and vcs.
+ */
+
+/* used by selection */
+u16 screen_glyph(struct vc_data *vc, int offset)
+{
+	u16 w = scr_readw(screenpos(vc, offset, 1));
+	u16 c = w & 0xff;
+
+	if (w & vc->vc_hi_font_mask)
+		c |= 0x100;
+	return c;
+}
+EXPORT_SYMBOL_GPL(screen_glyph);
+
+u32 screen_glyph_unicode(struct vc_data *vc, int n)
+{
+	struct uni_screen *uniscr = get_vc_uniscr(vc);
+
+	if (uniscr)
+		return uniscr->lines[n / vc->vc_cols][n % vc->vc_cols];
+	return inverse_translate(vc, screen_glyph(vc, n * 2), 1);
+}
+EXPORT_SYMBOL_GPL(screen_glyph_unicode);
+
+/* used by vcs - note the word offset */
+unsigned short *screen_pos(struct vc_data *vc, int w_offset, int viewed)
+{
+	return screenpos(vc, 2 * w_offset, viewed);
+}
+EXPORT_SYMBOL_GPL(screen_pos);
+
+void getconsxy(struct vc_data *vc, unsigned char *p)
+{
+	/* clamp values if they don't fit */
+	p[0] = min(vc->state.x, 0xFFu);
+	p[1] = min(vc->state.y, 0xFFu);
+}
+
+void putconsxy(struct vc_data *vc, unsigned char *p)
+{
+	hide_cursor(vc);
+	gotoxy(vc, p[0], p[1]);
+	set_cursor(vc);
+}
+
+u16 vcs_scr_readw(struct vc_data *vc, const u16 *org)
+{
+	if ((unsigned long)org == vc->vc_pos && softcursor_original != -1)
+		return softcursor_original;
+	return scr_readw(org);
+}
+
+void vcs_scr_writew(struct vc_data *vc, u16 val, u16 *org)
+{
+	scr_writew(val, org);
+	if ((unsigned long)org == vc->vc_pos) {
+		softcursor_original = -1;
+		add_softcursor(vc);
+	}
+}
+
+void vcs_scr_updated(struct vc_data *vc)
+{
+	notify_update(vc);
+}
+
 //void vc_scrolldelta_helper(struct vc_data *c, int lines,
 //		unsigned int rolled_over, void *base, unsigned int size)
 //{

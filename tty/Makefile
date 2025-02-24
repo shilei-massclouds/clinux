@@ -9,3 +9,4 @@ obj_y += tty_ioctl.o
 obj_y += tty_jobctrl.o
 obj_y += tty_buffer.o
 obj_y += tty_baudrate.o
+obj_y += tty_port.o

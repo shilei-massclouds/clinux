@@ -2943,7 +2943,9 @@ void __init console_init(void)
 	while (ce < __con_initcall_end) {
 		call = initcall_from_entry(ce);
 		trace_initcall_start(call);
+    printk("=======================>\n");
 		ret = call();
+    printk("=======================>\n");
 		trace_initcall_finish(call, ret);
 		ce++;
 	}

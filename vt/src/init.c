@@ -18,51 +18,15 @@ cl_vt_init(void)
 }
 EXPORT_SYMBOL(cl_vt_init);
 
-void vt_event_post(unsigned int event, unsigned int old, unsigned int new)
-{
-    booter_panic("No impl!\n");
-}
-bool vc_is_sel(struct vc_data *vc)
-{
-    booter_panic("No impl!\n");
-}
-void change_console(struct vc_data *new_vc)
-{
-    booter_panic("No impl!\n");
-}
-void clear_selection(void)
-{
-    booter_panic("No impl!\n");
-}
-/*
-void compute_shiftstate(void)
-{
-    booter_panic("No impl!\n");
-}
-*/
 void __tasklet_schedule(struct tasklet_struct *t)
 {
     booter_panic("No impl!\n");
 }
 
-/*
-void show_state_filter(unsigned long state_filter)
-{
-    booter_panic("No impl!\n");
-}
-*/
 int input_register_handle(struct input_handle *handle)
 {
     booter_panic("No impl!\n");
 }
-
-/*
-void show_regs(struct pt_regs *regs)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(show_regs);
-*/
 
 void ctrl_alt_del(void)
 {
@@ -95,8 +59,6 @@ void input_inject_event(struct input_handle *handle,
     booter_panic("No impl!\n");
 }
 
-bool vt_dont_switch;
-
 void *vmemdup_user(const void __user *src, size_t len)
 {
     booter_panic("No impl!\n");
@@ -114,4 +76,13 @@ void __sched console_conditional_schedule(void)
     booter_panic("No impl!\n");
 }
 
-const struct consw dummy_con;
+loff_t fixed_size_llseek(struct file *file, loff_t offset, int whence, loff_t size)
+{
+    booter_panic("No impl!\n");
+}
+
+int input_register_handler(struct input_handler *handler)
+{
+    booter_panic("No impl!\n");
+}
+

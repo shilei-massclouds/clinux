@@ -43,7 +43,7 @@ components := \
 	kasprintf random crypto uuid rhashtable iov_iter checksum \
 	traps irq softirq \
 	kobject driver_base \
-	of of_irq irq_work tty vt earlycon \
+	of of_irq irq_work tty vt earlycon dummycon \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess capability security \
 	clocksource pid seq_file \
