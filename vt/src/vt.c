@@ -3444,9 +3444,7 @@ static int __init con_init(void)
 
 	if (!conswitchp)
 		conswitchp = &dummy_con;
-    printk("%s: step1\n", __func__);
 	display_desc = conswitchp->con_startup();
-    printk("%s: step2\n", __func__);
 	if (!display_desc) {
 		fg_console = 0;
 		console_unlock();

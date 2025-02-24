@@ -1010,6 +1010,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(drv_char);
     REQUIRE_COMPONENT(notify);
     REQUIRE_COMPONENT(groups);
+    REQUIRE_COMPONENT(8250);
 
     //
     // start_kernel (init/main.c)

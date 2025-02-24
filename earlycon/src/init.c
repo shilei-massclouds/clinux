@@ -16,17 +16,3 @@ cl_earlycon_init(void)
 EXPORT_SYMBOL(cl_earlycon_init);
 
 DEFINE_ENABLE_FUNC(earlycon);
-
-int uart_parse_earlycon(char *p, unsigned char *iotype, resource_size_t *addr,
-            char **options)
-{
-    booter_panic("No impl!\n");
-}
-
-/*
-void register_console(struct console *newcon)
-{
-    booter_panic("No impl!\n");
-}
-*/
-

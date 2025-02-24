@@ -2236,10 +2236,10 @@ __setup("console_msg_format=", console_msg_format_setup);
 //{
 //	return __add_preferred_console(name, idx, options, NULL, false);
 //}
-//
-//bool console_suspend_enabled = true;
-//EXPORT_SYMBOL(console_suspend_enabled);
-//
+
+bool console_suspend_enabled = true;
+EXPORT_SYMBOL(console_suspend_enabled);
+
 //static int __init console_suspend_disable(char *str)
 //{
 //	console_suspend_enabled = false;
