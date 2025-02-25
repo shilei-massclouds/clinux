@@ -36,10 +36,6 @@ void pmd_clear_bad(pmd_t *pmd)
     booter_panic("No impl 'slub'.");
 }
 
-int __pte_alloc_kernel(pmd_t *pmd)
-{
-    booter_panic("No impl 'slub'.");
-}
 
 int __printk_ratelimit(const char *func)
 {
@@ -47,11 +43,6 @@ int __printk_ratelimit(const char *func)
 }
 EXPORT_SYMBOL(__printk_ratelimit);
 
-int __pmd_alloc(struct mm_struct *mm, pud_t *pud,
-                        unsigned long address)
-{
-    booter_panic("No impl 'slub'.");
-}
 void flush_icache_pte(pte_t pte)
 {
     booter_panic("No impl 'slub'.");

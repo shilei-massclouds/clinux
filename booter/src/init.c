@@ -1981,14 +1981,23 @@ __weak int of_irq_count(struct device_node *dev)
 }
 EXPORT_SYMBOL(of_irq_count);
 
+/*
 void __iomem *ioremap_prot(phys_addr_t addr, size_t size, unsigned long prot)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(ioremap_prot);
+*/
 
-void iounmap(volatile void __iomem *addr)
+int __pte_alloc_kernel(pmd_t *pmd)
 {
-    booter_panic("No impl.\n");
+    booter_panic("No impl 'slub'.");
 }
-EXPORT_SYMBOL(iounmap);
+EXPORT_SYMBOL(__pte_alloc_kernel);
+
+int __pmd_alloc(struct mm_struct *mm, pud_t *pud,
+                        unsigned long address)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(__pmd_alloc);
