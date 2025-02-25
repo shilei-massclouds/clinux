@@ -1986,3 +1986,9 @@ void __iomem *ioremap_prot(phys_addr_t addr, size_t size, unsigned long prot)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(ioremap_prot);
+
+void iounmap(volatile void __iomem *addr)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(iounmap);

@@ -1013,6 +1013,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(groups);
     REQUIRE_COMPONENT(8250);
     REQUIRE_COMPONENT(virtio_mmio);
+    REQUIRE_COMPONENT(drv_clk);
 
     //
     // start_kernel (init/main.c)

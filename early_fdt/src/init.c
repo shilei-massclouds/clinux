@@ -122,3 +122,10 @@ __weak bool of_dma_is_coherent(struct device_node *np)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL_GPL(of_dma_is_coherent);
+
+__weak int of_address_to_resource(struct device_node *dev, int index,
+			   struct resource *r)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(of_address_to_resource);

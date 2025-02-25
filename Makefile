@@ -42,7 +42,7 @@ components := \
 	radix_tree idr xarray assoc_array list_lru klist logic_pio \
 	kasprintf random crypto uuid rhashtable iov_iter checksum \
 	traps irq softirq \
-	kobject driver_base resource \
+	kobject driver_base resource devres \
 	of of_irq irq_work tty vt earlycon dummycon input \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess capability security \

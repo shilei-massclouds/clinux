@@ -1,8 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(iounmap)
-
 CL_MINE(clk_disable)
 CL_MINE(clk_enable)
 CL_MINE(clk_prepare)

@@ -1715,58 +1715,58 @@ int of_parse_phandle_with_fixed_args(const struct device_node *np,
 }
 EXPORT_SYMBOL(of_parse_phandle_with_fixed_args);
 
-///**
-// * of_count_phandle_with_args() - Find the number of phandles references in a property
-// * @np:		pointer to a device tree node containing a list
-// * @list_name:	property name that contains a list
-// * @cells_name:	property name that specifies phandles' arguments count
-// *
-// * Returns the number of phandle + argument tuples within a property. It
-// * is a typical pattern to encode a list of phandle and variable
-// * arguments into a single property. The number of arguments is encoded
-// * by a property in the phandle-target node. For example, a gpios
-// * property would contain a list of GPIO specifies consisting of a
-// * phandle and 1 or more arguments. The number of arguments are
-// * determined by the #gpio-cells property in the node pointed to by the
-// * phandle.
-// */
-//int of_count_phandle_with_args(const struct device_node *np, const char *list_name,
-//				const char *cells_name)
-//{
-//	struct of_phandle_iterator it;
-//	int rc, cur_index = 0;
-//
-//	/*
-//	 * If cells_name is NULL we assume a cell count of 0. This makes
-//	 * counting the phandles trivial as each 32bit word in the list is a
-//	 * phandle and no arguments are to consider. So we don't iterate through
-//	 * the list but just use the length to determine the phandle count.
-//	 */
-//	if (!cells_name) {
-//		const __be32 *list;
-//		int size;
-//
-//		list = of_get_property(np, list_name, &size);
-//		if (!list)
-//			return -ENOENT;
-//
-//		return size / sizeof(*list);
-//	}
-//
-//	rc = of_phandle_iterator_init(&it, np, list_name, cells_name, -1);
-//	if (rc)
-//		return rc;
-//
-//	while ((rc = of_phandle_iterator_next(&it)) == 0)
-//		cur_index += 1;
-//
-//	if (rc != -ENOENT)
-//		return rc;
-//
-//	return cur_index;
-//}
-//EXPORT_SYMBOL(of_count_phandle_with_args);
-//
+/**
+ * of_count_phandle_with_args() - Find the number of phandles references in a property
+ * @np:		pointer to a device tree node containing a list
+ * @list_name:	property name that contains a list
+ * @cells_name:	property name that specifies phandles' arguments count
+ *
+ * Returns the number of phandle + argument tuples within a property. It
+ * is a typical pattern to encode a list of phandle and variable
+ * arguments into a single property. The number of arguments is encoded
+ * by a property in the phandle-target node. For example, a gpios
+ * property would contain a list of GPIO specifies consisting of a
+ * phandle and 1 or more arguments. The number of arguments are
+ * determined by the #gpio-cells property in the node pointed to by the
+ * phandle.
+ */
+int of_count_phandle_with_args(const struct device_node *np, const char *list_name,
+				const char *cells_name)
+{
+	struct of_phandle_iterator it;
+	int rc, cur_index = 0;
+
+	/*
+	 * If cells_name is NULL we assume a cell count of 0. This makes
+	 * counting the phandles trivial as each 32bit word in the list is a
+	 * phandle and no arguments are to consider. So we don't iterate through
+	 * the list but just use the length to determine the phandle count.
+	 */
+	if (!cells_name) {
+		const __be32 *list;
+		int size;
+
+		list = of_get_property(np, list_name, &size);
+		if (!list)
+			return -ENOENT;
+
+		return size / sizeof(*list);
+	}
+
+	rc = of_phandle_iterator_init(&it, np, list_name, cells_name, -1);
+	if (rc)
+		return rc;
+
+	while ((rc = of_phandle_iterator_next(&it)) == 0)
+		cur_index += 1;
+
+	if (rc != -ENOENT)
+		return rc;
+
+	return cur_index;
+}
+EXPORT_SYMBOL(of_count_phandle_with_args);
+
 ///**
 // * __of_add_property - Add a property to a node without lock operations
 // */
