@@ -1772,28 +1772,28 @@ static void _vm_unmap_aliases(unsigned long start, unsigned long end, int flush)
 	mutex_unlock(&vmap_purge_lock);
 }
 
-///**
-// * vm_unmap_aliases - unmap outstanding lazy aliases in the vmap layer
-// *
-// * The vmap/vmalloc layer lazily flushes kernel virtual mappings primarily
-// * to amortize TLB flushing overheads. What this means is that any page you
-// * have now, may, in a former life, have been mapped into kernel virtual
-// * address by the vmap layer and so there might be some CPUs with TLB entries
-// * still referencing that page (additional to the regular 1:1 kernel mapping).
-// *
-// * vm_unmap_aliases flushes all such lazy mappings. After it returns, we can
-// * be sure that none of the pages we have control over will have any aliases
-// * from the vmap layer.
-// */
-//void vm_unmap_aliases(void)
-//{
-//	unsigned long start = ULONG_MAX, end = 0;
-//	int flush = 0;
-//
-//	_vm_unmap_aliases(start, end, flush);
-//}
-//EXPORT_SYMBOL_GPL(vm_unmap_aliases);
-//
+/**
+ * vm_unmap_aliases - unmap outstanding lazy aliases in the vmap layer
+ *
+ * The vmap/vmalloc layer lazily flushes kernel virtual mappings primarily
+ * to amortize TLB flushing overheads. What this means is that any page you
+ * have now, may, in a former life, have been mapped into kernel virtual
+ * address by the vmap layer and so there might be some CPUs with TLB entries
+ * still referencing that page (additional to the regular 1:1 kernel mapping).
+ *
+ * vm_unmap_aliases flushes all such lazy mappings. After it returns, we can
+ * be sure that none of the pages we have control over will have any aliases
+ * from the vmap layer.
+ */
+void vm_unmap_aliases(void)
+{
+	unsigned long start = ULONG_MAX, end = 0;
+	int flush = 0;
+
+	_vm_unmap_aliases(start, end, flush);
+}
+EXPORT_SYMBOL_GPL(vm_unmap_aliases);
+
 ///**
 // * vm_unmap_ram - unmap linear kernel address space set up by vm_map_ram
 // * @mem: the pointer returned by vm_map_ram
@@ -2352,25 +2352,25 @@ static void __vfree(const void *addr)
 //	__vfree(addr);
 //}
 //EXPORT_SYMBOL(vfree);
-//
-///**
-// * vunmap - release virtual mapping obtained by vmap()
-// * @addr:   memory base address
-// *
-// * Free the virtually contiguous memory area starting at @addr,
-// * which was created from the page array passed to vmap().
-// *
-// * Must not be called in interrupt context.
-// */
-//void vunmap(const void *addr)
-//{
-//	BUG_ON(in_interrupt());
-//	might_sleep();
-//	if (addr)
-//		__vunmap(addr, 0);
-//}
-//EXPORT_SYMBOL(vunmap);
-//
+
+/**
+ * vunmap - release virtual mapping obtained by vmap()
+ * @addr:   memory base address
+ *
+ * Free the virtually contiguous memory area starting at @addr,
+ * which was created from the page array passed to vmap().
+ *
+ * Must not be called in interrupt context.
+ */
+void vunmap(const void *addr)
+{
+	BUG_ON(in_interrupt());
+	might_sleep();
+	if (addr)
+		__vunmap(addr, 0);
+}
+EXPORT_SYMBOL(vunmap);
+
 ///**
 // * vmap - map an array of pages into virtually contiguous space
 // * @pages: array of page pointers

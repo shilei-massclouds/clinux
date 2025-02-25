@@ -854,12 +854,6 @@ __weak int proc_cgroup_show(struct seq_file *m, struct pid_namespace *ns,
 }
 EXPORT_SYMBOL(proc_cgroup_show);
 
-bool refcount_dec_not_one(refcount_t *r)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-EXPORT_SYMBOL(refcount_dec_not_one);
-
 bool cancel_work_sync(struct work_struct *work)
 {
     booter_panic("No impl.\n");

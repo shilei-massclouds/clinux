@@ -2009,35 +2009,35 @@ void of_alias_scan(void * (*dt_alloc)(u64 size, u64 align))
 	}
 }
 
-///**
-// * of_alias_get_id - Get alias id for the given device_node
-// * @np:		Pointer to the given device_node
-// * @stem:	Alias stem of the given device_node
-// *
-// * The function travels the lookup table to get the alias id for the given
-// * device_node and alias stem.  It returns the alias id if found.
-// */
-//int of_alias_get_id(struct device_node *np, const char *stem)
-//{
-//	struct alias_prop *app;
-//	int id = -ENODEV;
-//
-//	mutex_lock(&of_mutex);
-//	list_for_each_entry(app, &aliases_lookup, link) {
-//		if (strcmp(app->stem, stem) != 0)
-//			continue;
-//
-//		if (np == app->np) {
-//			id = app->id;
-//			break;
-//		}
-//	}
-//	mutex_unlock(&of_mutex);
-//
-//	return id;
-//}
-//EXPORT_SYMBOL_GPL(of_alias_get_id);
-//
+/**
+ * of_alias_get_id - Get alias id for the given device_node
+ * @np:		Pointer to the given device_node
+ * @stem:	Alias stem of the given device_node
+ *
+ * The function travels the lookup table to get the alias id for the given
+ * device_node and alias stem.  It returns the alias id if found.
+ */
+int of_alias_get_id(struct device_node *np, const char *stem)
+{
+	struct alias_prop *app;
+	int id = -ENODEV;
+
+	mutex_lock(&of_mutex);
+	list_for_each_entry(app, &aliases_lookup, link) {
+		if (strcmp(app->stem, stem) != 0)
+			continue;
+
+		if (np == app->np) {
+			id = app->id;
+			break;
+		}
+	}
+	mutex_unlock(&of_mutex);
+
+	return id;
+}
+EXPORT_SYMBOL_GPL(of_alias_get_id);
+
 ///**
 // * of_alias_get_alias_list - Get alias list for the given device driver
 // * @matches:	Array of OF device match structures to search in

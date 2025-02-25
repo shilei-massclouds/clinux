@@ -36,64 +36,64 @@ void refcount_warn_saturate(refcount_t *r, enum refcount_saturation_type t)
 }
 EXPORT_SYMBOL(refcount_warn_saturate);
 
-///**
-// * refcount_dec_if_one - decrement a refcount if it is 1
-// * @r: the refcount
-// *
-// * No atomic_t counterpart, it attempts a 1 -> 0 transition and returns the
-// * success thereof.
-// *
-// * Like all decrement operations, it provides release memory order and provides
-// * a control dependency.
-// *
-// * It can be used like a try-delete operator; this explicit case is provided
-// * and not cmpxchg in generic, because that would allow implementing unsafe
-// * operations.
-// *
-// * Return: true if the resulting refcount is 0, false otherwise
-// */
-//bool refcount_dec_if_one(refcount_t *r)
-//{
-//	int val = 1;
-//
-//	return atomic_try_cmpxchg_release(&r->refs, &val, 0);
-//}
-//EXPORT_SYMBOL(refcount_dec_if_one);
-//
-///**
-// * refcount_dec_not_one - decrement a refcount if it is not 1
-// * @r: the refcount
-// *
-// * No atomic_t counterpart, it decrements unless the value is 1, in which case
-// * it will return false.
-// *
-// * Was often done like: atomic_add_unless(&var, -1, 1)
-// *
-// * Return: true if the decrement operation was successful, false otherwise
-// */
-//bool refcount_dec_not_one(refcount_t *r)
-//{
-//	unsigned int new, val = atomic_read(&r->refs);
-//
-//	do {
-//		if (unlikely(val == REFCOUNT_SATURATED))
-//			return true;
-//
-//		if (val == 1)
-//			return false;
-//
-//		new = val - 1;
-//		if (new > val) {
-//			WARN_ONCE(new > val, "refcount_t: underflow; use-after-free.\n");
-//			return true;
-//		}
-//
-//	} while (!atomic_try_cmpxchg_release(&r->refs, &val, new));
-//
-//	return true;
-//}
-//EXPORT_SYMBOL(refcount_dec_not_one);
-//
+/**
+ * refcount_dec_if_one - decrement a refcount if it is 1
+ * @r: the refcount
+ *
+ * No atomic_t counterpart, it attempts a 1 -> 0 transition and returns the
+ * success thereof.
+ *
+ * Like all decrement operations, it provides release memory order and provides
+ * a control dependency.
+ *
+ * It can be used like a try-delete operator; this explicit case is provided
+ * and not cmpxchg in generic, because that would allow implementing unsafe
+ * operations.
+ *
+ * Return: true if the resulting refcount is 0, false otherwise
+ */
+bool refcount_dec_if_one(refcount_t *r)
+{
+	int val = 1;
+
+	return atomic_try_cmpxchg_release(&r->refs, &val, 0);
+}
+EXPORT_SYMBOL(refcount_dec_if_one);
+
+/**
+ * refcount_dec_not_one - decrement a refcount if it is not 1
+ * @r: the refcount
+ *
+ * No atomic_t counterpart, it decrements unless the value is 1, in which case
+ * it will return false.
+ *
+ * Was often done like: atomic_add_unless(&var, -1, 1)
+ *
+ * Return: true if the decrement operation was successful, false otherwise
+ */
+bool refcount_dec_not_one(refcount_t *r)
+{
+	unsigned int new, val = atomic_read(&r->refs);
+
+	do {
+		if (unlikely(val == REFCOUNT_SATURATED))
+			return true;
+
+		if (val == 1)
+			return false;
+
+		new = val - 1;
+		if (new > val) {
+			WARN_ONCE(new > val, "refcount_t: underflow; use-after-free.\n");
+			return true;
+		}
+
+	} while (!atomic_try_cmpxchg_release(&r->refs, &val, new));
+
+	return true;
+}
+EXPORT_SYMBOL(refcount_dec_not_one);
+
 ///**
 // * refcount_dec_and_mutex_lock - return holding mutex if able to decrement
 // *                               refcount to 0
