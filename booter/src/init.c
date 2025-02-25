@@ -1931,12 +1931,14 @@ __weak void sysfs_remove_group(struct kobject *kobj,
 }
 EXPORT_SYMBOL_GPL(sysfs_remove_group);
 
+/*
 struct clk;
 unsigned long clk_get_rate(struct clk *clk)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL_GPL(clk_get_rate);
+*/
 
 __weak int of_clk_set_defaults(struct device_node *node, bool clk_supplier)
 {

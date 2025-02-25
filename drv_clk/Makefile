@@ -2,5 +2,6 @@
 
 obj_y := init.o
 obj_y += clk-conf.o
+obj_y += clk.o
 
 obj_y += mine.o
