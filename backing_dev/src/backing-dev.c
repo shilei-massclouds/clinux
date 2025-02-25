@@ -36,6 +36,7 @@ EXPORT_SYMBOL(bdi_list);
 
 /* bdi_wq serves all asynchronous writeback tasks */
 struct workqueue_struct *bdi_wq;
+EXPORT_SYMBOL(bdi_wq);
 
 #ifdef CONFIG_DEBUG_FS
 #include <linux/debugfs.h>

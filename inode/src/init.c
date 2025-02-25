@@ -57,12 +57,13 @@ int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
     booter_panic("No impl!\n");
 }
 */
-void inode_io_list_del(struct inode *inode)
+__weak void inode_io_list_del(struct inode *inode)
 {
     booter_panic("No impl!\n");
 }
+EXPORT_SYMBOL(inode_io_list_del);
 
-void __mark_inode_dirty(struct inode *inode, int flags)
+__weak void __mark_inode_dirty(struct inode *inode, int flags)
 {
     booter_panic("No impl!\n");
 }
@@ -76,14 +77,6 @@ int inode_has_buffers(struct inode *inode)
 const struct file_operations def_blk_fops;
 
 void bd_forget(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
-void inode_wait_for_writeback(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}
-int write_inode_now(struct inode *inode, int sync)
 {
     booter_panic("No impl!\n");
 }

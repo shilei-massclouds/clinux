@@ -102,6 +102,7 @@ long get_nr_dirty_inodes(void)
 	long nr_dirty = get_nr_inodes() - get_nr_inodes_unused();
 	return nr_dirty > 0 ? nr_dirty : 0;
 }
+EXPORT_SYMBOL(get_nr_dirty_inodes);
 
 /*
  * Handle nr_inode sysctl
@@ -444,6 +445,7 @@ void inode_add_lru(struct inode *inode)
 	    !atomic_read(&inode->i_count) && inode->i_sb->s_flags & SB_ACTIVE)
 		inode_lru_list_add(inode);
 }
+EXPORT_SYMBOL(inode_add_lru);
 
 
 static void inode_lru_list_del(struct inode *inode)

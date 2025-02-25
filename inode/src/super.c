@@ -423,6 +423,7 @@ bool trylock_super(struct super_block *sb)
 
 	return false;
 }
+EXPORT_SYMBOL(trylock_super);
 
 /**
  *	generic_shutdown_super	-	common helper for ->kill_sb()

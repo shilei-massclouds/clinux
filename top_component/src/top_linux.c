@@ -1014,6 +1014,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(8250);
     REQUIRE_COMPONENT(virtio_mmio);
     REQUIRE_COMPONENT(drv_clk);
+    REQUIRE_COMPONENT(fs_writeback);
 
     //
     // start_kernel (init/main.c)

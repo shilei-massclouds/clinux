@@ -44,11 +44,6 @@ void io_wq_worker_sleeping(struct task_struct *tsk)
     booter_panic("No impl 'sched'.");
 }
 
-void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
-{
-    booter_panic("No impl 'sched'.");
-}
-
 /*
 int proc_dointvec(struct ctl_table *table, int write, void *buffer,
           size_t *lenp, loff_t *ppos)

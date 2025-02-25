@@ -107,11 +107,13 @@ EXPORT_SYMBOL_GPL(dirty_writeback_interval);
  * The longest time for which data is allowed to remain dirty
  */
 unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
+EXPORT_SYMBOL_GPL(dirty_expire_interval);
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
  */
 int block_dump;
+EXPORT_SYMBOL(block_dump);
 
 /*
  * Flag that puts the machine in "laptop mode". Doubles as a timeout in jiffies:
@@ -124,6 +126,8 @@ EXPORT_SYMBOL(laptop_mode);
 /* End of sysctl-exported parameters */
 
 struct wb_domain global_wb_domain;
+EXPORT_SYMBOL(global_wb_domain);
+
 
 /* consolidated parameters for balance_dirty_pages() and its subroutines */
 struct dirty_throttle_control {
@@ -1392,6 +1396,7 @@ void wb_update_bandwidth(struct bdi_writeback *wb, unsigned long start_time)
 
 	__wb_update_bandwidth(&gdtc, NULL, start_time, false);
 }
+EXPORT_SYMBOL(wb_update_bandwidth);
 
 /*
  * After a task dirtied this many pages, balance_dirty_pages_ratelimited()
@@ -1980,6 +1985,7 @@ bool wb_over_bg_thresh(struct bdi_writeback *wb)
 
 	return false;
 }
+EXPORT_SYMBOL(wb_over_bg_thresh);
 
 /*
  * sysctl handler for /proc/sys/vm/dirty_writeback_centisecs

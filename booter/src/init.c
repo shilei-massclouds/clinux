@@ -16,6 +16,7 @@
 #include <linux/ipc_namespace.h>
 #include <linux/user_namespace.h>
 #include <linux/kobj_map.h>
+#include <linux/backing-dev-defs.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -647,8 +648,7 @@ __weak int send_sig(int sig, struct task_struct *p, int priv)
 }
 EXPORT_SYMBOL(send_sig);
 
-#include <linux/backing-dev-defs.h>
-void wakeup_flusher_threads(enum wb_reason reason)
+__weak void wakeup_flusher_threads(enum wb_reason reason)
 {
     booter_panic("No impl!\n");
 }
@@ -2103,3 +2103,45 @@ __weak void __init files_maxfiles_init(void)
 }
 EXPORT_SYMBOL(files_maxfiles_init);
 
+void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+{
+    booter_panic("No impl 'sched'.");
+}
+EXPORT_SYMBOL(blk_flush_plug_list);
+
+__weak int write_inode_now(struct inode *inode, int sync)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(write_inode_now);
+
+__weak void inode_wait_for_writeback(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inode_wait_for_writeback);
+
+__weak void sb_mark_inode_writeback(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sb_mark_inode_writeback);
+
+__weak void sb_clear_inode_writeback(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sb_clear_inode_writeback);
+
+__weak void wakeup_flusher_threads_bdi(struct backing_dev_info *bdi,
+				enum wb_reason reason)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(wakeup_flusher_threads_bdi);
+
+__weak void wb_start_background_writeback(struct bdi_writeback *wb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(wb_start_background_writeback);

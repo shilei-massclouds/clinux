@@ -47,7 +47,7 @@ components := \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess capability security \
 	clocksource pid seq_file \
-	cpu task cgroup ksysfs dma up notify fs_attr fs_stat \
+	cpu task cgroup ksysfs dma up notify fs_attr fs_stat fs_writeback \
 	jump_label extable vdso utsname keys ucount umh \
 	early_sched sched \
 	percpu percpu_refcount workqueue_itf workqueue notifier \

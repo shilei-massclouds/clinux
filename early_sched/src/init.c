@@ -443,3 +443,11 @@ __weak void __put_net(struct net *net)
     booter_panic("No impl 'rwsem'.");
 }
 EXPORT_SYMBOL_GPL(__put_net);
+
+__weak int __sched
+__wait_on_bit(struct wait_queue_head *wq_head, struct wait_bit_queue_entry *wbq_entry,
+	      wait_bit_action_f *action, unsigned mode)
+{
+    booter_panic("No impl 'rwsem'.");
+}
+EXPORT_SYMBOL(__wait_on_bit);
