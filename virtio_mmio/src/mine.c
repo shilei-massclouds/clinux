@@ -1,9 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(register_virtio_device)
-CL_MINE(unregister_virtio_device)
-CL_MINE(virtio_config_changed)
 CL_MINE(virtqueue_get_avail_addr)
 CL_MINE(virtqueue_get_desc_addr)
 CL_MINE(virtqueue_get_used_addr)

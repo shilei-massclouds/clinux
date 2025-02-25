@@ -59,10 +59,6 @@ int device_online(struct device *dev)
     booter_panic("No impl 'driver_base'.");
 }
 
-bool kill_device(struct device *dev)
-{
-    booter_panic("No impl 'driver_base'.");
-}
 int device_offline(struct device *dev)
 {
     booter_panic("No impl 'driver_base'.");

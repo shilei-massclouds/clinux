@@ -1157,83 +1157,83 @@ void device_links_driver_bound(struct device *dev)
 	device_links_flush_sync_list(&sync_list, dev);
 }
 
-///**
-// * __device_links_no_driver - Update links of a device without a driver.
-// * @dev: Device without a drvier.
-// *
-// * Delete all non-persistent links from this device to any suppliers.
-// *
-// * Persistent links stay around, but their status is changed to "available",
-// * unless they already are in the "supplier unbind in progress" state in which
-// * case they need not be updated.
-// *
-// * Links without the DL_FLAG_MANAGED flag set are ignored.
-// */
-//static void __device_links_no_driver(struct device *dev)
-//{
-//	struct device_link *link, *ln;
-//
-//	list_for_each_entry_safe_reverse(link, ln, &dev->links.suppliers, c_node) {
-//		if (!(link->flags & DL_FLAG_MANAGED))
-//			continue;
-//
-//		if (link->flags & DL_FLAG_AUTOREMOVE_CONSUMER) {
-//			device_link_drop_managed(link);
-//			continue;
-//		}
-//
-//		if (link->status != DL_STATE_CONSUMER_PROBE &&
-//		    link->status != DL_STATE_ACTIVE)
-//			continue;
-//
-//		if (link->supplier->links.status == DL_DEV_DRIVER_BOUND) {
-//			WRITE_ONCE(link->status, DL_STATE_AVAILABLE);
-//		} else {
-//			WARN_ON(!(link->flags & DL_FLAG_SYNC_STATE_ONLY));
-//			WRITE_ONCE(link->status, DL_STATE_DORMANT);
-//		}
-//	}
-//
-//	dev->links.status = DL_DEV_NO_DRIVER;
-//}
-//
-///**
-// * device_links_no_driver - Update links after failing driver probe.
-// * @dev: Device whose driver has just failed to probe.
-// *
-// * Clean up leftover links to consumers for @dev and invoke
-// * %__device_links_no_driver() to update links to suppliers for it as
-// * appropriate.
-// *
-// * Links without the DL_FLAG_MANAGED flag set are ignored.
-// */
-//void device_links_no_driver(struct device *dev)
-//{
-//	struct device_link *link;
-//
-//	device_links_write_lock();
-//
-//	list_for_each_entry(link, &dev->links.consumers, s_node) {
-//		if (!(link->flags & DL_FLAG_MANAGED))
-//			continue;
-//
-//		/*
-//		 * The probe has failed, so if the status of the link is
-//		 * "consumer probe" or "active", it must have been added by
-//		 * a probing consumer while this device was still probing.
-//		 * Change its state to "dormant", as it represents a valid
-//		 * relationship, but it is not functionally meaningful.
-//		 */
-//		if (link->status == DL_STATE_CONSUMER_PROBE ||
-//		    link->status == DL_STATE_ACTIVE)
-//			WRITE_ONCE(link->status, DL_STATE_DORMANT);
-//	}
-//
-//	__device_links_no_driver(dev);
-//
-//	device_links_write_unlock();
-//}
-//
+/**
+ * __device_links_no_driver - Update links of a device without a driver.
+ * @dev: Device without a drvier.
+ *
+ * Delete all non-persistent links from this device to any suppliers.
+ *
+ * Persistent links stay around, but their status is changed to "available",
+ * unless they already are in the "supplier unbind in progress" state in which
+ * case they need not be updated.
+ *
+ * Links without the DL_FLAG_MANAGED flag set are ignored.
+ */
+static void __device_links_no_driver(struct device *dev)
+{
+	struct device_link *link, *ln;
+
+	list_for_each_entry_safe_reverse(link, ln, &dev->links.suppliers, c_node) {
+		if (!(link->flags & DL_FLAG_MANAGED))
+			continue;
+
+		if (link->flags & DL_FLAG_AUTOREMOVE_CONSUMER) {
+			device_link_drop_managed(link);
+			continue;
+		}
+
+		if (link->status != DL_STATE_CONSUMER_PROBE &&
+		    link->status != DL_STATE_ACTIVE)
+			continue;
+
+		if (link->supplier->links.status == DL_DEV_DRIVER_BOUND) {
+			WRITE_ONCE(link->status, DL_STATE_AVAILABLE);
+		} else {
+			WARN_ON(!(link->flags & DL_FLAG_SYNC_STATE_ONLY));
+			WRITE_ONCE(link->status, DL_STATE_DORMANT);
+		}
+	}
+
+	dev->links.status = DL_DEV_NO_DRIVER;
+}
+
+/**
+ * device_links_no_driver - Update links after failing driver probe.
+ * @dev: Device whose driver has just failed to probe.
+ *
+ * Clean up leftover links to consumers for @dev and invoke
+ * %__device_links_no_driver() to update links to suppliers for it as
+ * appropriate.
+ *
+ * Links without the DL_FLAG_MANAGED flag set are ignored.
+ */
+void device_links_no_driver(struct device *dev)
+{
+	struct device_link *link;
+
+	device_links_write_lock();
+
+	list_for_each_entry(link, &dev->links.consumers, s_node) {
+		if (!(link->flags & DL_FLAG_MANAGED))
+			continue;
+
+		/*
+		 * The probe has failed, so if the status of the link is
+		 * "consumer probe" or "active", it must have been added by
+		 * a probing consumer while this device was still probing.
+		 * Change its state to "dormant", as it represents a valid
+		 * relationship, but it is not functionally meaningful.
+		 */
+		if (link->status == DL_STATE_CONSUMER_PROBE ||
+		    link->status == DL_STATE_ACTIVE)
+			WRITE_ONCE(link->status, DL_STATE_DORMANT);
+	}
+
+	__device_links_no_driver(dev);
+
+	device_links_write_unlock();
+}
+
 ///**
 // * device_links_driver_cleanup - Update links after driver removal.
 // * @dev: Device whose driver has just gone away.
@@ -3027,23 +3027,23 @@ void put_device(struct device *dev)
 		kobject_put(&dev->kobj);
 }
 
-//bool kill_device(struct device *dev)
-//{
-//	/*
-//	 * Require the device lock and set the "dead" flag to guarantee that
-//	 * the update behavior is consistent with the other bitfields near
-//	 * it and that we cannot have an asynchronous probe routine trying
-//	 * to run while we are tearing out the bus/class/sysfs from
-//	 * underneath the device.
-//	 */
-//	lockdep_assert_held(&dev->mutex);
-//
-//	if (dev->p->dead)
-//		return false;
-//	dev->p->dead = true;
-//	return true;
-//}
-//EXPORT_SYMBOL_GPL(kill_device);
+bool kill_device(struct device *dev)
+{
+	/*
+	 * Require the device lock and set the "dead" flag to guarantee that
+	 * the update behavior is consistent with the other bitfields near
+	 * it and that we cannot have an asynchronous probe routine trying
+	 * to run while we are tearing out the bus/class/sysfs from
+	 * underneath the device.
+	 */
+	lockdep_assert_held(&dev->mutex);
+
+	if (dev->p->dead)
+		return false;
+	dev->p->dead = true;
+	return true;
+}
+EXPORT_SYMBOL_GPL(kill_device);
 
 /**
  * device_del - delete device from system.
