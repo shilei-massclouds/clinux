@@ -148,93 +148,93 @@ int device_is_dependent(struct device *dev, void *target)
 	return ret;
 }
 
-//static void device_link_init_status(struct device_link *link,
-//				    struct device *consumer,
-//				    struct device *supplier)
-//{
-//	switch (supplier->links.status) {
-//	case DL_DEV_PROBING:
-//		switch (consumer->links.status) {
-//		case DL_DEV_PROBING:
-//			/*
-//			 * A consumer driver can create a link to a supplier
-//			 * that has not completed its probing yet as long as it
-//			 * knows that the supplier is already functional (for
-//			 * example, it has just acquired some resources from the
-//			 * supplier).
-//			 */
-//			link->status = DL_STATE_CONSUMER_PROBE;
-//			break;
-//		default:
-//			link->status = DL_STATE_DORMANT;
-//			break;
-//		}
-//		break;
-//	case DL_DEV_DRIVER_BOUND:
-//		switch (consumer->links.status) {
-//		case DL_DEV_PROBING:
-//			link->status = DL_STATE_CONSUMER_PROBE;
-//			break;
-//		case DL_DEV_DRIVER_BOUND:
-//			link->status = DL_STATE_ACTIVE;
-//			break;
-//		default:
-//			link->status = DL_STATE_AVAILABLE;
-//			break;
-//		}
-//		break;
-//	case DL_DEV_UNBINDING:
-//		link->status = DL_STATE_SUPPLIER_UNBIND;
-//		break;
-//	default:
-//		link->status = DL_STATE_DORMANT;
-//		break;
-//	}
-//}
-//
-//static int device_reorder_to_tail(struct device *dev, void *not_used)
-//{
-//	struct device_link *link;
-//
-//	/*
-//	 * Devices that have not been registered yet will be put to the ends
-//	 * of the lists during the registration, so skip them here.
-//	 */
-//	if (device_is_registered(dev))
-//		devices_kset_move_last(dev);
-//
-//	if (device_pm_initialized(dev))
-//		device_pm_move_last(dev);
-//
-//	device_for_each_child(dev, NULL, device_reorder_to_tail);
-//	list_for_each_entry(link, &dev->links.consumers, s_node) {
-//		if (link->flags == (DL_FLAG_SYNC_STATE_ONLY | DL_FLAG_MANAGED))
-//			continue;
-//		device_reorder_to_tail(link->consumer, NULL);
-//	}
-//
-//	return 0;
-//}
-//
-///**
-// * device_pm_move_to_tail - Move set of devices to the end of device lists
-// * @dev: Device to move
-// *
-// * This is a device_reorder_to_tail() wrapper taking the requisite locks.
-// *
-// * It moves the @dev along with all of its children and all of its consumers
-// * to the ends of the device_kset and dpm_list, recursively.
-// */
-//void device_pm_move_to_tail(struct device *dev)
-//{
-//	int idx;
-//
-//	idx = device_links_read_lock();
-//	device_pm_lock();
-//	device_reorder_to_tail(dev, NULL);
-//	device_pm_unlock();
-//	device_links_read_unlock(idx);
-//}
+static void device_link_init_status(struct device_link *link,
+				    struct device *consumer,
+				    struct device *supplier)
+{
+	switch (supplier->links.status) {
+	case DL_DEV_PROBING:
+		switch (consumer->links.status) {
+		case DL_DEV_PROBING:
+			/*
+			 * A consumer driver can create a link to a supplier
+			 * that has not completed its probing yet as long as it
+			 * knows that the supplier is already functional (for
+			 * example, it has just acquired some resources from the
+			 * supplier).
+			 */
+			link->status = DL_STATE_CONSUMER_PROBE;
+			break;
+		default:
+			link->status = DL_STATE_DORMANT;
+			break;
+		}
+		break;
+	case DL_DEV_DRIVER_BOUND:
+		switch (consumer->links.status) {
+		case DL_DEV_PROBING:
+			link->status = DL_STATE_CONSUMER_PROBE;
+			break;
+		case DL_DEV_DRIVER_BOUND:
+			link->status = DL_STATE_ACTIVE;
+			break;
+		default:
+			link->status = DL_STATE_AVAILABLE;
+			break;
+		}
+		break;
+	case DL_DEV_UNBINDING:
+		link->status = DL_STATE_SUPPLIER_UNBIND;
+		break;
+	default:
+		link->status = DL_STATE_DORMANT;
+		break;
+	}
+}
+
+static int device_reorder_to_tail(struct device *dev, void *not_used)
+{
+	struct device_link *link;
+
+	/*
+	 * Devices that have not been registered yet will be put to the ends
+	 * of the lists during the registration, so skip them here.
+	 */
+	if (device_is_registered(dev))
+		devices_kset_move_last(dev);
+
+	if (device_pm_initialized(dev))
+		device_pm_move_last(dev);
+
+	device_for_each_child(dev, NULL, device_reorder_to_tail);
+	list_for_each_entry(link, &dev->links.consumers, s_node) {
+		if (link->flags == (DL_FLAG_SYNC_STATE_ONLY | DL_FLAG_MANAGED))
+			continue;
+		device_reorder_to_tail(link->consumer, NULL);
+	}
+
+	return 0;
+}
+
+/**
+ * device_pm_move_to_tail - Move set of devices to the end of device lists
+ * @dev: Device to move
+ *
+ * This is a device_reorder_to_tail() wrapper taking the requisite locks.
+ *
+ * It moves the @dev along with all of its children and all of its consumers
+ * to the ends of the device_kset and dpm_list, recursively.
+ */
+void device_pm_move_to_tail(struct device *dev)
+{
+	int idx;
+
+	idx = device_links_read_lock();
+	device_pm_lock();
+	device_reorder_to_tail(dev, NULL);
+	device_pm_unlock();
+	device_links_read_unlock(idx);
+}
 
 #define to_devlink(dev)	container_of((dev), struct device_link, link_dev)
 
@@ -343,349 +343,349 @@ static struct class devlink_class = {
 	.dev_release = devlink_dev_release,
 };
 
-//static int devlink_add_symlinks(struct device *dev,
-//				struct class_interface *class_intf)
-//{
-//	int ret;
-//	size_t len;
-//	struct device_link *link = to_devlink(dev);
-//	struct device *sup = link->supplier;
-//	struct device *con = link->consumer;
-//	char *buf;
-//
-//	len = max(strlen(dev_name(sup)), strlen(dev_name(con)));
-//	len += strlen("supplier:") + 1;
-//	buf = kzalloc(len, GFP_KERNEL);
-//	if (!buf)
-//		return -ENOMEM;
-//
-//	ret = sysfs_create_link(&link->link_dev.kobj, &sup->kobj, "supplier");
-//	if (ret)
-//		goto out;
-//
-//	ret = sysfs_create_link(&link->link_dev.kobj, &con->kobj, "consumer");
-//	if (ret)
-//		goto err_con;
-//
-//	snprintf(buf, len, "consumer:%s", dev_name(con));
-//	ret = sysfs_create_link(&sup->kobj, &link->link_dev.kobj, buf);
-//	if (ret)
-//		goto err_con_dev;
-//
-//	snprintf(buf, len, "supplier:%s", dev_name(sup));
-//	ret = sysfs_create_link(&con->kobj, &link->link_dev.kobj, buf);
-//	if (ret)
-//		goto err_sup_dev;
-//
-//	goto out;
-//
-//err_sup_dev:
-//	snprintf(buf, len, "consumer:%s", dev_name(con));
-//	sysfs_remove_link(&sup->kobj, buf);
-//err_con_dev:
-//	sysfs_remove_link(&link->link_dev.kobj, "consumer");
-//err_con:
-//	sysfs_remove_link(&link->link_dev.kobj, "supplier");
-//out:
-//	kfree(buf);
-//	return ret;
-//}
-//
-//static void devlink_remove_symlinks(struct device *dev,
-//				   struct class_interface *class_intf)
-//{
-//	struct device_link *link = to_devlink(dev);
-//	size_t len;
-//	struct device *sup = link->supplier;
-//	struct device *con = link->consumer;
-//	char *buf;
-//
-//	sysfs_remove_link(&link->link_dev.kobj, "consumer");
-//	sysfs_remove_link(&link->link_dev.kobj, "supplier");
-//
-//	len = max(strlen(dev_name(sup)), strlen(dev_name(con)));
-//	len += strlen("supplier:") + 1;
-//	buf = kzalloc(len, GFP_KERNEL);
-//	if (!buf) {
-//		WARN(1, "Unable to properly free device link symlinks!\n");
-//		return;
-//	}
-//
-//	snprintf(buf, len, "supplier:%s", dev_name(sup));
-//	sysfs_remove_link(&con->kobj, buf);
-//	snprintf(buf, len, "consumer:%s", dev_name(con));
-//	sysfs_remove_link(&sup->kobj, buf);
-//	kfree(buf);
-//}
-//
-//static struct class_interface devlink_class_intf = {
-//	.class = &devlink_class,
-//	.add_dev = devlink_add_symlinks,
-//	.remove_dev = devlink_remove_symlinks,
-//};
-//
-//static int __init devlink_class_init(void)
-//{
-//	int ret;
-//
-//	ret = class_register(&devlink_class);
-//	if (ret)
-//		return ret;
-//
-//	ret = class_interface_register(&devlink_class_intf);
-//	if (ret)
-//		class_unregister(&devlink_class);
-//
-//	return ret;
-//}
-//postcore_initcall(devlink_class_init);
-//
-//#define DL_MANAGED_LINK_FLAGS (DL_FLAG_AUTOREMOVE_CONSUMER | \
-//			       DL_FLAG_AUTOREMOVE_SUPPLIER | \
-//			       DL_FLAG_AUTOPROBE_CONSUMER  | \
-//			       DL_FLAG_SYNC_STATE_ONLY)
-//
-//#define DL_ADD_VALID_FLAGS (DL_MANAGED_LINK_FLAGS | DL_FLAG_STATELESS | \
-//			    DL_FLAG_PM_RUNTIME | DL_FLAG_RPM_ACTIVE)
-//
-///**
-// * device_link_add - Create a link between two devices.
-// * @consumer: Consumer end of the link.
-// * @supplier: Supplier end of the link.
-// * @flags: Link flags.
-// *
-// * The caller is responsible for the proper synchronization of the link creation
-// * with runtime PM.  First, setting the DL_FLAG_PM_RUNTIME flag will cause the
-// * runtime PM framework to take the link into account.  Second, if the
-// * DL_FLAG_RPM_ACTIVE flag is set in addition to it, the supplier devices will
-// * be forced into the active metastate and reference-counted upon the creation
-// * of the link.  If DL_FLAG_PM_RUNTIME is not set, DL_FLAG_RPM_ACTIVE will be
-// * ignored.
-// *
-// * If DL_FLAG_STATELESS is set in @flags, the caller of this function is
-// * expected to release the link returned by it directly with the help of either
-// * device_link_del() or device_link_remove().
-// *
-// * If that flag is not set, however, the caller of this function is handing the
-// * management of the link over to the driver core entirely and its return value
-// * can only be used to check whether or not the link is present.  In that case,
-// * the DL_FLAG_AUTOREMOVE_CONSUMER and DL_FLAG_AUTOREMOVE_SUPPLIER device link
-// * flags can be used to indicate to the driver core when the link can be safely
-// * deleted.  Namely, setting one of them in @flags indicates to the driver core
-// * that the link is not going to be used (by the given caller of this function)
-// * after unbinding the consumer or supplier driver, respectively, from its
-// * device, so the link can be deleted at that point.  If none of them is set,
-// * the link will be maintained until one of the devices pointed to by it (either
-// * the consumer or the supplier) is unregistered.
-// *
-// * Also, if DL_FLAG_STATELESS, DL_FLAG_AUTOREMOVE_CONSUMER and
-// * DL_FLAG_AUTOREMOVE_SUPPLIER are not set in @flags (that is, a persistent
-// * managed device link is being added), the DL_FLAG_AUTOPROBE_CONSUMER flag can
-// * be used to request the driver core to automaticall probe for a consmer
-// * driver after successfully binding a driver to the supplier device.
-// *
-// * The combination of DL_FLAG_STATELESS and one of DL_FLAG_AUTOREMOVE_CONSUMER,
-// * DL_FLAG_AUTOREMOVE_SUPPLIER, or DL_FLAG_AUTOPROBE_CONSUMER set in @flags at
-// * the same time is invalid and will cause NULL to be returned upfront.
-// * However, if a device link between the given @consumer and @supplier pair
-// * exists already when this function is called for them, the existing link will
-// * be returned regardless of its current type and status (the link's flags may
-// * be modified then).  The caller of this function is then expected to treat
-// * the link as though it has just been created, so (in particular) if
-// * DL_FLAG_STATELESS was passed in @flags, the link needs to be released
-// * explicitly when not needed any more (as stated above).
-// *
-// * A side effect of the link creation is re-ordering of dpm_list and the
-// * devices_kset list by moving the consumer device and all devices depending
-// * on it to the ends of these lists (that does not happen to devices that have
-// * not been registered when this function is called).
-// *
-// * The supplier device is required to be registered when this function is called
-// * and NULL will be returned if that is not the case.  The consumer device need
-// * not be registered, however.
-// */
-//struct device_link *device_link_add(struct device *consumer,
-//				    struct device *supplier, u32 flags)
-//{
-//	struct device_link *link;
-//
-//	if (!consumer || !supplier || flags & ~DL_ADD_VALID_FLAGS ||
-//	    (flags & DL_FLAG_STATELESS && flags & DL_MANAGED_LINK_FLAGS) ||
-//	    (flags & DL_FLAG_SYNC_STATE_ONLY &&
-//	     flags != DL_FLAG_SYNC_STATE_ONLY) ||
-//	    (flags & DL_FLAG_AUTOPROBE_CONSUMER &&
-//	     flags & (DL_FLAG_AUTOREMOVE_CONSUMER |
-//		      DL_FLAG_AUTOREMOVE_SUPPLIER)))
-//		return NULL;
-//
-//	if (flags & DL_FLAG_PM_RUNTIME && flags & DL_FLAG_RPM_ACTIVE) {
-//		if (pm_runtime_get_sync(supplier) < 0) {
-//			pm_runtime_put_noidle(supplier);
-//			return NULL;
-//		}
-//	}
-//
-//	if (!(flags & DL_FLAG_STATELESS))
-//		flags |= DL_FLAG_MANAGED;
-//
-//	device_links_write_lock();
-//	device_pm_lock();
-//
-//	/*
-//	 * If the supplier has not been fully registered yet or there is a
-//	 * reverse (non-SYNC_STATE_ONLY) dependency between the consumer and
-//	 * the supplier already in the graph, return NULL. If the link is a
-//	 * SYNC_STATE_ONLY link, we don't check for reverse dependencies
-//	 * because it only affects sync_state() callbacks.
-//	 */
-//	if (!device_pm_initialized(supplier)
-//	    || (!(flags & DL_FLAG_SYNC_STATE_ONLY) &&
-//		  device_is_dependent(consumer, supplier))) {
-//		link = NULL;
-//		goto out;
-//	}
-//
-//	/*
-//	 * DL_FLAG_AUTOREMOVE_SUPPLIER indicates that the link will be needed
-//	 * longer than for DL_FLAG_AUTOREMOVE_CONSUMER and setting them both
-//	 * together doesn't make sense, so prefer DL_FLAG_AUTOREMOVE_SUPPLIER.
-//	 */
-//	if (flags & DL_FLAG_AUTOREMOVE_SUPPLIER)
-//		flags &= ~DL_FLAG_AUTOREMOVE_CONSUMER;
-//
-//	list_for_each_entry(link, &supplier->links.consumers, s_node) {
-//		if (link->consumer != consumer)
-//			continue;
-//
-//		if (flags & DL_FLAG_PM_RUNTIME) {
-//			if (!(link->flags & DL_FLAG_PM_RUNTIME)) {
-//				pm_runtime_new_link(consumer);
-//				link->flags |= DL_FLAG_PM_RUNTIME;
-//			}
-//			if (flags & DL_FLAG_RPM_ACTIVE)
-//				refcount_inc(&link->rpm_active);
-//		}
-//
-//		if (flags & DL_FLAG_STATELESS) {
-//			kref_get(&link->kref);
-//			if (link->flags & DL_FLAG_SYNC_STATE_ONLY &&
-//			    !(link->flags & DL_FLAG_STATELESS)) {
-//				link->flags |= DL_FLAG_STATELESS;
-//				goto reorder;
-//			} else {
-//				link->flags |= DL_FLAG_STATELESS;
-//				goto out;
-//			}
-//		}
-//
-//		/*
-//		 * If the life time of the link following from the new flags is
-//		 * longer than indicated by the flags of the existing link,
-//		 * update the existing link to stay around longer.
-//		 */
-//		if (flags & DL_FLAG_AUTOREMOVE_SUPPLIER) {
-//			if (link->flags & DL_FLAG_AUTOREMOVE_CONSUMER) {
-//				link->flags &= ~DL_FLAG_AUTOREMOVE_CONSUMER;
-//				link->flags |= DL_FLAG_AUTOREMOVE_SUPPLIER;
-//			}
-//		} else if (!(flags & DL_FLAG_AUTOREMOVE_CONSUMER)) {
-//			link->flags &= ~(DL_FLAG_AUTOREMOVE_CONSUMER |
-//					 DL_FLAG_AUTOREMOVE_SUPPLIER);
-//		}
-//		if (!(link->flags & DL_FLAG_MANAGED)) {
-//			kref_get(&link->kref);
-//			link->flags |= DL_FLAG_MANAGED;
-//			device_link_init_status(link, consumer, supplier);
-//		}
-//		if (link->flags & DL_FLAG_SYNC_STATE_ONLY &&
-//		    !(flags & DL_FLAG_SYNC_STATE_ONLY)) {
-//			link->flags &= ~DL_FLAG_SYNC_STATE_ONLY;
-//			goto reorder;
-//		}
-//
-//		goto out;
-//	}
-//
-//	link = kzalloc(sizeof(*link), GFP_KERNEL);
-//	if (!link)
-//		goto out;
-//
-//	refcount_set(&link->rpm_active, 1);
-//
-//	get_device(supplier);
-//	link->supplier = supplier;
-//	INIT_LIST_HEAD(&link->s_node);
-//	get_device(consumer);
-//	link->consumer = consumer;
-//	INIT_LIST_HEAD(&link->c_node);
-//	link->flags = flags;
-//	kref_init(&link->kref);
-//
-//	link->link_dev.class = &devlink_class;
-//	device_set_pm_not_required(&link->link_dev);
-//	dev_set_name(&link->link_dev, "%s--%s",
-//		     dev_name(supplier), dev_name(consumer));
-//	if (device_register(&link->link_dev)) {
-//		put_device(consumer);
-//		put_device(supplier);
-//		kfree(link);
-//		link = NULL;
-//		goto out;
-//	}
-//
-//	if (flags & DL_FLAG_PM_RUNTIME) {
-//		if (flags & DL_FLAG_RPM_ACTIVE)
-//			refcount_inc(&link->rpm_active);
-//
-//		pm_runtime_new_link(consumer);
-//	}
-//
-//	/* Determine the initial link state. */
-//	if (flags & DL_FLAG_STATELESS)
-//		link->status = DL_STATE_NONE;
-//	else
-//		device_link_init_status(link, consumer, supplier);
-//
-//	/*
-//	 * Some callers expect the link creation during consumer driver probe to
-//	 * resume the supplier even without DL_FLAG_RPM_ACTIVE.
-//	 */
-//	if (link->status == DL_STATE_CONSUMER_PROBE &&
-//	    flags & DL_FLAG_PM_RUNTIME)
-//		pm_runtime_resume(supplier);
-//
-//	list_add_tail_rcu(&link->s_node, &supplier->links.consumers);
-//	list_add_tail_rcu(&link->c_node, &consumer->links.suppliers);
-//
-//	if (flags & DL_FLAG_SYNC_STATE_ONLY) {
-//		dev_dbg(consumer,
-//			"Linked as a sync state only consumer to %s\n",
-//			dev_name(supplier));
-//		goto out;
-//	}
-//
-//reorder:
-//	/*
-//	 * Move the consumer and all of the devices depending on it to the end
-//	 * of dpm_list and the devices_kset list.
-//	 *
-//	 * It is necessary to hold dpm_list locked throughout all that or else
-//	 * we may end up suspending with a wrong ordering of it.
-//	 */
-//	device_reorder_to_tail(consumer, NULL);
-//
-//	dev_dbg(consumer, "Linked as a consumer to %s\n", dev_name(supplier));
-//
-//out:
-//	device_pm_unlock();
-//	device_links_write_unlock();
-//
-//	if ((flags & DL_FLAG_PM_RUNTIME && flags & DL_FLAG_RPM_ACTIVE) && !link)
-//		pm_runtime_put(supplier);
-//
-//	return link;
-//}
-//EXPORT_SYMBOL_GPL(device_link_add);
+static int devlink_add_symlinks(struct device *dev,
+				struct class_interface *class_intf)
+{
+	int ret;
+	size_t len;
+	struct device_link *link = to_devlink(dev);
+	struct device *sup = link->supplier;
+	struct device *con = link->consumer;
+	char *buf;
+
+	len = max(strlen(dev_name(sup)), strlen(dev_name(con)));
+	len += strlen("supplier:") + 1;
+	buf = kzalloc(len, GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
+
+	ret = sysfs_create_link(&link->link_dev.kobj, &sup->kobj, "supplier");
+	if (ret)
+		goto out;
+
+	ret = sysfs_create_link(&link->link_dev.kobj, &con->kobj, "consumer");
+	if (ret)
+		goto err_con;
+
+	snprintf(buf, len, "consumer:%s", dev_name(con));
+	ret = sysfs_create_link(&sup->kobj, &link->link_dev.kobj, buf);
+	if (ret)
+		goto err_con_dev;
+
+	snprintf(buf, len, "supplier:%s", dev_name(sup));
+	ret = sysfs_create_link(&con->kobj, &link->link_dev.kobj, buf);
+	if (ret)
+		goto err_sup_dev;
+
+	goto out;
+
+err_sup_dev:
+	snprintf(buf, len, "consumer:%s", dev_name(con));
+	sysfs_remove_link(&sup->kobj, buf);
+err_con_dev:
+	sysfs_remove_link(&link->link_dev.kobj, "consumer");
+err_con:
+	sysfs_remove_link(&link->link_dev.kobj, "supplier");
+out:
+	kfree(buf);
+	return ret;
+}
+
+static void devlink_remove_symlinks(struct device *dev,
+				   struct class_interface *class_intf)
+{
+	struct device_link *link = to_devlink(dev);
+	size_t len;
+	struct device *sup = link->supplier;
+	struct device *con = link->consumer;
+	char *buf;
+
+	sysfs_remove_link(&link->link_dev.kobj, "consumer");
+	sysfs_remove_link(&link->link_dev.kobj, "supplier");
+
+	len = max(strlen(dev_name(sup)), strlen(dev_name(con)));
+	len += strlen("supplier:") + 1;
+	buf = kzalloc(len, GFP_KERNEL);
+	if (!buf) {
+		WARN(1, "Unable to properly free device link symlinks!\n");
+		return;
+	}
+
+	snprintf(buf, len, "supplier:%s", dev_name(sup));
+	sysfs_remove_link(&con->kobj, buf);
+	snprintf(buf, len, "consumer:%s", dev_name(con));
+	sysfs_remove_link(&sup->kobj, buf);
+	kfree(buf);
+}
+
+static struct class_interface devlink_class_intf = {
+	.class = &devlink_class,
+	.add_dev = devlink_add_symlinks,
+	.remove_dev = devlink_remove_symlinks,
+};
+
+static int __init devlink_class_init(void)
+{
+	int ret;
+
+	ret = class_register(&devlink_class);
+	if (ret)
+		return ret;
+
+	ret = class_interface_register(&devlink_class_intf);
+	if (ret)
+		class_unregister(&devlink_class);
+
+	return ret;
+}
+postcore_initcall(devlink_class_init);
+
+#define DL_MANAGED_LINK_FLAGS (DL_FLAG_AUTOREMOVE_CONSUMER | \
+			       DL_FLAG_AUTOREMOVE_SUPPLIER | \
+			       DL_FLAG_AUTOPROBE_CONSUMER  | \
+			       DL_FLAG_SYNC_STATE_ONLY)
+
+#define DL_ADD_VALID_FLAGS (DL_MANAGED_LINK_FLAGS | DL_FLAG_STATELESS | \
+			    DL_FLAG_PM_RUNTIME | DL_FLAG_RPM_ACTIVE)
+
+/**
+ * device_link_add - Create a link between two devices.
+ * @consumer: Consumer end of the link.
+ * @supplier: Supplier end of the link.
+ * @flags: Link flags.
+ *
+ * The caller is responsible for the proper synchronization of the link creation
+ * with runtime PM.  First, setting the DL_FLAG_PM_RUNTIME flag will cause the
+ * runtime PM framework to take the link into account.  Second, if the
+ * DL_FLAG_RPM_ACTIVE flag is set in addition to it, the supplier devices will
+ * be forced into the active metastate and reference-counted upon the creation
+ * of the link.  If DL_FLAG_PM_RUNTIME is not set, DL_FLAG_RPM_ACTIVE will be
+ * ignored.
+ *
+ * If DL_FLAG_STATELESS is set in @flags, the caller of this function is
+ * expected to release the link returned by it directly with the help of either
+ * device_link_del() or device_link_remove().
+ *
+ * If that flag is not set, however, the caller of this function is handing the
+ * management of the link over to the driver core entirely and its return value
+ * can only be used to check whether or not the link is present.  In that case,
+ * the DL_FLAG_AUTOREMOVE_CONSUMER and DL_FLAG_AUTOREMOVE_SUPPLIER device link
+ * flags can be used to indicate to the driver core when the link can be safely
+ * deleted.  Namely, setting one of them in @flags indicates to the driver core
+ * that the link is not going to be used (by the given caller of this function)
+ * after unbinding the consumer or supplier driver, respectively, from its
+ * device, so the link can be deleted at that point.  If none of them is set,
+ * the link will be maintained until one of the devices pointed to by it (either
+ * the consumer or the supplier) is unregistered.
+ *
+ * Also, if DL_FLAG_STATELESS, DL_FLAG_AUTOREMOVE_CONSUMER and
+ * DL_FLAG_AUTOREMOVE_SUPPLIER are not set in @flags (that is, a persistent
+ * managed device link is being added), the DL_FLAG_AUTOPROBE_CONSUMER flag can
+ * be used to request the driver core to automaticall probe for a consmer
+ * driver after successfully binding a driver to the supplier device.
+ *
+ * The combination of DL_FLAG_STATELESS and one of DL_FLAG_AUTOREMOVE_CONSUMER,
+ * DL_FLAG_AUTOREMOVE_SUPPLIER, or DL_FLAG_AUTOPROBE_CONSUMER set in @flags at
+ * the same time is invalid and will cause NULL to be returned upfront.
+ * However, if a device link between the given @consumer and @supplier pair
+ * exists already when this function is called for them, the existing link will
+ * be returned regardless of its current type and status (the link's flags may
+ * be modified then).  The caller of this function is then expected to treat
+ * the link as though it has just been created, so (in particular) if
+ * DL_FLAG_STATELESS was passed in @flags, the link needs to be released
+ * explicitly when not needed any more (as stated above).
+ *
+ * A side effect of the link creation is re-ordering of dpm_list and the
+ * devices_kset list by moving the consumer device and all devices depending
+ * on it to the ends of these lists (that does not happen to devices that have
+ * not been registered when this function is called).
+ *
+ * The supplier device is required to be registered when this function is called
+ * and NULL will be returned if that is not the case.  The consumer device need
+ * not be registered, however.
+ */
+struct device_link *device_link_add(struct device *consumer,
+				    struct device *supplier, u32 flags)
+{
+	struct device_link *link;
+
+	if (!consumer || !supplier || flags & ~DL_ADD_VALID_FLAGS ||
+	    (flags & DL_FLAG_STATELESS && flags & DL_MANAGED_LINK_FLAGS) ||
+	    (flags & DL_FLAG_SYNC_STATE_ONLY &&
+	     flags != DL_FLAG_SYNC_STATE_ONLY) ||
+	    (flags & DL_FLAG_AUTOPROBE_CONSUMER &&
+	     flags & (DL_FLAG_AUTOREMOVE_CONSUMER |
+		      DL_FLAG_AUTOREMOVE_SUPPLIER)))
+		return NULL;
+
+	if (flags & DL_FLAG_PM_RUNTIME && flags & DL_FLAG_RPM_ACTIVE) {
+		if (pm_runtime_get_sync(supplier) < 0) {
+			pm_runtime_put_noidle(supplier);
+			return NULL;
+		}
+	}
+
+	if (!(flags & DL_FLAG_STATELESS))
+		flags |= DL_FLAG_MANAGED;
+
+	device_links_write_lock();
+	device_pm_lock();
+
+	/*
+	 * If the supplier has not been fully registered yet or there is a
+	 * reverse (non-SYNC_STATE_ONLY) dependency between the consumer and
+	 * the supplier already in the graph, return NULL. If the link is a
+	 * SYNC_STATE_ONLY link, we don't check for reverse dependencies
+	 * because it only affects sync_state() callbacks.
+	 */
+	if (!device_pm_initialized(supplier)
+	    || (!(flags & DL_FLAG_SYNC_STATE_ONLY) &&
+		  device_is_dependent(consumer, supplier))) {
+		link = NULL;
+		goto out;
+	}
+
+	/*
+	 * DL_FLAG_AUTOREMOVE_SUPPLIER indicates that the link will be needed
+	 * longer than for DL_FLAG_AUTOREMOVE_CONSUMER and setting them both
+	 * together doesn't make sense, so prefer DL_FLAG_AUTOREMOVE_SUPPLIER.
+	 */
+	if (flags & DL_FLAG_AUTOREMOVE_SUPPLIER)
+		flags &= ~DL_FLAG_AUTOREMOVE_CONSUMER;
+
+	list_for_each_entry(link, &supplier->links.consumers, s_node) {
+		if (link->consumer != consumer)
+			continue;
+
+		if (flags & DL_FLAG_PM_RUNTIME) {
+			if (!(link->flags & DL_FLAG_PM_RUNTIME)) {
+				pm_runtime_new_link(consumer);
+				link->flags |= DL_FLAG_PM_RUNTIME;
+			}
+			if (flags & DL_FLAG_RPM_ACTIVE)
+				refcount_inc(&link->rpm_active);
+		}
+
+		if (flags & DL_FLAG_STATELESS) {
+			kref_get(&link->kref);
+			if (link->flags & DL_FLAG_SYNC_STATE_ONLY &&
+			    !(link->flags & DL_FLAG_STATELESS)) {
+				link->flags |= DL_FLAG_STATELESS;
+				goto reorder;
+			} else {
+				link->flags |= DL_FLAG_STATELESS;
+				goto out;
+			}
+		}
+
+		/*
+		 * If the life time of the link following from the new flags is
+		 * longer than indicated by the flags of the existing link,
+		 * update the existing link to stay around longer.
+		 */
+		if (flags & DL_FLAG_AUTOREMOVE_SUPPLIER) {
+			if (link->flags & DL_FLAG_AUTOREMOVE_CONSUMER) {
+				link->flags &= ~DL_FLAG_AUTOREMOVE_CONSUMER;
+				link->flags |= DL_FLAG_AUTOREMOVE_SUPPLIER;
+			}
+		} else if (!(flags & DL_FLAG_AUTOREMOVE_CONSUMER)) {
+			link->flags &= ~(DL_FLAG_AUTOREMOVE_CONSUMER |
+					 DL_FLAG_AUTOREMOVE_SUPPLIER);
+		}
+		if (!(link->flags & DL_FLAG_MANAGED)) {
+			kref_get(&link->kref);
+			link->flags |= DL_FLAG_MANAGED;
+			device_link_init_status(link, consumer, supplier);
+		}
+		if (link->flags & DL_FLAG_SYNC_STATE_ONLY &&
+		    !(flags & DL_FLAG_SYNC_STATE_ONLY)) {
+			link->flags &= ~DL_FLAG_SYNC_STATE_ONLY;
+			goto reorder;
+		}
+
+		goto out;
+	}
+
+	link = kzalloc(sizeof(*link), GFP_KERNEL);
+	if (!link)
+		goto out;
+
+	refcount_set(&link->rpm_active, 1);
+
+	get_device(supplier);
+	link->supplier = supplier;
+	INIT_LIST_HEAD(&link->s_node);
+	get_device(consumer);
+	link->consumer = consumer;
+	INIT_LIST_HEAD(&link->c_node);
+	link->flags = flags;
+	kref_init(&link->kref);
+
+	link->link_dev.class = &devlink_class;
+	device_set_pm_not_required(&link->link_dev);
+	dev_set_name(&link->link_dev, "%s--%s",
+		     dev_name(supplier), dev_name(consumer));
+	if (device_register(&link->link_dev)) {
+		put_device(consumer);
+		put_device(supplier);
+		kfree(link);
+		link = NULL;
+		goto out;
+	}
+
+	if (flags & DL_FLAG_PM_RUNTIME) {
+		if (flags & DL_FLAG_RPM_ACTIVE)
+			refcount_inc(&link->rpm_active);
+
+		pm_runtime_new_link(consumer);
+	}
+
+	/* Determine the initial link state. */
+	if (flags & DL_FLAG_STATELESS)
+		link->status = DL_STATE_NONE;
+	else
+		device_link_init_status(link, consumer, supplier);
+
+	/*
+	 * Some callers expect the link creation during consumer driver probe to
+	 * resume the supplier even without DL_FLAG_RPM_ACTIVE.
+	 */
+	if (link->status == DL_STATE_CONSUMER_PROBE &&
+	    flags & DL_FLAG_PM_RUNTIME)
+		pm_runtime_resume(supplier);
+
+	list_add_tail_rcu(&link->s_node, &supplier->links.consumers);
+	list_add_tail_rcu(&link->c_node, &consumer->links.suppliers);
+
+	if (flags & DL_FLAG_SYNC_STATE_ONLY) {
+		dev_dbg(consumer,
+			"Linked as a sync state only consumer to %s\n",
+			dev_name(supplier));
+		goto out;
+	}
+
+reorder:
+	/*
+	 * Move the consumer and all of the devices depending on it to the end
+	 * of dpm_list and the devices_kset list.
+	 *
+	 * It is necessary to hold dpm_list locked throughout all that or else
+	 * we may end up suspending with a wrong ordering of it.
+	 */
+	device_reorder_to_tail(consumer, NULL);
+
+	dev_dbg(consumer, "Linked as a consumer to %s\n", dev_name(supplier));
+
+out:
+	device_pm_unlock();
+	device_links_write_unlock();
+
+	if ((flags & DL_FLAG_PM_RUNTIME && flags & DL_FLAG_RPM_ACTIVE) && !link)
+		pm_runtime_put(supplier);
+
+	return link;
+}
+EXPORT_SYMBOL_GPL(device_link_add);
 
 /**
  * device_link_wait_for_supplier - Add device to wait_for_suppliers list
@@ -2240,51 +2240,51 @@ static DEVICE_ATTR_RO(dev);
 struct kset *devices_kset;
 EXPORT_SYMBOL(devices_kset);
 
-///**
-// * devices_kset_move_before - Move device in the devices_kset's list.
-// * @deva: Device to move.
-// * @devb: Device @deva should come before.
-// */
-//static void devices_kset_move_before(struct device *deva, struct device *devb)
-//{
-//	if (!devices_kset)
-//		return;
-//	pr_debug("devices_kset: Moving %s before %s\n",
-//		 dev_name(deva), dev_name(devb));
-//	spin_lock(&devices_kset->list_lock);
-//	list_move_tail(&deva->kobj.entry, &devb->kobj.entry);
-//	spin_unlock(&devices_kset->list_lock);
-//}
-//
-///**
-// * devices_kset_move_after - Move device in the devices_kset's list.
-// * @deva: Device to move
-// * @devb: Device @deva should come after.
-// */
-//static void devices_kset_move_after(struct device *deva, struct device *devb)
-//{
-//	if (!devices_kset)
-//		return;
-//	pr_debug("devices_kset: Moving %s after %s\n",
-//		 dev_name(deva), dev_name(devb));
-//	spin_lock(&devices_kset->list_lock);
-//	list_move(&deva->kobj.entry, &devb->kobj.entry);
-//	spin_unlock(&devices_kset->list_lock);
-//}
-//
-///**
-// * devices_kset_move_last - move the device to the end of devices_kset's list.
-// * @dev: device to move
-// */
-//void devices_kset_move_last(struct device *dev)
-//{
-//	if (!devices_kset)
-//		return;
-//	pr_debug("devices_kset: Moving %s to end of list\n", dev_name(dev));
-//	spin_lock(&devices_kset->list_lock);
-//	list_move_tail(&dev->kobj.entry, &devices_kset->list);
-//	spin_unlock(&devices_kset->list_lock);
-//}
+/**
+ * devices_kset_move_before - Move device in the devices_kset's list.
+ * @deva: Device to move.
+ * @devb: Device @deva should come before.
+ */
+static void devices_kset_move_before(struct device *deva, struct device *devb)
+{
+	if (!devices_kset)
+		return;
+	pr_debug("devices_kset: Moving %s before %s\n",
+		 dev_name(deva), dev_name(devb));
+	spin_lock(&devices_kset->list_lock);
+	list_move_tail(&deva->kobj.entry, &devb->kobj.entry);
+	spin_unlock(&devices_kset->list_lock);
+}
+
+/**
+ * devices_kset_move_after - Move device in the devices_kset's list.
+ * @deva: Device to move
+ * @devb: Device @deva should come after.
+ */
+static void devices_kset_move_after(struct device *deva, struct device *devb)
+{
+	if (!devices_kset)
+		return;
+	pr_debug("devices_kset: Moving %s after %s\n",
+		 dev_name(deva), dev_name(devb));
+	spin_lock(&devices_kset->list_lock);
+	list_move(&deva->kobj.entry, &devb->kobj.entry);
+	spin_unlock(&devices_kset->list_lock);
+}
+
+/**
+ * devices_kset_move_last - move the device to the end of devices_kset's list.
+ * @dev: device to move
+ */
+void devices_kset_move_last(struct device *dev)
+{
+	if (!devices_kset)
+		return;
+	pr_debug("devices_kset: Moving %s to end of list\n", dev_name(dev));
+	spin_lock(&devices_kset->list_lock);
+	list_move_tail(&dev->kobj.entry, &devices_kset->list);
+	spin_unlock(&devices_kset->list_lock);
+}
 
 /**
  * device_create_file - create sysfs attribute file for device.

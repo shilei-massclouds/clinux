@@ -52,26 +52,27 @@ EXPORT_SYMBOL(of_match_device);
 //		put_device(&dev->dev);
 //}
 //EXPORT_SYMBOL(of_dev_put);
-//
-//int of_device_add(struct platform_device *ofdev)
-//{
-//	BUG_ON(ofdev->dev.of_node == NULL);
-//
-//	/* name and id have to be set so that the platform bus doesn't get
-//	 * confused on matching */
-//	ofdev->name = dev_name(&ofdev->dev);
-//	ofdev->id = PLATFORM_DEVID_NONE;
-//
-//	/*
-//	 * If this device has not binding numa node in devicetree, that is
-//	 * of_node_to_nid returns NUMA_NO_NODE. device_add will assume that this
-//	 * device is on the same node as the parent.
-//	 */
-//	set_dev_node(&ofdev->dev, of_node_to_nid(ofdev->dev.of_node));
-//
-//	return device_add(&ofdev->dev);
-//}
-//
+
+int of_device_add(struct platform_device *ofdev)
+{
+	BUG_ON(ofdev->dev.of_node == NULL);
+
+	/* name and id have to be set so that the platform bus doesn't get
+	 * confused on matching */
+	ofdev->name = dev_name(&ofdev->dev);
+	ofdev->id = PLATFORM_DEVID_NONE;
+
+	/*
+	 * If this device has not binding numa node in devicetree, that is
+	 * of_node_to_nid returns NUMA_NO_NODE. device_add will assume that this
+	 * device is on the same node as the parent.
+	 */
+	set_dev_node(&ofdev->dev, of_node_to_nid(ofdev->dev.of_node));
+
+	return device_add(&ofdev->dev);
+}
+EXPORT_SYMBOL(of_device_add);
+
 ///**
 // * of_dma_configure - Setup DMA configuration
 // * @dev:	Device to apply DMA configuration

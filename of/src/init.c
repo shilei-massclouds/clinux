@@ -13,10 +13,3 @@ cl_of_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_of_init);
-
-struct device_link *device_link_add(struct device *consumer,
-                    struct device *supplier, u32 flags)
-{
-    booter_panic("No impl in 'of_fdt'.");
-}
-
