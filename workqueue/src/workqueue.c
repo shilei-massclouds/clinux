@@ -3166,29 +3166,29 @@ EXPORT_SYMBOL_GPL(flush_work);
 //	return __cancel_work_timer(work, false);
 //}
 //EXPORT_SYMBOL_GPL(cancel_work_sync);
-//
-///**
-// * flush_delayed_work - wait for a dwork to finish executing the last queueing
-// * @dwork: the delayed work to flush
-// *
-// * Delayed timer is cancelled and the pending work is queued for
-// * immediate execution.  Like flush_work(), this function only
-// * considers the last queueing instance of @dwork.
-// *
-// * Return:
-// * %true if flush_work() waited for the work to finish execution,
-// * %false if it was already idle.
-// */
-//bool flush_delayed_work(struct delayed_work *dwork)
-//{
-//	local_irq_disable();
-//	if (del_timer_sync(&dwork->timer))
-//		__queue_work(dwork->cpu, dwork->wq, &dwork->work);
-//	local_irq_enable();
-//	return flush_work(&dwork->work);
-//}
-//EXPORT_SYMBOL(flush_delayed_work);
-//
+
+/**
+ * flush_delayed_work - wait for a dwork to finish executing the last queueing
+ * @dwork: the delayed work to flush
+ *
+ * Delayed timer is cancelled and the pending work is queued for
+ * immediate execution.  Like flush_work(), this function only
+ * considers the last queueing instance of @dwork.
+ *
+ * Return:
+ * %true if flush_work() waited for the work to finish execution,
+ * %false if it was already idle.
+ */
+bool flush_delayed_work(struct delayed_work *dwork)
+{
+	local_irq_disable();
+	if (del_timer_sync(&dwork->timer))
+		__queue_work(dwork->cpu, dwork->wq, &dwork->work);
+	local_irq_enable();
+	return flush_work(&dwork->work);
+}
+EXPORT_SYMBOL(flush_delayed_work);
+
 ///**
 // * flush_rcu_work - wait for a rwork to finish executing the last queueing
 // * @rwork: the rcu work to flush

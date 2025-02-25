@@ -595,18 +595,12 @@ __weak int setattr_prepare(struct dentry *dentry, struct iattr *attr)
 }
 EXPORT_SYMBOL(setattr_prepare);
 
+/*
 void generic_fillattr(struct inode *inode, struct kstat *stat)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(generic_fillattr);
-
-/*
-void setattr_copy(struct inode *inode, const struct iattr *attr)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(setattr_copy);
 */
 
 __weak struct pseudo_fs_context *init_pseudo(struct fs_context *fc,
@@ -1283,12 +1277,14 @@ __weak int __mnt_want_write(struct vfsmount *m)
 }
 EXPORT_SYMBOL(__mnt_want_write);
 
+/*
 int vfs_getattr(const struct path *path, struct kstat *stat,
         u32 request_mask, unsigned int query_flags)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(vfs_getattr);
+*/
 
 __weak int __legitimize_mnt(struct vfsmount *bastard, unsigned seq)
 {

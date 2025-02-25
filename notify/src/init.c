@@ -16,6 +16,3 @@ cl_notify_init(void)
 EXPORT_SYMBOL(cl_notify_init);
 
 DEFINE_ENABLE_FUNC(notify);
-
-struct srcu_struct fsnotify_mark_srcu;
-struct kmem_cache *fsnotify_mark_connector_cachep;

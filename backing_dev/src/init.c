@@ -14,8 +14,3 @@ cl_backing_dev_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_backing_dev_init);
-
-bool flush_delayed_work(struct delayed_work *dwork)
-{
-    booter_panic("No impl!\n");
-}
