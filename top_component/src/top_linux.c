@@ -1003,7 +1003,6 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(devtmpfs);
     REQUIRE_COMPONENT(security);
     REQUIRE_COMPONENT(pid_namespace);
-    REQUIRE_COMPONENT(platform);
     REQUIRE_COMPONENT(net_core);
     REQUIRE_COMPONENT(ksysfs);
     REQUIRE_COMPONENT(debugfs);
@@ -1013,6 +1012,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(notify);
     REQUIRE_COMPONENT(groups);
     REQUIRE_COMPONENT(8250);
+    REQUIRE_COMPONENT(virtio_mmio);
 
     //
     // start_kernel (init/main.c)

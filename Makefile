@@ -60,10 +60,11 @@ components := \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
 	fs_context fs_parser fs_struct namei libfs debugfs \
 	ipc_namespace drv_char 8250 serial drv_clk \
-	net_core platform \
+	net_core \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap riscv_fault \
 	signal sysctl kallsyms \
+	virtio_mmio \
 	early_printk printk panic bug dump_stack show_mem
 	#partitions \
 

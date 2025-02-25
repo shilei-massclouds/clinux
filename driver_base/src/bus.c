@@ -603,6 +603,7 @@ int bus_add_driver(struct device_driver *drv)
 		return -EINVAL;
 
 	pr_debug("bus: '%s': add driver %s\n", bus->name, drv->name);
+	pr_info("bus: '%s': add driver %s\n", bus->name, drv->name);
 
 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
 	if (!priv) {

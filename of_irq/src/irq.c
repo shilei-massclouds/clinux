@@ -400,7 +400,6 @@ int of_irq_get(struct device_node *dev, int index)
 
 	return irq_create_of_mapping(&oirq);
 }
-EXPORT_SYMBOL_GPL(of_irq_get);
 
 /**
  * of_irq_get_byname - Decode a node's IRQ and return it as a Linux IRQ number
@@ -424,7 +423,6 @@ int of_irq_get_byname(struct device_node *dev, const char *name)
 
 	return of_irq_get(dev, index);
 }
-EXPORT_SYMBOL_GPL(of_irq_get_byname);
 
 /**
  * of_irq_count - Count the number of IRQs a node uses
@@ -460,7 +458,6 @@ int of_irq_to_resource_table(struct device_node *dev, struct resource *res,
 
 	return i;
 }
-EXPORT_SYMBOL_GPL(of_irq_to_resource_table);
 
 struct of_intc_desc {
 	struct list_head	list;
@@ -687,4 +684,3 @@ void of_msi_configure(struct device *dev, struct device_node *np)
 	dev_set_msi_domain(dev,
 			   of_msi_get_domain(dev, np, DOMAIN_BUS_PLATFORM_MSI));
 }
-EXPORT_SYMBOL_GPL(of_msi_configure);

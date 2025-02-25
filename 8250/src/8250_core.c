@@ -41,6 +41,7 @@
 #include <asm/irq.h>
 
 #include "8250.h"
+#include "../../booter/src/booter.h"
 
 /*
  * Configuration:
@@ -1167,6 +1168,7 @@ static int __init serial8250_init(void)
 {
 	int ret;
 
+    sbi_puts("serial8250_init: ===========> \n");
 	if (nr_uarts == 0)
 		return -ENODEV;
 

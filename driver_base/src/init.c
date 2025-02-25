@@ -86,6 +86,7 @@ bool __weak is_of_node(const struct fwnode_handle *fwnode)
 {
     booter_panic("No impl 'driver_base'.");
 }
+EXPORT_SYMBOL_GPL(is_of_node);
 
 __weak int devtmpfs_create_node(struct device *dev)
 {

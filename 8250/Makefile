@@ -3,5 +3,6 @@
 obj_y := init.o
 obj_y += 8250_core.o
 obj_y += 8250_port.o
+obj_y += 8250_of.o
 
 obj_y += mine.o

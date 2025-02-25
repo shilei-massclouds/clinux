@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(__clk_get_name)
-CL_MINE(clk_get_rate)
 CL_MINE(clk_put)
 CL_MINE(clk_set_parent)
 CL_MINE(clk_set_rate)

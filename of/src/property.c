@@ -1450,7 +1450,6 @@ bool is_of_node(const struct fwnode_handle *fwnode)
 {
 	return !IS_ERR_OR_NULL(fwnode) && fwnode->ops == &of_fwnode_ops;
 }
-EXPORT_SYMBOL_GPL(is_of_node);
 
 void of_node_init(struct device_node *node)
 {

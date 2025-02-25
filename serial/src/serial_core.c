@@ -28,6 +28,7 @@
 
 #include <linux/irq.h>
 #include <linux/uaccess.h>
+#include "../../booter/src/booter.h"
 
 /*
  * This is used to lock changes in serial line configuration.
@@ -2332,6 +2333,7 @@ uart_report_port(struct uart_driver *drv, struct uart_port *port)
 		break;
 	}
 
+    sbi_puts("uart_report_port: ==============> \n");
 	pr_info("%s%s%s at %s (irq = %d, base_baud = %d) is a %s\n",
 	       port->dev ? dev_name(port->dev) : "",
 	       port->dev ? ": " : "",
@@ -2345,6 +2347,9 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 {
 	unsigned int flags;
 
+    sbi_puts("uart_configure_port: ==============> \n");
+    sbi_puts(uart_type(port));
+    sbi_puts("\n");
 	/*
 	 * If there isn't a port here, don't do anything further.
 	 */
@@ -2860,6 +2865,7 @@ int uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
 	struct device *tty_dev;
 	int num_groups;
 
+    sbi_puts("uart_add_one_port: ==============> \n");
 	BUG_ON(in_interrupt());
 
 	if (uport->line >= drv->nr)
