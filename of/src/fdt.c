@@ -1221,6 +1221,7 @@ static void * __init early_init_dt_alloc_memory_arch(u64 size, u64 align)
  */
 void __init unflatten_device_tree(void)
 {
+    printk("%s: ==============>\n", __func__);
 	__unflatten_device_tree(initial_boot_params, NULL, &of_root,
 				early_init_dt_alloc_memory_arch, false);
 

@@ -97,6 +97,7 @@ static int __init riscv_intc_init(struct device_node *node,
 {
 	int rc, hartid;
 
+    printk("%s: node=(%x)\n", __func__, node);
 	hartid = riscv_of_parent_hartid(node);
 	if (hartid < 0) {
 		pr_warn("unable to find hart id for %pOF\n", node);

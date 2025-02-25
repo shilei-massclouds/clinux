@@ -213,6 +213,7 @@ struct irq_domain *__irq_domain_add(struct fwnode_handle *fwnode, int size,
 	mutex_unlock(&irq_domain_mutex);
 
 	pr_debug("Added domain %s\n", domain->name);
+	printk("=============> Added domain %s\n", domain->name);
 	return domain;
 }
 EXPORT_SYMBOL_GPL(__irq_domain_add);
@@ -374,6 +375,7 @@ struct irq_domain *irq_find_matching_fwspec(struct irq_fwspec *fwspec,
 	struct fwnode_handle *fwnode = fwspec->fwnode;
 	int rc;
 
+    //printk("%s: +++++++++++ \n", __func__);
 	/* We might want to match the legacy controller last since
 	 * it might potentially be set to match all interrupts in
 	 * the absence of a device node. This isn't a problem so far
@@ -385,14 +387,16 @@ struct irq_domain *irq_find_matching_fwspec(struct irq_fwspec *fwspec,
 	 */
 	mutex_lock(&irq_domain_mutex);
 	list_for_each_entry(h, &irq_domain_list, link) {
-		if (h->ops->select && fwspec->param_count)
+		if (h->ops->select && fwspec->param_count) {
 			rc = h->ops->select(h, fwspec, bus_token);
-		else if (h->ops->match)
+        } else if (h->ops->match) {
 			rc = h->ops->match(h, to_of_node(fwnode), bus_token);
-		else
+        } else {
+    //printk("%s: (%x)(%x)\n", __func__, fwnode, h->fwnode);
 			rc = ((fwnode != NULL) && (h->fwnode == fwnode) &&
 			      ((bus_token == DOMAIN_BUS_ANY) ||
 			       (h->bus_token == bus_token)));
+        }
 
 		if (rc) {
 			found = h;
@@ -1283,6 +1287,7 @@ void irq_domain_free_irqs_top(struct irq_domain *domain, unsigned int virq,
 	}
 	irq_domain_free_irqs_common(domain, virq, nr_irqs);
 }
+EXPORT_SYMBOL(irq_domain_free_irqs_top);
 
 static void irq_domain_free_irqs_hierarchy(struct irq_domain *domain,
 					   unsigned int irq_base,

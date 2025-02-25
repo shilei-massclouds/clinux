@@ -986,6 +986,7 @@ int serial8250_register_8250_port(struct uart_8250_port *up)
 	struct uart_8250_port *uart;
 	int ret = -ENOSPC;
 
+    printk("++++++++ %s: \n", __func__);
 	if (up->port.uartclk == 0)
 		return -EINVAL;
 
