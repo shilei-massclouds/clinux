@@ -2827,7 +2827,7 @@ static int __init bpf_iter_register(void)
 
 static int __init netlink_proto_init(void)
 {
-    pr_warn("%s: ============> Disable this core_initcall temporarily.", __func__);
+    printk("%s: =============> Disable it temporarily!\n", __func__);
     return 0;
 //	int i;
 //    int err;
@@ -2865,6 +2865,7 @@ static int __init netlink_proto_init(void)
 //	sock_register(&netlink_family_ops);
 //	register_pernet_subsys(&netlink_net_ops);
 //	register_pernet_subsys(&netlink_tap_net_ops);
+//	err = proto_register(&netlink_proto, 0);
 //	/* The netlink device handler may be needed early. */
 //	rtnetlink_init();
 //out:

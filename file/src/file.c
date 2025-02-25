@@ -563,6 +563,7 @@ int __get_unused_fd_flags(unsigned flags, unsigned long nofile)
 {
 	return __alloc_fd(current->files, 0, nofile, flags);
 }
+EXPORT_SYMBOL(__get_unused_fd_flags);
 
 int get_unused_fd_flags(unsigned flags)
 {

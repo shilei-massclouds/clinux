@@ -35,5 +35,3 @@ DECLARE_WAIT_QUEUE_HEAD(genl_sk_destructing_waitq);
 struct net_protocol __rcu *inet_protos[1] __read_mostly;
 EXPORT_SYMBOL(inet_protos);
 
-unsigned int sysctl_net_busy_read __read_mostly;
-

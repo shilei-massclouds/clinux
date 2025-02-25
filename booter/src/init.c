@@ -2067,3 +2067,43 @@ struct scatterlist *sg_next(struct scatterlist *sg)
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(sg_next);
+
+__weak int sock_register(const struct net_proto_family *ops)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(sock_register);
+
+ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
+                 struct pipe_inode_info *pipe, size_t len,
+                 unsigned int flags)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(generic_file_splice_read);
+
+char *dynamic_dname(struct dentry *dentry, char *buffer, int buflen,
+            const char *fmt, ...)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(dynamic_dname);
+
+errseq_t errseq_sample(errseq_t *eseq)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(errseq_sample);
+
+char *simple_dname(struct dentry *dentry, char *buffer, int buflen)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(simple_dname);
+
+__weak void __init files_maxfiles_init(void)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(files_maxfiles_init);
+

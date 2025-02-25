@@ -310,28 +310,27 @@ static DECLARE_DELAYED_WORK(deferred_probe_timeout_work, deferred_probe_timeout_
  */
 static int deferred_probe_initcall(void)
 {
-    printk("%s: Disable this subsys_initcall temporarily.\n", __func__);
-//  printk("%s: ...\n", __func__);
-//	deferred_devices = debugfs_create_file("devices_deferred", 0444, NULL,
-//					       NULL, &deferred_devs_fops);
-//
-//	driver_deferred_probe_enable = true;
-//	driver_deferred_probe_trigger();
-//	/* Sort as many dependencies as possible before exiting initcalls */
-//	flush_work(&deferred_probe_work);
-//	initcalls_done = true;
-//
-//	/*
-//	 * Trigger deferred probe again, this time we won't defer anything
-//	 * that is optional
-//	 */
-//	driver_deferred_probe_trigger();
-//	flush_work(&deferred_probe_work);
-//
-//	if (driver_deferred_probe_timeout > 0) {
-//		schedule_delayed_work(&deferred_probe_timeout_work,
-//			driver_deferred_probe_timeout * HZ);
-//	}
+    printk("%s: ...\n", __func__);
+	deferred_devices = debugfs_create_file("devices_deferred", 0444, NULL,
+					       NULL, &deferred_devs_fops);
+
+	driver_deferred_probe_enable = true;
+	driver_deferred_probe_trigger();
+	/* Sort as many dependencies as possible before exiting initcalls */
+	flush_work(&deferred_probe_work);
+	initcalls_done = true;
+
+	/*
+	 * Trigger deferred probe again, this time we won't defer anything
+	 * that is optional
+	 */
+	driver_deferred_probe_trigger();
+	flush_work(&deferred_probe_work);
+
+	if (driver_deferred_probe_timeout > 0) {
+		schedule_delayed_work(&deferred_probe_timeout_work,
+			driver_deferred_probe_timeout * HZ);
+	}
 	return 0;
 }
 late_initcall(deferred_probe_initcall);
