@@ -421,71 +421,72 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
 //}
 //EXPORT_SYMBOL(mark_buffer_async_write);
 //
-//
-///*
-// * fs/buffer.c contains helper functions for buffer-backed address space's
-// * fsync functions.  A common requirement for buffer-based filesystems is
-// * that certain data from the backing blockdev needs to be written out for
-// * a successful fsync().  For example, ext2 indirect blocks need to be
-// * written back and waited upon before fsync() returns.
-// *
-// * The functions mark_buffer_inode_dirty(), fsync_inode_buffers(),
-// * inode_has_buffers() and invalidate_inode_buffers() are provided for the
-// * management of a list of dependent buffers at ->i_mapping->private_list.
-// *
-// * Locking is a little subtle: try_to_free_buffers() will remove buffers
-// * from their controlling inode's queue when they are being freed.  But
-// * try_to_free_buffers() will be operating against the *blockdev* mapping
-// * at the time, not against the S_ISREG file which depends on those buffers.
-// * So the locking for private_list is via the private_lock in the address_space
-// * which backs the buffers.  Which is different from the address_space 
-// * against which the buffers are listed.  So for a particular address_space,
-// * mapping->private_lock does *not* protect mapping->private_list!  In fact,
-// * mapping->private_list will always be protected by the backing blockdev's
-// * ->private_lock.
-// *
-// * Which introduces a requirement: all buffers on an address_space's
-// * ->private_list must be from the same address_space: the blockdev's.
-// *
-// * address_spaces which do not place buffers at ->private_list via these
-// * utility functions are free to use private_lock and private_list for
-// * whatever they want.  The only requirement is that list_empty(private_list)
-// * be true at clear_inode() time.
-// *
-// * FIXME: clear_inode should not call invalidate_inode_buffers().  The
-// * filesystems should do that.  invalidate_inode_buffers() should just go
-// * BUG_ON(!list_empty).
-// *
-// * FIXME: mark_buffer_dirty_inode() is a data-plane operation.  It should
-// * take an address_space, not an inode.  And it should be called
-// * mark_buffer_dirty_fsync() to clearly define why those buffers are being
-// * queued up.
-// *
-// * FIXME: mark_buffer_dirty_inode() doesn't need to add the buffer to the
-// * list if it is already on a list.  Because if the buffer is on a list,
-// * it *must* already be on the right one.  If not, the filesystem is being
-// * silly.  This will save a ton of locking.  But first we have to ensure
-// * that buffers are taken *off* the old inode's list when they are freed
-// * (presumably in truncate).  That requires careful auditing of all
-// * filesystems (do it inside bforget()).  It could also be done by bringing
-// * b_inode back.
-// */
-//
-///*
-// * The buffer's backing address_space's private_lock must be held
-// */
-//static void __remove_assoc_queue(struct buffer_head *bh)
-//{
-//	list_del_init(&bh->b_assoc_buffers);
-//	WARN_ON(!bh->b_assoc_map);
-//	bh->b_assoc_map = NULL;
-//}
-//
-//int inode_has_buffers(struct inode *inode)
-//{
-//	return !list_empty(&inode->i_data.private_list);
-//}
-//
+
+/*
+ * fs/buffer.c contains helper functions for buffer-backed address space's
+ * fsync functions.  A common requirement for buffer-based filesystems is
+ * that certain data from the backing blockdev needs to be written out for
+ * a successful fsync().  For example, ext2 indirect blocks need to be
+ * written back and waited upon before fsync() returns.
+ *
+ * The functions mark_buffer_inode_dirty(), fsync_inode_buffers(),
+ * inode_has_buffers() and invalidate_inode_buffers() are provided for the
+ * management of a list of dependent buffers at ->i_mapping->private_list.
+ *
+ * Locking is a little subtle: try_to_free_buffers() will remove buffers
+ * from their controlling inode's queue when they are being freed.  But
+ * try_to_free_buffers() will be operating against the *blockdev* mapping
+ * at the time, not against the S_ISREG file which depends on those buffers.
+ * So the locking for private_list is via the private_lock in the address_space
+ * which backs the buffers.  Which is different from the address_space 
+ * against which the buffers are listed.  So for a particular address_space,
+ * mapping->private_lock does *not* protect mapping->private_list!  In fact,
+ * mapping->private_list will always be protected by the backing blockdev's
+ * ->private_lock.
+ *
+ * Which introduces a requirement: all buffers on an address_space's
+ * ->private_list must be from the same address_space: the blockdev's.
+ *
+ * address_spaces which do not place buffers at ->private_list via these
+ * utility functions are free to use private_lock and private_list for
+ * whatever they want.  The only requirement is that list_empty(private_list)
+ * be true at clear_inode() time.
+ *
+ * FIXME: clear_inode should not call invalidate_inode_buffers().  The
+ * filesystems should do that.  invalidate_inode_buffers() should just go
+ * BUG_ON(!list_empty).
+ *
+ * FIXME: mark_buffer_dirty_inode() is a data-plane operation.  It should
+ * take an address_space, not an inode.  And it should be called
+ * mark_buffer_dirty_fsync() to clearly define why those buffers are being
+ * queued up.
+ *
+ * FIXME: mark_buffer_dirty_inode() doesn't need to add the buffer to the
+ * list if it is already on a list.  Because if the buffer is on a list,
+ * it *must* already be on the right one.  If not, the filesystem is being
+ * silly.  This will save a ton of locking.  But first we have to ensure
+ * that buffers are taken *off* the old inode's list when they are freed
+ * (presumably in truncate).  That requires careful auditing of all
+ * filesystems (do it inside bforget()).  It could also be done by bringing
+ * b_inode back.
+ */
+
+/*
+ * The buffer's backing address_space's private_lock must be held
+ */
+static void __remove_assoc_queue(struct buffer_head *bh)
+{
+	list_del_init(&bh->b_assoc_buffers);
+	WARN_ON(!bh->b_assoc_map);
+	bh->b_assoc_map = NULL;
+}
+
+int inode_has_buffers(struct inode *inode)
+{
+	return !list_empty(&inode->i_data.private_list);
+}
+EXPORT_SYMBOL(inode_has_buffers);
+
 ///*
 // * osync is designed to support O_SYNC io.  It waits synchronously for
 // * all already-submitted IO to complete, but does not queue any new

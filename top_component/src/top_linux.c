@@ -986,6 +986,7 @@ cl_top_linux_init(void)
     char *after_dashes;
 
     sbi_puts("module[top_linux]: init begin ...\n");
+    REQUIRE_COMPONENT(locks);
     REQUIRE_COMPONENT(of_irq);
     REQUIRE_COMPONENT(irqchip);
     REQUIRE_COMPONENT(timer_riscv);

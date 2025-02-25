@@ -1732,7 +1732,7 @@ __weak void vm_stat_account(struct mm_struct *mm, vm_flags_t flags, long npages)
 }
 EXPORT_SYMBOL(vm_stat_account);
 
-int locks_mandatory_locked(struct file *file)
+__weak int locks_mandatory_locked(struct file *file)
 {
     booter_panic("No impl!\n");
 }
@@ -2145,3 +2145,67 @@ __weak void wb_start_background_writeback(struct bdi_writeback *wb)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(wb_start_background_writeback);
+
+__weak int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__break_lease);
+
+__weak void
+locks_free_lock_context(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(locks_free_lock_context);
+
+__weak int locks_mandatory_area(struct inode *inode, struct file *filp, loff_t start,
+			 loff_t end, unsigned char type)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(locks_mandatory_area);
+
+void truncate_inode_pages_final(struct address_space *mapping)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(truncate_inode_pages_final);
+
+unsigned long invalidate_mapping_pages(struct address_space *mapping,
+        pgoff_t start, pgoff_t end)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(invalidate_mapping_pages);
+
+__weak void inode_io_list_del(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inode_io_list_del);
+
+__weak void __mark_inode_dirty(struct inode *inode, int flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__mark_inode_dirty);
+
+__weak void locks_remove_posix(struct file *filp, fl_owner_t owner)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(locks_remove_posix);
+
+__weak void locks_remove_file(struct file *filp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(locks_remove_file);
+
+void __f_setown(struct file *filp, struct pid *pid, enum pid_type type,
+        int force)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__f_setown);

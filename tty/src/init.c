@@ -47,11 +47,6 @@ int __sched ldsem_down_read(struct ld_semaphore *sem, long timeout)
 {
     booter_panic("No impl.\n");
 }
-void __f_setown(struct file *filp, struct pid *pid, enum pid_type type,
-        int force)
-{
-    booter_panic("No impl.\n");
-}
 void ldsem_up_write(struct ld_semaphore *sem)
 {
     booter_panic("No impl.\n");

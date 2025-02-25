@@ -14,10 +14,6 @@ cl_file_table_init(void)
 }
 EXPORT_SYMBOL(cl_file_table_init);
 
-void locks_remove_file(struct file *filp)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
 void dissolve_on_fput(struct vfsmount *mnt)
 {
     booter_panic("No impl in 'workqueue'.");
