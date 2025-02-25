@@ -1655,6 +1655,7 @@ void __init __memblock_free_late(phys_addr_t base, phys_addr_t size)
 		totalram_pages_inc();
 	}
 }
+EXPORT_SYMBOL(__memblock_free_late);
 
 ///*
 // * Remaining API functions

@@ -2066,7 +2066,8 @@ swp_entry_t get_swap_page(struct page *page)
 }
 EXPORT_SYMBOL(get_swap_page);
 
-
-
-
-
+struct scatterlist *sg_next(struct scatterlist *sg)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(sg_next);
