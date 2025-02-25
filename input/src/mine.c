@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(__bitmap_subset)
-CL_MINE(devres_destroy)
 CL_MINE(input_dev_poller_finalize)
 CL_MINE(input_dev_poller_start)
 CL_MINE(input_dev_poller_stop)

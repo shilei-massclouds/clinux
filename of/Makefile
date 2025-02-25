@@ -9,5 +9,6 @@ obj_y += kobj.o
 obj_y += fdt_address.o
 obj_y += platform.o
 obj_y += base_platform.o
+obj_y += address.o
 
 obj_y += mine.o

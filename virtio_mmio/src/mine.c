@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(devm_kfree)
 CL_MINE(dma_set_coherent_mask)
 CL_MINE(dma_set_mask)
 CL_MINE(register_virtio_device)

@@ -116,3 +116,9 @@ __weak void of_device_uevent(struct device *dev, struct kobj_uevent_env *env)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(of_device_uevent);
+
+__weak bool of_dma_is_coherent(struct device_node *np)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+EXPORT_SYMBOL_GPL(of_dma_is_coherent);

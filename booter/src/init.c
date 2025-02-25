@@ -1937,12 +1937,6 @@ __weak void sysfs_remove_group(struct kobject *kobj,
 }
 EXPORT_SYMBOL_GPL(sysfs_remove_group);
 
-void *devm_kmalloc(struct device *dev, size_t size, gfp_t gfp)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(devm_kmalloc);
-
 struct clk;
 unsigned long clk_get_rate(struct clk *clk)
 {
@@ -1981,33 +1975,14 @@ __weak void of_msi_configure(struct device *dev, struct device_node *np)
 }
 EXPORT_SYMBOL_GPL(of_msi_configure);
 
-void devres_add(struct device *dev, void *res)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL_GPL(devres_add);
-
-void * devres_alloc_node(dr_release_t release, size_t size, gfp_t gfp, int nid)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL_GPL(devres_alloc_node);
-
-void devres_free(void *res)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL_GPL(devres_free);
-
-int of_address_to_resource(struct device_node *node, int index,
-               struct resource *r)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL_GPL(of_address_to_resource);
-
 __weak int of_irq_count(struct device_node *dev)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(of_irq_count);
+
+void __iomem *ioremap_prot(phys_addr_t addr, size_t size, unsigned long prot)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(ioremap_prot);

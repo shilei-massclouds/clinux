@@ -14,5 +14,6 @@ obj_y += dd.o
 obj_y += syscore.o
 obj_y += driver.o
 obj_y += module.o
+obj_y += devres.o
 
 obj_y += mine.o

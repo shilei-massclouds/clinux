@@ -72,11 +72,6 @@ int lock_device_hotplug_sysfs(void)
     booter_panic("No impl 'driver_base'.");
 }
 
-bool of_dma_is_coherent(struct device_node *np)
-{
-    booter_panic("No impl 'driver_base'.");
-}
-
 int __weak of_irq_get(struct device_node *dev, int index)
 {
     booter_panic("No impl 'driver_base'.");

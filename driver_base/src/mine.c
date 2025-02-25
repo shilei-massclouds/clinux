@@ -1,8 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(devres_release_all)
-
 CL_MINE(async_schedule_node)
 CL_MINE(async_synchronize_full)
 CL_MINE(device_links_busy)
