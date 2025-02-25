@@ -52,24 +52,7 @@ void truncate_inode_pages_final(struct address_space *mapping)
 EXPORT_SYMBOL(truncate_inode_pages_final);
 
 /*
-bool capable_wrt_inode_uidgid(const struct inode *inode, int cap)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(capable_wrt_inode_uidgid);
-*/
-
 int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
-{
-    booter_panic("No impl!\n");
-}
-/*
-void list_lru_isolate(struct list_lru_one *list, struct list_head *item)
-{
-    booter_panic("No impl!\n");
-}
-int
-send_sig(int sig, struct task_struct *p, int priv)
 {
     booter_panic("No impl!\n");
 }
