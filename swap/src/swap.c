@@ -503,6 +503,7 @@ void lru_cache_add_inactive_or_unevictable(struct page *page,
 	}
 	lru_cache_add(page);
 }
+EXPORT_SYMBOL(lru_cache_add_inactive_or_unevictable);
 
 /*
  * If the page can not be invalidated, it is moved to the

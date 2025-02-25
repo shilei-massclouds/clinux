@@ -167,6 +167,7 @@ void unlink_file_vma(struct vm_area_struct *vma)
 		i_mmap_unlock_write(mapping);
 	}
 }
+EXPORT_SYMBOL(unlink_file_vma);
 
 /*
  * Close a vm structure and free it, returning the next.

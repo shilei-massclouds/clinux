@@ -17,13 +17,6 @@ cl_kernfs_init(void)
 }
 EXPORT_SYMBOL(cl_kernfs_init);
 
-void unmap_mapping_range(struct address_space *mapping,
-        loff_t const holebegin, loff_t const holelen, int even_cows)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(unmap_mapping_range);
-
 int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
              const void *value, size_t size, int flags,
              ssize_t *removed_size)

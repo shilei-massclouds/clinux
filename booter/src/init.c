@@ -1981,23 +1981,92 @@ __weak int of_irq_count(struct device_node *dev)
 }
 EXPORT_SYMBOL(of_irq_count);
 
-/*
-void __iomem *ioremap_prot(phys_addr_t addr, size_t size, unsigned long prot)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(ioremap_prot);
-*/
-
-int __pte_alloc_kernel(pmd_t *pmd)
+int __anon_vma_prepare(struct vm_area_struct *vma)
 {
     booter_panic("No impl 'slub'.");
 }
-EXPORT_SYMBOL(__pte_alloc_kernel);
+EXPORT_SYMBOL(__anon_vma_prepare);
 
-int __pmd_alloc(struct mm_struct *mm, pud_t *pud,
-                        unsigned long address)
+void unlink_anon_vmas(struct vm_area_struct *vma)
 {
     booter_panic("No impl 'slub'.");
 }
-EXPORT_SYMBOL(__pmd_alloc);
+EXPORT_SYMBOL(unlink_anon_vmas);
+
+void pmd_clear_bad(pmd_t *pmd)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(pmd_clear_bad);
+
+int swap_readpage(struct page *page, bool synchronous)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(swap_readpage);
+
+void tlb_finish_mmu(struct mmu_gather *tlb,
+        unsigned long start, unsigned long end)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(tlb_finish_mmu);
+
+void workingset_refault(struct page *page, void *shadow)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(workingset_refault);
+
+long get_user_pages_remote(struct mm_struct *mm,
+        unsigned long start, unsigned long nr_pages,
+        unsigned int gup_flags, struct page **pages,
+        struct vm_area_struct **vmas, int *locked)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(get_user_pages_remote);
+
+void tlb_gather_mmu(struct mmu_gather *tlb, struct mm_struct *mm,
+            unsigned long start, unsigned long end)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(tlb_gather_mmu);
+
+int __page_mapcount(struct page *page)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(__page_mapcount);
+
+void page_add_file_rmap(struct page *page, bool compound)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(page_add_file_rmap);
+
+int migrate_page(struct address_space *mapping,
+        struct page *newpage, struct page *page,
+        enum migrate_mode mode)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(migrate_page);
+
+int swap_writepage(struct page *page, struct writeback_control *wbc)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(swap_writepage);
+
+swp_entry_t get_swap_page(struct page *page)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(get_swap_page);
+
+
+
+
+

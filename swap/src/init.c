@@ -19,10 +19,4 @@ int free_swap_slot(swp_entry_t entry)
     booter_panic("No impl.\n");
 }
 
-/*
-void lru_cache_add(struct page *page)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(lru_cache_add);
-*/
+bool    swap_slot_cache_enabled;

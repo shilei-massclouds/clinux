@@ -185,3 +185,43 @@ enum compact_result compaction_suitable(struct zone *zone, int order,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(compaction_suitable);
+
+__weak int access_remote_vm(struct mm_struct *mm, unsigned long addr,
+		void *buf, int len, unsigned int gup_flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(access_remote_vm);
+
+__weak int copy_page_range(struct mm_struct *dst_mm, struct mm_struct *src_mm,
+		    struct vm_area_struct *vma, struct vm_area_struct *new)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(copy_page_range);
+
+__weak vm_fault_t alloc_set_pte(struct vm_fault *vmf, struct page *page)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(alloc_set_pte);
+
+__weak int __pmd_alloc(struct mm_struct *mm, pud_t *pud,
+                        unsigned long address)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(__pmd_alloc);
+
+__weak void unmap_mapping_range(struct address_space *mapping,
+		loff_t const holebegin, loff_t const holelen, int even_cows)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(unmap_mapping_range);
+
+__weak int __pte_alloc_kernel(pmd_t *pmd)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(__pte_alloc_kernel);

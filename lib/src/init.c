@@ -14,7 +14,7 @@ int oops_in_progress;
 EXPORT_SYMBOL(oops_in_progress);
 
 #if defined(CONFIG_PROVE_LOCKING) || defined(CONFIG_DEBUG_ATOMIC_SLEEP)
-void __might_fault(const char *file, int line)
+__weak void __might_fault(const char *file, int line)
 {
     sbi_puts("unimplemented __might_fault!");
     sbi_shutdown();

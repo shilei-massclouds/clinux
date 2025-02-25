@@ -34,10 +34,6 @@ asmlinkage long sys_ni_syscall(void)
 {
     booter_panic("No impl!\n");
 }
-void print_vma_addr(char *prefix, unsigned long rip)
-{
-    booter_panic("No impl!\n");
-}
 /*
 enum bug_trap_type report_bug(unsigned long bug_addr,
                         struct pt_regs *regs)

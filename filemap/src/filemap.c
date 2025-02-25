@@ -1571,6 +1571,7 @@ int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
 		return 1;
 	}
 }
+EXPORT_SYMBOL(__lock_page_or_retry);
 
 /**
  * page_cache_next_miss() - Find the next gap in the page cache.
@@ -1693,6 +1694,7 @@ out:
 
 	return page;
 }
+EXPORT_SYMBOL(find_get_entry);
 
 /**
  * find_lock_entry - locate, pin and lock a page cache entry
