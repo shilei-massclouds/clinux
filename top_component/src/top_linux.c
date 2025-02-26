@@ -105,6 +105,8 @@ static bool initargs_found;
 //bool initcall_debug;
 //core_param(initcall_debug, initcall_debug, bool, 0644);
 
+static char *ramdisk_execute_command = "/init";
+
 extern void setup_vm_final(void);
 extern void free_area_init(unsigned long *max_zone_pfn);
 extern void init_IRQ(void);
@@ -957,15 +959,15 @@ static noinline void __init kernel_init_freeable(void)
     console_on_rootfs();
     sbi_puts("kernel_init_freeable: ============ 2 \n");
 
-//    /*
-//     * check if there is an early userspace init.  If yes, let it do all
-//     * the work
-//     */
-//    if (init_eaccess(ramdisk_execute_command) != 0) {
-//        ramdisk_execute_command = NULL;
-//        prepare_namespace();
-//    }
-//
+    /*
+     * check if there is an early userspace init.  If yes, let it do all
+     * the work
+     */
+    if (init_eaccess(ramdisk_execute_command) != 0) {
+        ramdisk_execute_command = NULL;
+        prepare_namespace();
+    }
+
 //    /*
 //     * Ok, we have completed the initial bootup, and
 //     * we're essentially up and running. Get rid of the

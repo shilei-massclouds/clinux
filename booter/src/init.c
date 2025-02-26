@@ -2239,3 +2239,12 @@ page_cache_async_readahead(struct address_space *mapping,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(page_cache_async_readahead);
+
+struct class block_class;
+EXPORT_SYMBOL_GPL(block_class);
+
+void async_synchronize_full(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(async_synchronize_full);

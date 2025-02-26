@@ -14,4 +14,7 @@ cl_do_mounts_init(void)
 }
 EXPORT_SYMBOL(cl_do_mounts_init);
 
-
+int __init nfs_root_data(char **root_device, char **root_data)
+{
+    booter_panic("No impl.\n");
+}

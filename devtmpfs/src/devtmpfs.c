@@ -368,6 +368,7 @@ int __init devtmpfs_mount(void)
 		printk(KERN_INFO "devtmpfs: mounted\n");
 	return err;
 }
+EXPORT_SYMBOL(devtmpfs_mount);
 
 static DECLARE_COMPLETION(setup_done);
 

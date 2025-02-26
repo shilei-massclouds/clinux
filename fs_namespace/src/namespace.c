@@ -30,6 +30,7 @@
 #include <uapi/linux/mount.h>
 #include <linux/fs_context.h>
 #include <linux/shmem_fs.h>
+#include <linux/ramfs.h>
 
 #include "../fs/pnode.h"
 #include "../fs/internal.h"
@@ -4088,3 +4089,33 @@ static int mntns_install(struct nsset *nsset, struct ns_common *ns)
 //	.install	= mntns_install,
 //	.owner		= mntns_owner,
 //};
+
+static bool is_tmpfs;
+static int rootfs_init_fs_context(struct fs_context *fc)
+{
+	if (IS_ENABLED(CONFIG_TMPFS) && is_tmpfs)
+		return shmem_init_fs_context(fc);
+
+	return ramfs_init_fs_context(fc);
+}
+
+struct file_system_type rootfs_fs_type = {
+	.name		= "rootfs",
+	.init_fs_context = rootfs_init_fs_context,
+	.kill_sb	= kill_litter_super,
+};
+EXPORT_SYMBOL(rootfs_fs_type);
+
+char * __initdata root_fs_names;
+EXPORT_SYMBOL(root_fs_names);
+
+char __initdata saved_root_name[64];
+EXPORT_SYMBOL(saved_root_name);
+
+void __init init_rootfs(void)
+{
+	if (IS_ENABLED(CONFIG_TMPFS) && !saved_root_name[0] &&
+		(!root_fs_names || strstr(root_fs_names, "tmpfs")))
+		is_tmpfs = true;
+}
+EXPORT_SYMBOL(init_rootfs);

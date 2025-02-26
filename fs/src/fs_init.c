@@ -125,6 +125,7 @@ int __init init_eaccess(const char *filename)
 	path_put(&path);
 	return error;
 }
+EXPORT_SYMBOL(init_eaccess);
 
 int __init init_stat(const char *filename, struct kstat *stat, int flags)
 {
@@ -220,6 +221,7 @@ int __init init_unlink(const char *pathname)
 {
 	return do_unlinkat(AT_FDCWD, getname_kernel(pathname));
 }
+EXPORT_SYMBOL(init_unlink);
 
 int __init init_mkdir(const char *pathname, umode_t mode)
 {

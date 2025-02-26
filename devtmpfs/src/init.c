@@ -16,5 +16,3 @@ cl_devtmpfs_init(void)
 EXPORT_SYMBOL(cl_devtmpfs_init);
 
 DEFINE_ENABLE_FUNC(devtmpfs);
-
-struct class block_class;
