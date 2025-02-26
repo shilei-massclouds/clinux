@@ -319,6 +319,7 @@ int register_virtio_device(struct virtio_device *dev)
 {
 	int err;
 
+    printk("%s: -------------- %x,%x\n", __func__, dev->id.device, dev->id.vendor);
 	dev->dev.bus = &virtio_bus;
 	device_initialize(&dev->dev);
 

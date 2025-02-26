@@ -85,23 +85,22 @@ static void kill_bdev(struct block_device *bdev)
 	truncate_inode_pages(mapping, 0);
 }
 
-///* Invalidate clean unused buffers and pagecache. */
-//void invalidate_bdev(struct block_device *bdev)
-//{
-//	struct address_space *mapping = bdev->bd_inode->i_mapping;
-//
-//	if (mapping->nrpages) {
-//		invalidate_bh_lrus();
-//		lru_add_drain_all();	/* make sure all lru add caches are flushed */
-//		invalidate_mapping_pages(mapping, 0, -1);
-//	}
-//	/* 99% of the time, we don't need to flush the cleancache on the bdev.
-//	 * But, for the strange corners, lets be cautious
-//	 */
-//	cleancache_invalidate_inode(mapping);
-//}
-//EXPORT_SYMBOL(invalidate_bdev);
-//
+/* Invalidate clean unused buffers and pagecache. */
+void invalidate_bdev(struct block_device *bdev)
+{
+	struct address_space *mapping = bdev->bd_inode->i_mapping;
+
+	if (mapping->nrpages) {
+		invalidate_bh_lrus();
+		lru_add_drain_all();	/* make sure all lru add caches are flushed */
+		invalidate_mapping_pages(mapping, 0, -1);
+	}
+	/* 99% of the time, we don't need to flush the cleancache on the bdev.
+	 * But, for the strange corners, lets be cautious
+	 */
+	cleancache_invalidate_inode(mapping);
+}
+
 //static void set_init_blocksize(struct block_device *bdev)
 //{
 //	bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
@@ -1268,72 +1267,71 @@ void bdput(struct block_device *bdev)
 //}
 //EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
 //#endif
-//
-///**
-// * check_disk_size_change - checks for disk size change and adjusts bdev size.
-// * @disk: struct gendisk to check
-// * @bdev: struct bdev to adjust.
-// * @verbose: if %true log a message about a size change if there is any
-// *
-// * This routine checks to see if the bdev size does not match the disk size
-// * and adjusts it if it differs. When shrinking the bdev size, its all caches
-// * are freed.
-// */
-//static void check_disk_size_change(struct gendisk *disk,
-//		struct block_device *bdev, bool verbose)
-//{
-//	loff_t disk_size, bdev_size;
-//
-//	disk_size = (loff_t)get_capacity(disk) << 9;
-//	bdev_size = i_size_read(bdev->bd_inode);
-//	if (disk_size != bdev_size) {
-//		if (verbose) {
-//			printk(KERN_INFO
-//			       "%s: detected capacity change from %lld to %lld\n",
-//			       disk->disk_name, bdev_size, disk_size);
-//		}
-//		i_size_write(bdev->bd_inode, disk_size);
-//		if (bdev_size > disk_size && __invalidate_device(bdev, false))
-//			pr_warn("VFS: busy inodes on resized disk %s\n",
-//				disk->disk_name);
-//	}
-//	bdev->bd_invalidated = 0;
-//}
-//
-///**
-// * revalidate_disk - wrapper for lower-level driver's revalidate_disk call-back
-// * @disk: struct gendisk to be revalidated
-// *
-// * This routine is a wrapper for lower-level driver's revalidate_disk
-// * call-backs.  It is used to do common pre and post operations needed
-// * for all revalidate_disk operations.
-// */
-//int revalidate_disk(struct gendisk *disk)
-//{
-//	int ret = 0;
-//
-//	if (disk->fops->revalidate_disk)
-//		ret = disk->fops->revalidate_disk(disk);
-//
-//	/*
-//	 * Hidden disks don't have associated bdev so there's no point in
-//	 * revalidating it.
-//	 */
-//	if (!(disk->flags & GENHD_FL_HIDDEN)) {
-//		struct block_device *bdev = bdget_disk(disk, 0);
-//
-//		if (!bdev)
-//			return ret;
-//
-//		mutex_lock(&bdev->bd_mutex);
-//		check_disk_size_change(disk, bdev, ret == 0);
-//		mutex_unlock(&bdev->bd_mutex);
-//		bdput(bdev);
-//	}
-//	return ret;
-//}
-//EXPORT_SYMBOL(revalidate_disk);
-//
+
+/**
+ * check_disk_size_change - checks for disk size change and adjusts bdev size.
+ * @disk: struct gendisk to check
+ * @bdev: struct bdev to adjust.
+ * @verbose: if %true log a message about a size change if there is any
+ *
+ * This routine checks to see if the bdev size does not match the disk size
+ * and adjusts it if it differs. When shrinking the bdev size, its all caches
+ * are freed.
+ */
+static void check_disk_size_change(struct gendisk *disk,
+		struct block_device *bdev, bool verbose)
+{
+	loff_t disk_size, bdev_size;
+
+	disk_size = (loff_t)get_capacity(disk) << 9;
+	bdev_size = i_size_read(bdev->bd_inode);
+	if (disk_size != bdev_size) {
+		if (verbose) {
+			printk(KERN_INFO
+			       "%s: detected capacity change from %lld to %lld\n",
+			       disk->disk_name, bdev_size, disk_size);
+		}
+		i_size_write(bdev->bd_inode, disk_size);
+		if (bdev_size > disk_size && __invalidate_device(bdev, false))
+			pr_warn("VFS: busy inodes on resized disk %s\n",
+				disk->disk_name);
+	}
+	bdev->bd_invalidated = 0;
+}
+
+/**
+ * revalidate_disk - wrapper for lower-level driver's revalidate_disk call-back
+ * @disk: struct gendisk to be revalidated
+ *
+ * This routine is a wrapper for lower-level driver's revalidate_disk
+ * call-backs.  It is used to do common pre and post operations needed
+ * for all revalidate_disk operations.
+ */
+int revalidate_disk(struct gendisk *disk)
+{
+	int ret = 0;
+
+	if (disk->fops->revalidate_disk)
+		ret = disk->fops->revalidate_disk(disk);
+
+	/*
+	 * Hidden disks don't have associated bdev so there's no point in
+	 * revalidating it.
+	 */
+	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+		struct block_device *bdev = bdget_disk(disk, 0);
+
+		if (!bdev)
+			return ret;
+
+		mutex_lock(&bdev->bd_mutex);
+		check_disk_size_change(disk, bdev, ret == 0);
+		mutex_unlock(&bdev->bd_mutex);
+		bdput(bdev);
+	}
+	return ret;
+}
+
 ///*
 // * This routine checks whether a removable media has been changed,
 // * and invalidates all buffer-cache-entries in that case. This
@@ -2083,28 +2081,27 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
 //	goto out;
 //}
 //EXPORT_SYMBOL(lookup_bdev);
-//
-//int __invalidate_device(struct block_device *bdev, bool kill_dirty)
-//{
-//	struct super_block *sb = get_super(bdev);
-//	int res = 0;
-//
-//	if (sb) {
-//		/*
-//		 * no need to lock the super, get_super holds the
-//		 * read mutex so the filesystem cannot go away
-//		 * under us (->put_super runs with the write lock
-//		 * hold).
-//		 */
-//		shrink_dcache_sb(sb);
-//		res = invalidate_inodes(sb, kill_dirty);
-//		drop_super(sb);
-//	}
-//	invalidate_bdev(bdev);
-//	return res;
-//}
-//EXPORT_SYMBOL(__invalidate_device);
-//
+
+int __invalidate_device(struct block_device *bdev, bool kill_dirty)
+{
+	struct super_block *sb = get_super(bdev);
+	int res = 0;
+
+	if (sb) {
+		/*
+		 * no need to lock the super, get_super holds the
+		 * read mutex so the filesystem cannot go away
+		 * under us (->put_super runs with the write lock
+		 * hold).
+		 */
+		shrink_dcache_sb(sb);
+		res = invalidate_inodes(sb, kill_dirty);
+		drop_super(sb);
+	}
+	invalidate_bdev(bdev);
+	return res;
+}
+
 //void iterate_bdevs(void (*func)(struct block_device *, void *), void *arg)
 //{
 //	struct inode *inode, *old_inode = NULL;

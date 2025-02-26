@@ -1020,6 +1020,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(fs_writeback);
     REQUIRE_COMPONENT(noinitramfs);
     REQUIRE_COMPONENT(block_dev);
+    REQUIRE_COMPONENT(virtio_blk);
 
     //
     // start_kernel (init/main.c)

@@ -430,31 +430,31 @@ static void d_shrink_add(struct dentry *dentry, struct list_head *list)
 	this_cpu_inc(nr_dentry_unused);
 }
 
-///*
-// * These can only be called under the global LRU lock, ie during the
-// * callback for freeing the LRU list. "isolate" removes it from the
-// * LRU lists entirely, while shrink_move moves it to the indicated
-// * private list.
-// */
-//static void d_lru_isolate(struct list_lru_one *lru, struct dentry *dentry)
-//{
-//	D_FLAG_VERIFY(dentry, DCACHE_LRU_LIST);
-//	dentry->d_flags &= ~DCACHE_LRU_LIST;
-//	this_cpu_dec(nr_dentry_unused);
-//	if (d_is_negative(dentry))
-//		this_cpu_dec(nr_dentry_negative);
-//	list_lru_isolate(lru, &dentry->d_lru);
-//}
-//
-//static void d_lru_shrink_move(struct list_lru_one *lru, struct dentry *dentry,
-//			      struct list_head *list)
-//{
-//	D_FLAG_VERIFY(dentry, DCACHE_LRU_LIST);
-//	dentry->d_flags |= DCACHE_SHRINK_LIST;
-//	if (d_is_negative(dentry))
-//		this_cpu_dec(nr_dentry_negative);
-//	list_lru_isolate_move(lru, &dentry->d_lru, list);
-//}
+/*
+ * These can only be called under the global LRU lock, ie during the
+ * callback for freeing the LRU list. "isolate" removes it from the
+ * LRU lists entirely, while shrink_move moves it to the indicated
+ * private list.
+ */
+static void d_lru_isolate(struct list_lru_one *lru, struct dentry *dentry)
+{
+	D_FLAG_VERIFY(dentry, DCACHE_LRU_LIST);
+	dentry->d_flags &= ~DCACHE_LRU_LIST;
+	this_cpu_dec(nr_dentry_unused);
+	if (d_is_negative(dentry))
+		this_cpu_dec(nr_dentry_negative);
+	list_lru_isolate(lru, &dentry->d_lru);
+}
+
+static void d_lru_shrink_move(struct list_lru_one *lru, struct dentry *dentry,
+			      struct list_head *list)
+{
+	D_FLAG_VERIFY(dentry, DCACHE_LRU_LIST);
+	dentry->d_flags |= DCACHE_SHRINK_LIST;
+	if (d_is_negative(dentry))
+		this_cpu_dec(nr_dentry_negative);
+	list_lru_isolate_move(lru, &dentry->d_lru, list);
+}
 
 /**
  * d_drop - drop a dentry
@@ -1223,46 +1223,45 @@ EXPORT_SYMBOL(shrink_dentry_list);
 //	shrink_dentry_list(&dispose);
 //	return freed;
 //}
-//
-//static enum lru_status dentry_lru_isolate_shrink(struct list_head *item,
-//		struct list_lru_one *lru, spinlock_t *lru_lock, void *arg)
-//{
-//	struct list_head *freeable = arg;
-//	struct dentry	*dentry = container_of(item, struct dentry, d_lru);
-//
-//	/*
-//	 * we are inverting the lru lock/dentry->d_lock here,
-//	 * so use a trylock. If we fail to get the lock, just skip
-//	 * it
-//	 */
-//	if (!spin_trylock(&dentry->d_lock))
-//		return LRU_SKIP;
-//
-//	d_lru_shrink_move(lru, dentry, freeable);
-//	spin_unlock(&dentry->d_lock);
-//
-//	return LRU_REMOVED;
-//}
-//
-//
-///**
-// * shrink_dcache_sb - shrink dcache for a superblock
-// * @sb: superblock
-// *
-// * Shrink the dcache for the specified super block. This is used to free
-// * the dcache before unmounting a file system.
-// */
-//void shrink_dcache_sb(struct super_block *sb)
-//{
-//	do {
-//		LIST_HEAD(dispose);
-//
-//		list_lru_walk(&sb->s_dentry_lru,
-//			dentry_lru_isolate_shrink, &dispose, 1024);
-//		shrink_dentry_list(&dispose);
-//	} while (list_lru_count(&sb->s_dentry_lru) > 0);
-//}
-//EXPORT_SYMBOL(shrink_dcache_sb);
+
+static enum lru_status dentry_lru_isolate_shrink(struct list_head *item,
+		struct list_lru_one *lru, spinlock_t *lru_lock, void *arg)
+{
+	struct list_head *freeable = arg;
+	struct dentry	*dentry = container_of(item, struct dentry, d_lru);
+
+	/*
+	 * we are inverting the lru lock/dentry->d_lock here,
+	 * so use a trylock. If we fail to get the lock, just skip
+	 * it
+	 */
+	if (!spin_trylock(&dentry->d_lock))
+		return LRU_SKIP;
+
+	d_lru_shrink_move(lru, dentry, freeable);
+	spin_unlock(&dentry->d_lock);
+
+	return LRU_REMOVED;
+}
+
+
+/**
+ * shrink_dcache_sb - shrink dcache for a superblock
+ * @sb: superblock
+ *
+ * Shrink the dcache for the specified super block. This is used to free
+ * the dcache before unmounting a file system.
+ */
+void shrink_dcache_sb(struct super_block *sb)
+{
+	do {
+		LIST_HEAD(dispose);
+
+		list_lru_walk(&sb->s_dentry_lru,
+			dentry_lru_isolate_shrink, &dispose, 1024);
+		shrink_dentry_list(&dispose);
+	} while (list_lru_count(&sb->s_dentry_lru) > 0);
+}
 
 /**
  * enum d_walk_ret - action to talke during tree walk

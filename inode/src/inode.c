@@ -717,6 +717,7 @@ again:
 
 	return busy;
 }
+EXPORT_SYMBOL(invalidate_inodes);
 
 /*
  * Isolate the inode from the LRU in preparation for freeing it.

@@ -66,7 +66,7 @@ components := \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap riscv_fault \
 	signal sysctl kallsyms \
-	virtio_mmio virtio \
+	virtio_mmio virtio virtio_blk \
 	early_printk printk panic bug dump_stack show_mem
 	#partitions \
 

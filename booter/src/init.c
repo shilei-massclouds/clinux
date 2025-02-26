@@ -2343,3 +2343,27 @@ __weak int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned max_ratio)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(bdi_set_max_ratio);
+
+__weak int revalidate_disk(struct gendisk *disk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(revalidate_disk);
+
+__weak void shrink_dcache_sb(struct super_block *sb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(shrink_dcache_sb);
+
+__weak void invalidate_bdev(struct block_device *bdev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(invalidate_bdev);
+
+__weak int __invalidate_device(struct block_device *bdev, bool kill_dirty)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__invalidate_device);
