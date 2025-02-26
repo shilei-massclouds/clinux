@@ -685,6 +685,7 @@ void deactivate_file_page(struct page *page)
 		local_unlock(&lru_pvecs.lock);
 	}
 }
+EXPORT_SYMBOL(deactivate_file_page);
 
 /*
  * deactivate_page - deactivate a page
@@ -1065,6 +1066,7 @@ unsigned pagevec_lookup_entries(struct pagevec *pvec,
 				    pvec->pages, indices);
 	return pagevec_count(pvec);
 }
+EXPORT_SYMBOL(pagevec_lookup_entries);
 
 /**
  * pagevec_remove_exceptionals - pagevec exceptionals pruning

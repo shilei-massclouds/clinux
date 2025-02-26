@@ -41,7 +41,7 @@ components := \
 	prebuilt booter lib math flex_proportions \
 	radix_tree idr xarray assoc_array list_lru klist logic_pio \
 	kasprintf random crypto uuid rhashtable iov_iter checksum \
-	sbitmap scatterlist bio mempool \
+	sbitmap scatterlist bio mempool truncate interval_tree \
 	traps irq softirq dec_and_lock \
 	kobject driver_base resource devres \
 	of of_irq irq_work tty vt earlycon dummycon input \

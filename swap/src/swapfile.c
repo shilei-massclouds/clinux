@@ -3430,82 +3430,82 @@ EXPORT_SYMBOL(free_swap_and_cache);
 //	val->totalswap = total_swap_pages + nr_to_be_unused;
 //	spin_unlock(&swap_lock);
 //}
-//
-///*
-// * Verify that a swap entry is valid and increment its swap map count.
-// *
-// * Returns error code in following case.
-// * - success -> 0
-// * - swp_entry is invalid -> EINVAL
-// * - swp_entry is migration entry -> EINVAL
-// * - swap-cache reference is requested but there is already one. -> EEXIST
-// * - swap-cache reference is requested but the entry is not used. -> ENOENT
-// * - swap-mapped reference requested but needs continued swap count. -> ENOMEM
-// */
-//static int __swap_duplicate(swp_entry_t entry, unsigned char usage)
-//{
-//	struct swap_info_struct *p;
-//	struct swap_cluster_info *ci;
-//	unsigned long offset;
-//	unsigned char count;
-//	unsigned char has_cache;
-//	int err = -EINVAL;
-//
-//	p = get_swap_device(entry);
-//	if (!p)
-//		goto out;
-//
-//	offset = swp_offset(entry);
-//	ci = lock_cluster_or_swap_info(p, offset);
-//
-//	count = p->swap_map[offset];
-//
-//	/*
-//	 * swapin_readahead() doesn't check if a swap entry is valid, so the
-//	 * swap entry could be SWAP_MAP_BAD. Check here with lock held.
-//	 */
-//	if (unlikely(swap_count(count) == SWAP_MAP_BAD)) {
-//		err = -ENOENT;
-//		goto unlock_out;
-//	}
-//
-//	has_cache = count & SWAP_HAS_CACHE;
-//	count &= ~SWAP_HAS_CACHE;
-//	err = 0;
-//
-//	if (usage == SWAP_HAS_CACHE) {
-//
-//		/* set SWAP_HAS_CACHE if there is no cache and entry is used */
-//		if (!has_cache && count)
-//			has_cache = SWAP_HAS_CACHE;
-//		else if (has_cache)		/* someone else added cache */
-//			err = -EEXIST;
-//		else				/* no users remaining */
-//			err = -ENOENT;
-//
-//	} else if (count || has_cache) {
-//
-//		if ((count & ~COUNT_CONTINUED) < SWAP_MAP_MAX)
-//			count += usage;
-//		else if ((count & ~COUNT_CONTINUED) > SWAP_MAP_MAX)
-//			err = -EINVAL;
-//		else if (swap_count_continued(p, offset, count))
-//			count = COUNT_CONTINUED;
-//		else
-//			err = -ENOMEM;
-//	} else
-//		err = -ENOENT;			/* unused swap entry */
-//
-//	WRITE_ONCE(p->swap_map[offset], count | has_cache);
-//
-//unlock_out:
-//	unlock_cluster_or_swap_info(p, ci);
-//out:
-//	if (p)
-//		put_swap_device(p);
-//	return err;
-//}
-//
+
+/*
+ * Verify that a swap entry is valid and increment its swap map count.
+ *
+ * Returns error code in following case.
+ * - success -> 0
+ * - swp_entry is invalid -> EINVAL
+ * - swp_entry is migration entry -> EINVAL
+ * - swap-cache reference is requested but there is already one. -> EEXIST
+ * - swap-cache reference is requested but the entry is not used. -> ENOENT
+ * - swap-mapped reference requested but needs continued swap count. -> ENOMEM
+ */
+static int __swap_duplicate(swp_entry_t entry, unsigned char usage)
+{
+	struct swap_info_struct *p;
+	struct swap_cluster_info *ci;
+	unsigned long offset;
+	unsigned char count;
+	unsigned char has_cache;
+	int err = -EINVAL;
+
+	p = get_swap_device(entry);
+	if (!p)
+		goto out;
+
+	offset = swp_offset(entry);
+	ci = lock_cluster_or_swap_info(p, offset);
+
+	count = p->swap_map[offset];
+
+	/*
+	 * swapin_readahead() doesn't check if a swap entry is valid, so the
+	 * swap entry could be SWAP_MAP_BAD. Check here with lock held.
+	 */
+	if (unlikely(swap_count(count) == SWAP_MAP_BAD)) {
+		err = -ENOENT;
+		goto unlock_out;
+	}
+
+	has_cache = count & SWAP_HAS_CACHE;
+	count &= ~SWAP_HAS_CACHE;
+	err = 0;
+
+	if (usage == SWAP_HAS_CACHE) {
+
+		/* set SWAP_HAS_CACHE if there is no cache and entry is used */
+		if (!has_cache && count)
+			has_cache = SWAP_HAS_CACHE;
+		else if (has_cache)		/* someone else added cache */
+			err = -EEXIST;
+		else				/* no users remaining */
+			err = -ENOENT;
+
+	} else if (count || has_cache) {
+
+		if ((count & ~COUNT_CONTINUED) < SWAP_MAP_MAX)
+			count += usage;
+		else if ((count & ~COUNT_CONTINUED) > SWAP_MAP_MAX)
+			err = -EINVAL;
+		else if (swap_count_continued(p, offset, count))
+			count = COUNT_CONTINUED;
+		else
+			err = -ENOMEM;
+	} else
+		err = -ENOENT;			/* unused swap entry */
+
+	WRITE_ONCE(p->swap_map[offset], count | has_cache);
+
+unlock_out:
+	unlock_cluster_or_swap_info(p, ci);
+out:
+	if (p)
+		put_swap_device(p);
+	return err;
+}
+
 ///*
 // * Help swapoff by noting that swap entry belongs to shmem/tmpfs
 // * (in which case its reference count is never incremented).
@@ -3514,23 +3514,24 @@ EXPORT_SYMBOL(free_swap_and_cache);
 //{
 //	__swap_duplicate(entry, SWAP_MAP_SHMEM);
 //}
-//
-///*
-// * Increase reference count of swap entry by 1.
-// * Returns 0 for success, or -ENOMEM if a swap_count_continuation is required
-// * but could not be atomically allocated.  Returns 0, just as if it succeeded,
-// * if __swap_duplicate() fails for another reason (-EINVAL or -ENOENT), which
-// * might occur if a page table entry has got corrupted.
-// */
-//int swap_duplicate(swp_entry_t entry)
-//{
-//	int err = 0;
-//
-//	while (!err && __swap_duplicate(entry, 1) == -ENOMEM)
-//		err = add_swap_count_continuation(entry, GFP_ATOMIC);
-//	return err;
-//}
-//
+
+/*
+ * Increase reference count of swap entry by 1.
+ * Returns 0 for success, or -ENOMEM if a swap_count_continuation is required
+ * but could not be atomically allocated.  Returns 0, just as if it succeeded,
+ * if __swap_duplicate() fails for another reason (-EINVAL or -ENOENT), which
+ * might occur if a page table entry has got corrupted.
+ */
+int swap_duplicate(swp_entry_t entry)
+{
+	int err = 0;
+
+	while (!err && __swap_duplicate(entry, 1) == -ENOMEM)
+		err = add_swap_count_continuation(entry, GFP_ATOMIC);
+	return err;
+}
+EXPORT_SYMBOL_GPL(swap_duplicate);
+
 ///*
 // * @entry: swap entry for which we allocate swap cache.
 // *
@@ -3571,124 +3572,125 @@ EXPORT_SYMBOL(swp_swap_info);
 //	return swp_offset(swap);
 //}
 //EXPORT_SYMBOL_GPL(__page_file_index);
-//
-///*
-// * add_swap_count_continuation - called when a swap count is duplicated
-// * beyond SWAP_MAP_MAX, it allocates a new page and links that to the entry's
-// * page of the original vmalloc'ed swap_map, to hold the continuation count
-// * (for that entry and for its neighbouring PAGE_SIZE swap entries).  Called
-// * again when count is duplicated beyond SWAP_MAP_MAX * SWAP_CONT_MAX, etc.
-// *
-// * These continuation pages are seldom referenced: the common paths all work
-// * on the original swap_map, only referring to a continuation page when the
-// * low "digit" of a count is incremented or decremented through SWAP_MAP_MAX.
-// *
-// * add_swap_count_continuation(, GFP_ATOMIC) can be called while holding
-// * page table locks; if it fails, add_swap_count_continuation(, GFP_KERNEL)
-// * can be called after dropping locks.
-// */
-//int add_swap_count_continuation(swp_entry_t entry, gfp_t gfp_mask)
-//{
-//	struct swap_info_struct *si;
-//	struct swap_cluster_info *ci;
-//	struct page *head;
-//	struct page *page;
-//	struct page *list_page;
-//	pgoff_t offset;
-//	unsigned char count;
-//	int ret = 0;
-//
-//	/*
-//	 * When debugging, it's easier to use __GFP_ZERO here; but it's better
-//	 * for latency not to zero a page while GFP_ATOMIC and holding locks.
-//	 */
-//	page = alloc_page(gfp_mask | __GFP_HIGHMEM);
-//
-//	si = get_swap_device(entry);
-//	if (!si) {
-//		/*
-//		 * An acceptable race has occurred since the failing
-//		 * __swap_duplicate(): the swap device may be swapoff
-//		 */
-//		goto outer;
-//	}
-//	spin_lock(&si->lock);
-//
-//	offset = swp_offset(entry);
-//
-//	ci = lock_cluster(si, offset);
-//
-//	count = si->swap_map[offset] & ~SWAP_HAS_CACHE;
-//
-//	if ((count & ~COUNT_CONTINUED) != SWAP_MAP_MAX) {
-//		/*
-//		 * The higher the swap count, the more likely it is that tasks
-//		 * will race to add swap count continuation: we need to avoid
-//		 * over-provisioning.
-//		 */
-//		goto out;
-//	}
-//
-//	if (!page) {
-//		ret = -ENOMEM;
-//		goto out;
-//	}
-//
-//	/*
-//	 * We are fortunate that although vmalloc_to_page uses pte_offset_map,
-//	 * no architecture is using highmem pages for kernel page tables: so it
-//	 * will not corrupt the GFP_ATOMIC caller's atomic page table kmaps.
-//	 */
-//	head = vmalloc_to_page(si->swap_map + offset);
-//	offset &= ~PAGE_MASK;
-//
-//	spin_lock(&si->cont_lock);
-//	/*
-//	 * Page allocation does not initialize the page's lru field,
-//	 * but it does always reset its private field.
-//	 */
-//	if (!page_private(head)) {
-//		BUG_ON(count & COUNT_CONTINUED);
-//		INIT_LIST_HEAD(&head->lru);
-//		set_page_private(head, SWP_CONTINUED);
-//		si->flags |= SWP_CONTINUED;
-//	}
-//
-//	list_for_each_entry(list_page, &head->lru, lru) {
-//		unsigned char *map;
-//
-//		/*
-//		 * If the previous map said no continuation, but we've found
-//		 * a continuation page, free our allocation and use this one.
-//		 */
-//		if (!(count & COUNT_CONTINUED))
-//			goto out_unlock_cont;
-//
-//		map = kmap_atomic(list_page) + offset;
-//		count = *map;
-//		kunmap_atomic(map);
-//
-//		/*
-//		 * If this continuation count now has some space in it,
-//		 * free our allocation and use this one.
-//		 */
-//		if ((count & ~COUNT_CONTINUED) != SWAP_CONT_MAX)
-//			goto out_unlock_cont;
-//	}
-//
-//	list_add_tail(&page->lru, &head->lru);
-//	page = NULL;			/* now it's attached, don't free it */
-//out_unlock_cont:
-//	spin_unlock(&si->cont_lock);
-//out:
-//	unlock_cluster(ci);
-//	spin_unlock(&si->lock);
-//	put_swap_device(si);
-//outer:
-//	if (page)
-//		__free_page(page);
-//	return ret;
-//}
+
+/*
+ * add_swap_count_continuation - called when a swap count is duplicated
+ * beyond SWAP_MAP_MAX, it allocates a new page and links that to the entry's
+ * page of the original vmalloc'ed swap_map, to hold the continuation count
+ * (for that entry and for its neighbouring PAGE_SIZE swap entries).  Called
+ * again when count is duplicated beyond SWAP_MAP_MAX * SWAP_CONT_MAX, etc.
+ *
+ * These continuation pages are seldom referenced: the common paths all work
+ * on the original swap_map, only referring to a continuation page when the
+ * low "digit" of a count is incremented or decremented through SWAP_MAP_MAX.
+ *
+ * add_swap_count_continuation(, GFP_ATOMIC) can be called while holding
+ * page table locks; if it fails, add_swap_count_continuation(, GFP_KERNEL)
+ * can be called after dropping locks.
+ */
+int add_swap_count_continuation(swp_entry_t entry, gfp_t gfp_mask)
+{
+	struct swap_info_struct *si;
+	struct swap_cluster_info *ci;
+	struct page *head;
+	struct page *page;
+	struct page *list_page;
+	pgoff_t offset;
+	unsigned char count;
+	int ret = 0;
+
+	/*
+	 * When debugging, it's easier to use __GFP_ZERO here; but it's better
+	 * for latency not to zero a page while GFP_ATOMIC and holding locks.
+	 */
+	page = alloc_page(gfp_mask | __GFP_HIGHMEM);
+
+	si = get_swap_device(entry);
+	if (!si) {
+		/*
+		 * An acceptable race has occurred since the failing
+		 * __swap_duplicate(): the swap device may be swapoff
+		 */
+		goto outer;
+	}
+	spin_lock(&si->lock);
+
+	offset = swp_offset(entry);
+
+	ci = lock_cluster(si, offset);
+
+	count = si->swap_map[offset] & ~SWAP_HAS_CACHE;
+
+	if ((count & ~COUNT_CONTINUED) != SWAP_MAP_MAX) {
+		/*
+		 * The higher the swap count, the more likely it is that tasks
+		 * will race to add swap count continuation: we need to avoid
+		 * over-provisioning.
+		 */
+		goto out;
+	}
+
+	if (!page) {
+		ret = -ENOMEM;
+		goto out;
+	}
+
+	/*
+	 * We are fortunate that although vmalloc_to_page uses pte_offset_map,
+	 * no architecture is using highmem pages for kernel page tables: so it
+	 * will not corrupt the GFP_ATOMIC caller's atomic page table kmaps.
+	 */
+	head = vmalloc_to_page(si->swap_map + offset);
+	offset &= ~PAGE_MASK;
+
+	spin_lock(&si->cont_lock);
+	/*
+	 * Page allocation does not initialize the page's lru field,
+	 * but it does always reset its private field.
+	 */
+	if (!page_private(head)) {
+		BUG_ON(count & COUNT_CONTINUED);
+		INIT_LIST_HEAD(&head->lru);
+		set_page_private(head, SWP_CONTINUED);
+		si->flags |= SWP_CONTINUED;
+	}
+
+	list_for_each_entry(list_page, &head->lru, lru) {
+		unsigned char *map;
+
+		/*
+		 * If the previous map said no continuation, but we've found
+		 * a continuation page, free our allocation and use this one.
+		 */
+		if (!(count & COUNT_CONTINUED))
+			goto out_unlock_cont;
+
+		map = kmap_atomic(list_page) + offset;
+		count = *map;
+		kunmap_atomic(map);
+
+		/*
+		 * If this continuation count now has some space in it,
+		 * free our allocation and use this one.
+		 */
+		if ((count & ~COUNT_CONTINUED) != SWAP_CONT_MAX)
+			goto out_unlock_cont;
+	}
+
+	list_add_tail(&page->lru, &head->lru);
+	page = NULL;			/* now it's attached, don't free it */
+out_unlock_cont:
+	spin_unlock(&si->cont_lock);
+out:
+	unlock_cluster(ci);
+	spin_unlock(&si->lock);
+	put_swap_device(si);
+outer:
+	if (page)
+		__free_page(page);
+	return ret;
+}
+EXPORT_SYMBOL_GPL(add_swap_count_continuation);
 
 /*
  * swap_count_continued - when the original swap_map count is incremented

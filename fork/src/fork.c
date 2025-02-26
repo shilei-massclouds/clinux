@@ -937,9 +937,6 @@ free_tsk:
 	return NULL;
 }
 
-__cacheline_aligned_in_smp DEFINE_SPINLOCK(mmlist_lock);
-EXPORT_SYMBOL(mmlist_lock);
-
 static unsigned long default_dump_filter = MMF_DUMP_FILTER_DEFAULT;
 
 static int __init coredump_filter_setup(char *s)

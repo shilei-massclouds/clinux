@@ -621,23 +621,24 @@ EXPORT_SYMBOL(kvmalloc_node);
 //	}
 //}
 //EXPORT_SYMBOL(kvfree_sensitive);
-//
-//static inline void *__page_rmapping(struct page *page)
-//{
-//	unsigned long mapping;
-//
-//	mapping = (unsigned long)page->mapping;
-//	mapping &= ~PAGE_MAPPING_FLAGS;
-//
-//	return (void *)mapping;
-//}
-//
-///* Neutral page->mapping pointer to address_space or anon_vma or other */
-//void *page_rmapping(struct page *page)
-//{
-//	page = compound_head(page);
-//	return __page_rmapping(page);
-//}
+
+static inline void *__page_rmapping(struct page *page)
+{
+	unsigned long mapping;
+
+	mapping = (unsigned long)page->mapping;
+	mapping &= ~PAGE_MAPPING_FLAGS;
+
+	return (void *)mapping;
+}
+
+/* Neutral page->mapping pointer to address_space or anon_vma or other */
+void *page_rmapping(struct page *page)
+{
+	page = compound_head(page);
+	return __page_rmapping(page);
+}
+EXPORT_SYMBOL(page_rmapping);
 
 /*
  * Return true if this page is mapped into pagetables.

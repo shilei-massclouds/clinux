@@ -15,6 +15,7 @@
 #include <linux/fs_context.h>
 #include <linux/ipc_namespace.h>
 #include <linux/user_namespace.h>
+#include <linux/rmap.h>
 #include <linux/kobj_map.h>
 #include <linux/backing-dev-defs.h>
 #include <linux/backing-dev.h>
@@ -1990,13 +1991,13 @@ __weak int of_irq_count(struct device_node *dev)
 }
 EXPORT_SYMBOL(of_irq_count);
 
-int __anon_vma_prepare(struct vm_area_struct *vma)
+__weak int __anon_vma_prepare(struct vm_area_struct *vma)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(__anon_vma_prepare);
 
-void unlink_anon_vmas(struct vm_area_struct *vma)
+__weak void unlink_anon_vmas(struct vm_area_struct *vma)
 {
     booter_panic("No impl 'slub'.");
 }
@@ -2048,12 +2049,6 @@ int __page_mapcount(struct page *page)
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(__page_mapcount);
-
-void page_add_file_rmap(struct page *page, bool compound)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(page_add_file_rmap);
 
 int migrate_page(struct address_space *mapping,
         struct page *newpage, struct page *page,
@@ -2181,18 +2176,11 @@ __weak int locks_mandatory_area(struct inode *inode, struct file *filp, loff_t s
 }
 EXPORT_SYMBOL(locks_mandatory_area);
 
-void truncate_inode_pages_final(struct address_space *mapping)
+__weak void truncate_inode_pages_final(struct address_space *mapping)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(truncate_inode_pages_final);
-
-unsigned long invalidate_mapping_pages(struct address_space *mapping,
-        pgoff_t start, pgoff_t end)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(invalidate_mapping_pages);
 
 __weak void inode_io_list_del(struct inode *inode)
 {
@@ -2431,3 +2419,57 @@ __weak const char *bdevname(struct block_device *bdev, char *buf)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(bdevname);
+
+__weak unsigned long invalidate_mapping_pages(struct address_space *mapping,
+		pgoff_t start, pgoff_t end)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(invalidate_mapping_pages);
+
+__weak int page_mkclean(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(page_mkclean);
+
+__weak bool try_to_unmap(struct page *page, enum ttu_flags flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(try_to_unmap);
+
+pte_t ptep_clear_flush(struct vm_area_struct *vma, unsigned long address,
+               pte_t *ptep)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ptep_clear_flush);
+
+__cacheline_aligned_in_smp DEFINE_SPINLOCK(mmlist_lock);
+EXPORT_SYMBOL(mmlist_lock);
+
+void dump_vma(const struct vm_area_struct *vma)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(dump_vma);
+
+__weak int anon_vma_clone(struct vm_area_struct *dst, struct vm_area_struct *src)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(anon_vma_clone);
+
+void workingset_update_node(struct xa_node *node)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(workingset_update_node);
+
+__weak int invalidate_inode_pages2_range(struct address_space *mapping,
+				  pgoff_t start, pgoff_t end)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL_GPL(invalidate_inode_pages2_range);

@@ -957,6 +957,7 @@ int remove_mapping(struct address_space *mapping, struct page *page)
 	}
 	return 0;
 }
+EXPORT_SYMBOL(remove_mapping);
 
 /**
  * putback_lru_page - put previously isolated page onto appropriate LRU list

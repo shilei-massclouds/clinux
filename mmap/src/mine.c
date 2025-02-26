@@ -1,20 +1,14 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(anon_vma_clone)
-CL_MINE(anon_vma_interval_tree_insert)
-CL_MINE(anon_vma_interval_tree_remove)
 CL_MINE(can_do_mlock)
 CL_MINE(__do_munmap)
 CL_MINE(do_munmap)
-CL_MINE(dump_vma)
 CL_MINE(get_unmapped_area)
 CL_MINE(may_expand_vm)
 CL_MINE(mmap_region)
 CL_MINE(__mm_populate)
 CL_MINE(populate_vma_page_range)
-CL_MINE(vma_interval_tree_insert)
-CL_MINE(vma_interval_tree_remove)
 CL_MINE(__vma_link_list)
 CL_MINE(__vma_unlink_list)
 CL_MINE(vma_wants_writenotify)

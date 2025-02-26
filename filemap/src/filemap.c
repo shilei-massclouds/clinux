@@ -362,6 +362,7 @@ void delete_from_page_cache_batch(struct address_space *mapping,
 	for (i = 0; i < pagevec_count(pvec); i++)
 		page_cache_free_page(mapping, pvec->pages[i]);
 }
+EXPORT_SYMBOL(delete_from_page_cache_batch);
 
 int filemap_check_errors(struct address_space *mapping)
 {

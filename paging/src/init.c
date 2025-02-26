@@ -232,3 +232,10 @@ __weak int remap_pfn_range(struct vm_area_struct *vma, unsigned long addr,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(remap_pfn_range);
+
+__weak void unmap_mapping_pages(struct address_space *mapping, pgoff_t start,
+		pgoff_t nr, bool even_cows)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(unmap_mapping_pages);

@@ -1299,6 +1299,7 @@ struct anon_vma *find_mergeable_anon_vma(struct vm_area_struct *vma)
 	 */
 	return anon_vma;
 }
+EXPORT_SYMBOL(find_mergeable_anon_vma);
 
 /*
  * If a hint addr is less than mmap_min_addr change hint to be as

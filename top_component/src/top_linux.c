@@ -1022,6 +1022,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(block_dev);
     REQUIRE_COMPONENT(virtio_blk);
     REQUIRE_COMPONENT(partitions);
+    REQUIRE_COMPONENT(truncate);
 
     //
     // start_kernel (init/main.c)
