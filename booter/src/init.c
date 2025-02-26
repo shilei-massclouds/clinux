@@ -1006,11 +1006,13 @@ __weak void __mnt_drop_write(struct vfsmount *mnt)
 }
 EXPORT_SYMBOL(__mnt_drop_write);
 
+/*
 void exit_io_context(struct task_struct *task)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(exit_io_context);
+*/
 
 void exit_shm(struct task_struct *task)
 {
@@ -2369,11 +2371,13 @@ EXPORT_SYMBOL(delete_partition);
 int laptop_mode;
 EXPORT_SYMBOL(laptop_mode);
 
+/*
 void put_io_context(struct io_context *ioc)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(put_io_context);
+*/
 
 /*
 void elevator_init_mq(struct request_queue *q)

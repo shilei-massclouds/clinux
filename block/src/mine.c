@@ -3,7 +3,6 @@
 
 CL_MINE(blk_recalc_rq_segments)
 CL_MINE(blk_rq_set_mixed_merge)
-CL_MINE(create_task_io_context)
 CL_MINE(ll_back_merge_fn)
 CL_MINE(ll_front_merge_fn)
 CL_MINE(rq_qos_exit)
