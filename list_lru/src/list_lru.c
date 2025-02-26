@@ -284,6 +284,7 @@ list_lru_walk_one_irq(struct list_lru *lru, int nid, struct mem_cgroup *memcg,
 	spin_unlock_irq(&nlru->lock);
 	return ret;
 }
+EXPORT_SYMBOL_GPL(list_lru_walk_one_irq);
 
 unsigned long list_lru_walk_node(struct list_lru *lru, int nid,
 				 list_lru_walk_cb isolate, void *cb_arg,

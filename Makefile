@@ -51,7 +51,7 @@ components := \
 	cpu task cgroup ksysfs dma up notify fs_attr fs_stat fs_writeback \
 	jump_label extable vdso utsname keys ucount umh locks \
 	early_sched sched \
-	percpu percpu_refcount workqueue_itf workqueue notifier \
+	percpu percpu_refcount workqueue_itf workqueue notifier workingset \
 	memblock paging rmap backing_dev riscv_mm_context \
 	page_alloc slub vmalloc mm_util vmscan ioremap \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \

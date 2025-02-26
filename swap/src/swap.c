@@ -314,6 +314,7 @@ void lru_note_cost_page(struct page *page)
 	lru_note_cost(mem_cgroup_page_lruvec(page, page_pgdat(page)),
 		      page_is_file_lru(page), thp_nr_pages(page));
 }
+EXPORT_SYMBOL(lru_note_cost_page);
 
 static void __activate_page(struct page *page, struct lruvec *lruvec,
 			    void *arg)

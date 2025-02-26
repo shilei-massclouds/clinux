@@ -1024,6 +1024,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(partitions);
     REQUIRE_COMPONENT(truncate);
     REQUIRE_COMPONENT(elevator);
+    REQUIRE_COMPONENT(workingset);
 
     //
     // start_kernel (init/main.c)

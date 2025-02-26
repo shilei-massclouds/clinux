@@ -2018,7 +2018,7 @@ void tlb_finish_mmu(struct mmu_gather *tlb,
 }
 EXPORT_SYMBOL(tlb_finish_mmu);
 
-void workingset_refault(struct page *page, void *shadow)
+__weak void workingset_refault(struct page *page, void *shadow)
 {
     booter_panic("No impl 'slub'.");
 }
@@ -2461,7 +2461,7 @@ __weak int anon_vma_clone(struct vm_area_struct *dst, struct vm_area_struct *src
 }
 EXPORT_SYMBOL(anon_vma_clone);
 
-void workingset_update_node(struct xa_node *node)
+__weak void workingset_update_node(struct xa_node *node)
 {
     booter_panic("No impl.\n");
 }
@@ -2681,3 +2681,9 @@ __weak void elv_merged_request(struct request_queue *q, struct request *rq,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(elv_merged_request);
+
+__weak void workingset_activation(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(workingset_activation);
