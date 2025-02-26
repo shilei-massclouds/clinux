@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(blk_execute_rq)
-CL_MINE(blk_mq_virtio_map_queues)
 CL_MINE(blk_queue_alignment_offset)
 CL_MINE(blk_queue_io_min)
 CL_MINE(blk_queue_io_opt)
