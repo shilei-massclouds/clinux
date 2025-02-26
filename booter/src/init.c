@@ -2498,6 +2498,7 @@ __weak void elevator_init_mq(struct request_queue *q)
 }
 EXPORT_SYMBOL(elevator_init_mq);
 
+/*
 bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
 {
     booter_panic("No impl!\n");
@@ -2509,6 +2510,7 @@ enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(blk_try_merge);
+*/
 
 __weak int elevator_switch_mq(struct request_queue *q,
 			      struct elevator_type *new_e)
@@ -2628,3 +2630,22 @@ __weak void do_invalidatepage(struct page *page, unsigned int offset,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(do_invalidatepage);
+
+__weak struct request *elv_latter_request(struct request_queue *q, struct request *rq)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elv_latter_request);
+
+__weak struct request *elv_former_request(struct request_queue *q, struct request *rq)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elv_former_request);
+
+__weak void elv_merge_requests(struct request_queue *q, struct request *rq,
+			     struct request *next)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elv_merge_requests);

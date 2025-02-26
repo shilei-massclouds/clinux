@@ -3,4 +3,3 @@
 
 CL_MINE(blk_execute_rq)
 CL_MINE(blk_rq_map_kern)
-CL_MINE(__blk_rq_map_sg)

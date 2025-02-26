@@ -11,5 +11,6 @@ obj_y += blk-settings.o
 obj_y += blk-mq-sysfs.o
 obj_y += blk-flush.o
 obj_y += blk-ioc.o
+obj_y += blk-merge.o
 
 obj_y += mine.o
