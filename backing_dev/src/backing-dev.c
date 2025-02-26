@@ -44,74 +44,74 @@ static void bdi_debug_init(void)
 	bdi_debug_root = debugfs_create_dir("bdi", NULL);
 }
 
-//static int bdi_debug_stats_show(struct seq_file *m, void *v)
-//{
-//	struct backing_dev_info *bdi = m->private;
-//	struct bdi_writeback *wb = &bdi->wb;
-//	unsigned long background_thresh;
-//	unsigned long dirty_thresh;
-//	unsigned long wb_thresh;
-//	unsigned long nr_dirty, nr_io, nr_more_io, nr_dirty_time;
-//	struct inode *inode;
-//
-//	nr_dirty = nr_io = nr_more_io = nr_dirty_time = 0;
-//	spin_lock(&wb->list_lock);
-//	list_for_each_entry(inode, &wb->b_dirty, i_io_list)
-//		nr_dirty++;
-//	list_for_each_entry(inode, &wb->b_io, i_io_list)
-//		nr_io++;
-//	list_for_each_entry(inode, &wb->b_more_io, i_io_list)
-//		nr_more_io++;
-//	list_for_each_entry(inode, &wb->b_dirty_time, i_io_list)
-//		if (inode->i_state & I_DIRTY_TIME)
-//			nr_dirty_time++;
-//	spin_unlock(&wb->list_lock);
-//
-//	global_dirty_limits(&background_thresh, &dirty_thresh);
-//	wb_thresh = wb_calc_thresh(wb, dirty_thresh);
-//
-//#define K(x) ((x) << (PAGE_SHIFT - 10))
-//	seq_printf(m,
-//		   "BdiWriteback:       %10lu kB\n"
-//		   "BdiReclaimable:     %10lu kB\n"
-//		   "BdiDirtyThresh:     %10lu kB\n"
-//		   "DirtyThresh:        %10lu kB\n"
-//		   "BackgroundThresh:   %10lu kB\n"
-//		   "BdiDirtied:         %10lu kB\n"
-//		   "BdiWritten:         %10lu kB\n"
-//		   "BdiWriteBandwidth:  %10lu kBps\n"
-//		   "b_dirty:            %10lu\n"
-//		   "b_io:               %10lu\n"
-//		   "b_more_io:          %10lu\n"
-//		   "b_dirty_time:       %10lu\n"
-//		   "bdi_list:           %10u\n"
-//		   "state:              %10lx\n",
-//		   (unsigned long) K(wb_stat(wb, WB_WRITEBACK)),
-//		   (unsigned long) K(wb_stat(wb, WB_RECLAIMABLE)),
-//		   K(wb_thresh),
-//		   K(dirty_thresh),
-//		   K(background_thresh),
-//		   (unsigned long) K(wb_stat(wb, WB_DIRTIED)),
-//		   (unsigned long) K(wb_stat(wb, WB_WRITTEN)),
-//		   (unsigned long) K(wb->write_bandwidth),
-//		   nr_dirty,
-//		   nr_io,
-//		   nr_more_io,
-//		   nr_dirty_time,
-//		   !list_empty(&bdi->bdi_list), bdi->wb.state);
-//#undef K
-//
-//	return 0;
-//}
-//DEFINE_SHOW_ATTRIBUTE(bdi_debug_stats);
-//
-//static void bdi_debug_register(struct backing_dev_info *bdi, const char *name)
-//{
-//	bdi->debug_dir = debugfs_create_dir(name, bdi_debug_root);
-//
-//	debugfs_create_file("stats", 0444, bdi->debug_dir, bdi,
-//			    &bdi_debug_stats_fops);
-//}
+static int bdi_debug_stats_show(struct seq_file *m, void *v)
+{
+	struct backing_dev_info *bdi = m->private;
+	struct bdi_writeback *wb = &bdi->wb;
+	unsigned long background_thresh;
+	unsigned long dirty_thresh;
+	unsigned long wb_thresh;
+	unsigned long nr_dirty, nr_io, nr_more_io, nr_dirty_time;
+	struct inode *inode;
+
+	nr_dirty = nr_io = nr_more_io = nr_dirty_time = 0;
+	spin_lock(&wb->list_lock);
+	list_for_each_entry(inode, &wb->b_dirty, i_io_list)
+		nr_dirty++;
+	list_for_each_entry(inode, &wb->b_io, i_io_list)
+		nr_io++;
+	list_for_each_entry(inode, &wb->b_more_io, i_io_list)
+		nr_more_io++;
+	list_for_each_entry(inode, &wb->b_dirty_time, i_io_list)
+		if (inode->i_state & I_DIRTY_TIME)
+			nr_dirty_time++;
+	spin_unlock(&wb->list_lock);
+
+	global_dirty_limits(&background_thresh, &dirty_thresh);
+	wb_thresh = wb_calc_thresh(wb, dirty_thresh);
+
+#define K(x) ((x) << (PAGE_SHIFT - 10))
+	seq_printf(m,
+		   "BdiWriteback:       %10lu kB\n"
+		   "BdiReclaimable:     %10lu kB\n"
+		   "BdiDirtyThresh:     %10lu kB\n"
+		   "DirtyThresh:        %10lu kB\n"
+		   "BackgroundThresh:   %10lu kB\n"
+		   "BdiDirtied:         %10lu kB\n"
+		   "BdiWritten:         %10lu kB\n"
+		   "BdiWriteBandwidth:  %10lu kBps\n"
+		   "b_dirty:            %10lu\n"
+		   "b_io:               %10lu\n"
+		   "b_more_io:          %10lu\n"
+		   "b_dirty_time:       %10lu\n"
+		   "bdi_list:           %10u\n"
+		   "state:              %10lx\n",
+		   (unsigned long) K(wb_stat(wb, WB_WRITEBACK)),
+		   (unsigned long) K(wb_stat(wb, WB_RECLAIMABLE)),
+		   K(wb_thresh),
+		   K(dirty_thresh),
+		   K(background_thresh),
+		   (unsigned long) K(wb_stat(wb, WB_DIRTIED)),
+		   (unsigned long) K(wb_stat(wb, WB_WRITTEN)),
+		   (unsigned long) K(wb->write_bandwidth),
+		   nr_dirty,
+		   nr_io,
+		   nr_more_io,
+		   nr_dirty_time,
+		   !list_empty(&bdi->bdi_list), bdi->wb.state);
+#undef K
+
+	return 0;
+}
+DEFINE_SHOW_ATTRIBUTE(bdi_debug_stats);
+
+static void bdi_debug_register(struct backing_dev_info *bdi, const char *name)
+{
+	bdi->debug_dir = debugfs_create_dir(name, bdi_debug_root);
+
+	debugfs_create_file("stats", 0444, bdi->debug_dir, bdi,
+			    &bdi_debug_stats_fops);
+}
 
 static void bdi_debug_unregister(struct backing_dev_info *bdi)
 {
@@ -748,109 +748,110 @@ struct backing_dev_info *bdi_alloc(int node_id)
 	}
 	return bdi;
 }
-EXPORT_SYMBOL(bdi_alloc);
 
-//static struct rb_node **bdi_lookup_rb_node(u64 id, struct rb_node **parentp)
-//{
-//	struct rb_node **p = &bdi_tree.rb_node;
-//	struct rb_node *parent = NULL;
-//	struct backing_dev_info *bdi;
-//
-//	lockdep_assert_held(&bdi_lock);
-//
-//	while (*p) {
-//		parent = *p;
-//		bdi = rb_entry(parent, struct backing_dev_info, rb_node);
-//
-//		if (bdi->id > id)
-//			p = &(*p)->rb_left;
-//		else if (bdi->id < id)
-//			p = &(*p)->rb_right;
-//		else
-//			break;
-//	}
-//
-//	if (parentp)
-//		*parentp = parent;
-//	return p;
-//}
-//
-///**
-// * bdi_get_by_id - lookup and get bdi from its id
-// * @id: bdi id to lookup
-// *
-// * Find bdi matching @id and get it.  Returns NULL if the matching bdi
-// * doesn't exist or is already unregistered.
-// */
-//struct backing_dev_info *bdi_get_by_id(u64 id)
-//{
-//	struct backing_dev_info *bdi = NULL;
-//	struct rb_node **p;
-//
-//	spin_lock_bh(&bdi_lock);
-//	p = bdi_lookup_rb_node(id, NULL);
-//	if (*p) {
-//		bdi = rb_entry(*p, struct backing_dev_info, rb_node);
-//		bdi_get(bdi);
-//	}
-//	spin_unlock_bh(&bdi_lock);
-//
-//	return bdi;
-//}
-//
-//int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
-//{
-//	struct device *dev;
-//	struct rb_node *parent, **p;
-//
-//	if (bdi->dev)	/* The driver needs to use separate queues per device */
-//		return 0;
-//
-//	vsnprintf(bdi->dev_name, sizeof(bdi->dev_name), fmt, args);
-//	dev = device_create(bdi_class, NULL, MKDEV(0, 0), bdi, bdi->dev_name);
-//	if (IS_ERR(dev))
-//		return PTR_ERR(dev);
-//
-//	cgwb_bdi_register(bdi);
-//	bdi->dev = dev;
-//
-//	bdi_debug_register(bdi, dev_name(dev));
-//	set_bit(WB_registered, &bdi->wb.state);
-//
-//	spin_lock_bh(&bdi_lock);
-//
-//	bdi->id = ++bdi_id_cursor;
-//
-//	p = bdi_lookup_rb_node(bdi->id, &parent);
-//	rb_link_node(&bdi->rb_node, parent, p);
-//	rb_insert_color(&bdi->rb_node, &bdi_tree);
-//
-//	list_add_tail_rcu(&bdi->bdi_list, &bdi_list);
-//
-//	spin_unlock_bh(&bdi_lock);
-//
-//	trace_writeback_bdi_register(bdi);
-//	return 0;
-//}
-//
-//int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...)
-//{
-//	va_list args;
-//	int ret;
-//
-//	va_start(args, fmt);
-//	ret = bdi_register_va(bdi, fmt, args);
-//	va_end(args);
-//	return ret;
-//}
-//EXPORT_SYMBOL(bdi_register);
-//
-//void bdi_set_owner(struct backing_dev_info *bdi, struct device *owner)
-//{
-//	WARN_ON_ONCE(bdi->owner);
-//	bdi->owner = owner;
-//	get_device(owner);
-//}
+static struct rb_node **bdi_lookup_rb_node(u64 id, struct rb_node **parentp)
+{
+	struct rb_node **p = &bdi_tree.rb_node;
+	struct rb_node *parent = NULL;
+	struct backing_dev_info *bdi;
+
+	lockdep_assert_held(&bdi_lock);
+
+	while (*p) {
+		parent = *p;
+		bdi = rb_entry(parent, struct backing_dev_info, rb_node);
+
+		if (bdi->id > id)
+			p = &(*p)->rb_left;
+		else if (bdi->id < id)
+			p = &(*p)->rb_right;
+		else
+			break;
+	}
+
+	if (parentp)
+		*parentp = parent;
+	return p;
+}
+
+/**
+ * bdi_get_by_id - lookup and get bdi from its id
+ * @id: bdi id to lookup
+ *
+ * Find bdi matching @id and get it.  Returns NULL if the matching bdi
+ * doesn't exist or is already unregistered.
+ */
+struct backing_dev_info *bdi_get_by_id(u64 id)
+{
+	struct backing_dev_info *bdi = NULL;
+	struct rb_node **p;
+
+	spin_lock_bh(&bdi_lock);
+	p = bdi_lookup_rb_node(id, NULL);
+	if (*p) {
+		bdi = rb_entry(*p, struct backing_dev_info, rb_node);
+		bdi_get(bdi);
+	}
+	spin_unlock_bh(&bdi_lock);
+
+	return bdi;
+}
+
+int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
+{
+	struct device *dev;
+	struct rb_node *parent, **p;
+
+	if (bdi->dev)	/* The driver needs to use separate queues per device */
+		return 0;
+
+	vsnprintf(bdi->dev_name, sizeof(bdi->dev_name), fmt, args);
+	dev = device_create(bdi_class, NULL, MKDEV(0, 0), bdi, bdi->dev_name);
+	if (IS_ERR(dev))
+		return PTR_ERR(dev);
+
+	cgwb_bdi_register(bdi);
+	bdi->dev = dev;
+
+	bdi_debug_register(bdi, dev_name(dev));
+	set_bit(WB_registered, &bdi->wb.state);
+
+	spin_lock_bh(&bdi_lock);
+
+	bdi->id = ++bdi_id_cursor;
+
+	p = bdi_lookup_rb_node(bdi->id, &parent);
+	rb_link_node(&bdi->rb_node, parent, p);
+	rb_insert_color(&bdi->rb_node, &bdi_tree);
+
+	list_add_tail_rcu(&bdi->bdi_list, &bdi_list);
+
+	spin_unlock_bh(&bdi_lock);
+
+	trace_writeback_bdi_register(bdi);
+	return 0;
+}
+EXPORT_SYMBOL(bdi_register_va);
+
+int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...)
+{
+	va_list args;
+	int ret;
+
+	va_start(args, fmt);
+	ret = bdi_register_va(bdi, fmt, args);
+	va_end(args);
+	return ret;
+}
+EXPORT_SYMBOL(bdi_register);
+
+void bdi_set_owner(struct backing_dev_info *bdi, struct device *owner)
+{
+	WARN_ON_ONCE(bdi->owner);
+	bdi->owner = owner;
+	get_device(owner);
+}
+EXPORT_SYMBOL(bdi_set_owner);
 
 /*
  * Remove bdi from bdi_list, and ensure that it is no longer visible
@@ -901,7 +902,6 @@ void bdi_put(struct backing_dev_info *bdi)
 {
 	kref_put(&bdi->refcnt, release_bdi);
 }
-EXPORT_SYMBOL(bdi_put);
 
 //const char *bdi_dev_name(struct backing_dev_info *bdi)
 //{

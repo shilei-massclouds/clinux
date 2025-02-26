@@ -640,10 +640,10 @@ int blk_drop_partitions(struct block_device *bdev)
 
 	return 0;
 }
-#ifdef CONFIG_S390
+//#ifdef CONFIG_S390
 /* for historic reasons in the DASD driver */
 EXPORT_SYMBOL_GPL(blk_drop_partitions);
-#endif
+//#endif
 
 static bool blk_add_partition(struct gendisk *disk, struct block_device *bdev,
 		struct parsed_partitions *state, int p)
@@ -764,6 +764,7 @@ out_free_state:
 	free_partitions(state);
 	return ret;
 }
+EXPORT_SYMBOL(blk_add_partitions);
 
 void *read_part_sector(struct parsed_partitions *state, sector_t n, Sector *p)
 {

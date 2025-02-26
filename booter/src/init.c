@@ -2524,3 +2524,39 @@ void blk_mq_sched_free_requests(struct request_queue *q)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(blk_mq_sched_free_requests);
+
+__weak void bdi_put(struct backing_dev_info *bdi)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdi_put);
+
+__weak struct backing_dev_info *bdi_alloc(int node_id)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdi_alloc);
+
+__weak unsigned long wb_calc_thresh(struct bdi_writeback *wb, unsigned long thresh)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(wb_calc_thresh);
+
+__weak struct block_device *bdget_disk(struct gendisk *disk, int partno)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdget_disk);
+
+__weak int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(blkdev_get);
+
+__weak int sb_set_blocksize(struct super_block *sb, int size)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sb_set_blocksize);

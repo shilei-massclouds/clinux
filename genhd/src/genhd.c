@@ -1040,6 +1040,7 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
 	}
 	return disk;
 }
+EXPORT_SYMBOL(get_gendisk);
 
 /**
  * bdget_disk - do bdget() by gendisk and partition number
@@ -1066,7 +1067,6 @@ struct block_device *bdget_disk(struct gendisk *disk, int partno)
 
 	return bdev;
 }
-EXPORT_SYMBOL(bdget_disk);
 
 /*
  * print a full list of all partitions - intended for places where the root
@@ -1983,6 +1983,7 @@ void disk_block_events(struct gendisk *disk)
 
 	mutex_unlock(&ev->block_mutex);
 }
+EXPORT_SYMBOL(disk_block_events);
 
 static void __disk_unblock_events(struct gendisk *disk, bool check_now)
 {
@@ -2102,6 +2103,7 @@ unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask)
 
 	return pending;
 }
+EXPORT_SYMBOL(disk_clear_events);
 
 /*
  * Separate this part out so that a different pointer for clearing_ptr can be
