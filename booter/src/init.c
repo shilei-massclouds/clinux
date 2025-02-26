@@ -2213,3 +2213,29 @@ void __f_setown(struct file *filp, struct pid *pid, enum pid_type type,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__f_setown);
+
+__weak void __do_page_cache_readahead(struct address_space *mapping,
+		struct file *file, pgoff_t index, unsigned long nr_to_read,
+		unsigned long lookahead_size)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(__do_page_cache_readahead);
+
+__weak void page_cache_sync_readahead(struct address_space *mapping,
+			       struct file_ra_state *ra, struct file *filp,
+			       pgoff_t index, unsigned long req_count)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(page_cache_sync_readahead);
+
+__weak void
+page_cache_async_readahead(struct address_space *mapping,
+			   struct file_ra_state *ra, struct file *filp,
+			   struct page *page, pgoff_t index,
+			   unsigned long req_count)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(page_cache_async_readahead);
