@@ -2381,11 +2381,13 @@ void put_io_context(struct io_context *ioc)
 }
 EXPORT_SYMBOL(put_io_context);
 
+/*
 void elevator_init_mq(struct request_queue *q)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(elevator_init_mq);
+*/
 
 __weak blk_qc_t submit_bio(struct bio *bio)
 {
@@ -2491,3 +2493,34 @@ __weak void mmput(struct mm_struct *mm)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(mmput);
+
+__weak void elevator_init_mq(struct request_queue *q)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elevator_init_mq);
+
+bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(blk_rq_merge_ok);
+
+enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(blk_try_merge);
+
+__weak int elevator_switch_mq(struct request_queue *q,
+			      struct elevator_type *new_e)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(elevator_switch_mq);
+
+void blk_mq_sched_free_requests(struct request_queue *q)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(blk_mq_sched_free_requests);

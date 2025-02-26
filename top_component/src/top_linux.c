@@ -1023,6 +1023,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(virtio_blk);
     REQUIRE_COMPONENT(partitions);
     REQUIRE_COMPONENT(truncate);
+    REQUIRE_COMPONENT(elevator);
 
     //
     // start_kernel (init/main.c)
