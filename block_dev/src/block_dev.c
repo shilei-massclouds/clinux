@@ -52,40 +52,39 @@ struct block_device *I_BDEV(struct inode *inode)
 {
 	return &BDEV_I(inode)->bdev;
 }
-EXPORT_SYMBOL(I_BDEV);
 
-//static void bdev_write_inode(struct block_device *bdev)
-//{
-//	struct inode *inode = bdev->bd_inode;
-//	int ret;
-//
-//	spin_lock(&inode->i_lock);
-//	while (inode->i_state & I_DIRTY) {
-//		spin_unlock(&inode->i_lock);
-//		ret = write_inode_now(inode, true);
-//		if (ret) {
-//			char name[BDEVNAME_SIZE];
-//			pr_warn_ratelimited("VFS: Dirty inode writeback failed "
-//					    "for block device %s (err=%d).\n",
-//					    bdevname(bdev, name), ret);
-//		}
-//		spin_lock(&inode->i_lock);
-//	}
-//	spin_unlock(&inode->i_lock);
-//}
-//
-///* Kill _all_ buffers and pagecache , dirty or not.. */
-//static void kill_bdev(struct block_device *bdev)
-//{
-//	struct address_space *mapping = bdev->bd_inode->i_mapping;
-//
-//	if (mapping->nrpages == 0 && mapping->nrexceptional == 0)
-//		return;
-//
-//	invalidate_bh_lrus();
-//	truncate_inode_pages(mapping, 0);
-//}
-//
+static void bdev_write_inode(struct block_device *bdev)
+{
+	struct inode *inode = bdev->bd_inode;
+	int ret;
+
+	spin_lock(&inode->i_lock);
+	while (inode->i_state & I_DIRTY) {
+		spin_unlock(&inode->i_lock);
+		ret = write_inode_now(inode, true);
+		if (ret) {
+			char name[BDEVNAME_SIZE];
+			pr_warn_ratelimited("VFS: Dirty inode writeback failed "
+					    "for block device %s (err=%d).\n",
+					    bdevname(bdev, name), ret);
+		}
+		spin_lock(&inode->i_lock);
+	}
+	spin_unlock(&inode->i_lock);
+}
+
+/* Kill _all_ buffers and pagecache , dirty or not.. */
+static void kill_bdev(struct block_device *bdev)
+{
+	struct address_space *mapping = bdev->bd_inode->i_mapping;
+
+	if (mapping->nrpages == 0 && mapping->nrexceptional == 0)
+		return;
+
+	invalidate_bh_lrus();
+	truncate_inode_pages(mapping, 0);
+}
+
 ///* Invalidate clean unused buffers and pagecache. */
 //void invalidate_bdev(struct block_device *bdev)
 //{
@@ -470,26 +469,26 @@ EXPORT_SYMBOL(I_BDEV);
 //	return bioset_init(&blkdev_dio_pool, 4, offsetof(struct blkdev_dio, bio), BIOSET_NEED_BVECS);
 //}
 //module_init(blkdev_init);
-//
-//int __sync_blockdev(struct block_device *bdev, int wait)
-//{
-//	if (!bdev)
-//		return 0;
-//	if (!wait)
-//		return filemap_flush(bdev->bd_inode->i_mapping);
-//	return filemap_write_and_wait(bdev->bd_inode->i_mapping);
-//}
-//
-///*
-// * Write out and wait upon all the dirty data associated with a block
-// * device via its mapping.  Does not take the superblock lock.
-// */
-//int sync_blockdev(struct block_device *bdev)
-//{
-//	return __sync_blockdev(bdev, 1);
-//}
-//EXPORT_SYMBOL(sync_blockdev);
-//
+
+int __sync_blockdev(struct block_device *bdev, int wait)
+{
+	if (!bdev)
+		return 0;
+	if (!wait)
+		return filemap_flush(bdev->bd_inode->i_mapping);
+	return filemap_write_and_wait(bdev->bd_inode->i_mapping);
+}
+
+/*
+ * Write out and wait upon all the dirty data associated with a block
+ * device via its mapping.  Does not take the superblock lock.
+ */
+int sync_blockdev(struct block_device *bdev)
+{
+	return __sync_blockdev(bdev, 1);
+}
+EXPORT_SYMBOL(sync_blockdev);
+
 ///*
 // * Write out and wait upon all dirty data associated with this
 // * device.   Filesystem data as well as the underlying block
@@ -820,9 +819,6 @@ static struct file_system_type bd_type = {
 	.kill_sb	= kill_anon_super,
 };
 
-struct super_block *blockdev_superblock __read_mostly;
-EXPORT_SYMBOL_GPL(blockdev_superblock);
-
 void __init bdev_cache_init(void)
 {
 	int err;
@@ -916,14 +912,14 @@ void __init bdev_cache_init(void)
 //
 //	return ret;
 //}
-//
-//void bdput(struct block_device *bdev)
-//{
-//	iput(bdev->bd_inode);
-//}
-//
-//EXPORT_SYMBOL(bdput);
-// 
+
+void bdput(struct block_device *bdev)
+{
+	iput(bdev->bd_inode);
+}
+
+EXPORT_SYMBOL(bdput);
+ 
 //static struct block_device *bd_acquire(struct inode *inode)
 //{
 //	struct block_device *bdev;
@@ -1378,9 +1374,9 @@ void __init bdev_cache_init(void)
 //	inode_unlock(bdev->bd_inode);
 //}
 //EXPORT_SYMBOL(bd_set_size);
-//
-//static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
-//
+
+static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
+
 //int bdev_disk_changed(struct block_device *bdev, bool invalidate)
 //{
 //	struct gendisk *disk = bdev->bd_disk;
@@ -1752,100 +1748,100 @@ void __init bdev_cache_init(void)
 //
 //	return blkdev_get(bdev, filp->f_mode, filp);
 //}
-//
-//static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
-//{
-//	struct gendisk *disk = bdev->bd_disk;
-//	struct block_device *victim = NULL;
-//
-//	/*
-//	 * Sync early if it looks like we're the last one.  If someone else
-//	 * opens the block device between now and the decrement of bd_openers
-//	 * then we did a sync that we didn't need to, but that's not the end
-//	 * of the world and we want to avoid long (could be several minute)
-//	 * syncs while holding the mutex.
-//	 */
-//	if (bdev->bd_openers == 1)
-//		sync_blockdev(bdev);
-//
-//	mutex_lock_nested(&bdev->bd_mutex, for_part);
-//	if (for_part)
-//		bdev->bd_part_count--;
-//
-//	if (!--bdev->bd_openers) {
-//		WARN_ON_ONCE(bdev->bd_holders);
-//		sync_blockdev(bdev);
-//		kill_bdev(bdev);
-//
-//		bdev_write_inode(bdev);
-//	}
-//	if (bdev->bd_contains == bdev) {
-//		if (disk->fops->release)
-//			disk->fops->release(disk, mode);
-//	}
-//	if (!bdev->bd_openers) {
-//		disk_put_part(bdev->bd_part);
-//		bdev->bd_part = NULL;
-//		bdev->bd_disk = NULL;
-//		if (bdev != bdev->bd_contains)
-//			victim = bdev->bd_contains;
-//		bdev->bd_contains = NULL;
-//
-//		put_disk_and_module(disk);
-//	}
-//	mutex_unlock(&bdev->bd_mutex);
-//	bdput(bdev);
-//	if (victim)
-//		__blkdev_put(victim, mode, 1);
-//}
-//
-//void blkdev_put(struct block_device *bdev, fmode_t mode)
-//{
-//	mutex_lock(&bdev->bd_mutex);
-//
-//	if (mode & FMODE_EXCL) {
-//		bool bdev_free;
-//
-//		/*
-//		 * Release a claim on the device.  The holder fields
-//		 * are protected with bdev_lock.  bd_mutex is to
-//		 * synchronize disk_holder unlinking.
-//		 */
-//		spin_lock(&bdev_lock);
-//
-//		WARN_ON_ONCE(--bdev->bd_holders < 0);
-//		WARN_ON_ONCE(--bdev->bd_contains->bd_holders < 0);
-//
-//		/* bd_contains might point to self, check in a separate step */
-//		if ((bdev_free = !bdev->bd_holders))
-//			bdev->bd_holder = NULL;
-//		if (!bdev->bd_contains->bd_holders)
-//			bdev->bd_contains->bd_holder = NULL;
-//
-//		spin_unlock(&bdev_lock);
-//
-//		/*
-//		 * If this was the last claim, remove holder link and
-//		 * unblock evpoll if it was a write holder.
-//		 */
-//		if (bdev_free && bdev->bd_write_holder) {
-//			disk_unblock_events(bdev->bd_disk);
-//			bdev->bd_write_holder = false;
-//		}
-//	}
-//
-//	/*
-//	 * Trigger event checking and tell drivers to flush MEDIA_CHANGE
-//	 * event.  This is to ensure detection of media removal commanded
-//	 * from userland - e.g. eject(1).
-//	 */
-//	disk_flush_events(bdev->bd_disk, DISK_EVENT_MEDIA_CHANGE);
-//
-//	mutex_unlock(&bdev->bd_mutex);
-//
-//	__blkdev_put(bdev, mode, 0);
-//}
-//EXPORT_SYMBOL(blkdev_put);
+
+static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
+{
+	struct gendisk *disk = bdev->bd_disk;
+	struct block_device *victim = NULL;
+
+	/*
+	 * Sync early if it looks like we're the last one.  If someone else
+	 * opens the block device between now and the decrement of bd_openers
+	 * then we did a sync that we didn't need to, but that's not the end
+	 * of the world and we want to avoid long (could be several minute)
+	 * syncs while holding the mutex.
+	 */
+	if (bdev->bd_openers == 1)
+		sync_blockdev(bdev);
+
+	mutex_lock_nested(&bdev->bd_mutex, for_part);
+	if (for_part)
+		bdev->bd_part_count--;
+
+	if (!--bdev->bd_openers) {
+		WARN_ON_ONCE(bdev->bd_holders);
+		sync_blockdev(bdev);
+		kill_bdev(bdev);
+
+		bdev_write_inode(bdev);
+	}
+	if (bdev->bd_contains == bdev) {
+		if (disk->fops->release)
+			disk->fops->release(disk, mode);
+	}
+	if (!bdev->bd_openers) {
+		disk_put_part(bdev->bd_part);
+		bdev->bd_part = NULL;
+		bdev->bd_disk = NULL;
+		if (bdev != bdev->bd_contains)
+			victim = bdev->bd_contains;
+		bdev->bd_contains = NULL;
+
+		put_disk_and_module(disk);
+	}
+	mutex_unlock(&bdev->bd_mutex);
+	bdput(bdev);
+	if (victim)
+		__blkdev_put(victim, mode, 1);
+}
+
+void blkdev_put(struct block_device *bdev, fmode_t mode)
+{
+	mutex_lock(&bdev->bd_mutex);
+
+	if (mode & FMODE_EXCL) {
+		bool bdev_free;
+
+		/*
+		 * Release a claim on the device.  The holder fields
+		 * are protected with bdev_lock.  bd_mutex is to
+		 * synchronize disk_holder unlinking.
+		 */
+		spin_lock(&bdev_lock);
+
+		WARN_ON_ONCE(--bdev->bd_holders < 0);
+		WARN_ON_ONCE(--bdev->bd_contains->bd_holders < 0);
+
+		/* bd_contains might point to self, check in a separate step */
+		if ((bdev_free = !bdev->bd_holders))
+			bdev->bd_holder = NULL;
+		if (!bdev->bd_contains->bd_holders)
+			bdev->bd_contains->bd_holder = NULL;
+
+		spin_unlock(&bdev_lock);
+
+		/*
+		 * If this was the last claim, remove holder link and
+		 * unblock evpoll if it was a write holder.
+		 */
+		if (bdev_free && bdev->bd_write_holder) {
+			disk_unblock_events(bdev->bd_disk);
+			bdev->bd_write_holder = false;
+		}
+	}
+
+	/*
+	 * Trigger event checking and tell drivers to flush MEDIA_CHANGE
+	 * event.  This is to ensure detection of media removal commanded
+	 * from userland - e.g. eject(1).
+	 */
+	disk_flush_events(bdev->bd_disk, DISK_EVENT_MEDIA_CHANGE);
+
+	mutex_unlock(&bdev->bd_mutex);
+
+	__blkdev_put(bdev, mode, 0);
+}
+
 //
 //static int blkdev_close(struct inode * inode, struct file * filp)
 //{

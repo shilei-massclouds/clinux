@@ -1576,6 +1576,7 @@ int (*platform_notify_remove)(struct device *dev) = NULL;
 static struct kobject *dev_kobj;
 struct kobject *sysfs_dev_char_kobj;
 struct kobject *sysfs_dev_block_kobj;
+EXPORT_SYMBOL(sysfs_dev_block_kobj);
 
 //static DEFINE_MUTEX(device_hotplug_lock);
 //

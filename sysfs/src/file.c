@@ -345,7 +345,6 @@ int sysfs_create_files(struct kobject *kobj, const struct attribute * const *ptr
 			sysfs_remove_file(kobj, ptr[i]);
 	return err;
 }
-EXPORT_SYMBOL_GPL(sysfs_create_files);
 
 /**
  * sysfs_add_file_to_group - add an attribute file to a pre-existing group.
@@ -499,7 +498,6 @@ void sysfs_remove_files(struct kobject *kobj, const struct attribute * const *pt
 	for (i = 0; ptr[i]; i++)
 		sysfs_remove_file(kobj, ptr[i]);
 }
-EXPORT_SYMBOL_GPL(sysfs_remove_files);
 
 /**
  * sysfs_remove_file_from_group - remove an attribute file from a group.

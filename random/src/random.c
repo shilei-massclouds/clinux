@@ -1824,6 +1824,7 @@ void rand_initialize_disk(struct gendisk *disk)
 		disk->random = state;
 	}
 }
+EXPORT_SYMBOL(rand_initialize_disk);
 #endif
 
 static ssize_t

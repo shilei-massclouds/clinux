@@ -2240,13 +2240,36 @@ page_cache_async_readahead(struct address_space *mapping,
 }
 EXPORT_SYMBOL_GPL(page_cache_async_readahead);
 
-struct class block_class;
-EXPORT_SYMBOL_GPL(block_class);
 
-/*
-void async_synchronize_full(void)
+__weak void blkdev_put(struct block_device *bdev, fmode_t mode)
 {
     booter_panic("No impl!\n");
 }
-EXPORT_SYMBOL_GPL(async_synchronize_full);
-*/
+EXPORT_SYMBOL(blkdev_put);
+
+struct super_block *blockdev_superblock __read_mostly;
+EXPORT_SYMBOL_GPL(blockdev_superblock);
+
+__weak struct block_device *I_BDEV(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(I_BDEV);
+
+__weak void sysfs_remove_files(struct kobject *kobj, const struct attribute * const *ptr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(sysfs_remove_files);
+
+__weak int sysfs_create_files(struct kobject *kobj, const struct attribute * const *ptr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(sysfs_create_files);
+
+__weak int bdev_read_only(struct block_device *bdev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdev_read_only);
