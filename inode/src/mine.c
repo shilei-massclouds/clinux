@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(blkdev_get_by_path)
-CL_MINE(emergency_thaw_bdev)
 CL_MINE(group_pin_kill)
 CL_MINE(prune_dcache_sb)
 CL_MINE(sb_prepare_remount_readonly)

@@ -15,6 +15,3 @@ cl_vmscan_init(void)
 EXPORT_SYMBOL(cl_vmscan_init);
 
 DEFINE_ENABLE_FUNC(vmscan);
-
-int buffer_heads_over_limit;
-

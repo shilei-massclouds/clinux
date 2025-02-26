@@ -471,3 +471,16 @@ wait_for_completion_io_timeout(struct completion *x, unsigned long timeout)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(wait_for_completion_io_timeout);
+
+__weak __sched int bit_wait_io(struct wait_bit_key *word, int mode)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(bit_wait_io);
+
+__weak int __sched out_of_line_wait_on_bit_lock(void *word, int bit,
+					 wait_bit_action_f *action, unsigned mode)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(out_of_line_wait_on_bit_lock);

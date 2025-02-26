@@ -640,12 +640,6 @@ errseq_t errseq_set(errseq_t *eseq, int err)
 EXPORT_SYMBOL(errseq_set);
 */
 
-int try_to_free_buffers(struct page *page)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(try_to_free_buffers);
-
 __weak int send_sig(int sig, struct task_struct *p, int priv)
 {
     booter_panic("No impl!\n");
@@ -2572,3 +2566,61 @@ __weak int fsync_bdev(struct block_device *bdev)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(fsync_bdev);
+
+__weak int inode_has_buffers(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inode_has_buffers);
+
+__weak int try_to_free_buffers(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(try_to_free_buffers);
+
+__weak int thaw_bdev(struct block_device *bdev, struct super_block *sb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(thaw_bdev);
+
+__weak pgoff_t __page_file_index(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(__page_file_index);
+
+__weak int __set_page_dirty_buffers(struct page *page)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__set_page_dirty_buffers);
+
+int buffer_heads_over_limit;
+EXPORT_SYMBOL(buffer_heads_over_limit);
+
+__weak int remove_inode_buffers(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(remove_inode_buffers);
+
+__weak void emergency_thaw_bdev(struct super_block *sb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(emergency_thaw_bdev);
+
+__weak void pagecache_isize_extended(struct inode *inode, loff_t from, loff_t to)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(pagecache_isize_extended);
+
+__weak void do_invalidatepage(struct page *page, unsigned int offset,
+		       unsigned int length)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(do_invalidatepage);

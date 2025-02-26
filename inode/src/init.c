@@ -23,7 +23,3 @@ int __mnt_want_write_file(struct file *file)
     booter_panic("No impl!\n");
 }
 
-int remove_inode_buffers(struct inode *inode)
-{
-    booter_panic("No impl!\n");
-}

@@ -112,7 +112,6 @@ int __sched out_of_line_wait_on_bit_lock(void *word, int bit,
 
 	return __wait_on_bit_lock(wq_head, &wq_entry, action, mode);
 }
-EXPORT_SYMBOL(out_of_line_wait_on_bit_lock);
 
 void __wake_up_bit(struct wait_queue_head *wq_head, void *word, int bit)
 {
@@ -202,7 +201,6 @@ __sched int bit_wait_io(struct wait_bit_key *word, int mode)
 
 	return 0;
 }
-EXPORT_SYMBOL(bit_wait_io);
 
 __sched int bit_wait_timeout(struct wait_bit_key *word, int mode)
 {

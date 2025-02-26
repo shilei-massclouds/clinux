@@ -585,7 +585,6 @@ out:
 	mutex_unlock(&bdev->bd_fsfreeze_mutex);
 	return error;
 }
-EXPORT_SYMBOL(thaw_bdev);
 
 static int blkdev_writepage(struct page *page, struct writeback_control *wbc)
 {

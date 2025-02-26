@@ -3565,13 +3565,12 @@ EXPORT_SYMBOL(swp_swap_info);
 //	return page_swap_info(page)->swap_file->f_mapping;
 //}
 //EXPORT_SYMBOL_GPL(__page_file_mapping);
-//
-//pgoff_t __page_file_index(struct page *page)
-//{
-//	swp_entry_t swap = { .val = page_private(page) };
-//	return swp_offset(swap);
-//}
-//EXPORT_SYMBOL_GPL(__page_file_index);
+
+pgoff_t __page_file_index(struct page *page)
+{
+	swp_entry_t swap = { .val = page_private(page) };
+	return swp_offset(swap);
+}
 
 /*
  * add_swap_count_continuation - called when a swap count is duplicated

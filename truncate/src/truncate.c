@@ -162,7 +162,6 @@ void do_invalidatepage(struct page *page, unsigned int offset,
 	if (invalidatepage)
 		(*invalidatepage)(page, offset, length);
 }
-EXPORT_SYMBOL(do_invalidatepage);
 
 /*
  * If truncate cannot remove the fs-private metadata from the page, the page
@@ -891,7 +890,6 @@ void pagecache_isize_extended(struct inode *inode, loff_t from, loff_t to)
 	unlock_page(page);
 	put_page(page);
 }
-EXPORT_SYMBOL(pagecache_isize_extended);
 
 /**
  * truncate_pagecache_range - unmap and remove pagecache that is hole-punched

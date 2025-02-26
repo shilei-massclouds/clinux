@@ -635,6 +635,7 @@ void guard_bio_eod(struct bio *bio)
 
 	bio_truncate(bio, maxsector << 9);
 }
+EXPORT_SYMBOL(guard_bio_eod);
 
 /**
  * bio_put - release a reference to a bio
