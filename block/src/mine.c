@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(blk_free_flush_queue)
 CL_MINE(blk_mq_sched_free_requests)
 CL_MINE(blk_recalc_rq_segments)
 CL_MINE(blk_rq_merge_ok)
@@ -14,8 +13,6 @@ CL_MINE(rq_qos_exit)
 CL_MINE(__rq_qos_merge)
 
 CL_MINE(blk_add_timer)
-CL_MINE(blk_alloc_flush_queue)
-CL_MINE(blk_insert_flush)
 CL_MINE(blk_mq_debugfs_register_hctxs)
 CL_MINE(blk_mq_debugfs_unregister_hctx)
 CL_MINE(blk_mq_debugfs_unregister_hctxs)
