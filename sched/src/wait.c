@@ -245,7 +245,6 @@ prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_ent
 	set_current_state(state);
 	spin_unlock_irqrestore(&wq_head->lock, flags);
 }
-EXPORT_SYMBOL(prepare_to_wait_exclusive);
 
 void init_wait_entry(struct wait_queue_entry *wq_entry, int flags)
 {

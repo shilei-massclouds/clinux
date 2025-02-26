@@ -451,3 +451,10 @@ __wait_on_bit(struct wait_queue_head *wq_head, struct wait_bit_queue_entry *wbq_
     booter_panic("No impl 'rwsem'.");
 }
 EXPORT_SYMBOL(__wait_on_bit);
+
+__weak void
+prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_entry, int state)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(prepare_to_wait_exclusive);
