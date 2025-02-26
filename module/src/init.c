@@ -16,8 +16,3 @@ cl_module_init(void)
 EXPORT_SYMBOL(cl_module_init);
 
 DEFINE_ENABLE_FUNC(module);
-
-bool current_is_async(void)
-{
-    booter_panic("No impl.\n");
-}

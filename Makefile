@@ -56,7 +56,7 @@ components := \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
 	ipc_sem watchdog noinitramfs \
 	fs inode dcache file_table do_mounts file \
-	open readahead \
+	open readahead async \
 	cred groups posix_acl user_namespace nsproxy fs_namespace pid_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
 	fs_context fs_parser fs_struct namei libfs debugfs \

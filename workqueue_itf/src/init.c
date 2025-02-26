@@ -82,3 +82,10 @@ __weak void flush_workqueue(struct workqueue_struct *wq)
     booter_panic("No impl in 'rcu'.");
 }
 EXPORT_SYMBOL(flush_workqueue);
+
+__weak bool queue_work_node(int node, struct workqueue_struct *wq,
+		     struct work_struct *work)
+{
+    booter_panic("No impl in 'rcu'.");
+}
+EXPORT_SYMBOL_GPL(queue_work_node);
