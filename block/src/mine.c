@@ -4,7 +4,6 @@
 CL_MINE(rq_qos_exit)
 CL_MINE(__rq_qos_merge)
 
-CL_MINE(blk_add_timer)
 CL_MINE(list_sort)
 CL_MINE(__rq_qos_cleanup)
 CL_MINE(__rq_qos_done)
