@@ -209,7 +209,6 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
 {
 	blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
 }
-EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
 
 /**
  * blk_mq_quiesce_queue() - wait until all ongoing dispatches have finished
@@ -253,7 +252,6 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
 	/* dispatch requests which are inserted during quiescing */
 	blk_mq_run_hw_queues(q, true);
 }
-EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
 
 void blk_mq_wake_waiters(struct request_queue *q)
 {

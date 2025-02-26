@@ -885,7 +885,6 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
 
 	return true;
 }
-EXPORT_SYMBOL(blk_rq_merge_ok);
 
 enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
 {
@@ -897,4 +896,3 @@ enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
 		return ELEVATOR_FRONT_MERGE;
 	return ELEVATOR_NO_MERGE;
 }
-EXPORT_SYMBOL(blk_try_merge);

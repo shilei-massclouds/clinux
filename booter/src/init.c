@@ -2498,19 +2498,17 @@ __weak void elevator_init_mq(struct request_queue *q)
 }
 EXPORT_SYMBOL(elevator_init_mq);
 
-/*
-bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+__weak bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(blk_rq_merge_ok);
 
-enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
+__weak enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(blk_try_merge);
-*/
 
 __weak int elevator_switch_mq(struct request_queue *q,
 			      struct elevator_type *new_e)
@@ -2519,11 +2517,13 @@ __weak int elevator_switch_mq(struct request_queue *q,
 }
 EXPORT_SYMBOL_GPL(elevator_switch_mq);
 
+/*
 void blk_mq_sched_free_requests(struct request_queue *q)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(blk_mq_sched_free_requests);
+*/
 
 __weak void bdi_put(struct backing_dev_info *bdi)
 {
@@ -2649,3 +2649,35 @@ __weak void elv_merge_requests(struct request_queue *q, struct request *rq,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(elv_merge_requests);
+
+__weak void blk_mq_unquiesce_queue(struct request_queue *q)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
+
+__weak void blk_mq_quiesce_queue_nowait(struct request_queue *q)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+
+__weak enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+		struct bio *bio)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elv_merge);
+
+__weak bool elv_attempt_insert_merge(struct request_queue *q, struct request *rq)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elv_attempt_insert_merge);
+
+__weak void elv_merged_request(struct request_queue *q, struct request *rq,
+		enum elv_merge type)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elv_merged_request);
