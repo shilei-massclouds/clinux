@@ -1816,7 +1816,6 @@ void blk_start_plug(struct blk_plug *plug)
 	 */
 	tsk->plug = plug;
 }
-EXPORT_SYMBOL(blk_start_plug);
 
 static void flush_plug_callbacks(struct blk_plug *plug, bool from_schedule)
 {
@@ -1887,7 +1886,6 @@ void blk_finish_plug(struct blk_plug *plug)
 
 	current->plug = NULL;
 }
-EXPORT_SYMBOL(blk_finish_plug);
 
 void blk_io_schedule(void)
 {

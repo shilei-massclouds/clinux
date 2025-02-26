@@ -657,19 +657,17 @@ __weak void wakeup_flusher_threads(enum wb_reason reason)
 }
 EXPORT_SYMBOL(wakeup_flusher_threads);
 
-/*
-void blk_finish_plug(struct blk_plug *plug)
+__weak void blk_finish_plug(struct blk_plug *plug)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(blk_finish_plug);
 
-void blk_start_plug(struct blk_plug *plug)
+__weak void blk_start_plug(struct blk_plug *plug)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(blk_start_plug);
-*/
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
@@ -2385,3 +2383,23 @@ __weak void delete_partition(struct gendisk *disk, struct hd_struct *part)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(delete_partition);
+
+/*
+ * Flag that puts the machine in "laptop mode". Doubles as a timeout in jiffies:
+ * a full sync is triggered after this time elapses without any disk activity.
+ */
+int laptop_mode;
+EXPORT_SYMBOL(laptop_mode);
+
+void put_io_context(struct io_context *ioc)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(put_io_context);
+
+void elevator_init_mq(struct request_queue *q)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(elevator_init_mq);
+

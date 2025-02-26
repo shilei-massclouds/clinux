@@ -2,14 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(blk_execute_rq)
-CL_MINE(blk_mq_alloc_tag_set)
-CL_MINE(blk_mq_complete_request)
-CL_MINE(blk_mq_end_request)
-CL_MINE(blk_mq_free_tag_set)
-CL_MINE(blk_mq_init_queue)
-CL_MINE(blk_mq_start_request)
-CL_MINE(blk_mq_start_stopped_hw_queues)
-CL_MINE(blk_mq_stop_hw_queue)
 CL_MINE(blk_mq_virtio_map_queues)
 CL_MINE(blk_queue_alignment_offset)
 CL_MINE(blk_queue_io_min)

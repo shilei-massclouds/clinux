@@ -110,14 +110,6 @@ unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
 EXPORT_SYMBOL_GPL(dirty_expire_interval);
 
 
-/*
- * Flag that puts the machine in "laptop mode". Doubles as a timeout in jiffies:
- * a full sync is triggered after this time elapses without any disk activity.
- */
-int laptop_mode;
-
-EXPORT_SYMBOL(laptop_mode);
-
 /* End of sysctl-exported parameters */
 
 struct wb_domain global_wb_domain;
@@ -2024,6 +2016,7 @@ void laptop_io_completion(struct backing_dev_info *info)
 {
 	mod_timer(&info->laptop_mode_wb_timer, jiffies + laptop_mode);
 }
+EXPORT_SYMBOL(laptop_io_completion);
 
 /*
  * We're in laptop mode and we've just synced. The sync's writes will have
