@@ -867,6 +867,7 @@ restart:
 	spin_unlock(&sb_lock);
 	return NULL;
 }
+EXPORT_SYMBOL(get_active_super);
 
 struct super_block *user_get_super(dev_t dev)
 {

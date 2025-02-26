@@ -2972,10 +2972,11 @@ repeat:
 		}
 
 filler:
-		if (filler)
+		if (filler) {
 			err = filler(data, page);
-		else
+        } else {
 			err = mapping->a_ops->readpage(data, page);
+        }
 
 		if (err < 0) {
 			put_page(page);

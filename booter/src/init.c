@@ -2560,3 +2560,15 @@ __weak int sb_set_blocksize(struct super_block *sb, int size)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(sb_set_blocksize);
+
+int vfs_fsync_range(struct file *file, loff_t start, loff_t end, int datasync)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(vfs_fsync_range);
+
+__weak int fsync_bdev(struct block_device *bdev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fsync_bdev);

@@ -738,7 +738,9 @@ static void register_disk(struct device *parent, struct gendisk *disk,
 		goto exit;
 
 	bdev->bd_invalidated = 1;
+    printk("%s: ---------------- 1\n", __func__);
 	err = blkdev_get(bdev, FMODE_READ, NULL);
+    printk("%s: ---------------- 2\n", __func__);
 	if (err < 0)
 		goto exit;
 	blkdev_put(bdev, FMODE_READ);
@@ -781,7 +783,6 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
 	dev_t devt;
 	int retval;
 
-    printk("%s: ----------------\n", __func__);
 	/*
 	 * The disk queue should now be all set with enough information about
 	 * the device for the elevator code to pick an adequate default
@@ -791,7 +792,6 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
 	if (register_queue)
 		elevator_init_mq(disk->queue);
 
-    printk("%s: ----------------\n", __func__);
 	/* minors == 0 indicates to use ext devt from part0 and should
 	 * be accompanied with EXT_DEVT flag.  Make sure all
 	 * parameters make sense.
@@ -832,7 +832,9 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
 		blk_register_region(disk_devt(disk), disk->minors, NULL,
 				    exact_match, exact_lock, disk);
 	}
+    printk("%s: ---------------- 1\n", __func__);
 	register_disk(parent, disk, groups);
+    printk("%s: ---------------- 2\n", __func__);
 	if (register_queue)
 		blk_register_queue(disk);
 
@@ -842,8 +844,10 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
 	 */
 	WARN_ON_ONCE(!blk_get_queue(disk->queue));
 
+    printk("%s: ---------------- 3\n", __func__);
 	disk_add_events(disk);
 	blk_integrity_add(disk);
+    printk("%s: ----------------\n", __func__);
 }
 
 void device_add_disk(struct device *parent, struct gendisk *disk,
