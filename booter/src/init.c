@@ -1056,11 +1056,13 @@ void exit_itimers(struct signal_struct *sig)
 }
 EXPORT_SYMBOL(exit_itimers);
 
+/*
 void vfree(const void *addr)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(vfree);
+*/
 
 __weak char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *tsk)
 {
@@ -2687,3 +2689,21 @@ __weak void workingset_activation(struct page *page)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(workingset_activation);
+
+__weak void kvfree(const void *addr)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(kvfree);
+
+__weak bool is_vmalloc_addr(const void *x)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(is_vmalloc_addr);
+
+__weak void vfree(const void *addr)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(vfree);

@@ -50,7 +50,6 @@ bool is_vmalloc_addr(const void *x)
 
 	return addr >= VMALLOC_START && addr < VMALLOC_END;
 }
-EXPORT_SYMBOL(is_vmalloc_addr);
 
 struct vfree_deferred {
 	struct llist_head list;
@@ -2322,36 +2321,35 @@ static void __vfree(const void *addr)
 		__vunmap(addr, 1);
 }
 
-///**
-// * vfree - release memory allocated by vmalloc()
-// * @addr:  memory base address
-// *
-// * Free the virtually continuous memory area starting at @addr, as
-// * obtained from vmalloc(), vmalloc_32() or __vmalloc(). If @addr is
-// * NULL, no operation is performed.
-// *
-// * Must not be called in NMI context (strictly speaking, only if we don't
-// * have CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG, but making the calling
-// * conventions for vfree() arch-depenedent would be a really bad idea)
-// *
-// * May sleep if called *not* from interrupt context.
-// *
-// * NOTE: assumes that the object at @addr has a size >= sizeof(llist_node)
-// */
-//void vfree(const void *addr)
-//{
-//	BUG_ON(in_nmi());
-//
-//	kmemleak_free(addr);
-//
-//	might_sleep_if(!in_interrupt());
-//
-//	if (!addr)
-//		return;
-//
-//	__vfree(addr);
-//}
-//EXPORT_SYMBOL(vfree);
+/**
+ * vfree - release memory allocated by vmalloc()
+ * @addr:  memory base address
+ *
+ * Free the virtually continuous memory area starting at @addr, as
+ * obtained from vmalloc(), vmalloc_32() or __vmalloc(). If @addr is
+ * NULL, no operation is performed.
+ *
+ * Must not be called in NMI context (strictly speaking, only if we don't
+ * have CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG, but making the calling
+ * conventions for vfree() arch-depenedent would be a really bad idea)
+ *
+ * May sleep if called *not* from interrupt context.
+ *
+ * NOTE: assumes that the object at @addr has a size >= sizeof(llist_node)
+ */
+void vfree(const void *addr)
+{
+	BUG_ON(in_nmi());
+
+	kmemleak_free(addr);
+
+	might_sleep_if(!in_interrupt());
+
+	if (!addr)
+		return;
+
+	__vfree(addr);
+}
 
 /**
  * vunmap - release virtual mapping obtained by vmap()

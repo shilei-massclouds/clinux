@@ -585,25 +585,25 @@ void *kvmalloc_node(size_t size, gfp_t flags, int node)
 }
 EXPORT_SYMBOL(kvmalloc_node);
 
-///**
-// * kvfree() - Free memory.
-// * @addr: Pointer to allocated memory.
-// *
-// * kvfree frees memory allocated by any of vmalloc(), kmalloc() or kvmalloc().
-// * It is slightly more efficient to use kfree() or vfree() if you are certain
-// * that you know which one to use.
-// *
-// * Context: Either preemptible task context or not-NMI interrupt.
-// */
-//void kvfree(const void *addr)
-//{
-//	if (is_vmalloc_addr(addr))
-//		vfree(addr);
-//	else
-//		kfree(addr);
-//}
-//EXPORT_SYMBOL(kvfree);
-//
+/**
+ * kvfree() - Free memory.
+ * @addr: Pointer to allocated memory.
+ *
+ * kvfree frees memory allocated by any of vmalloc(), kmalloc() or kvmalloc().
+ * It is slightly more efficient to use kfree() or vfree() if you are certain
+ * that you know which one to use.
+ *
+ * Context: Either preemptible task context or not-NMI interrupt.
+ */
+void kvfree(const void *addr)
+{
+	if (is_vmalloc_addr(addr))
+		vfree(addr);
+	else
+		kfree(addr);
+}
+EXPORT_SYMBOL(kvfree);
+
 ///**
 // * kvfree_sensitive - Free a data object containing sensitive information.
 // * @addr: address of the data object to be freed.

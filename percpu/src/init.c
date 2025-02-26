@@ -12,15 +12,3 @@ cl_percpu_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_percpu_init);
-
-void kvfree(const void *addr)
-{
-    booter_panic("No impl 'percpu'.");
-}
-EXPORT_SYMBOL(kvfree);
-
-void* __weak __kmalloc(size_t size, gfp_t flags)
-{
-    booter_panic("No impl in 'percpu'.");
-}
-EXPORT_SYMBOL(__kmalloc);
