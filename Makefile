@@ -38,7 +38,7 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter lib math flex_proportions \
+	prebuilt booter lib math flex_proportions crc32 \
 	radix_tree idr xarray assoc_array list_lru klist logic_pio \
 	kasprintf random crypto uuid rhashtable iov_iter checksum \
 	sbitmap scatterlist bio mempool truncate interval_tree \
