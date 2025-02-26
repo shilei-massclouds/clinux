@@ -1083,7 +1083,6 @@ void mmput(struct mm_struct *mm)
 	if (atomic_dec_and_test(&mm->mm_users))
 		__mmput(mm);
 }
-EXPORT_SYMBOL_GPL(mmput);
 
 #ifdef CONFIG_MMU
 static void mmput_async_fn(struct work_struct *work)
@@ -1199,7 +1198,6 @@ struct mm_struct *get_task_mm(struct task_struct *task)
 	task_unlock(task);
 	return mm;
 }
-EXPORT_SYMBOL_GPL(get_task_mm);
 
 struct mm_struct *mm_access(struct task_struct *task, unsigned int mode)
 {

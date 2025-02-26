@@ -2479,3 +2479,15 @@ __weak void bd_forget(struct inode *inode)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(bd_forget);
+
+__weak struct mm_struct *get_task_mm(struct task_struct *task)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(get_task_mm);
+
+__weak void mmput(struct mm_struct *mm)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(mmput);
