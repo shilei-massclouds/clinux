@@ -2314,7 +2314,6 @@ int remap_pfn_range(struct vm_area_struct *vma, unsigned long addr,
 
 	return err;
 }
-EXPORT_SYMBOL(remap_pfn_range);
 
 /**
  * vm_iomap_memory - remap memory to userspace

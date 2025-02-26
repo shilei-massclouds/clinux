@@ -672,11 +672,11 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
 	smp_mb();
 }
 
-//static void clear_work_data(struct work_struct *work)
-//{
-//	smp_wmb();	/* see set_work_pool_and_clear_pending() */
-//	set_work_data(work, WORK_STRUCT_NO_POOL, 0);
-//}
+static void clear_work_data(struct work_struct *work)
+{
+	smp_wmb();	/* see set_work_pool_and_clear_pending() */
+	set_work_data(work, WORK_STRUCT_NO_POOL, 0);
+}
 
 static struct pool_workqueue *get_work_pwq(struct work_struct *work)
 {
@@ -721,31 +721,31 @@ static struct worker_pool *get_work_pool(struct work_struct *work)
 	return idr_find(&worker_pool_idr, pool_id);
 }
 
-///**
-// * get_work_pool_id - return the worker pool ID a given work is associated with
-// * @work: the work item of interest
-// *
-// * Return: The worker_pool ID @work was last associated with.
-// * %WORK_OFFQ_POOL_NONE if none.
-// */
-//static int get_work_pool_id(struct work_struct *work)
-//{
-//	unsigned long data = atomic_long_read(&work->data);
-//
-//	if (data & WORK_STRUCT_PWQ)
-//		return ((struct pool_workqueue *)
-//			(data & WORK_STRUCT_WQ_DATA_MASK))->pool->id;
-//
-//	return data >> WORK_OFFQ_POOL_SHIFT;
-//}
-//
-//static void mark_work_canceling(struct work_struct *work)
-//{
-//	unsigned long pool_id = get_work_pool_id(work);
-//
-//	pool_id <<= WORK_OFFQ_POOL_SHIFT;
-//	set_work_data(work, pool_id | WORK_OFFQ_CANCELING, WORK_STRUCT_PENDING);
-//}
+/**
+ * get_work_pool_id - return the worker pool ID a given work is associated with
+ * @work: the work item of interest
+ *
+ * Return: The worker_pool ID @work was last associated with.
+ * %WORK_OFFQ_POOL_NONE if none.
+ */
+static int get_work_pool_id(struct work_struct *work)
+{
+	unsigned long data = atomic_long_read(&work->data);
+
+	if (data & WORK_STRUCT_PWQ)
+		return ((struct pool_workqueue *)
+			(data & WORK_STRUCT_WQ_DATA_MASK))->pool->id;
+
+	return data >> WORK_OFFQ_POOL_SHIFT;
+}
+
+static void mark_work_canceling(struct work_struct *work)
+{
+	unsigned long pool_id = get_work_pool_id(work);
+
+	pool_id <<= WORK_OFFQ_POOL_SHIFT;
+	set_work_data(work, pool_id | WORK_OFFQ_CANCELING, WORK_STRUCT_PENDING);
+}
 
 static bool work_is_canceling(struct work_struct *work)
 {
@@ -3064,107 +3064,107 @@ bool flush_work(struct work_struct *work)
 }
 EXPORT_SYMBOL_GPL(flush_work);
 
-//struct cwt_wait {
-//	wait_queue_entry_t		wait;
-//	struct work_struct	*work;
-//};
-//
-//static int cwt_wakefn(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
-//{
-//	struct cwt_wait *cwait = container_of(wait, struct cwt_wait, wait);
-//
-//	if (cwait->work != key)
-//		return 0;
-//	return autoremove_wake_function(wait, mode, sync, key);
-//}
-//
-//static bool __cancel_work_timer(struct work_struct *work, bool is_dwork)
-//{
-//	static DECLARE_WAIT_QUEUE_HEAD(cancel_waitq);
-//	unsigned long flags;
-//	int ret;
-//
-//	do {
-//		ret = try_to_grab_pending(work, is_dwork, &flags);
-//		/*
-//		 * If someone else is already canceling, wait for it to
-//		 * finish.  flush_work() doesn't work for PREEMPT_NONE
-//		 * because we may get scheduled between @work's completion
-//		 * and the other canceling task resuming and clearing
-//		 * CANCELING - flush_work() will return false immediately
-//		 * as @work is no longer busy, try_to_grab_pending() will
-//		 * return -ENOENT as @work is still being canceled and the
-//		 * other canceling task won't be able to clear CANCELING as
-//		 * we're hogging the CPU.
-//		 *
-//		 * Let's wait for completion using a waitqueue.  As this
-//		 * may lead to the thundering herd problem, use a custom
-//		 * wake function which matches @work along with exclusive
-//		 * wait and wakeup.
-//		 */
-//		if (unlikely(ret == -ENOENT)) {
-//			struct cwt_wait cwait;
-//
-//			init_wait(&cwait.wait);
-//			cwait.wait.func = cwt_wakefn;
-//			cwait.work = work;
-//
-//			prepare_to_wait_exclusive(&cancel_waitq, &cwait.wait,
-//						  TASK_UNINTERRUPTIBLE);
-//			if (work_is_canceling(work))
-//				schedule();
-//			finish_wait(&cancel_waitq, &cwait.wait);
-//		}
-//	} while (unlikely(ret < 0));
-//
-//	/* tell other tasks trying to grab @work to back off */
-//	mark_work_canceling(work);
-//	local_irq_restore(flags);
-//
-//	/*
-//	 * This allows canceling during early boot.  We know that @work
-//	 * isn't executing.
-//	 */
-//	if (wq_online)
-//		__flush_work(work, true);
-//
-//	clear_work_data(work);
-//
-//	/*
-//	 * Paired with prepare_to_wait() above so that either
-//	 * waitqueue_active() is visible here or !work_is_canceling() is
-//	 * visible there.
-//	 */
-//	smp_mb();
-//	if (waitqueue_active(&cancel_waitq))
-//		__wake_up(&cancel_waitq, TASK_NORMAL, 1, work);
-//
-//	return ret;
-//}
-//
-///**
-// * cancel_work_sync - cancel a work and wait for it to finish
-// * @work: the work to cancel
-// *
-// * Cancel @work and wait for its execution to finish.  This function
-// * can be used even if the work re-queues itself or migrates to
-// * another workqueue.  On return from this function, @work is
-// * guaranteed to be not pending or executing on any CPU.
-// *
-// * cancel_work_sync(&delayed_work->work) must not be used for
-// * delayed_work's.  Use cancel_delayed_work_sync() instead.
-// *
-// * The caller must ensure that the workqueue on which @work was last
-// * queued can't be destroyed before this function returns.
-// *
-// * Return:
-// * %true if @work was pending, %false otherwise.
-// */
-//bool cancel_work_sync(struct work_struct *work)
-//{
-//	return __cancel_work_timer(work, false);
-//}
-//EXPORT_SYMBOL_GPL(cancel_work_sync);
+struct cwt_wait {
+	wait_queue_entry_t		wait;
+	struct work_struct	*work;
+};
+
+static int cwt_wakefn(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
+{
+	struct cwt_wait *cwait = container_of(wait, struct cwt_wait, wait);
+
+	if (cwait->work != key)
+		return 0;
+	return autoremove_wake_function(wait, mode, sync, key);
+}
+
+static bool __cancel_work_timer(struct work_struct *work, bool is_dwork)
+{
+	static DECLARE_WAIT_QUEUE_HEAD(cancel_waitq);
+	unsigned long flags;
+	int ret;
+
+	do {
+		ret = try_to_grab_pending(work, is_dwork, &flags);
+		/*
+		 * If someone else is already canceling, wait for it to
+		 * finish.  flush_work() doesn't work for PREEMPT_NONE
+		 * because we may get scheduled between @work's completion
+		 * and the other canceling task resuming and clearing
+		 * CANCELING - flush_work() will return false immediately
+		 * as @work is no longer busy, try_to_grab_pending() will
+		 * return -ENOENT as @work is still being canceled and the
+		 * other canceling task won't be able to clear CANCELING as
+		 * we're hogging the CPU.
+		 *
+		 * Let's wait for completion using a waitqueue.  As this
+		 * may lead to the thundering herd problem, use a custom
+		 * wake function which matches @work along with exclusive
+		 * wait and wakeup.
+		 */
+		if (unlikely(ret == -ENOENT)) {
+			struct cwt_wait cwait;
+
+			init_wait(&cwait.wait);
+			cwait.wait.func = cwt_wakefn;
+			cwait.work = work;
+
+			prepare_to_wait_exclusive(&cancel_waitq, &cwait.wait,
+						  TASK_UNINTERRUPTIBLE);
+			if (work_is_canceling(work))
+				schedule();
+			finish_wait(&cancel_waitq, &cwait.wait);
+		}
+	} while (unlikely(ret < 0));
+
+	/* tell other tasks trying to grab @work to back off */
+	mark_work_canceling(work);
+	local_irq_restore(flags);
+
+	/*
+	 * This allows canceling during early boot.  We know that @work
+	 * isn't executing.
+	 */
+	if (wq_online)
+		__flush_work(work, true);
+
+	clear_work_data(work);
+
+	/*
+	 * Paired with prepare_to_wait() above so that either
+	 * waitqueue_active() is visible here or !work_is_canceling() is
+	 * visible there.
+	 */
+	smp_mb();
+	if (waitqueue_active(&cancel_waitq))
+		__wake_up(&cancel_waitq, TASK_NORMAL, 1, work);
+
+	return ret;
+}
+
+/**
+ * cancel_work_sync - cancel a work and wait for it to finish
+ * @work: the work to cancel
+ *
+ * Cancel @work and wait for its execution to finish.  This function
+ * can be used even if the work re-queues itself or migrates to
+ * another workqueue.  On return from this function, @work is
+ * guaranteed to be not pending or executing on any CPU.
+ *
+ * cancel_work_sync(&delayed_work->work) must not be used for
+ * delayed_work's.  Use cancel_delayed_work_sync() instead.
+ *
+ * The caller must ensure that the workqueue on which @work was last
+ * queued can't be destroyed before this function returns.
+ *
+ * Return:
+ * %true if @work was pending, %false otherwise.
+ */
+bool cancel_work_sync(struct work_struct *work)
+{
+	return __cancel_work_timer(work, false);
+}
+EXPORT_SYMBOL_GPL(cancel_work_sync);
 
 /**
  * flush_delayed_work - wait for a dwork to finish executing the last queueing
@@ -3207,61 +3207,61 @@ EXPORT_SYMBOL(flush_delayed_work);
 //	}
 //}
 //EXPORT_SYMBOL(flush_rcu_work);
-//
-//static bool __cancel_work(struct work_struct *work, bool is_dwork)
-//{
-//	unsigned long flags;
-//	int ret;
-//
-//	do {
-//		ret = try_to_grab_pending(work, is_dwork, &flags);
-//	} while (unlikely(ret == -EAGAIN));
-//
-//	if (unlikely(ret < 0))
-//		return false;
-//
-//	set_work_pool_and_clear_pending(work, get_work_pool_id(work));
-//	local_irq_restore(flags);
-//	return ret;
-//}
-//
-///**
-// * cancel_delayed_work - cancel a delayed work
-// * @dwork: delayed_work to cancel
-// *
-// * Kill off a pending delayed_work.
-// *
-// * Return: %true if @dwork was pending and canceled; %false if it wasn't
-// * pending.
-// *
-// * Note:
-// * The work callback function may still be running on return, unless
-// * it returns %true and the work doesn't re-arm itself.  Explicitly flush or
-// * use cancel_delayed_work_sync() to wait on it.
-// *
-// * This function is safe to call from any context including IRQ handler.
-// */
-//bool cancel_delayed_work(struct delayed_work *dwork)
-//{
-//	return __cancel_work(&dwork->work, true);
-//}
-//EXPORT_SYMBOL(cancel_delayed_work);
-//
-///**
-// * cancel_delayed_work_sync - cancel a delayed work and wait for it to finish
-// * @dwork: the delayed work cancel
-// *
-// * This is cancel_work_sync() for delayed works.
-// *
-// * Return:
-// * %true if @dwork was pending, %false otherwise.
-// */
-//bool cancel_delayed_work_sync(struct delayed_work *dwork)
-//{
-//	return __cancel_work_timer(&dwork->work, true);
-//}
-//EXPORT_SYMBOL(cancel_delayed_work_sync);
-//
+
+static bool __cancel_work(struct work_struct *work, bool is_dwork)
+{
+	unsigned long flags;
+	int ret;
+
+	do {
+		ret = try_to_grab_pending(work, is_dwork, &flags);
+	} while (unlikely(ret == -EAGAIN));
+
+	if (unlikely(ret < 0))
+		return false;
+
+	set_work_pool_and_clear_pending(work, get_work_pool_id(work));
+	local_irq_restore(flags);
+	return ret;
+}
+
+/**
+ * cancel_delayed_work - cancel a delayed work
+ * @dwork: delayed_work to cancel
+ *
+ * Kill off a pending delayed_work.
+ *
+ * Return: %true if @dwork was pending and canceled; %false if it wasn't
+ * pending.
+ *
+ * Note:
+ * The work callback function may still be running on return, unless
+ * it returns %true and the work doesn't re-arm itself.  Explicitly flush or
+ * use cancel_delayed_work_sync() to wait on it.
+ *
+ * This function is safe to call from any context including IRQ handler.
+ */
+bool cancel_delayed_work(struct delayed_work *dwork)
+{
+	return __cancel_work(&dwork->work, true);
+}
+EXPORT_SYMBOL(cancel_delayed_work);
+
+/**
+ * cancel_delayed_work_sync - cancel a delayed work and wait for it to finish
+ * @dwork: the delayed work cancel
+ *
+ * This is cancel_work_sync() for delayed works.
+ *
+ * Return:
+ * %true if @dwork was pending, %false otherwise.
+ */
+bool cancel_delayed_work_sync(struct delayed_work *dwork)
+{
+	return __cancel_work_timer(&dwork->work, true);
+}
+EXPORT_SYMBOL(cancel_delayed_work_sync);
+
 ///**
 // * schedule_on_each_cpu - execute a function synchronously on each online CPU
 // * @func: the function to call

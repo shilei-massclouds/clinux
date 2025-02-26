@@ -857,11 +857,13 @@ __weak int proc_cgroup_show(struct seq_file *m, struct pid_namespace *ns,
 }
 EXPORT_SYMBOL(proc_cgroup_show);
 
+/*
 bool cancel_work_sync(struct work_struct *work)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(cancel_work_sync);
+*/
 
 __weak u64 get_random_u64(void)
 {
@@ -2423,3 +2425,9 @@ EXPORT_SYMBOL(disk_name);
 
 unsigned long __read_mostly sysctl_hung_task_timeout_secs = CONFIG_DEFAULT_HUNG_TASK_TIMEOUT;
 EXPORT_SYMBOL(sysctl_hung_task_timeout_secs);
+
+__weak const char *bdevname(struct block_device *bdev, char *buf)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdevname);

@@ -225,3 +225,10 @@ __weak int __pte_alloc_kernel(pmd_t *pmd)
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(__pte_alloc_kernel);
+
+__weak int remap_pfn_range(struct vm_area_struct *vma, unsigned long addr,
+		    unsigned long pfn, unsigned long size, pgprot_t prot)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(remap_pfn_range);
