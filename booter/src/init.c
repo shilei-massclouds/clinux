@@ -2367,3 +2367,21 @@ __weak int __invalidate_device(struct block_device *bdev, bool kill_dirty)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__invalidate_device);
+
+__weak int hd_ref_init(struct hd_struct *part)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(hd_ref_init);
+
+__weak struct block_device *bdget(dev_t dev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdget);
+
+__weak void delete_partition(struct gendisk *disk, struct hd_struct *part)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(delete_partition);

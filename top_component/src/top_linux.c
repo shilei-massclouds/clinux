@@ -1021,6 +1021,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(noinitramfs);
     REQUIRE_COMPONENT(block_dev);
     REQUIRE_COMPONENT(virtio_blk);
+    REQUIRE_COMPONENT(partitions);
 
     //
     // start_kernel (init/main.c)

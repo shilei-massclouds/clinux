@@ -47,8 +47,6 @@ void __init driver_init(void)
 }
 EXPORT_SYMBOL(driver_init);
 
-struct device_type part_type;
-
 void unlock_device_hotplug(void)
 {
     booter_panic("No impl 'driver_base'.");
@@ -85,3 +83,10 @@ __weak int devtmpfs_delete_node(struct device *dev)
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL(devtmpfs_delete_node);
+
+#ifdef CONFIG_BLOCK
+__weak int device_is_not_partition(struct device *dev)
+{
+    booter_panic("No impl 'driver_base'.");
+}
+#endif

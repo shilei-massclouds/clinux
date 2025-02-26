@@ -83,6 +83,7 @@ char *disk_name(struct gendisk *hd, int partno, char *buf)
 
 	return buf;
 }
+EXPORT_SYMBOL(disk_name);
 
 const char *bdevname(struct block_device *bdev, char *buf)
 {
@@ -594,6 +595,7 @@ int blk_alloc_devt(struct hd_struct *part, dev_t *devt)
 	*devt = MKDEV(BLOCK_EXT_MAJOR, blk_mangle_minor(idx));
 	return 0;
 }
+EXPORT_SYMBOL(blk_alloc_devt);
 
 /**
  * blk_free_devt - free a dev_t
@@ -615,6 +617,7 @@ void blk_free_devt(dev_t devt)
 		spin_unlock_bh(&ext_devt_lock);
 	}
 }
+EXPORT_SYMBOL(blk_free_devt);
 
 /*
  * We invalidate devt by assigning NULL pointer for devt in idr.
@@ -627,6 +630,7 @@ void blk_invalidate_devt(dev_t devt)
 		spin_unlock_bh(&ext_devt_lock);
 	}
 }
+EXPORT_SYMBOL(blk_invalidate_devt);
 
 static char *bdevt_str(dev_t devt, char *buf)
 {
@@ -1291,6 +1295,7 @@ ssize_t part_size_show(struct device *dev,
 	return sprintf(buf, "%llu\n",
 		(unsigned long long)part_nr_sects_read(p));
 }
+EXPORT_SYMBOL(part_size_show);
 
 ssize_t part_stat_show(struct device *dev,
 		       struct device_attribute *attr, char *buf)
@@ -1335,6 +1340,7 @@ ssize_t part_stat_show(struct device *dev,
 		stat.ios[STAT_FLUSH],
 		(unsigned int)div_u64(stat.nsecs[STAT_FLUSH], NSEC_PER_MSEC));
 }
+EXPORT_SYMBOL(part_stat_show);
 
 ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
 			   char *buf)
@@ -1350,6 +1356,7 @@ ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
 
 	return sprintf(buf, "%8u %8u\n", inflight[0], inflight[1]);
 }
+EXPORT_SYMBOL(part_inflight_show);
 
 static ssize_t disk_capability_show(struct device *dev,
 				    struct device_attribute *attr, char *buf)
@@ -1539,6 +1546,7 @@ int disk_expand_part_tbl(struct gendisk *disk, int partno)
 	disk_replace_part_tbl(disk, new_ptbl);
 	return 0;
 }
+EXPORT_SYMBOL(disk_expand_part_tbl);
 
 /**
  * disk_release - releases all allocated resources of the gendisk

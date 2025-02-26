@@ -410,4 +410,13 @@ static inline dev_t blk_lookup_devt(const char *name, int partno)
 }
 #endif /* CONFIG_BLOCK */
 
+#ifdef CONFIG_BLOCK
+extern int device_is_not_partition(struct device *dev);
+#else
+static inline int device_is_not_partition(struct device *dev)
+{
+	return 1;
+}
+#endif
+
 #endif /* _LINUX_GENHD_H */

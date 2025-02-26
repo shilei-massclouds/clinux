@@ -1600,18 +1600,6 @@ EXPORT_SYMBOL(sysfs_dev_block_kobj);
 //	return restart_syscall();
 //}
 
-#ifdef CONFIG_BLOCK
-static inline int device_is_not_partition(struct device *dev)
-{
-	return !(dev->type == &part_type);
-}
-#else
-static inline int device_is_not_partition(struct device *dev)
-{
-	return 1;
-}
-#endif
-
 static int
 device_platform_notify(struct device *dev, enum kobject_action action)
 {

@@ -835,58 +835,56 @@ void __init bdev_cache_init(void)
 	blockdev_superblock = bd_mnt->mnt_sb;   /* For writeback */
 }
 
-///*
-// * Most likely _very_ bad one - but then it's hardly critical for small
-// * /dev and can be fixed when somebody will need really large one.
-// * Keep in mind that it will be fed through icache hash function too.
-// */
-//static inline unsigned long hash(dev_t dev)
-//{
-//	return MAJOR(dev)+MINOR(dev);
-//}
-//
-//static int bdev_test(struct inode *inode, void *data)
-//{
-//	return BDEV_I(inode)->bdev.bd_dev == *(dev_t *)data;
-//}
-//
-//static int bdev_set(struct inode *inode, void *data)
-//{
-//	BDEV_I(inode)->bdev.bd_dev = *(dev_t *)data;
-//	return 0;
-//}
-//
-//struct block_device *bdget(dev_t dev)
-//{
-//	struct block_device *bdev;
-//	struct inode *inode;
-//
-//	inode = iget5_locked(blockdev_superblock, hash(dev),
-//			bdev_test, bdev_set, &dev);
-//
-//	if (!inode)
-//		return NULL;
-//
-//	bdev = &BDEV_I(inode)->bdev;
-//
-//	if (inode->i_state & I_NEW) {
-//		bdev->bd_contains = NULL;
-//		bdev->bd_super = NULL;
-//		bdev->bd_inode = inode;
-//		bdev->bd_part_count = 0;
-//		bdev->bd_invalidated = 0;
-//		inode->i_mode = S_IFBLK;
-//		inode->i_rdev = dev;
-//		inode->i_bdev = bdev;
-//		inode->i_data.a_ops = &def_blk_aops;
-//		mapping_set_gfp_mask(&inode->i_data, GFP_USER);
-//		unlock_new_inode(inode);
-//	}
-//	return bdev;
-//}
-//
-//EXPORT_SYMBOL(bdget);
-//
+/*
+ * Most likely _very_ bad one - but then it's hardly critical for small
+ * /dev and can be fixed when somebody will need really large one.
+ * Keep in mind that it will be fed through icache hash function too.
+ */
+static inline unsigned long hash(dev_t dev)
+{
+	return MAJOR(dev)+MINOR(dev);
+}
+
+static int bdev_test(struct inode *inode, void *data)
+{
+	return BDEV_I(inode)->bdev.bd_dev == *(dev_t *)data;
+}
+
+static int bdev_set(struct inode *inode, void *data)
+{
+	BDEV_I(inode)->bdev.bd_dev = *(dev_t *)data;
+	return 0;
+}
+
+struct block_device *bdget(dev_t dev)
+{
+	struct block_device *bdev;
+	struct inode *inode;
+
+	inode = iget5_locked(blockdev_superblock, hash(dev),
+			bdev_test, bdev_set, &dev);
+
+	if (!inode)
+		return NULL;
+
+	bdev = &BDEV_I(inode)->bdev;
+
+	if (inode->i_state & I_NEW) {
+		bdev->bd_contains = NULL;
+		bdev->bd_super = NULL;
+		bdev->bd_inode = inode;
+		bdev->bd_part_count = 0;
+		bdev->bd_invalidated = 0;
+		inode->i_mode = S_IFBLK;
+		inode->i_rdev = dev;
+		inode->i_bdev = bdev;
+		inode->i_data.a_ops = &def_blk_aops;
+		mapping_set_gfp_mask(&inode->i_data, GFP_USER);
+		unlock_new_inode(inode);
+	}
+	return bdev;
+}
+
 ///**
 // * bdgrab -- Grab a reference to an already referenced block device
 // * @bdev:	Block device to grab a reference to.

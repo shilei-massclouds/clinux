@@ -10,7 +10,7 @@
 #include <linux/vmalloc.h>
 #include <linux/blktrace_api.h>
 #include <linux/raid/detect.h>
-#include "check.h"
+#include "../check.h"
 
 static int (*check_part[])(struct parsed_partitions *) = {
 	/*
@@ -791,3 +791,10 @@ out:
 	p->v = NULL;
 	return NULL;
 }
+
+#ifdef CONFIG_BLOCK
+int device_is_not_partition(struct device *dev)
+{
+	return !(dev->type == &part_type);
+}
+#endif
