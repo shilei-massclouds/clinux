@@ -2707,3 +2707,40 @@ __weak void vfree(const void *addr)
     booter_panic("No impl 'percpu'.");
 }
 EXPORT_SYMBOL(vfree);
+
+__weak void blk_mq_quiesce_queue(struct request_queue *q)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+
+__weak ssize_t elv_iosched_store(struct request_queue *q, const char *name,
+			  size_t count)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(elv_iosched_store);
+
+__weak void __elevator_exit(struct request_queue *q, struct elevator_queue *e)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(__elevator_exit);
+
+__weak ssize_t elv_iosched_show(struct request_queue *q, char *name)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(elv_iosched_show);
+
+__weak void elv_unregister_queue(struct request_queue *q)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(elv_unregister_queue);
+
+__weak int elv_register_queue(struct request_queue *q, bool uevent)
+{
+    booter_panic("No impl 'percpu'.");
+}
+EXPORT_SYMBOL(elv_register_queue);

@@ -15,5 +15,6 @@ obj_y += blk-merge.o
 obj_y += blk-mq-sched.o
 obj_y += blk-mq-debugfs.o
 obj_y += blk-timeout.o
+obj_y += blk-sysfs.o
 
 obj_y += mine.o

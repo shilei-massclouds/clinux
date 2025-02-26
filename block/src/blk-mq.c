@@ -236,7 +236,6 @@ void blk_mq_quiesce_queue(struct request_queue *q)
 	if (rcu)
 		synchronize_rcu();
 }
-EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
 
 /*
  * blk_mq_unquiesce_queue() - counterpart of blk_mq_quiesce_queue()

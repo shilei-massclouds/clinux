@@ -15,5 +15,3 @@ cl_block_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_block_init);
-
-struct kobj_type blk_queue_ktype;
