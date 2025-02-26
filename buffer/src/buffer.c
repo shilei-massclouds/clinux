@@ -774,31 +774,31 @@ EXPORT_SYMBOL(inode_has_buffers);
 //	else
 //		return err2;
 //}
-//
-///*
-// * Invalidate any and all dirty buffers on a given inode.  We are
-// * probably unmounting the fs, but that doesn't mean we have already
-// * done a sync().  Just drop the buffers from the inode list.
-// *
-// * NOTE: we take the inode's blockdev's mapping's private_lock.  Which
-// * assumes that all the buffers are against the blockdev.  Not true
-// * for reiserfs.
-// */
-//void invalidate_inode_buffers(struct inode *inode)
-//{
-//	if (inode_has_buffers(inode)) {
-//		struct address_space *mapping = &inode->i_data;
-//		struct list_head *list = &mapping->private_list;
-//		struct address_space *buffer_mapping = mapping->private_data;
-//
-//		spin_lock(&buffer_mapping->private_lock);
-//		while (!list_empty(list))
-//			__remove_assoc_queue(BH_ENTRY(list->next));
-//		spin_unlock(&buffer_mapping->private_lock);
-//	}
-//}
-//EXPORT_SYMBOL(invalidate_inode_buffers);
-//
+
+/*
+ * Invalidate any and all dirty buffers on a given inode.  We are
+ * probably unmounting the fs, but that doesn't mean we have already
+ * done a sync().  Just drop the buffers from the inode list.
+ *
+ * NOTE: we take the inode's blockdev's mapping's private_lock.  Which
+ * assumes that all the buffers are against the blockdev.  Not true
+ * for reiserfs.
+ */
+void invalidate_inode_buffers(struct inode *inode)
+{
+	if (inode_has_buffers(inode)) {
+		struct address_space *mapping = &inode->i_data;
+		struct list_head *list = &mapping->private_list;
+		struct address_space *buffer_mapping = mapping->private_data;
+
+		spin_lock(&buffer_mapping->private_lock);
+		while (!list_empty(list))
+			__remove_assoc_queue(BH_ENTRY(list->next));
+		spin_unlock(&buffer_mapping->private_lock);
+	}
+}
+EXPORT_SYMBOL(invalidate_inode_buffers);
+
 ///*
 // * Remove any clean buffers from the inode's buffer list.  This is called
 // * when we're trying to free the inode itself.  Those buffers can pin it.

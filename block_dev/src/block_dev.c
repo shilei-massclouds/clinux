@@ -955,24 +955,24 @@ void bdput(struct block_device *bdev)
 //	}
 //	return bdev;
 //}
-//
-///* Call when you free inode */
-//
-//void bd_forget(struct inode *inode)
-//{
-//	struct block_device *bdev = NULL;
-//
-//	spin_lock(&bdev_lock);
-//	if (!sb_is_blkdev_sb(inode->i_sb))
-//		bdev = inode->i_bdev;
-//	inode->i_bdev = NULL;
-//	inode->i_mapping = &inode->i_data;
-//	spin_unlock(&bdev_lock);
-//
-//	if (bdev)
-//		bdput(bdev);
-//}
-//
+
+/* Call when you free inode */
+
+void bd_forget(struct inode *inode)
+{
+	struct block_device *bdev = NULL;
+
+	spin_lock(&bdev_lock);
+	if (!sb_is_blkdev_sb(inode->i_sb))
+		bdev = inode->i_bdev;
+	inode->i_bdev = NULL;
+	inode->i_mapping = &inode->i_data;
+	spin_unlock(&bdev_lock);
+
+	if (bdev)
+		bdput(bdev);
+}
+
 ///**
 // * bd_may_claim - test whether a block device can be claimed
 // * @bdev: block device of interest

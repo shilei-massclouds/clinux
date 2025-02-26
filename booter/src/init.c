@@ -2473,3 +2473,9 @@ __weak int invalidate_inode_pages2_range(struct address_space *mapping,
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL_GPL(invalidate_inode_pages2_range);
+
+__weak void bd_forget(struct inode *inode)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bd_forget);
