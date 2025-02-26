@@ -24,46 +24,6 @@ int ptm_open_peer(struct file *master, struct tty_struct *tty, int flags)
 {
     booter_panic("No impl.\n");
 }
-int __sched ldsem_down_write(struct ld_semaphore *sem, long timeout)
-{
-    booter_panic("No impl.\n");
-}
-
-/*
-struct device *device_create(struct class *class, struct device *parent,
-                 dev_t devt, void *drvdata, const char *fmt, ...)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(device_create);
-*/
-
-struct tty_driver *console_device(int *index)
-{
-    booter_panic("No impl.\n");
-}
-
-int __sched ldsem_down_read(struct ld_semaphore *sem, long timeout)
-{
-    booter_panic("No impl.\n");
-}
-void ldsem_up_write(struct ld_semaphore *sem)
-{
-    booter_panic("No impl.\n");
-}
-int ldsem_down_read_trylock(struct ld_semaphore *sem)
-{
-    booter_panic("No impl.\n");
-}
-void ldsem_up_read(struct ld_semaphore *sem)
-{
-    booter_panic("No impl.\n");
-}
-void __init_ldsem(struct ld_semaphore *sem, const char *name,
-          struct lock_class_key *key)
-{
-    booter_panic("No impl.\n");
-}
 
 struct tty_driver *console_driver;
 EXPORT_SYMBOL(console_driver);

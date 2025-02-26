@@ -165,6 +165,7 @@ int __init init_mknod(const char *filename, umode_t mode, unsigned int dev)
 	done_path_create(&path, dentry);
 	return error;
 }
+EXPORT_SYMBOL(init_mknod);
 
 int __init init_link(const char *oldname, const char *newname)
 {
@@ -237,6 +238,7 @@ int __init init_mkdir(const char *pathname, umode_t mode)
 	done_path_create(&path, dentry);
 	return error;
 }
+EXPORT_SYMBOL(init_mkdir);
 
 int __init init_rmdir(const char *pathname)
 {

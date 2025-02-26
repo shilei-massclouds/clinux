@@ -3492,7 +3492,6 @@ EXPORT_SYMBOL(console_sysfs_notify);
  */
 int __init tty_init(void)
 {
-    printk("%s: ========================\n", __func__);
 	tty_sysctl_init();
 	cdev_init(&tty_cdev, &tty_fops);
 	if (cdev_add(&tty_cdev, MKDEV(TTYAUX_MAJOR, 0), 1) ||

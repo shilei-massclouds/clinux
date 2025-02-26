@@ -203,6 +203,7 @@ int register_chrdev_region(dev_t from, unsigned count, const char *name)
 	dev_t to = from + count;
 	dev_t n, next;
 
+    printk("%s: ++++++++++++++++++++++++ name (%s)\n", __func__, name);
 	for (n = from; n < to; n = next) {
 		next = MKDEV(MAJOR(n)+1, 0);
 		if (next > to)

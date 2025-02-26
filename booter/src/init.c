@@ -630,11 +630,13 @@ __weak bool shmem_mapping(struct address_space *mapping)
 }
 EXPORT_SYMBOL(shmem_mapping);
 
+/*
 errseq_t errseq_set(errseq_t *eseq, int err)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(errseq_set);
+*/
 
 int try_to_free_buffers(struct page *page)
 {
@@ -2085,11 +2087,13 @@ char *dynamic_dname(struct dentry *dentry, char *buffer, int buflen,
 }
 EXPORT_SYMBOL(dynamic_dname);
 
+/*
 errseq_t errseq_sample(errseq_t *eseq)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(errseq_sample);
+*/
 
 char *simple_dname(struct dentry *dentry, char *buffer, int buflen)
 {

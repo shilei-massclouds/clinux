@@ -1127,9 +1127,12 @@ struct file *filp_open(const char *filename, int flags, umode_t mode)
 {
 	struct filename *name = getname_kernel(filename);
 	struct file *file = ERR_CAST(name);
+    printk("%s: step1\n", __func__);
 
 	if (!IS_ERR(name)) {
+    printk("%s: step2\n", __func__);
 		file = file_open_name(name, flags, mode);
+    printk("%s: step3\n", __func__);
 		putname(name);
 	}
 	return file;

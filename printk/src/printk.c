@@ -2593,26 +2593,26 @@ void console_flush_on_panic(enum con_flush_mode mode)
 }
 EXPORT_SYMBOL(console_flush_on_panic);
 
-///*
-// * Return the console tty driver structure and its associated index
-// */
-//struct tty_driver *console_device(int *index)
-//{
-//	struct console *c;
-//	struct tty_driver *driver = NULL;
-//
-//	console_lock();
-//	for_each_console(c) {
-//		if (!c->device)
-//			continue;
-//		driver = c->device(c, index);
-//		if (driver)
-//			break;
-//	}
-//	console_unlock();
-//	return driver;
-//}
-//
+/*
+ * Return the console tty driver structure and its associated index
+ */
+struct tty_driver *console_device(int *index)
+{
+	struct console *c;
+	struct tty_driver *driver = NULL;
+
+	console_lock();
+	for_each_console(c) {
+		if (!c->device)
+			continue;
+		driver = c->device(c, index);
+		if (driver)
+			break;
+	}
+	console_unlock();
+	return driver;
+}
+
 ///*
 // * Prevent further output on the passed console device so that (for example)
 // * serial drivers can disable console output before suspending a port, and can

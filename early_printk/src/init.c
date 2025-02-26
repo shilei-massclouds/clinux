@@ -153,3 +153,9 @@ __weak void console_unblank(void)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(console_unblank);
+
+__weak struct tty_driver *console_device(int *index)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(console_device);

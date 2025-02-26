@@ -122,6 +122,7 @@ int devtmpfs_create_node(struct device *dev)
 	if (!req.name)
 		return -ENOMEM;
 
+    printk("%s: ------------------------------------ name(%s)\n", __func__, req.name);
 	if (req.mode == 0)
 		req.mode = 0600;
 	if (is_blockdev(dev))

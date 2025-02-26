@@ -46,7 +46,7 @@ components := \
 	of of_irq irq_work tty vt earlycon dummycon input \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess capability security \
-	clocksource pid seq_file \
+	clocksource pid seq_file errseq \
 	cpu task cgroup ksysfs dma up notify fs_attr fs_stat fs_writeback \
 	jump_label extable vdso utsname keys ucount umh locks \
 	early_sched sched \
@@ -54,7 +54,7 @@ components := \
 	memblock paging rmap backing_dev riscv_mm_context \
 	page_alloc slub vmalloc mm_util vmscan ioremap \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
-	ipc_sem watchdog \
+	ipc_sem watchdog noinitramfs \
 	fs inode dcache file_table do_mounts file open \
 	cred groups posix_acl user_namespace nsproxy fs_namespace pid_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
