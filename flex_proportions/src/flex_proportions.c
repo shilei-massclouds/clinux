@@ -182,6 +182,7 @@ int fprop_local_init_percpu(struct fprop_local_percpu *pl, gfp_t gfp)
 	raw_spin_lock_init(&pl->lock);
 	return 0;
 }
+EXPORT_SYMBOL(fprop_local_init_percpu);
 
 void fprop_local_destroy_percpu(struct fprop_local_percpu *pl)
 {

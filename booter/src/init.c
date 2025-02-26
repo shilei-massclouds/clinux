@@ -17,6 +17,7 @@
 #include <linux/user_namespace.h>
 #include <linux/kobj_map.h>
 #include <linux/backing-dev-defs.h>
+#include <linux/backing-dev.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -656,6 +657,7 @@ __weak void wakeup_flusher_threads(enum wb_reason reason)
 }
 EXPORT_SYMBOL(wakeup_flusher_threads);
 
+/*
 void blk_finish_plug(struct blk_plug *plug)
 {
     booter_panic("No impl!\n");
@@ -667,6 +669,13 @@ void blk_start_plug(struct blk_plug *plug)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(blk_start_plug);
+*/
+
+/*
+ * Flag that makes the machine dump writes/reads and block dirtyings.
+ */
+int block_dump;
+EXPORT_SYMBOL(block_dump);
 
 __weak bool node_dirty_ok(struct pglist_data *pgdat)
 {
@@ -1684,6 +1693,12 @@ __weak void debugfs_remove(struct dentry *dentry)
 }
 EXPORT_SYMBOL_GPL(debugfs_remove);
 
+__weak struct dentry *debugfs_create_dir(const char *name, struct dentry *parent)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(debugfs_create_dir);
+
 __weak struct dentry *debugfs_create_file(const char *name, umode_t mode,
 				   struct dentry *parent, void *data,
 				   const struct file_operations *fops)
@@ -2107,11 +2122,13 @@ __weak void __init files_maxfiles_init(void)
 }
 EXPORT_SYMBOL(files_maxfiles_init);
 
+/*
 void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
 {
     booter_panic("No impl 'sched'.");
 }
 EXPORT_SYMBOL(blk_flush_plug_list);
+*/
 
 __weak int write_inode_now(struct inode *inode, int sync)
 {
@@ -2285,3 +2302,44 @@ __weak int sync_blockdev(struct block_device *bdev)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(sync_blockdev);
+
+struct backing_dev_info noop_backing_dev_info = {
+	.capabilities	= BDI_CAP_NO_ACCT_AND_WRITEBACK,
+};
+EXPORT_SYMBOL_GPL(noop_backing_dev_info);
+
+__weak void wb_workfn(struct work_struct *work)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(wb_workfn);
+
+__weak void laptop_mode_timer_fn(struct timer_list *t)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(laptop_mode_timer_fn);
+
+__weak struct hd_struct *disk_map_sector_rcu(struct gendisk *disk, sector_t sector)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(disk_map_sector_rcu);
+
+__weak struct hd_struct *__disk_get_part(struct gendisk *disk, int partno)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__disk_get_part);
+
+__weak int bdi_set_min_ratio(struct backing_dev_info *bdi, unsigned int min_ratio)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdi_set_min_ratio);
+
+__weak int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned max_ratio)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdi_set_max_ratio);

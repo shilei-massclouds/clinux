@@ -5254,87 +5254,87 @@ void show_workqueue_state(void)
 //	mutex_unlock(&wq_pool_mutex);
 //}
 //#endif /* CONFIG_FREEZER */
-//
-//static int workqueue_apply_unbound_cpumask(void)
-//{
-//	LIST_HEAD(ctxs);
-//	int ret = 0;
-//	struct workqueue_struct *wq;
-//	struct apply_wqattrs_ctx *ctx, *n;
-//
-//	lockdep_assert_held(&wq_pool_mutex);
-//
-//	list_for_each_entry(wq, &workqueues, list) {
-//		if (!(wq->flags & WQ_UNBOUND))
-//			continue;
-//		/* creating multiple pwqs breaks ordering guarantee */
-//		if (wq->flags & __WQ_ORDERED)
-//			continue;
-//
-//		ctx = apply_wqattrs_prepare(wq, wq->unbound_attrs);
-//		if (!ctx) {
-//			ret = -ENOMEM;
-//			break;
-//		}
-//
-//		list_add_tail(&ctx->list, &ctxs);
-//	}
-//
-//	list_for_each_entry_safe(ctx, n, &ctxs, list) {
-//		if (!ret)
-//			apply_wqattrs_commit(ctx);
-//		apply_wqattrs_cleanup(ctx);
-//	}
-//
-//	return ret;
-//}
-//
-///**
-// *  workqueue_set_unbound_cpumask - Set the low-level unbound cpumask
-// *  @cpumask: the cpumask to set
-// *
-// *  The low-level workqueues cpumask is a global cpumask that limits
-// *  the affinity of all unbound workqueues.  This function check the @cpumask
-// *  and apply it to all unbound workqueues and updates all pwqs of them.
-// *
-// *  Retun:	0	- Success
-// *  		-EINVAL	- Invalid @cpumask
-// *  		-ENOMEM	- Failed to allocate memory for attrs or pwqs.
-// */
-//int workqueue_set_unbound_cpumask(cpumask_var_t cpumask)
-//{
-//	int ret = -EINVAL;
-//	cpumask_var_t saved_cpumask;
-//
-//	if (!zalloc_cpumask_var(&saved_cpumask, GFP_KERNEL))
-//		return -ENOMEM;
-//
-//	/*
-//	 * Not excluding isolated cpus on purpose.
-//	 * If the user wishes to include them, we allow that.
-//	 */
-//	cpumask_and(cpumask, cpumask, cpu_possible_mask);
-//	if (!cpumask_empty(cpumask)) {
-//		apply_wqattrs_lock();
-//
-//		/* save the old wq_unbound_cpumask. */
-//		cpumask_copy(saved_cpumask, wq_unbound_cpumask);
-//
-//		/* update wq_unbound_cpumask at first and apply it to wqs. */
-//		cpumask_copy(wq_unbound_cpumask, cpumask);
-//		ret = workqueue_apply_unbound_cpumask();
-//
-//		/* restore the wq_unbound_cpumask when failed. */
-//		if (ret < 0)
-//			cpumask_copy(wq_unbound_cpumask, saved_cpumask);
-//
-//		apply_wqattrs_unlock();
-//	}
-//
-//	free_cpumask_var(saved_cpumask);
-//	return ret;
-//}
-//
+
+static int workqueue_apply_unbound_cpumask(void)
+{
+	LIST_HEAD(ctxs);
+	int ret = 0;
+	struct workqueue_struct *wq;
+	struct apply_wqattrs_ctx *ctx, *n;
+
+	lockdep_assert_held(&wq_pool_mutex);
+
+	list_for_each_entry(wq, &workqueues, list) {
+		if (!(wq->flags & WQ_UNBOUND))
+			continue;
+		/* creating multiple pwqs breaks ordering guarantee */
+		if (wq->flags & __WQ_ORDERED)
+			continue;
+
+		ctx = apply_wqattrs_prepare(wq, wq->unbound_attrs);
+		if (!ctx) {
+			ret = -ENOMEM;
+			break;
+		}
+
+		list_add_tail(&ctx->list, &ctxs);
+	}
+
+	list_for_each_entry_safe(ctx, n, &ctxs, list) {
+		if (!ret)
+			apply_wqattrs_commit(ctx);
+		apply_wqattrs_cleanup(ctx);
+	}
+
+	return ret;
+}
+
+/**
+ *  workqueue_set_unbound_cpumask - Set the low-level unbound cpumask
+ *  @cpumask: the cpumask to set
+ *
+ *  The low-level workqueues cpumask is a global cpumask that limits
+ *  the affinity of all unbound workqueues.  This function check the @cpumask
+ *  and apply it to all unbound workqueues and updates all pwqs of them.
+ *
+ *  Retun:	0	- Success
+ *  		-EINVAL	- Invalid @cpumask
+ *  		-ENOMEM	- Failed to allocate memory for attrs or pwqs.
+ */
+int workqueue_set_unbound_cpumask(cpumask_var_t cpumask)
+{
+	int ret = -EINVAL;
+	cpumask_var_t saved_cpumask;
+
+	if (!zalloc_cpumask_var(&saved_cpumask, GFP_KERNEL))
+		return -ENOMEM;
+
+	/*
+	 * Not excluding isolated cpus on purpose.
+	 * If the user wishes to include them, we allow that.
+	 */
+	cpumask_and(cpumask, cpumask, cpu_possible_mask);
+	if (!cpumask_empty(cpumask)) {
+		apply_wqattrs_lock();
+
+		/* save the old wq_unbound_cpumask. */
+		cpumask_copy(saved_cpumask, wq_unbound_cpumask);
+
+		/* update wq_unbound_cpumask at first and apply it to wqs. */
+		cpumask_copy(wq_unbound_cpumask, cpumask);
+		ret = workqueue_apply_unbound_cpumask();
+
+		/* restore the wq_unbound_cpumask when failed. */
+		if (ret < 0)
+			cpumask_copy(wq_unbound_cpumask, saved_cpumask);
+
+		apply_wqattrs_unlock();
+	}
+
+	free_cpumask_var(saved_cpumask);
+	return ret;
+}
+
 #ifdef CONFIG_SYSFS
 /*
  * Workqueues with WQ_SYSFS flag set is visible to userland via
@@ -5566,51 +5566,51 @@ static struct bus_type wq_subsys = {
 	.dev_groups			= wq_sysfs_groups,
 };
 
-//static ssize_t wq_unbound_cpumask_show(struct device *dev,
-//		struct device_attribute *attr, char *buf)
-//{
-//	int written;
-//
-//	mutex_lock(&wq_pool_mutex);
-//	written = scnprintf(buf, PAGE_SIZE, "%*pb\n",
-//			    cpumask_pr_args(wq_unbound_cpumask));
-//	mutex_unlock(&wq_pool_mutex);
-//
-//	return written;
-//}
-//
-//static ssize_t wq_unbound_cpumask_store(struct device *dev,
-//		struct device_attribute *attr, const char *buf, size_t count)
-//{
-//	cpumask_var_t cpumask;
-//	int ret;
-//
-//	if (!zalloc_cpumask_var(&cpumask, GFP_KERNEL))
-//		return -ENOMEM;
-//
-//	ret = cpumask_parse(buf, cpumask);
-//	if (!ret)
-//		ret = workqueue_set_unbound_cpumask(cpumask);
-//
-//	free_cpumask_var(cpumask);
-//	return ret ? ret : count;
-//}
-//
-//static struct device_attribute wq_sysfs_cpumask_attr =
-//	__ATTR(cpumask, 0644, wq_unbound_cpumask_show,
-//	       wq_unbound_cpumask_store);
-//
-//static int __init wq_sysfs_init(void)
-//{
-//	int err;
-//
-//	err = subsys_virtual_register(&wq_subsys, NULL);
-//	if (err)
-//		return err;
-//
-//	return device_create_file(wq_subsys.dev_root, &wq_sysfs_cpumask_attr);
-//}
-//core_initcall(wq_sysfs_init);
+static ssize_t wq_unbound_cpumask_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	int written;
+
+	mutex_lock(&wq_pool_mutex);
+	written = scnprintf(buf, PAGE_SIZE, "%*pb\n",
+			    cpumask_pr_args(wq_unbound_cpumask));
+	mutex_unlock(&wq_pool_mutex);
+
+	return written;
+}
+
+static ssize_t wq_unbound_cpumask_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	cpumask_var_t cpumask;
+	int ret;
+
+	if (!zalloc_cpumask_var(&cpumask, GFP_KERNEL))
+		return -ENOMEM;
+
+	ret = cpumask_parse(buf, cpumask);
+	if (!ret)
+		ret = workqueue_set_unbound_cpumask(cpumask);
+
+	free_cpumask_var(cpumask);
+	return ret ? ret : count;
+}
+
+static struct device_attribute wq_sysfs_cpumask_attr =
+	__ATTR(cpumask, 0644, wq_unbound_cpumask_show,
+	       wq_unbound_cpumask_store);
+
+static int __init wq_sysfs_init(void)
+{
+	int err;
+
+	err = subsys_virtual_register(&wq_subsys, NULL);
+	if (err)
+		return err;
+
+	return device_create_file(wq_subsys.dev_root, &wq_sysfs_cpumask_attr);
+}
+core_initcall(wq_sysfs_init);
 
 static void wq_device_release(struct device *dev)
 {

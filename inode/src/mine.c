@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(bdi_alloc)
 CL_MINE(bdi_register_va)
 CL_MINE(blkdev_get_by_path)
 CL_MINE(emergency_thaw_bdev)

@@ -1223,6 +1223,7 @@ static int __init genhd_device_init(void)
 {
 	int error;
 
+    printk("%s: ...\n", __func__);
 	block_class.dev_kobj = sysfs_dev_block_kobj;
 	error = class_register(&block_class);
 	if (unlikely(error))

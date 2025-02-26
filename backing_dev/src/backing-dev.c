@@ -14,11 +14,6 @@
 #include <linux/device.h>
 #include <trace/events/writeback.h>
 
-struct backing_dev_info noop_backing_dev_info = {
-	.capabilities	= BDI_CAP_NO_ACCT_AND_WRITEBACK,
-};
-EXPORT_SYMBOL_GPL(noop_backing_dev_info);
-
 static struct class *bdi_class;
 static const char *bdi_unknown_name = "(unknown)";
 
@@ -134,126 +129,127 @@ static inline void bdi_debug_unregister(struct backing_dev_info *bdi)
 {
 }
 #endif
-//
-//static ssize_t read_ahead_kb_store(struct device *dev,
-//				  struct device_attribute *attr,
-//				  const char *buf, size_t count)
-//{
-//	struct backing_dev_info *bdi = dev_get_drvdata(dev);
-//	unsigned long read_ahead_kb;
-//	ssize_t ret;
-//
-//	ret = kstrtoul(buf, 10, &read_ahead_kb);
-//	if (ret < 0)
-//		return ret;
-//
-//	bdi->ra_pages = read_ahead_kb >> (PAGE_SHIFT - 10);
-//
-//	return count;
-//}
-//
-//#define K(pages) ((pages) << (PAGE_SHIFT - 10))
-//
-//#define BDI_SHOW(name, expr)						\
-//static ssize_t name##_show(struct device *dev,				\
-//			   struct device_attribute *attr, char *page)	\
-//{									\
-//	struct backing_dev_info *bdi = dev_get_drvdata(dev);		\
-//									\
-//	return snprintf(page, PAGE_SIZE-1, "%lld\n", (long long)expr);	\
-//}									\
-//static DEVICE_ATTR_RW(name);
-//
-//BDI_SHOW(read_ahead_kb, K(bdi->ra_pages))
-//
-//static ssize_t min_ratio_store(struct device *dev,
-//		struct device_attribute *attr, const char *buf, size_t count)
-//{
-//	struct backing_dev_info *bdi = dev_get_drvdata(dev);
-//	unsigned int ratio;
-//	ssize_t ret;
-//
-//	ret = kstrtouint(buf, 10, &ratio);
-//	if (ret < 0)
-//		return ret;
-//
-//	ret = bdi_set_min_ratio(bdi, ratio);
-//	if (!ret)
-//		ret = count;
-//
-//	return ret;
-//}
-//BDI_SHOW(min_ratio, bdi->min_ratio)
-//
-//static ssize_t max_ratio_store(struct device *dev,
-//		struct device_attribute *attr, const char *buf, size_t count)
-//{
-//	struct backing_dev_info *bdi = dev_get_drvdata(dev);
-//	unsigned int ratio;
-//	ssize_t ret;
-//
-//	ret = kstrtouint(buf, 10, &ratio);
-//	if (ret < 0)
-//		return ret;
-//
-//	ret = bdi_set_max_ratio(bdi, ratio);
-//	if (!ret)
-//		ret = count;
-//
-//	return ret;
-//}
-//BDI_SHOW(max_ratio, bdi->max_ratio)
-//
-//static ssize_t stable_pages_required_show(struct device *dev,
-//					  struct device_attribute *attr,
-//					  char *page)
-//{
-//	struct backing_dev_info *bdi = dev_get_drvdata(dev);
-//
-//	return snprintf(page, PAGE_SIZE-1, "%d\n",
-//			bdi_cap_stable_pages_required(bdi) ? 1 : 0);
-//}
-//static DEVICE_ATTR_RO(stable_pages_required);
-//
-//static struct attribute *bdi_dev_attrs[] = {
-//	&dev_attr_read_ahead_kb.attr,
-//	&dev_attr_min_ratio.attr,
-//	&dev_attr_max_ratio.attr,
-//	&dev_attr_stable_pages_required.attr,
-//	NULL,
-//};
-//ATTRIBUTE_GROUPS(bdi_dev);
-//
-//static __init int bdi_class_init(void)
-//{
-//	bdi_class = class_create(THIS_MODULE, "bdi");
-//	if (IS_ERR(bdi_class))
-//		return PTR_ERR(bdi_class);
-//
-//	bdi_class->dev_groups = bdi_dev_groups;
-//	bdi_debug_init();
-//
-//	return 0;
-//}
-//postcore_initcall(bdi_class_init);
-//
-//static int bdi_init(struct backing_dev_info *bdi);
-//
-//static int __init default_bdi_init(void)
-//{
-//	int err;
-//
-//	bdi_wq = alloc_workqueue("writeback", WQ_MEM_RECLAIM | WQ_UNBOUND |
-//				 WQ_SYSFS, 0);
-//	if (!bdi_wq)
-//		return -ENOMEM;
-//
-//	err = bdi_init(&noop_backing_dev_info);
-//
-//	return err;
-//}
-//subsys_initcall(default_bdi_init);
-//
+
+static ssize_t read_ahead_kb_store(struct device *dev,
+				  struct device_attribute *attr,
+				  const char *buf, size_t count)
+{
+	struct backing_dev_info *bdi = dev_get_drvdata(dev);
+	unsigned long read_ahead_kb;
+	ssize_t ret;
+
+	ret = kstrtoul(buf, 10, &read_ahead_kb);
+	if (ret < 0)
+		return ret;
+
+	bdi->ra_pages = read_ahead_kb >> (PAGE_SHIFT - 10);
+
+	return count;
+}
+
+#define K(pages) ((pages) << (PAGE_SHIFT - 10))
+
+#define BDI_SHOW(name, expr)						\
+static ssize_t name##_show(struct device *dev,				\
+			   struct device_attribute *attr, char *page)	\
+{									\
+	struct backing_dev_info *bdi = dev_get_drvdata(dev);		\
+									\
+	return snprintf(page, PAGE_SIZE-1, "%lld\n", (long long)expr);	\
+}									\
+static DEVICE_ATTR_RW(name);
+
+BDI_SHOW(read_ahead_kb, K(bdi->ra_pages))
+
+static ssize_t min_ratio_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct backing_dev_info *bdi = dev_get_drvdata(dev);
+	unsigned int ratio;
+	ssize_t ret;
+
+	ret = kstrtouint(buf, 10, &ratio);
+	if (ret < 0)
+		return ret;
+
+	ret = bdi_set_min_ratio(bdi, ratio);
+	if (!ret)
+		ret = count;
+
+	return ret;
+}
+BDI_SHOW(min_ratio, bdi->min_ratio)
+
+static ssize_t max_ratio_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct backing_dev_info *bdi = dev_get_drvdata(dev);
+	unsigned int ratio;
+	ssize_t ret;
+
+	ret = kstrtouint(buf, 10, &ratio);
+	if (ret < 0)
+		return ret;
+
+	ret = bdi_set_max_ratio(bdi, ratio);
+	if (!ret)
+		ret = count;
+
+	return ret;
+}
+BDI_SHOW(max_ratio, bdi->max_ratio)
+
+static ssize_t stable_pages_required_show(struct device *dev,
+					  struct device_attribute *attr,
+					  char *page)
+{
+	struct backing_dev_info *bdi = dev_get_drvdata(dev);
+
+	return snprintf(page, PAGE_SIZE-1, "%d\n",
+			bdi_cap_stable_pages_required(bdi) ? 1 : 0);
+}
+static DEVICE_ATTR_RO(stable_pages_required);
+
+static struct attribute *bdi_dev_attrs[] = {
+	&dev_attr_read_ahead_kb.attr,
+	&dev_attr_min_ratio.attr,
+	&dev_attr_max_ratio.attr,
+	&dev_attr_stable_pages_required.attr,
+	NULL,
+};
+ATTRIBUTE_GROUPS(bdi_dev);
+
+static __init int bdi_class_init(void)
+{
+	bdi_class = class_create(THIS_MODULE, "bdi");
+	if (IS_ERR(bdi_class))
+		return PTR_ERR(bdi_class);
+
+	bdi_class->dev_groups = bdi_dev_groups;
+	bdi_debug_init();
+
+	return 0;
+}
+postcore_initcall(bdi_class_init);
+
+static int bdi_init(struct backing_dev_info *bdi);
+
+static int __init default_bdi_init(void)
+{
+	int err;
+
+    printk("%s: ...\n", __func__);
+	bdi_wq = alloc_workqueue("writeback", WQ_MEM_RECLAIM | WQ_UNBOUND |
+				 WQ_SYSFS, 0);
+	if (!bdi_wq)
+		return -ENOMEM;
+
+	err = bdi_init(&noop_backing_dev_info);
+
+	return err;
+}
+subsys_initcall(default_bdi_init);
+
 ///*
 // * This function is used when the first inode for this wb is marked dirty. It
 // * wakes-up the corresponding bdi thread which should then take care of the
@@ -719,41 +715,41 @@ static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
 
 #endif	/* CONFIG_CGROUP_WRITEBACK */
 
-//static int bdi_init(struct backing_dev_info *bdi)
-//{
-//	int ret;
-//
-//	bdi->dev = NULL;
-//
-//	kref_init(&bdi->refcnt);
-//	bdi->min_ratio = 0;
-//	bdi->max_ratio = 100;
-//	bdi->max_prop_frac = FPROP_FRAC_BASE;
-//	INIT_LIST_HEAD(&bdi->bdi_list);
-//	INIT_LIST_HEAD(&bdi->wb_list);
-//	init_waitqueue_head(&bdi->wb_waitq);
-//
-//	ret = cgwb_bdi_init(bdi);
-//
-//	return ret;
-//}
-//
-//struct backing_dev_info *bdi_alloc(int node_id)
-//{
-//	struct backing_dev_info *bdi;
-//
-//	bdi = kzalloc_node(sizeof(*bdi), GFP_KERNEL, node_id);
-//	if (!bdi)
-//		return NULL;
-//
-//	if (bdi_init(bdi)) {
-//		kfree(bdi);
-//		return NULL;
-//	}
-//	return bdi;
-//}
-//EXPORT_SYMBOL(bdi_alloc);
-//
+static int bdi_init(struct backing_dev_info *bdi)
+{
+	int ret;
+
+	bdi->dev = NULL;
+
+	kref_init(&bdi->refcnt);
+	bdi->min_ratio = 0;
+	bdi->max_ratio = 100;
+	bdi->max_prop_frac = FPROP_FRAC_BASE;
+	INIT_LIST_HEAD(&bdi->bdi_list);
+	INIT_LIST_HEAD(&bdi->wb_list);
+	init_waitqueue_head(&bdi->wb_waitq);
+
+	ret = cgwb_bdi_init(bdi);
+
+	return ret;
+}
+
+struct backing_dev_info *bdi_alloc(int node_id)
+{
+	struct backing_dev_info *bdi;
+
+	bdi = kzalloc_node(sizeof(*bdi), GFP_KERNEL, node_id);
+	if (!bdi)
+		return NULL;
+
+	if (bdi_init(bdi)) {
+		kfree(bdi);
+		return NULL;
+	}
+	return bdi;
+}
+EXPORT_SYMBOL(bdi_alloc);
+
 //static struct rb_node **bdi_lookup_rb_node(u64 id, struct rb_node **parentp)
 //{
 //	struct rb_node **p = &bdi_tree.rb_node;

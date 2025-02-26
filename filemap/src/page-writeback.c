@@ -109,11 +109,6 @@ EXPORT_SYMBOL_GPL(dirty_writeback_interval);
 unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
 EXPORT_SYMBOL_GPL(dirty_expire_interval);
 
-/*
- * Flag that makes the machine dump writes/reads and block dirtyings.
- */
-int block_dump;
-EXPORT_SYMBOL(block_dump);
 
 /*
  * Flag that puts the machine in "laptop mode". Doubles as a timeout in jiffies:
@@ -709,7 +704,6 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned max_ratio)
 
 	return ret;
 }
-EXPORT_SYMBOL(bdi_set_max_ratio);
 
 static unsigned long dirty_freerun_ceiling(unsigned long thresh,
 					   unsigned long bg_thresh)

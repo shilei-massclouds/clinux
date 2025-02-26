@@ -575,7 +575,6 @@ struct dentry *debugfs_create_dir(const char *name, struct dentry *parent)
 	fsnotify_mkdir(d_inode(dentry->d_parent), dentry);
 	return end_creating(dentry);
 }
-EXPORT_SYMBOL_GPL(debugfs_create_dir);
 
 /**
  * debugfs_create_automount - create automount point in the debugfs filesystem
