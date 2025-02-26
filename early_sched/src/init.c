@@ -458,3 +458,16 @@ prepare_to_wait_exclusive(struct wait_queue_head *wq_head, struct wait_queue_ent
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(prepare_to_wait_exclusive);
+
+__weak void __sched wait_for_completion_io(struct completion *x)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(wait_for_completion_io);
+
+__weak unsigned long __sched
+wait_for_completion_io_timeout(struct completion *x, unsigned long timeout)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(wait_for_completion_io_timeout);

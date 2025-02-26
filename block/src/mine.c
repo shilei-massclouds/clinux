@@ -1,13 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(bio_advance)
-CL_MINE(bio_clone_fast)
-CL_MINE(bio_devname)
-CL_MINE(bio_endio)
-CL_MINE(bio_put)
-CL_MINE(bioset_exit)
-CL_MINE(bioset_init)
 CL_MINE(blk_alloc_queue_stats)
 CL_MINE(blk_free_queue_stats)
 CL_MINE(blk_mq_sched_free_requests)

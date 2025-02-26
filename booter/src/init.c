@@ -2397,3 +2397,29 @@ void elevator_init_mq(struct request_queue *q)
 }
 EXPORT_SYMBOL(elevator_init_mq);
 
+__weak blk_qc_t submit_bio(struct bio *bio)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(submit_bio);
+
+__weak blk_qc_t submit_bio_noacct(struct bio *bio)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(submit_bio_noacct);
+
+__weak int blk_status_to_errno(blk_status_t status)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(blk_status_to_errno);
+
+__weak char *disk_name(struct gendisk *hd, int partno, char *buf)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(disk_name);
+
+unsigned long __read_mostly sysctl_hung_task_timeout_secs = CONFIG_DEFAULT_HUNG_TASK_TIMEOUT;
+EXPORT_SYMBOL(sysctl_hung_task_timeout_secs);

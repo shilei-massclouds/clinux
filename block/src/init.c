@@ -16,7 +16,4 @@ cl_block_init(void)
 }
 EXPORT_SYMBOL(cl_block_init);
 
-unsigned long __read_mostly sysctl_hung_task_timeout_secs = CONFIG_DEFAULT_HUNG_TASK_TIMEOUT;
-
 struct kobj_type blk_queue_ktype;
-struct bio_set fs_bio_set;

@@ -211,7 +211,6 @@ int blk_status_to_errno(blk_status_t status)
 		return -EIO;
 	return blk_errors[idx].errno;
 }
-EXPORT_SYMBOL_GPL(blk_status_to_errno);
 
 static void print_req_error(struct request *req, blk_status_t status,
 		const char *caller)
@@ -1213,7 +1212,6 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
 		return __submit_bio_noacct_mq(bio);
 	return __submit_bio_noacct(bio);
 }
-EXPORT_SYMBOL(submit_bio_noacct);
 
 /**
  * submit_bio - submit a bio to the block device layer for I/O
@@ -1282,7 +1280,6 @@ blk_qc_t submit_bio(struct bio *bio)
 
 	return submit_bio_noacct(bio);
 }
-EXPORT_SYMBOL(submit_bio);
 
 /**
  * blk_cloned_rq_check_limits - Helper function to check a cloned request
