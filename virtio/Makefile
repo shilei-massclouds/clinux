@@ -2,3 +2,4 @@
 
 obj_y := init.o
 obj_y += virtio.o
+obj_y += virtio_ring.o

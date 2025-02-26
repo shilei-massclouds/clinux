@@ -5135,25 +5135,25 @@ EXPORT_SYMBOL(alloc_pages_exact);
 //		return NULL;
 //	return make_alloc_exact((unsigned long)page_address(p), order, size);
 //}
-//
-///**
-// * free_pages_exact - release memory allocated via alloc_pages_exact()
-// * @virt: the value returned by alloc_pages_exact.
-// * @size: size of allocation, same value as passed to alloc_pages_exact().
-// *
-// * Release the memory allocated by a previous call to alloc_pages_exact.
-// */
-//void free_pages_exact(void *virt, size_t size)
-//{
-//	unsigned long addr = (unsigned long)virt;
-//	unsigned long end = addr + PAGE_ALIGN(size);
-//
-//	while (addr < end) {
-//		free_page(addr);
-//		addr += PAGE_SIZE;
-//	}
-//}
-//EXPORT_SYMBOL(free_pages_exact);
+
+/**
+ * free_pages_exact - release memory allocated via alloc_pages_exact()
+ * @virt: the value returned by alloc_pages_exact.
+ * @size: size of allocation, same value as passed to alloc_pages_exact().
+ *
+ * Release the memory allocated by a previous call to alloc_pages_exact.
+ */
+void free_pages_exact(void *virt, size_t size)
+{
+	unsigned long addr = (unsigned long)virt;
+	unsigned long end = addr + PAGE_ALIGN(size);
+
+	while (addr < end) {
+		free_page(addr);
+		addr += PAGE_SIZE;
+	}
+}
+EXPORT_SYMBOL(free_pages_exact);
 
 /**
  * nr_free_zone_pages - count number of pages beyond high watermark
