@@ -2015,6 +2015,7 @@ void disk_unblock_events(struct gendisk *disk)
 	if (disk->ev)
 		__disk_unblock_events(disk, false);
 }
+EXPORT_SYMBOL(disk_unblock_events);
 
 /**
  * disk_flush_events - schedule immediate event checking and flushing
@@ -2042,6 +2043,7 @@ void disk_flush_events(struct gendisk *disk, unsigned int mask)
 				&ev->dwork, 0);
 	spin_unlock_irq(&ev->lock);
 }
+EXPORT_SYMBOL(disk_flush_events);
 
 /**
  * disk_clear_events - synchronously check, clear and return pending events

@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/fs.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -14,6 +15,7 @@ cl_block_dev_init(void)
 }
 EXPORT_SYMBOL(cl_block_dev_init);
 
+DEFINE_ENABLE_FUNC(block_dev);
 void invalidate_inode_buffers(struct inode *inode)
 {
     booter_panic("No impl!\n");

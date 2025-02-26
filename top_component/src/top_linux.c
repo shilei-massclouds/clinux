@@ -1019,6 +1019,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(drv_clk);
     REQUIRE_COMPONENT(fs_writeback);
     REQUIRE_COMPONENT(noinitramfs);
+    REQUIRE_COMPONENT(block_dev);
 
     //
     // start_kernel (init/main.c)

@@ -2273,3 +2273,15 @@ __weak int bdev_read_only(struct block_device *bdev)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(bdev_read_only);
+
+__weak void bdput(struct block_device *bdev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(bdput);
+
+__weak int sync_blockdev(struct block_device *bdev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sync_blockdev);

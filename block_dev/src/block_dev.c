@@ -487,7 +487,6 @@ int sync_blockdev(struct block_device *bdev)
 {
 	return __sync_blockdev(bdev, 1);
 }
-EXPORT_SYMBOL(sync_blockdev);
 
 ///*
 // * Write out and wait upon all dirty data associated with this
@@ -918,7 +917,6 @@ void bdput(struct block_device *bdev)
 	iput(bdev->bd_inode);
 }
 
-EXPORT_SYMBOL(bdput);
  
 //static struct block_device *bd_acquire(struct inode *inode)
 //{
