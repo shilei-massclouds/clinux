@@ -2452,11 +2452,17 @@ EXPORT_SYMBOL_GPL(ptep_clear_flush);
 __cacheline_aligned_in_smp DEFINE_SPINLOCK(mmlist_lock);
 EXPORT_SYMBOL(mmlist_lock);
 
-void dump_vma(const struct vm_area_struct *vma)
+__weak void dump_vma(const struct vm_area_struct *vma)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(dump_vma);
+
+__weak void dump_page(struct page *page, const char *reason)
+{
+    booter_panic("No impl 'dump_page'.");
+}
+EXPORT_SYMBOL(dump_page);
 
 __weak int anon_vma_clone(struct vm_area_struct *dst, struct vm_area_struct *src)
 {
@@ -2831,3 +2837,9 @@ DEFINE_SPINLOCK(bdi_lock);
 EXPORT_SYMBOL(bdi_lock);
 LIST_HEAD(bdi_list);
 EXPORT_SYMBOL(bdi_list);
+
+__weak struct address_space *page_mapping(struct page *page)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(page_mapping);

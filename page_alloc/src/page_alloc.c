@@ -7504,60 +7504,61 @@ EXPORT_SYMBOL(setup_per_cpu_pageset);
 //
 //early_param("kernelcore", cmdline_parse_kernelcore);
 //early_param("movablecore", cmdline_parse_movablecore);
-//
-//void adjust_managed_page_count(struct page *page, long count)
-//{
-//	atomic_long_add(count, &page_zone(page)->managed_pages);
-//	totalram_pages_add(count);
-//#ifdef CONFIG_HIGHMEM
-//	if (PageHighMem(page))
-//		totalhigh_pages_add(count);
-//#endif
-//}
-//EXPORT_SYMBOL(adjust_managed_page_count);
-//
-//unsigned long free_reserved_area(void *start, void *end, int poison, const char *s)
-//{
-//	void *pos;
-//	unsigned long pages = 0;
-//
-//	start = (void *)PAGE_ALIGN((unsigned long)start);
-//	end = (void *)((unsigned long)end & PAGE_MASK);
-//	for (pos = start; pos < end; pos += PAGE_SIZE, pages++) {
-//		struct page *page = virt_to_page(pos);
-//		void *direct_map_addr;
-//
-//		/*
-//		 * 'direct_map_addr' might be different from 'pos'
-//		 * because some architectures' virt_to_page()
-//		 * work with aliases.  Getting the direct map
-//		 * address ensures that we get a _writeable_
-//		 * alias for the memset().
-//		 */
-//		direct_map_addr = page_address(page);
-//		if ((unsigned int)poison <= 0xFF)
-//			memset(direct_map_addr, poison, PAGE_SIZE);
-//
-//		free_reserved_page(page);
-//	}
-//
-//	if (pages && s)
-//		pr_info("Freeing %s memory: %ldK\n",
-//			s, pages << (PAGE_SHIFT - 10));
-//
-//	return pages;
-//}
-//
-//#ifdef	CONFIG_HIGHMEM
-//void free_highmem_page(struct page *page)
-//{
-//	__free_reserved_page(page);
-//	totalram_pages_inc();
-//	atomic_long_inc(&page_zone(page)->managed_pages);
-//	totalhigh_pages_inc();
-//}
-//#endif
-//
+
+void adjust_managed_page_count(struct page *page, long count)
+{
+	atomic_long_add(count, &page_zone(page)->managed_pages);
+	totalram_pages_add(count);
+#ifdef CONFIG_HIGHMEM
+	if (PageHighMem(page))
+		totalhigh_pages_add(count);
+#endif
+}
+EXPORT_SYMBOL(adjust_managed_page_count);
+
+unsigned long free_reserved_area(void *start, void *end, int poison, const char *s)
+{
+	void *pos;
+	unsigned long pages = 0;
+
+	start = (void *)PAGE_ALIGN((unsigned long)start);
+	end = (void *)((unsigned long)end & PAGE_MASK);
+	for (pos = start; pos < end; pos += PAGE_SIZE, pages++) {
+		struct page *page = virt_to_page(pos);
+		void *direct_map_addr;
+
+		/*
+		 * 'direct_map_addr' might be different from 'pos'
+		 * because some architectures' virt_to_page()
+		 * work with aliases.  Getting the direct map
+		 * address ensures that we get a _writeable_
+		 * alias for the memset().
+		 */
+		direct_map_addr = page_address(page);
+		if ((unsigned int)poison <= 0xFF)
+			memset(direct_map_addr, poison, PAGE_SIZE);
+
+		free_reserved_page(page);
+	}
+
+	if (pages && s)
+		pr_info("Freeing %s memory: %ldK\n",
+			s, pages << (PAGE_SHIFT - 10));
+
+	return pages;
+}
+EXPORT_SYMBOL(free_reserved_area);
+
+#ifdef	CONFIG_HIGHMEM
+void free_highmem_page(struct page *page)
+{
+	__free_reserved_page(page);
+	totalram_pages_inc();
+	atomic_long_inc(&page_zone(page)->managed_pages);
+	totalhigh_pages_inc();
+}
+#endif
+
 
 void __init mem_init_print_info(const char *str)
 {

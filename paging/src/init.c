@@ -20,12 +20,6 @@ cl_paging_init(void)
 }
 EXPORT_SYMBOL(cl_paging_init);
 
-void dump_page(struct page *page, const char *reason)
-{
-    booter_panic("No impl 'dump_page'.");
-}
-EXPORT_SYMBOL(dump_page);
-
 void __weak __free_pages(struct page *page, unsigned int order)
 {
     booter_panic("No impl.");

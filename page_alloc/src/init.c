@@ -23,12 +23,12 @@ void print_modules(void)
 {
     booter_panic("No impl 'page_alloc'.");
 }
-*/
 
 void __dump_page(struct page *page, const char *reason)
 {
     booter_panic("No impl 'page_alloc'.");
 }
+*/
 
 /*
 unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
@@ -36,12 +36,12 @@ unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
 {
     booter_panic("No impl 'page_alloc'.");
 }
-*/
 
 void __kernel_map_pages(struct page *page, int numpages, int enable)
 {
     booter_panic("No impl 'page_alloc'.");
 }
+*/
 
 bool out_of_memory(struct oom_control *oc)
 {

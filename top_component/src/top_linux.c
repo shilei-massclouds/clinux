@@ -30,10 +30,12 @@
 #include <linux/sched/isolation.h>
 #include <linux/sched/clock.h>
 #include <linux/context_tracking.h>
+#include <linux/kprobes.h>
 #include <linux/random.h>
 #include <linux/stackprotector.h>
 #include <linux/perf_event.h>
 #include <linux/profile.h>
+#include <linux/async.h>
 #include <linux/console.h>
 #include <linux/mempolicy.h>
 #include <linux/acpi.h>
@@ -43,6 +45,8 @@
 #include <linux/buffer_head.h>
 #include <linux/kgdb.h>
 #include <linux/init_syscalls.h>
+#include <linux/integrity.h>
+#include <linux/rodata_test.h>
 #include <asm/bugs.h>
 #include <asm/pgtable.h>
 #include <asm/sbi.h>
@@ -82,6 +86,15 @@ static initcall_entry_t *initcall_levels[] __initdata = {
     __initcall7_start,
     __initcall_end,
 };
+
+#if defined(CONFIG_STRICT_KERNEL_RWX) || defined(CONFIG_STRICT_MODULE_RWX)
+bool rodata_enabled __ro_after_init = true;
+static int __init set_debug_rodata(char *str)
+{
+    return strtobool(str, &rodata_enabled);
+}
+__setup("rodata=", set_debug_rodata);
+#endif
 
 /* Untouched saved command line (eg. for /proc) */
 extern char *saved_command_line;
@@ -679,19 +692,52 @@ int __init_or_module do_one_initcall(initcall_t fn)
     return ret;
 }
 
+#ifdef CONFIG_STRICT_KERNEL_RWX
+static void mark_readonly(void)
+{
+    if (rodata_enabled) {
+        /*
+         * load_module() results in W+X mappings, which are cleaned
+         * up with call_rcu().  Let's make sure that queued work is
+         * flushed so that we don't hit false positives looking for
+         * insecure pages which are W+X.
+         */
+        rcu_barrier();
+        mark_rodata_ro();
+        rodata_test();
+    } else
+        pr_info("Kernel memory protection disabled.\n");
+}
+#elif defined(CONFIG_ARCH_HAS_STRICT_KERNEL_RWX)
+static inline void mark_readonly(void)
+{
+    pr_warn("Kernel memory protection not selected by kernel config.\n");
+}
+#else
+static inline void mark_readonly(void)
+{
+    pr_warn("This architecture does not have kernel memory protection.\n");
+}
+#endif
+
+void __weak free_initmem(void)
+{
+    free_initmem_default(POISON_FREE_INITMEM);
+}
+
 static int __ref kernel_init(void *unused)
 {
     int ret;
 
-    sbi_puts("kernel_init: ============ 0\n");
     kernel_init_freeable();
     sbi_puts("kernel_init: ============ 1\n");
     /* need to finish all async __init code before freeing the memory */
-//    async_synchronize_full();
-//    kprobe_free_init_mem();
-//    ftrace_free_init_mem();
-//    free_initmem();
-//    mark_readonly();
+    async_synchronize_full();
+    kprobe_free_init_mem();
+    ftrace_free_init_mem();
+    free_initmem();
+    mark_readonly();
+    sbi_puts("kernel_init: ============ 2\n");
 
 //    /*
 //     * Kernel mappings are now finalized - update the userspace page-table
@@ -955,9 +1001,7 @@ static noinline void __init kernel_init_freeable(void)
 
     do_basic_setup();
 
-    sbi_puts("kernel_init_freeable: ============ 1 \n");
     console_on_rootfs();
-    sbi_puts("kernel_init_freeable: ============ 2 \n");
 
     /*
      * check if there is an early userspace init.  If yes, let it do all
@@ -968,17 +1012,16 @@ static noinline void __init kernel_init_freeable(void)
         prepare_namespace();
     }
 
-//    /*
-//     * Ok, we have completed the initial bootup, and
-//     * we're essentially up and running. Get rid of the
-//     * initmem segments and start the user-mode stuff..
-//     *
-//     * rootfs is available now, try loading the public keys
-//     * and default modules
-//     */
-//
-//    integrity_load_keys();
-    panic("kernel_init_freeable end!\n");
+    /*
+     * Ok, we have completed the initial bootup, and
+     * we're essentially up and running. Get rid of the
+     * initmem segments and start the user-mode stuff..
+     *
+     * rootfs is available now, try loading the public keys
+     * and default modules
+     */
+
+    integrity_load_keys();
 }
 
 int

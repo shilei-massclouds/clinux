@@ -14,6 +14,8 @@
 #include <linux/notifier.h>
 #include <linux/sched.h>
 #include <linux/mman.h>
+#include <asm/set_memory.h>
+#include <asm/ptdump.h>
 #include "internal.h"
 
 #ifdef CONFIG_DEBUG_MEMORY_INIT
@@ -207,3 +209,22 @@ static int __init mm_sysfs_init(void)
 }
 postcore_initcall(mm_sysfs_init);
 */
+
+#ifdef CONFIG_STRICT_KERNEL_RWX
+void mark_rodata_ro(void)
+{
+    unsigned long text_start = (unsigned long)_text;
+    unsigned long text_end = (unsigned long)_etext;
+    unsigned long rodata_start = (unsigned long)__start_rodata;
+    unsigned long data_start = (unsigned long)_data;
+    unsigned long max_low = (unsigned long)(__va(PFN_PHYS(max_low_pfn)));
+
+    set_memory_ro(text_start, (text_end - text_start) >> PAGE_SHIFT);
+    set_memory_ro(rodata_start, (data_start - rodata_start) >> PAGE_SHIFT);
+    set_memory_nx(rodata_start, (data_start - rodata_start) >> PAGE_SHIFT);
+    set_memory_nx(data_start, (max_low - data_start) >> PAGE_SHIFT);
+
+    debug_checkwx();
+}
+EXPORT_SYMBOL(mark_rodata_ro);
+#endif

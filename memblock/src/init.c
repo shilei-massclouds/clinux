@@ -44,10 +44,11 @@ void __weak kfree(const void *objp)
 }
 EXPORT_SYMBOL(kfree);
 
-void page_init_poison(struct page *page, size_t size)
+__weak void page_init_poison(struct page *page, size_t size)
 {
     booter_panic("No impl 'page_init_poison'.");
 }
+EXPORT_SYMBOL_GPL(page_init_poison);
 
 __weak struct kmem_cache *
 kmem_cache_create(const char *name, unsigned int size, unsigned int align,
