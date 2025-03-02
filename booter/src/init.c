@@ -2815,3 +2815,19 @@ __weak void clean_page_buffers(struct page *page)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(clean_page_buffers);
+
+__weak int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(bdi_register_va);
+
+// From backing_dev.
+/*
+ * bdi_lock protects bdi_tree and updates to bdi_list. bdi_list has RCU
+ * reader side locking.
+ */
+DEFINE_SPINLOCK(bdi_lock);
+EXPORT_SYMBOL(bdi_lock);
+LIST_HEAD(bdi_list);
+EXPORT_SYMBOL(bdi_list);

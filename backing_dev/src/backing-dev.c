@@ -17,17 +17,9 @@
 static struct class *bdi_class;
 static const char *bdi_unknown_name = "(unknown)";
 
-/*
- * bdi_lock protects bdi_tree and updates to bdi_list. bdi_list has RCU
- * reader side locking.
- */
-DEFINE_SPINLOCK(bdi_lock);
-EXPORT_SYMBOL(bdi_lock);
 
 static u64 bdi_id_cursor;
 static struct rb_root bdi_tree = RB_ROOT;
-LIST_HEAD(bdi_list);
-EXPORT_SYMBOL(bdi_list);
 
 /* bdi_wq serves all asynchronous writeback tasks */
 struct workqueue_struct *bdi_wq;
@@ -250,30 +242,31 @@ static int __init default_bdi_init(void)
 }
 subsys_initcall(default_bdi_init);
 
-///*
-// * This function is used when the first inode for this wb is marked dirty. It
-// * wakes-up the corresponding bdi thread which should then take care of the
-// * periodic background write-out of dirty inodes. Since the write-out would
-// * starts only 'dirty_writeback_interval' centisecs from now anyway, we just
-// * set up a timer which wakes the bdi thread up later.
-// *
-// * Note, we wouldn't bother setting up the timer, but this function is on the
-// * fast-path (used by '__mark_inode_dirty()'), so we save few context switches
-// * by delaying the wake-up.
-// *
-// * We have to be careful not to postpone flush work if it is scheduled for
-// * earlier. Thus we use queue_delayed_work().
-// */
-//void wb_wakeup_delayed(struct bdi_writeback *wb)
-//{
-//	unsigned long timeout;
-//
-//	timeout = msecs_to_jiffies(dirty_writeback_interval * 10);
-//	spin_lock_bh(&wb->work_lock);
-//	if (test_bit(WB_registered, &wb->state))
-//		queue_delayed_work(bdi_wq, &wb->dwork, timeout);
-//	spin_unlock_bh(&wb->work_lock);
-//}
+/*
+ * This function is used when the first inode for this wb is marked dirty. It
+ * wakes-up the corresponding bdi thread which should then take care of the
+ * periodic background write-out of dirty inodes. Since the write-out would
+ * starts only 'dirty_writeback_interval' centisecs from now anyway, we just
+ * set up a timer which wakes the bdi thread up later.
+ *
+ * Note, we wouldn't bother setting up the timer, but this function is on the
+ * fast-path (used by '__mark_inode_dirty()'), so we save few context switches
+ * by delaying the wake-up.
+ *
+ * We have to be careful not to postpone flush work if it is scheduled for
+ * earlier. Thus we use queue_delayed_work().
+ */
+void wb_wakeup_delayed(struct bdi_writeback *wb)
+{
+	unsigned long timeout;
+
+	timeout = msecs_to_jiffies(dirty_writeback_interval * 10);
+	spin_lock_bh(&wb->work_lock);
+	if (test_bit(WB_registered, &wb->state))
+		queue_delayed_work(bdi_wq, &wb->dwork, timeout);
+	spin_unlock_bh(&wb->work_lock);
+}
+EXPORT_SYMBOL(wb_wakeup_delayed);
 
 /*
  * Initial write bandwidth: 100 MB/s
@@ -831,7 +824,6 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
 	trace_writeback_bdi_register(bdi);
 	return 0;
 }
-EXPORT_SYMBOL(bdi_register_va);
 
 int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...)
 {
