@@ -49,6 +49,7 @@ long do_no_restart_syscall(struct restart_block *param)
 {
     return -EINTR;
 }
+EXPORT_SYMBOL(do_no_restart_syscall);
 
 /* to be mentioned only in INIT_TASK */
 struct fs_struct init_fs = {

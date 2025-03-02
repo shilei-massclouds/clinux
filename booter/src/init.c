@@ -2956,3 +2956,10 @@ __weak ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xatt
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(simple_xattr_list);
+
+void plist_add(struct plist_node *node, struct plist_head *head)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(plist_add);
+
