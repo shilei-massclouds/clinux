@@ -1630,46 +1630,45 @@ int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
 	return res;
 }
 
-///**
-// * blkdev_get_by_path - open a block device by name
-// * @path: path to the block device to open
-// * @mode: FMODE_* mask
-// * @holder: exclusive holder identifier
-// *
-// * Open the blockdevice described by the device file at @path.  @mode
-// * and @holder are identical to blkdev_get().
-// *
-// * On success, the returned block_device has reference count of one.
-// *
-// * CONTEXT:
-// * Might sleep.
-// *
-// * RETURNS:
-// * Pointer to block_device on success, ERR_PTR(-errno) on failure.
-// */
-//struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
-//					void *holder)
-//{
-//	struct block_device *bdev;
-//	int err;
-//
-//	bdev = lookup_bdev(path);
-//	if (IS_ERR(bdev))
-//		return bdev;
-//
-//	err = blkdev_get(bdev, mode, holder);
-//	if (err)
-//		return ERR_PTR(err);
-//
-//	if ((mode & FMODE_WRITE) && bdev_read_only(bdev)) {
-//		blkdev_put(bdev, mode);
-//		return ERR_PTR(-EACCES);
-//	}
-//
-//	return bdev;
-//}
-//EXPORT_SYMBOL(blkdev_get_by_path);
-//
+/**
+ * blkdev_get_by_path - open a block device by name
+ * @path: path to the block device to open
+ * @mode: FMODE_* mask
+ * @holder: exclusive holder identifier
+ *
+ * Open the blockdevice described by the device file at @path.  @mode
+ * and @holder are identical to blkdev_get().
+ *
+ * On success, the returned block_device has reference count of one.
+ *
+ * CONTEXT:
+ * Might sleep.
+ *
+ * RETURNS:
+ * Pointer to block_device on success, ERR_PTR(-errno) on failure.
+ */
+struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
+					void *holder)
+{
+	struct block_device *bdev;
+	int err;
+
+	bdev = lookup_bdev(path);
+	if (IS_ERR(bdev))
+		return bdev;
+
+	err = blkdev_get(bdev, mode, holder);
+	if (err)
+		return ERR_PTR(err);
+
+	if ((mode & FMODE_WRITE) && bdev_read_only(bdev)) {
+		blkdev_put(bdev, mode);
+		return ERR_PTR(-EACCES);
+	}
+
+	return bdev;
+}
+
 ///**
 // * blkdev_get_by_dev - open a block device by device number
 // * @dev: device number of block device to open
@@ -2034,48 +2033,48 @@ static const struct address_space_operations def_blk_aops = {
 //	.splice_write	= iter_file_splice_write,
 //	.fallocate	= blkdev_fallocate,
 //};
-//
-///**
-// * lookup_bdev  - lookup a struct block_device by name
-// * @pathname:	special file representing the block device
-// *
-// * Get a reference to the blockdevice at @pathname in the current
-// * namespace if possible and return it.  Return ERR_PTR(error)
-// * otherwise.
-// */
-//struct block_device *lookup_bdev(const char *pathname)
-//{
-//	struct block_device *bdev;
-//	struct inode *inode;
-//	struct path path;
-//	int error;
-//
-//	if (!pathname || !*pathname)
-//		return ERR_PTR(-EINVAL);
-//
-//	error = kern_path(pathname, LOOKUP_FOLLOW, &path);
-//	if (error)
-//		return ERR_PTR(error);
-//
-//	inode = d_backing_inode(path.dentry);
-//	error = -ENOTBLK;
-//	if (!S_ISBLK(inode->i_mode))
-//		goto fail;
-//	error = -EACCES;
-//	if (!may_open_dev(&path))
-//		goto fail;
-//	error = -ENOMEM;
-//	bdev = bd_acquire(inode);
-//	if (!bdev)
-//		goto fail;
-//out:
-//	path_put(&path);
-//	return bdev;
-//fail:
-//	bdev = ERR_PTR(error);
-//	goto out;
-//}
-//EXPORT_SYMBOL(lookup_bdev);
+
+/**
+ * lookup_bdev  - lookup a struct block_device by name
+ * @pathname:	special file representing the block device
+ *
+ * Get a reference to the blockdevice at @pathname in the current
+ * namespace if possible and return it.  Return ERR_PTR(error)
+ * otherwise.
+ */
+struct block_device *lookup_bdev(const char *pathname)
+{
+	struct block_device *bdev;
+	struct inode *inode;
+	struct path path;
+	int error;
+
+	if (!pathname || !*pathname)
+		return ERR_PTR(-EINVAL);
+
+	error = kern_path(pathname, LOOKUP_FOLLOW, &path);
+	if (error)
+		return ERR_PTR(error);
+
+	inode = d_backing_inode(path.dentry);
+	error = -ENOTBLK;
+	if (!S_ISBLK(inode->i_mode))
+		goto fail;
+	error = -EACCES;
+	if (!may_open_dev(&path))
+		goto fail;
+	error = -ENOMEM;
+	bdev = bd_acquire(inode);
+	if (!bdev)
+		goto fail;
+out:
+	path_put(&path);
+	return bdev;
+fail:
+	bdev = ERR_PTR(error);
+	goto out;
+}
+EXPORT_SYMBOL(lookup_bdev);
 
 int __invalidate_device(struct block_device *bdev, bool kill_dirty)
 {

@@ -2783,3 +2783,22 @@ int match_token(char *s, const match_table_t table, substring_t args[])
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(match_token);
+
+__weak void truncate_inode_pages(struct address_space *mapping, loff_t lstart)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(truncate_inode_pages);
+
+__weak int filemap_flush(struct address_space *mapping)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(filemap_flush);
+
+__weak struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
+					void *holder)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(blkdev_get_by_path);

@@ -458,7 +458,6 @@ int filemap_flush(struct address_space *mapping)
 {
 	return __filemap_fdatawrite(mapping, WB_SYNC_NONE);
 }
-EXPORT_SYMBOL(filemap_flush);
 
 /**
  * filemap_range_has_page - check if a page exists in range.

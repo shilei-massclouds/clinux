@@ -476,7 +476,6 @@ void truncate_inode_pages(struct address_space *mapping, loff_t lstart)
 {
 	truncate_inode_pages_range(mapping, lstart, (loff_t)-1);
 }
-EXPORT_SYMBOL(truncate_inode_pages);
 
 /**
  * truncate_inode_pages_final - truncate *all* pages before inode dies
