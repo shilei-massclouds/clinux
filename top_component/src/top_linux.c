@@ -1025,6 +1025,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(truncate);
     REQUIRE_COMPONENT(elevator);
     REQUIRE_COMPONENT(workingset);
+    REQUIRE_COMPONENT(ext2);
 
     //
     // start_kernel (init/main.c)

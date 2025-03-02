@@ -360,63 +360,63 @@ int mnt_want_write(struct vfsmount *m)
 	return ret;
 }
 
-///**
-// * mnt_clone_write - get write access to a mount
-// * @mnt: the mount on which to take a write
-// *
-// * This is effectively like mnt_want_write, except
-// * it must only be used to take an extra write reference
-// * on a mountpoint that we already know has a write reference
-// * on it. This allows some optimisation.
-// *
-// * After finished, mnt_drop_write must be called as usual to
-// * drop the reference.
-// */
-//int mnt_clone_write(struct vfsmount *mnt)
-//{
-//	/* superblock may be r/o */
-//	if (__mnt_is_readonly(mnt))
-//		return -EROFS;
-//	preempt_disable();
-//	mnt_inc_writers(real_mount(mnt));
-//	preempt_enable();
-//	return 0;
-//}
-//EXPORT_SYMBOL_GPL(mnt_clone_write);
-//
-///**
-// * __mnt_want_write_file - get write access to a file's mount
-// * @file: the file who's mount on which to take a write
-// *
-// * This is like __mnt_want_write, but it takes a file and can
-// * do some optimisations if the file is open for write already
-// */
-//int __mnt_want_write_file(struct file *file)
-//{
-//	if (!(file->f_mode & FMODE_WRITER))
-//		return __mnt_want_write(file->f_path.mnt);
-//	else
-//		return mnt_clone_write(file->f_path.mnt);
-//}
-//
-///**
-// * mnt_want_write_file - get write access to a file's mount
-// * @file: the file who's mount on which to take a write
-// *
-// * This is like mnt_want_write, but it takes a file and can
-// * do some optimisations if the file is open for write already
-// */
-//int mnt_want_write_file(struct file *file)
-//{
-//	int ret;
-//
-//	sb_start_write(file_inode(file)->i_sb);
-//	ret = __mnt_want_write_file(file);
-//	if (ret)
-//		sb_end_write(file_inode(file)->i_sb);
-//	return ret;
-//}
-//EXPORT_SYMBOL_GPL(mnt_want_write_file);
+/**
+ * mnt_clone_write - get write access to a mount
+ * @mnt: the mount on which to take a write
+ *
+ * This is effectively like mnt_want_write, except
+ * it must only be used to take an extra write reference
+ * on a mountpoint that we already know has a write reference
+ * on it. This allows some optimisation.
+ *
+ * After finished, mnt_drop_write must be called as usual to
+ * drop the reference.
+ */
+int mnt_clone_write(struct vfsmount *mnt)
+{
+	/* superblock may be r/o */
+	if (__mnt_is_readonly(mnt))
+		return -EROFS;
+	preempt_disable();
+	mnt_inc_writers(real_mount(mnt));
+	preempt_enable();
+	return 0;
+}
+EXPORT_SYMBOL_GPL(mnt_clone_write);
+
+/**
+ * __mnt_want_write_file - get write access to a file's mount
+ * @file: the file who's mount on which to take a write
+ *
+ * This is like __mnt_want_write, but it takes a file and can
+ * do some optimisations if the file is open for write already
+ */
+int __mnt_want_write_file(struct file *file)
+{
+	if (!(file->f_mode & FMODE_WRITER))
+		return __mnt_want_write(file->f_path.mnt);
+	else
+		return mnt_clone_write(file->f_path.mnt);
+}
+
+/**
+ * mnt_want_write_file - get write access to a file's mount
+ * @file: the file who's mount on which to take a write
+ *
+ * This is like mnt_want_write, but it takes a file and can
+ * do some optimisations if the file is open for write already
+ */
+int mnt_want_write_file(struct file *file)
+{
+	int ret;
+
+	sb_start_write(file_inode(file)->i_sb);
+	ret = __mnt_want_write_file(file);
+	if (ret)
+		sb_end_write(file_inode(file)->i_sb);
+	return ret;
+}
+EXPORT_SYMBOL_GPL(mnt_want_write_file);
 
 /**
  * __mnt_drop_write - give up write access to a mount

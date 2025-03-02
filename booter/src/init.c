@@ -19,6 +19,7 @@
 #include <linux/kobj_map.h>
 #include <linux/backing-dev-defs.h>
 #include <linux/backing-dev.h>
+#include <linux/parser.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #include <cl_hook.h>
@@ -2744,3 +2745,41 @@ __weak int elv_register_queue(struct request_queue *q, bool uevent)
     booter_panic("No impl 'percpu'.");
 }
 EXPORT_SYMBOL(elv_register_queue);
+
+ssize_t
+iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
+              loff_t *ppos, size_t len, unsigned int flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(iter_file_splice_write);
+
+__weak int __mnt_want_write_file(struct file *file)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(__mnt_want_write_file);
+
+int match_int(substring_t *s, int *result)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(match_int);
+
+void mpage_readahead(struct readahead_control *rac, get_block_t get_block)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(mpage_readahead);
+
+bool is_bad_inode(struct inode *inode)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(is_bad_inode);
+
+int match_token(char *s, const match_table_t table, substring_t args[])
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(match_token);
