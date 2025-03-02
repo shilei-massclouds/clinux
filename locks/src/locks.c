@@ -2993,6 +2993,7 @@ static const struct seq_operations locks_seq_operations = {
 
 static int __init proc_locks_init(void)
 {
+    printk("%s: ==============> ...\n", __func__);
 	proc_create_seq_private("locks", 0, NULL, &locks_seq_operations,
 			sizeof(struct locks_iterator), NULL);
 	return 0;

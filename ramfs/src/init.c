@@ -14,7 +14,3 @@ cl_ramfs_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_ramfs_init);
-
-
-const struct inode_operations ramfs_file_inode_operations;
-const struct file_operations ramfs_file_operations;

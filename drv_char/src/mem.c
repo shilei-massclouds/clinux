@@ -998,6 +998,7 @@ static struct class *mem_class;
 
 static int devmem_fs_init_fs_context(struct fs_context *fc)
 {
+    printk("%s: ==============> ...\n", __func__);
 	return init_pseudo(fc, DEVMEM_MAGIC) ? 0 : -ENOMEM;
 }
 

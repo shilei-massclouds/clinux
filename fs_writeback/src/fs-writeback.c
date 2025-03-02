@@ -1012,6 +1012,7 @@ void cgroup_writeback_umount(void)
 
 static int __init cgroup_writeback_init(void)
 {
+    printk("%s: ==============> ...\n", __func__);
 	isw_wq = alloc_workqueue("inode_switch_wbs", 0, 0);
 	if (!isw_wq)
 		return -ENOMEM;

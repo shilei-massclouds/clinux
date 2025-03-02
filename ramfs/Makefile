@@ -2,3 +2,4 @@
 
 obj_y := init.o
 obj_y += inode.o
+obj_y += file-mmu.o

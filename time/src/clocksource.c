@@ -813,6 +813,7 @@ static inline void clocksource_select_fallback(void) { }
  */
 static int __init clocksource_done_booting(void)
 {
+    printk("%s: ==============> ...\n", __func__);
 	mutex_lock(&clocksource_mutex);
 	curr_clocksource = clocksource_default_clock();
 	finished_booting = 1;

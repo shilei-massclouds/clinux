@@ -96,86 +96,86 @@ struct inode *ramfs_get_inode(struct super_block *sb,
 	return inode;
 }
 
-///*
-// * File creation. Allocate an inode, and we're done..
-// */
-///* SMP-safe */
-//static int
-//ramfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
-//{
-//	struct inode * inode = ramfs_get_inode(dir->i_sb, dir, mode, dev);
-//	int error = -ENOSPC;
-//
-//	if (inode) {
-//		d_instantiate(dentry, inode);
-//		dget(dentry);	/* Extra count - pin the dentry in core */
-//		error = 0;
-//		dir->i_mtime = dir->i_ctime = current_time(dir);
-//	}
-//	return error;
-//}
-//
-//static int ramfs_mkdir(struct inode * dir, struct dentry * dentry, umode_t mode)
-//{
-//	int retval = ramfs_mknod(dir, dentry, mode | S_IFDIR, 0);
-//	if (!retval)
-//		inc_nlink(dir);
-//	return retval;
-//}
-//
-//static int ramfs_create(struct inode *dir, struct dentry *dentry, umode_t mode, bool excl)
-//{
-//	return ramfs_mknod(dir, dentry, mode | S_IFREG, 0);
-//}
-//
-//static int ramfs_symlink(struct inode * dir, struct dentry *dentry, const char * symname)
-//{
-//	struct inode *inode;
-//	int error = -ENOSPC;
-//
-//	inode = ramfs_get_inode(dir->i_sb, dir, S_IFLNK|S_IRWXUGO, 0);
-//	if (inode) {
-//		int l = strlen(symname)+1;
-//		error = page_symlink(inode, symname, l);
-//		if (!error) {
-//			d_instantiate(dentry, inode);
-//			dget(dentry);
-//			dir->i_mtime = dir->i_ctime = current_time(dir);
-//		} else
-//			iput(inode);
-//	}
-//	return error;
-//}
-//
-//static const struct inode_operations ramfs_dir_inode_operations = {
-//	.create		= ramfs_create,
-//	.lookup		= simple_lookup,
-//	.link		= simple_link,
-//	.unlink		= simple_unlink,
-//	.symlink	= ramfs_symlink,
-//	.mkdir		= ramfs_mkdir,
-//	.rmdir		= simple_rmdir,
-//	.mknod		= ramfs_mknod,
-//	.rename		= simple_rename,
-//};
-//
-///*
-// * Display the mount options in /proc/mounts.
-// */
-//static int ramfs_show_options(struct seq_file *m, struct dentry *root)
-//{
-//	struct ramfs_fs_info *fsi = root->d_sb->s_fs_info;
-//
-//	if (fsi->mount_opts.mode != RAMFS_DEFAULT_MODE)
-//		seq_printf(m, ",mode=%o", fsi->mount_opts.mode);
-//	return 0;
-//}
-//
-//static const struct super_operations ramfs_ops = {
-//	.statfs		= simple_statfs,
-//	.drop_inode	= generic_delete_inode,
-//	.show_options	= ramfs_show_options,
-//};
+/*
+ * File creation. Allocate an inode, and we're done..
+ */
+/* SMP-safe */
+static int
+ramfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
+{
+	struct inode * inode = ramfs_get_inode(dir->i_sb, dir, mode, dev);
+	int error = -ENOSPC;
+
+	if (inode) {
+		d_instantiate(dentry, inode);
+		dget(dentry);	/* Extra count - pin the dentry in core */
+		error = 0;
+		dir->i_mtime = dir->i_ctime = current_time(dir);
+	}
+	return error;
+}
+
+static int ramfs_mkdir(struct inode * dir, struct dentry * dentry, umode_t mode)
+{
+	int retval = ramfs_mknod(dir, dentry, mode | S_IFDIR, 0);
+	if (!retval)
+		inc_nlink(dir);
+	return retval;
+}
+
+static int ramfs_create(struct inode *dir, struct dentry *dentry, umode_t mode, bool excl)
+{
+	return ramfs_mknod(dir, dentry, mode | S_IFREG, 0);
+}
+
+static int ramfs_symlink(struct inode * dir, struct dentry *dentry, const char * symname)
+{
+	struct inode *inode;
+	int error = -ENOSPC;
+
+	inode = ramfs_get_inode(dir->i_sb, dir, S_IFLNK|S_IRWXUGO, 0);
+	if (inode) {
+		int l = strlen(symname)+1;
+		error = page_symlink(inode, symname, l);
+		if (!error) {
+			d_instantiate(dentry, inode);
+			dget(dentry);
+			dir->i_mtime = dir->i_ctime = current_time(dir);
+		} else
+			iput(inode);
+	}
+	return error;
+}
+
+static const struct inode_operations ramfs_dir_inode_operations = {
+	.create		= ramfs_create,
+	.lookup		= simple_lookup,
+	.link		= simple_link,
+	.unlink		= simple_unlink,
+	.symlink	= ramfs_symlink,
+	.mkdir		= ramfs_mkdir,
+	.rmdir		= simple_rmdir,
+	.mknod		= ramfs_mknod,
+	.rename		= simple_rename,
+};
+
+/*
+ * Display the mount options in /proc/mounts.
+ */
+static int ramfs_show_options(struct seq_file *m, struct dentry *root)
+{
+	struct ramfs_fs_info *fsi = root->d_sb->s_fs_info;
+
+	if (fsi->mount_opts.mode != RAMFS_DEFAULT_MODE)
+		seq_printf(m, ",mode=%o", fsi->mount_opts.mode);
+	return 0;
+}
+
+static const struct super_operations ramfs_ops = {
+	.statfs		= simple_statfs,
+	.drop_inode	= generic_delete_inode,
+	.show_options	= ramfs_show_options,
+};
 
 enum ramfs_param {
 	Opt_mode,
@@ -265,22 +265,23 @@ int ramfs_init_fs_context(struct fs_context *fc)
 }
 EXPORT_SYMBOL(ramfs_init_fs_context);
 
-//static void ramfs_kill_sb(struct super_block *sb)
-//{
-//	kfree(sb->s_fs_info);
-//	kill_litter_super(sb);
-//}
-//
-//static struct file_system_type ramfs_fs_type = {
-//	.name		= "ramfs",
-//	.init_fs_context = ramfs_init_fs_context,
-//	.parameters	= ramfs_fs_parameters,
-//	.kill_sb	= ramfs_kill_sb,
-//	.fs_flags	= FS_USERNS_MOUNT,
-//};
-//
-//static int __init init_ramfs_fs(void)
-//{
-//	return register_filesystem(&ramfs_fs_type);
-//}
-//fs_initcall(init_ramfs_fs);
+static void ramfs_kill_sb(struct super_block *sb)
+{
+	kfree(sb->s_fs_info);
+	kill_litter_super(sb);
+}
+
+static struct file_system_type ramfs_fs_type = {
+	.name		= "ramfs",
+	.init_fs_context = ramfs_init_fs_context,
+	.parameters	= ramfs_fs_parameters,
+	.kill_sb	= ramfs_kill_sb,
+	.fs_flags	= FS_USERNS_MOUNT,
+};
+
+static int __init init_ramfs_fs(void)
+{
+    printk("%s: =========> \n", __func__);
+	return register_filesystem(&ramfs_fs_type);
+}
+fs_initcall(init_ramfs_fs);
