@@ -730,28 +730,28 @@ static int __ref kernel_init(void *unused)
     int ret;
 
     kernel_init_freeable();
-    sbi_puts("kernel_init: ============ 1\n");
     /* need to finish all async __init code before freeing the memory */
     async_synchronize_full();
     kprobe_free_init_mem();
     ftrace_free_init_mem();
     free_initmem();
     mark_readonly();
-    sbi_puts("kernel_init: ============ 2\n");
 
-//    /*
-//     * Kernel mappings are now finalized - update the userspace page-table
-//     * to finalize PTI.
-//     */
-//    pti_finalize();
-//
-//    system_state = SYSTEM_RUNNING;
-//    numa_default_policy();
-//
-//    rcu_end_inkernel_boot();
-//
-//    do_sysctl_args();
-//
+    /*
+     * Kernel mappings are now finalized - update the userspace page-table
+     * to finalize PTI.
+     */
+    pti_finalize();
+
+    system_state = SYSTEM_RUNNING;
+    numa_default_policy();
+
+    rcu_end_inkernel_boot();
+    sbi_puts("kernel_init: ============ 1\n");
+
+    do_sysctl_args();
+
+    sbi_puts("kernel_init: ============ 2\n");
 //    if (ramdisk_execute_command) {
 //        ret = run_init_process(ramdisk_execute_command);
 //        if (!ret)
