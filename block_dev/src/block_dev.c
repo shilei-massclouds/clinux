@@ -1556,7 +1556,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, void *holder,
 	if (claiming)
 		bd_finish_claiming(bdev, claiming, holder);
 
-    printk("%s: ---------------- 1\n", __func__);
 	/*
 	 * Block event polling for write claims if requested.  Any write holder
 	 * makes the write_holder state stick until all are released.  This is

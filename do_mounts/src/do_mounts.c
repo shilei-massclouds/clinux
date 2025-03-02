@@ -36,31 +36,31 @@ static int root_wait;
 
 dev_t ROOT_DEV;
 
-//static int __init load_ramdisk(char *str)
-//{
-//	pr_warn("ignoring the deprecated load_ramdisk= option\n");
-//	return 1;
-//}
-//__setup("load_ramdisk=", load_ramdisk);
-//
-//static int __init readonly(char *str)
-//{
-//	if (*str)
-//		return 0;
-//	root_mountflags |= MS_RDONLY;
-//	return 1;
-//}
-//
-//static int __init readwrite(char *str)
-//{
-//	if (*str)
-//		return 0;
-//	root_mountflags &= ~MS_RDONLY;
-//	return 1;
-//}
-//
-//__setup("ro", readonly);
-//__setup("rw", readwrite);
+static int __init load_ramdisk(char *str)
+{
+	pr_warn("ignoring the deprecated load_ramdisk= option\n");
+	return 1;
+}
+__setup("load_ramdisk=", load_ramdisk);
+
+static int __init readonly(char *str)
+{
+	if (*str)
+		return 0;
+	root_mountflags |= MS_RDONLY;
+	return 1;
+}
+
+static int __init readwrite(char *str)
+{
+	if (*str)
+		return 0;
+	root_mountflags &= ~MS_RDONLY;
+	return 1;
+}
+
+__setup("ro", readonly);
+__setup("rw", readwrite);
 
 #ifdef CONFIG_BLOCK
 struct uuidcmp {
