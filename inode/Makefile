@@ -3,5 +3,6 @@
 obj_y := init.o
 obj_y += inode.o
 obj_y += super.o
+obj_y += bad_inode.o
 
 obj_y += mine.o

@@ -2763,11 +2763,13 @@ __weak void mpage_readahead(struct readahead_control *rac, get_block_t get_block
 }
 EXPORT_SYMBOL(mpage_readahead);
 
+/*
 bool is_bad_inode(struct inode *inode)
 {
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(is_bad_inode);
+*/
 
 int match_token(char *s, const match_table_t table, substring_t args[])
 {
