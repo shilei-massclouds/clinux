@@ -77,20 +77,10 @@ int proc_dointvec_minmax(struct ctl_table *table, int write,
 }
 EXPORT_SYMBOL(proc_dointvec_minmax);
 
-unsigned long nr_iowait_cpu(int cpu)
-{
-    booter_panic("No impl in 'time'.");
-}
 void timerfd_clock_was_set(void)
 {
     booter_panic("No impl in 'time'.");
 }
-/*
-void touch_softlockup_watchdog_sched(void)
-{
-    booter_panic("No impl in 'time'.");
-}
-*/
 
 void __weak thread_group_cputime(struct task_struct *tsk, struct task_cputime *times)
 {

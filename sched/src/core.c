@@ -3826,19 +3826,19 @@ context_switch(struct rq *rq, struct task_struct *prev,
 //
 //	return sum;
 //}
-//
-///*
-// * Consumers of these two interfaces, like for example the cpuidle menu
-// * governor, are using nonsensical data. Preferring shallow idle state selection
-// * for a CPU that has IO-wait which might not even end up running the task when
-// * it does become runnable.
-// */
-//
-//unsigned long nr_iowait_cpu(int cpu)
-//{
-//	return atomic_read(&cpu_rq(cpu)->nr_iowait);
-//}
-//
+
+/*
+ * Consumers of these two interfaces, like for example the cpuidle menu
+ * governor, are using nonsensical data. Preferring shallow idle state selection
+ * for a CPU that has IO-wait which might not even end up running the task when
+ * it does become runnable.
+ */
+
+unsigned long nr_iowait_cpu(int cpu)
+{
+	return atomic_read(&cpu_rq(cpu)->nr_iowait);
+}
+
 ///*
 // * IO-wait accounting, and how its mostly bollocks (on SMP).
 // *

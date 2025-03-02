@@ -694,6 +694,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
 	blk_queue_exit(bdev->bd_disk->queue);
 	return result;
 }
+EXPORT_SYMBOL(bdev_read_page);
 
 /**
  * bdev_write_page() - Start writing a page to a block device
@@ -738,6 +739,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
 	blk_queue_exit(bdev->bd_disk->queue);
 	return result;
 }
+EXPORT_SYMBOL(bdev_write_page);
 
 /*
  * pseudo-fs

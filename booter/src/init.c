@@ -2766,7 +2766,7 @@ int match_int(substring_t *s, int *result)
 }
 EXPORT_SYMBOL(match_int);
 
-void mpage_readahead(struct readahead_control *rac, get_block_t get_block)
+__weak void mpage_readahead(struct readahead_control *rac, get_block_t get_block)
 {
     booter_panic("No impl.");
 }
@@ -2802,3 +2802,16 @@ __weak struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(blkdev_get_by_path);
+
+__weak int mpage_writepage(struct page *page, get_block_t get_block,
+	struct writeback_control *wbc)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(mpage_writepage);
+
+__weak void clean_page_buffers(struct page *page)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(clean_page_buffers);

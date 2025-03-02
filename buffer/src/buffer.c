@@ -566,6 +566,7 @@ void write_boundary_block(struct block_device *bdev,
 		put_bh(bh);
 	}
 }
+EXPORT_SYMBOL(write_boundary_block);
 
 void mark_buffer_dirty_inode(struct buffer_head *bh, struct inode *inode)
 {

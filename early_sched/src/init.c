@@ -484,3 +484,9 @@ __weak int __sched out_of_line_wait_on_bit_lock(void *word, int bit,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(out_of_line_wait_on_bit_lock);
+
+__weak unsigned long nr_iowait_cpu(int cpu)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(nr_iowait_cpu);
