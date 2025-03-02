@@ -1038,11 +1038,13 @@ __weak bool thread_group_exited(struct pid *pid)
 }
 EXPORT_SYMBOL(thread_group_exited);
 
+/*
 void exit_itimers(struct signal_struct *sig)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(exit_itimers);
+*/
 
 /*
 void vfree(const void *addr)
@@ -2963,3 +2965,20 @@ void plist_add(struct plist_node *node, struct plist_head *head)
 }
 EXPORT_SYMBOL(plist_add);
 
+__weak void sigqueue_free(struct sigqueue *q)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sigqueue_free);
+
+__weak struct sigqueue *sigqueue_alloc(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sigqueue_alloc);
+
+__weak int send_sigqueue(struct sigqueue *q, struct pid *pid, enum pid_type type)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(send_sigqueue);

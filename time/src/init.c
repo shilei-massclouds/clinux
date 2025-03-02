@@ -10,6 +10,7 @@
 #include <linux/syscore_ops.h>
 #include <linux/prandom.h>
 #include "../../booter/src/booter.h"
+#include "posix-timers.h"
 
 int
 cl_time_init(void)
@@ -93,13 +94,11 @@ int nanosleep_copyout(struct restart_block *restart, struct timespec64 *ts)
     booter_panic("No impl in 'time'.");
 }
 
-int posix_timer_event(struct k_itimer *timr, int si_private)
-{
-    booter_panic("No impl in 'time'.");
-}
-
 unsigned long long task_sched_runtime(struct task_struct *p)
 {
     booter_panic("No impl in 'time'.");
 }
 EXPORT_SYMBOL(task_sched_runtime);
+
+const struct k_clock clock_posix_dynamic;
+const struct k_clock alarm_clock;

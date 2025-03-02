@@ -18,3 +18,6 @@ obj_y += delay.o
 obj_y += vsyscall.o
 obj_y += sched_clock.o
 obj_y += posix-cpu-timers.o
+obj_y += posix-timers.o
+
+obj_y += mine.o
