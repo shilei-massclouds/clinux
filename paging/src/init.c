@@ -240,3 +240,20 @@ __weak int access_process_vm(struct task_struct *tsk, unsigned long addr,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL_GPL(access_process_vm);
+
+__weak vm_fault_t handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
+			   unsigned int flags, struct pt_regs *regs)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL_GPL(handle_mm_fault);
+
+unsigned long zero_pfn __read_mostly;
+EXPORT_SYMBOL(zero_pfn);
+
+__weak struct page *vm_normal_page(struct vm_area_struct *vma, unsigned long addr,
+			    pte_t pte)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(vm_normal_page);

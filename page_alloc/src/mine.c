@@ -10,7 +10,6 @@ CL_MINE(migrate_prep_local)
 CL_MINE(putback_movable_pages)
 CL_MINE(zone_watermark_ok)
 
-CL_MINE(migration_entry_wait)
 CL_MINE(munlock_vma_page)
 CL_MINE(tlb_flush_mmu)
 CL_MINE(__tlb_remove_page_size)

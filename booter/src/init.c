@@ -2027,6 +2027,7 @@ __weak void workingset_refault(struct page *page, void *shadow)
 }
 EXPORT_SYMBOL(workingset_refault);
 
+/*
 long get_user_pages_remote(struct mm_struct *mm,
         unsigned long start, unsigned long nr_pages,
         unsigned int gup_flags, struct page **pages,
@@ -2035,6 +2036,7 @@ long get_user_pages_remote(struct mm_struct *mm,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(get_user_pages_remote);
+*/
 
 void tlb_gather_mmu(struct mmu_gather *tlb, struct mm_struct *mm,
             unsigned long start, unsigned long end)
@@ -2843,3 +2845,36 @@ __weak struct address_space *page_mapping(struct page *page)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(page_mapping);
+
+__weak int get_user_pages_fast(unsigned long start, int nr_pages,
+			unsigned int gup_flags, struct page **pages)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(get_user_pages_fast);
+
+void mlock_vma_page(struct page *page)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(mlock_vma_page);
+
+__weak long populate_vma_page_range(struct vm_area_struct *vma,
+		unsigned long start, unsigned long end, int *locked)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(populate_vma_page_range);
+
+__weak int __mm_populate(unsigned long start, unsigned long len, int ignore_errors)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__mm_populate);
+
+void migration_entry_wait(struct mm_struct *mm, pmd_t *pmd,
+                unsigned long address)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(migration_entry_wait);
