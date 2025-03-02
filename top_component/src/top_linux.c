@@ -26,6 +26,7 @@
 #include <linux/kmemleak.h>
 #include <linux/pti.h>
 #include <linux/ftrace.h>
+#include <linux/binfmts.h>
 #include <linux/sched/init.h>
 #include <linux/sched/isolation.h>
 #include <linux/sched/clock.h>
@@ -118,6 +119,7 @@ static bool initargs_found;
 //bool initcall_debug;
 //core_param(initcall_debug, initcall_debug, bool, 0644);
 
+static char *execute_command;
 static char *ramdisk_execute_command = "/init";
 
 extern void setup_vm_final(void);
@@ -725,6 +727,52 @@ void __weak free_initmem(void)
     free_initmem_default(POISON_FREE_INITMEM);
 }
 
+static int run_init_process(const char *init_filename)
+{
+    const char *const *p;
+
+    argv_init[0] = init_filename;
+    pr_info("Run %s as init process\n", init_filename);
+    pr_debug("  with arguments:\n");
+    for (p = argv_init; *p; p++)
+        pr_debug("    %s\n", *p);
+    pr_debug("  with environment:\n");
+    for (p = envp_init; *p; p++)
+        pr_debug("    %s\n", *p);
+    return kernel_execve(init_filename, argv_init, envp_init);
+}
+
+static int try_to_run_init_process(const char *init_filename)
+{
+    int ret;
+
+    ret = run_init_process(init_filename);
+
+    if (ret && ret != -ENOENT) {
+        pr_err("Starting init: %s exists but couldn't execute it (error %d)\n",
+               init_filename, ret);
+    }
+
+    return ret;
+}
+
+static int __init init_setup(char *str)
+{
+    unsigned int i;
+
+    execute_command = str;
+    /*
+     * In case LILO is going to boot us with default command line,
+     * it prepends "auto" before the whole cmdline which makes
+     * the shell think it should execute a script with such name.
+     * So we ignore all arguments entered _before_ init=... [MJ]
+     */
+    for (i = 1; i < MAX_INIT_ARGS; i++)
+        argv_init[i] = NULL;
+    return 1;
+}
+__setup("init=", init_setup);
+
 static int __ref kernel_init(void *unused)
 {
     int ret;
@@ -747,47 +795,45 @@ static int __ref kernel_init(void *unused)
     numa_default_policy();
 
     rcu_end_inkernel_boot();
-    sbi_puts("kernel_init: ============ 1\n");
 
     do_sysctl_args();
 
-    sbi_puts("kernel_init: ============ 2\n");
-//    if (ramdisk_execute_command) {
-//        ret = run_init_process(ramdisk_execute_command);
-//        if (!ret)
-//            return 0;
-//        pr_err("Failed to execute %s (error %d)\n",
-//               ramdisk_execute_command, ret);
-//    }
-//
-//    /*
-//     * We try each of these until one succeeds.
-//     *
-//     * The Bourne shell can be used instead of init if we are
-//     * trying to recover a really broken machine.
-//     */
-//    if (execute_command) {
-//        ret = run_init_process(execute_command);
-//        if (!ret)
-//            return 0;
-//        panic("Requested init %s failed (error %d).",
-//              execute_command, ret);
-//    }
-//
-//    if (CONFIG_DEFAULT_INIT[0] != '\0') {
-//        ret = run_init_process(CONFIG_DEFAULT_INIT);
-//        if (ret)
-//            pr_err("Default init %s failed (error %d)\n",
-//                   CONFIG_DEFAULT_INIT, ret);
-//        else
-//            return 0;
-//    }
-//
-//    if (!try_to_run_init_process("/sbin/init") ||
-//        !try_to_run_init_process("/etc/init") ||
-//        !try_to_run_init_process("/bin/init") ||
-//        !try_to_run_init_process("/bin/sh"))
-//        return 0;
+    if (ramdisk_execute_command) {
+        ret = run_init_process(ramdisk_execute_command);
+        if (!ret)
+            return 0;
+        pr_err("Failed to execute %s (error %d)\n",
+               ramdisk_execute_command, ret);
+    }
+
+    /*
+     * We try each of these until one succeeds.
+     *
+     * The Bourne shell can be used instead of init if we are
+     * trying to recover a really broken machine.
+     */
+    if (execute_command) {
+        ret = run_init_process(execute_command);
+        if (!ret)
+            return 0;
+        panic("Requested init %s failed (error %d).",
+              execute_command, ret);
+    }
+
+    if (CONFIG_DEFAULT_INIT[0] != '\0') {
+        ret = run_init_process(CONFIG_DEFAULT_INIT);
+        if (ret)
+            pr_err("Default init %s failed (error %d)\n",
+                   CONFIG_DEFAULT_INIT, ret);
+        else
+            return 0;
+    }
+
+    if (!try_to_run_init_process("/sbin/init") ||
+        !try_to_run_init_process("/etc/init") ||
+        !try_to_run_init_process("/bin/init") ||
+        !try_to_run_init_process("/bin/sh"))
+        return 0;
 
     panic("No working init found.  Try passing init= option to kernel. "
           "See Linux Documentation/admin-guide/init.rst for guidance.");

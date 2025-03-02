@@ -1849,3 +1849,4 @@ void do_sysctl_args(void)
 
 	kfree(command_line);
 }
+EXPORT_SYMBOL(do_sysctl_args);
