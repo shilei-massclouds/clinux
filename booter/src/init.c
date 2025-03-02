@@ -2982,3 +2982,44 @@ __weak int send_sigqueue(struct sigqueue *q, struct pid *pid, enum pid_type type
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(send_sigqueue);
+
+#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
+    defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
+int sysctl_legacy_va_layout;
+EXPORT_SYMBOL(sysctl_legacy_va_layout);
+#endif
+
+/* enforced gap between the expanding stack and other mappings. */
+unsigned long stack_guard_gap = 256UL<<PAGE_SHIFT;
+EXPORT_SYMBOL(stack_guard_gap);
+
+__weak unsigned long
+arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
+			  unsigned long len, unsigned long pgoff,
+			  unsigned long flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(arch_get_unmapped_area_topdown);
+
+#ifdef CONFIG_HAVE_ARCH_MMAP_RND_BITS
+const int mmap_rnd_bits_min = CONFIG_ARCH_MMAP_RND_BITS_MIN;
+const int mmap_rnd_bits_max = CONFIG_ARCH_MMAP_RND_BITS_MAX;
+int mmap_rnd_bits __read_mostly = CONFIG_ARCH_MMAP_RND_BITS;
+EXPORT_SYMBOL(mmap_rnd_bits);
+#endif
+
+__weak unsigned long
+arch_get_unmapped_area(struct file *filp, unsigned long addr,
+		unsigned long len, unsigned long pgoff, unsigned long flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(arch_get_unmapped_area);
+
+__weak unsigned long
+randomize_page(unsigned long start, unsigned long range)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(randomize_page);

@@ -178,12 +178,8 @@
 //
 //static enum sysctl_writes_mode sysctl_writes_strict = SYSCTL_WRITES_STRICT;
 //#endif /* CONFIG_PROC_SYSCTL */
-//
-//#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
-//    defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
-//int sysctl_legacy_va_layout;
-//#endif
-//
+
+
 //#ifdef CONFIG_SCHED_DEBUG
 //static int min_sched_granularity_ns = 100000;		/* 100 usecs */
 //static int max_sched_granularity_ns = NSEC_PER_SEC;	/* 1 second */

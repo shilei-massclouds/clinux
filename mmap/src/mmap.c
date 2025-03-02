@@ -62,11 +62,6 @@
 #define arch_mmap_check(addr, len, flags)	(0)
 #endif
 
-#ifdef CONFIG_HAVE_ARCH_MMAP_RND_BITS
-const int mmap_rnd_bits_min = CONFIG_ARCH_MMAP_RND_BITS_MIN;
-const int mmap_rnd_bits_max = CONFIG_ARCH_MMAP_RND_BITS_MAX;
-int mmap_rnd_bits __read_mostly = CONFIG_ARCH_MMAP_RND_BITS;
-#endif
 #ifdef CONFIG_HAVE_ARCH_MMAP_RND_COMPAT_BITS
 const int mmap_rnd_compat_bits_min = CONFIG_ARCH_MMAP_RND_COMPAT_BITS_MIN;
 const int mmap_rnd_compat_bits_max = CONFIG_ARCH_MMAP_RND_COMPAT_BITS_MAX;
@@ -1878,343 +1873,343 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 //		vm_unacct_memory(charged);
 //	return error;
 //}
-//
-//static unsigned long unmapped_area(struct vm_unmapped_area_info *info)
-//{
-//	/*
-//	 * We implement the search by looking for an rbtree node that
-//	 * immediately follows a suitable gap. That is,
-//	 * - gap_start = vma->vm_prev->vm_end <= info->high_limit - length;
-//	 * - gap_end   = vma->vm_start        >= info->low_limit  + length;
-//	 * - gap_end - gap_start >= length
-//	 */
-//
-//	struct mm_struct *mm = current->mm;
-//	struct vm_area_struct *vma;
-//	unsigned long length, low_limit, high_limit, gap_start, gap_end;
-//
-//	/* Adjust search length to account for worst case alignment overhead */
-//	length = info->length + info->align_mask;
-//	if (length < info->length)
-//		return -ENOMEM;
-//
-//	/* Adjust search limits by the desired length */
-//	if (info->high_limit < length)
-//		return -ENOMEM;
-//	high_limit = info->high_limit - length;
-//
-//	if (info->low_limit > high_limit)
-//		return -ENOMEM;
-//	low_limit = info->low_limit + length;
-//
-//	/* Check if rbtree root looks promising */
-//	if (RB_EMPTY_ROOT(&mm->mm_rb))
-//		goto check_highest;
-//	vma = rb_entry(mm->mm_rb.rb_node, struct vm_area_struct, vm_rb);
-//	if (vma->rb_subtree_gap < length)
-//		goto check_highest;
-//
-//	while (true) {
-//		/* Visit left subtree if it looks promising */
-//		gap_end = vm_start_gap(vma);
-//		if (gap_end >= low_limit && vma->vm_rb.rb_left) {
-//			struct vm_area_struct *left =
-//				rb_entry(vma->vm_rb.rb_left,
-//					 struct vm_area_struct, vm_rb);
-//			if (left->rb_subtree_gap >= length) {
-//				vma = left;
-//				continue;
-//			}
-//		}
-//
-//		gap_start = vma->vm_prev ? vm_end_gap(vma->vm_prev) : 0;
-//check_current:
-//		/* Check if current node has a suitable gap */
-//		if (gap_start > high_limit)
-//			return -ENOMEM;
-//		if (gap_end >= low_limit &&
-//		    gap_end > gap_start && gap_end - gap_start >= length)
-//			goto found;
-//
-//		/* Visit right subtree if it looks promising */
-//		if (vma->vm_rb.rb_right) {
-//			struct vm_area_struct *right =
-//				rb_entry(vma->vm_rb.rb_right,
-//					 struct vm_area_struct, vm_rb);
-//			if (right->rb_subtree_gap >= length) {
-//				vma = right;
-//				continue;
-//			}
-//		}
-//
-//		/* Go back up the rbtree to find next candidate node */
-//		while (true) {
-//			struct rb_node *prev = &vma->vm_rb;
-//			if (!rb_parent(prev))
-//				goto check_highest;
-//			vma = rb_entry(rb_parent(prev),
-//				       struct vm_area_struct, vm_rb);
-//			if (prev == vma->vm_rb.rb_left) {
-//				gap_start = vm_end_gap(vma->vm_prev);
-//				gap_end = vm_start_gap(vma);
-//				goto check_current;
-//			}
-//		}
-//	}
-//
-//check_highest:
-//	/* Check highest gap, which does not precede any rbtree node */
-//	gap_start = mm->highest_vm_end;
-//	gap_end = ULONG_MAX;  /* Only for VM_BUG_ON below */
-//	if (gap_start > high_limit)
-//		return -ENOMEM;
-//
-//found:
-//	/* We found a suitable gap. Clip it with the original low_limit. */
-//	if (gap_start < info->low_limit)
-//		gap_start = info->low_limit;
-//
-//	/* Adjust gap address to the desired alignment */
-//	gap_start += (info->align_offset - gap_start) & info->align_mask;
-//
-//	VM_BUG_ON(gap_start + info->length > info->high_limit);
-//	VM_BUG_ON(gap_start + info->length > gap_end);
-//	return gap_start;
-//}
-//
-//static unsigned long unmapped_area_topdown(struct vm_unmapped_area_info *info)
-//{
-//	struct mm_struct *mm = current->mm;
-//	struct vm_area_struct *vma;
-//	unsigned long length, low_limit, high_limit, gap_start, gap_end;
-//
-//	/* Adjust search length to account for worst case alignment overhead */
-//	length = info->length + info->align_mask;
-//	if (length < info->length)
-//		return -ENOMEM;
-//
-//	/*
-//	 * Adjust search limits by the desired length.
-//	 * See implementation comment at top of unmapped_area().
-//	 */
-//	gap_end = info->high_limit;
-//	if (gap_end < length)
-//		return -ENOMEM;
-//	high_limit = gap_end - length;
-//
-//	if (info->low_limit > high_limit)
-//		return -ENOMEM;
-//	low_limit = info->low_limit + length;
-//
-//	/* Check highest gap, which does not precede any rbtree node */
-//	gap_start = mm->highest_vm_end;
-//	if (gap_start <= high_limit)
-//		goto found_highest;
-//
-//	/* Check if rbtree root looks promising */
-//	if (RB_EMPTY_ROOT(&mm->mm_rb))
-//		return -ENOMEM;
-//	vma = rb_entry(mm->mm_rb.rb_node, struct vm_area_struct, vm_rb);
-//	if (vma->rb_subtree_gap < length)
-//		return -ENOMEM;
-//
-//	while (true) {
-//		/* Visit right subtree if it looks promising */
-//		gap_start = vma->vm_prev ? vm_end_gap(vma->vm_prev) : 0;
-//		if (gap_start <= high_limit && vma->vm_rb.rb_right) {
-//			struct vm_area_struct *right =
-//				rb_entry(vma->vm_rb.rb_right,
-//					 struct vm_area_struct, vm_rb);
-//			if (right->rb_subtree_gap >= length) {
-//				vma = right;
-//				continue;
-//			}
-//		}
-//
-//check_current:
-//		/* Check if current node has a suitable gap */
-//		gap_end = vm_start_gap(vma);
-//		if (gap_end < low_limit)
-//			return -ENOMEM;
-//		if (gap_start <= high_limit &&
-//		    gap_end > gap_start && gap_end - gap_start >= length)
-//			goto found;
-//
-//		/* Visit left subtree if it looks promising */
-//		if (vma->vm_rb.rb_left) {
-//			struct vm_area_struct *left =
-//				rb_entry(vma->vm_rb.rb_left,
-//					 struct vm_area_struct, vm_rb);
-//			if (left->rb_subtree_gap >= length) {
-//				vma = left;
-//				continue;
-//			}
-//		}
-//
-//		/* Go back up the rbtree to find next candidate node */
-//		while (true) {
-//			struct rb_node *prev = &vma->vm_rb;
-//			if (!rb_parent(prev))
-//				return -ENOMEM;
-//			vma = rb_entry(rb_parent(prev),
-//				       struct vm_area_struct, vm_rb);
-//			if (prev == vma->vm_rb.rb_right) {
-//				gap_start = vma->vm_prev ?
-//					vm_end_gap(vma->vm_prev) : 0;
-//				goto check_current;
-//			}
-//		}
-//	}
-//
-//found:
-//	/* We found a suitable gap. Clip it with the original high_limit. */
-//	if (gap_end > info->high_limit)
-//		gap_end = info->high_limit;
-//
-//found_highest:
-//	/* Compute highest gap address at the desired alignment */
-//	gap_end -= info->length;
-//	gap_end -= (gap_end - info->align_offset) & info->align_mask;
-//
-//	VM_BUG_ON(gap_end < info->low_limit);
-//	VM_BUG_ON(gap_end < gap_start);
-//	return gap_end;
-//}
-//
-///*
-// * Search for an unmapped address range.
-// *
-// * We are looking for a range that:
-// * - does not intersect with any VMA;
-// * - is contained within the [low_limit, high_limit) interval;
-// * - is at least the desired size.
-// * - satisfies (begin_addr & align_mask) == (align_offset & align_mask)
-// */
-//unsigned long vm_unmapped_area(struct vm_unmapped_area_info *info)
-//{
-//	unsigned long addr;
-//
-//	if (info->flags & VM_UNMAPPED_AREA_TOPDOWN)
-//		addr = unmapped_area_topdown(info);
-//	else
-//		addr = unmapped_area(info);
-//
-//	trace_vm_unmapped_area(addr, info);
-//	return addr;
-//}
-//
-//#ifndef arch_get_mmap_end
-//#define arch_get_mmap_end(addr)	(TASK_SIZE)
-//#endif
-//
-//#ifndef arch_get_mmap_base
-//#define arch_get_mmap_base(addr, base) (base)
-//#endif
-//
-///* Get an address range which is currently unmapped.
-// * For shmat() with addr=0.
-// *
-// * Ugly calling convention alert:
-// * Return value with the low bits set means error value,
-// * ie
-// *	if (ret & ~PAGE_MASK)
-// *		error = ret;
-// *
-// * This function "knows" that -ENOMEM has the bits set.
-// */
-//#ifndef HAVE_ARCH_UNMAPPED_AREA
-//unsigned long
-//arch_get_unmapped_area(struct file *filp, unsigned long addr,
-//		unsigned long len, unsigned long pgoff, unsigned long flags)
-//{
-//	struct mm_struct *mm = current->mm;
-//	struct vm_area_struct *vma, *prev;
-//	struct vm_unmapped_area_info info;
-//	const unsigned long mmap_end = arch_get_mmap_end(addr);
-//
-//	if (len > mmap_end - mmap_min_addr)
-//		return -ENOMEM;
-//
-//	if (flags & MAP_FIXED)
-//		return addr;
-//
-//	if (addr) {
-//		addr = PAGE_ALIGN(addr);
-//		vma = find_vma_prev(mm, addr, &prev);
-//		if (mmap_end - len >= addr && addr >= mmap_min_addr &&
-//		    (!vma || addr + len <= vm_start_gap(vma)) &&
-//		    (!prev || addr >= vm_end_gap(prev)))
-//			return addr;
-//	}
-//
-//	info.flags = 0;
-//	info.length = len;
-//	info.low_limit = mm->mmap_base;
-//	info.high_limit = mmap_end;
-//	info.align_mask = 0;
-//	info.align_offset = 0;
-//	return vm_unmapped_area(&info);
-//}
-//#endif
-//
-///*
-// * This mmap-allocator allocates new areas top-down from below the
-// * stack's low limit (the base):
-// */
-//#ifndef HAVE_ARCH_UNMAPPED_AREA_TOPDOWN
-//unsigned long
-//arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
-//			  unsigned long len, unsigned long pgoff,
-//			  unsigned long flags)
-//{
-//	struct vm_area_struct *vma, *prev;
-//	struct mm_struct *mm = current->mm;
-//	struct vm_unmapped_area_info info;
-//	const unsigned long mmap_end = arch_get_mmap_end(addr);
-//
-//	/* requested length too big for entire address space */
-//	if (len > mmap_end - mmap_min_addr)
-//		return -ENOMEM;
-//
-//	if (flags & MAP_FIXED)
-//		return addr;
-//
-//	/* requesting a specific address */
-//	if (addr) {
-//		addr = PAGE_ALIGN(addr);
-//		vma = find_vma_prev(mm, addr, &prev);
-//		if (mmap_end - len >= addr && addr >= mmap_min_addr &&
-//				(!vma || addr + len <= vm_start_gap(vma)) &&
-//				(!prev || addr >= vm_end_gap(prev)))
-//			return addr;
-//	}
-//
-//	info.flags = VM_UNMAPPED_AREA_TOPDOWN;
-//	info.length = len;
-//	info.low_limit = max(PAGE_SIZE, mmap_min_addr);
-//	info.high_limit = arch_get_mmap_base(addr, mm->mmap_base);
-//	info.align_mask = 0;
-//	info.align_offset = 0;
-//	addr = vm_unmapped_area(&info);
-//
-//	/*
-//	 * A failed mmap() very likely causes application failure,
-//	 * so fall back to the bottom-up function here. This scenario
-//	 * can happen with large stack limits and large mmap()
-//	 * allocations.
-//	 */
-//	if (offset_in_page(addr)) {
-//		VM_BUG_ON(addr != -ENOMEM);
-//		info.flags = 0;
-//		info.low_limit = TASK_UNMAPPED_BASE;
-//		info.high_limit = mmap_end;
-//		addr = vm_unmapped_area(&info);
-//	}
-//
-//	return addr;
-//}
-//#endif
-//
+
+static unsigned long unmapped_area(struct vm_unmapped_area_info *info)
+{
+	/*
+	 * We implement the search by looking for an rbtree node that
+	 * immediately follows a suitable gap. That is,
+	 * - gap_start = vma->vm_prev->vm_end <= info->high_limit - length;
+	 * - gap_end   = vma->vm_start        >= info->low_limit  + length;
+	 * - gap_end - gap_start >= length
+	 */
+
+	struct mm_struct *mm = current->mm;
+	struct vm_area_struct *vma;
+	unsigned long length, low_limit, high_limit, gap_start, gap_end;
+
+	/* Adjust search length to account for worst case alignment overhead */
+	length = info->length + info->align_mask;
+	if (length < info->length)
+		return -ENOMEM;
+
+	/* Adjust search limits by the desired length */
+	if (info->high_limit < length)
+		return -ENOMEM;
+	high_limit = info->high_limit - length;
+
+	if (info->low_limit > high_limit)
+		return -ENOMEM;
+	low_limit = info->low_limit + length;
+
+	/* Check if rbtree root looks promising */
+	if (RB_EMPTY_ROOT(&mm->mm_rb))
+		goto check_highest;
+	vma = rb_entry(mm->mm_rb.rb_node, struct vm_area_struct, vm_rb);
+	if (vma->rb_subtree_gap < length)
+		goto check_highest;
+
+	while (true) {
+		/* Visit left subtree if it looks promising */
+		gap_end = vm_start_gap(vma);
+		if (gap_end >= low_limit && vma->vm_rb.rb_left) {
+			struct vm_area_struct *left =
+				rb_entry(vma->vm_rb.rb_left,
+					 struct vm_area_struct, vm_rb);
+			if (left->rb_subtree_gap >= length) {
+				vma = left;
+				continue;
+			}
+		}
+
+		gap_start = vma->vm_prev ? vm_end_gap(vma->vm_prev) : 0;
+check_current:
+		/* Check if current node has a suitable gap */
+		if (gap_start > high_limit)
+			return -ENOMEM;
+		if (gap_end >= low_limit &&
+		    gap_end > gap_start && gap_end - gap_start >= length)
+			goto found;
+
+		/* Visit right subtree if it looks promising */
+		if (vma->vm_rb.rb_right) {
+			struct vm_area_struct *right =
+				rb_entry(vma->vm_rb.rb_right,
+					 struct vm_area_struct, vm_rb);
+			if (right->rb_subtree_gap >= length) {
+				vma = right;
+				continue;
+			}
+		}
+
+		/* Go back up the rbtree to find next candidate node */
+		while (true) {
+			struct rb_node *prev = &vma->vm_rb;
+			if (!rb_parent(prev))
+				goto check_highest;
+			vma = rb_entry(rb_parent(prev),
+				       struct vm_area_struct, vm_rb);
+			if (prev == vma->vm_rb.rb_left) {
+				gap_start = vm_end_gap(vma->vm_prev);
+				gap_end = vm_start_gap(vma);
+				goto check_current;
+			}
+		}
+	}
+
+check_highest:
+	/* Check highest gap, which does not precede any rbtree node */
+	gap_start = mm->highest_vm_end;
+	gap_end = ULONG_MAX;  /* Only for VM_BUG_ON below */
+	if (gap_start > high_limit)
+		return -ENOMEM;
+
+found:
+	/* We found a suitable gap. Clip it with the original low_limit. */
+	if (gap_start < info->low_limit)
+		gap_start = info->low_limit;
+
+	/* Adjust gap address to the desired alignment */
+	gap_start += (info->align_offset - gap_start) & info->align_mask;
+
+	VM_BUG_ON(gap_start + info->length > info->high_limit);
+	VM_BUG_ON(gap_start + info->length > gap_end);
+	return gap_start;
+}
+
+static unsigned long unmapped_area_topdown(struct vm_unmapped_area_info *info)
+{
+	struct mm_struct *mm = current->mm;
+	struct vm_area_struct *vma;
+	unsigned long length, low_limit, high_limit, gap_start, gap_end;
+
+	/* Adjust search length to account for worst case alignment overhead */
+	length = info->length + info->align_mask;
+	if (length < info->length)
+		return -ENOMEM;
+
+	/*
+	 * Adjust search limits by the desired length.
+	 * See implementation comment at top of unmapped_area().
+	 */
+	gap_end = info->high_limit;
+	if (gap_end < length)
+		return -ENOMEM;
+	high_limit = gap_end - length;
+
+	if (info->low_limit > high_limit)
+		return -ENOMEM;
+	low_limit = info->low_limit + length;
+
+	/* Check highest gap, which does not precede any rbtree node */
+	gap_start = mm->highest_vm_end;
+	if (gap_start <= high_limit)
+		goto found_highest;
+
+	/* Check if rbtree root looks promising */
+	if (RB_EMPTY_ROOT(&mm->mm_rb))
+		return -ENOMEM;
+	vma = rb_entry(mm->mm_rb.rb_node, struct vm_area_struct, vm_rb);
+	if (vma->rb_subtree_gap < length)
+		return -ENOMEM;
+
+	while (true) {
+		/* Visit right subtree if it looks promising */
+		gap_start = vma->vm_prev ? vm_end_gap(vma->vm_prev) : 0;
+		if (gap_start <= high_limit && vma->vm_rb.rb_right) {
+			struct vm_area_struct *right =
+				rb_entry(vma->vm_rb.rb_right,
+					 struct vm_area_struct, vm_rb);
+			if (right->rb_subtree_gap >= length) {
+				vma = right;
+				continue;
+			}
+		}
+
+check_current:
+		/* Check if current node has a suitable gap */
+		gap_end = vm_start_gap(vma);
+		if (gap_end < low_limit)
+			return -ENOMEM;
+		if (gap_start <= high_limit &&
+		    gap_end > gap_start && gap_end - gap_start >= length)
+			goto found;
+
+		/* Visit left subtree if it looks promising */
+		if (vma->vm_rb.rb_left) {
+			struct vm_area_struct *left =
+				rb_entry(vma->vm_rb.rb_left,
+					 struct vm_area_struct, vm_rb);
+			if (left->rb_subtree_gap >= length) {
+				vma = left;
+				continue;
+			}
+		}
+
+		/* Go back up the rbtree to find next candidate node */
+		while (true) {
+			struct rb_node *prev = &vma->vm_rb;
+			if (!rb_parent(prev))
+				return -ENOMEM;
+			vma = rb_entry(rb_parent(prev),
+				       struct vm_area_struct, vm_rb);
+			if (prev == vma->vm_rb.rb_right) {
+				gap_start = vma->vm_prev ?
+					vm_end_gap(vma->vm_prev) : 0;
+				goto check_current;
+			}
+		}
+	}
+
+found:
+	/* We found a suitable gap. Clip it with the original high_limit. */
+	if (gap_end > info->high_limit)
+		gap_end = info->high_limit;
+
+found_highest:
+	/* Compute highest gap address at the desired alignment */
+	gap_end -= info->length;
+	gap_end -= (gap_end - info->align_offset) & info->align_mask;
+
+	VM_BUG_ON(gap_end < info->low_limit);
+	VM_BUG_ON(gap_end < gap_start);
+	return gap_end;
+}
+
+/*
+ * Search for an unmapped address range.
+ *
+ * We are looking for a range that:
+ * - does not intersect with any VMA;
+ * - is contained within the [low_limit, high_limit) interval;
+ * - is at least the desired size.
+ * - satisfies (begin_addr & align_mask) == (align_offset & align_mask)
+ */
+unsigned long vm_unmapped_area(struct vm_unmapped_area_info *info)
+{
+	unsigned long addr;
+
+	if (info->flags & VM_UNMAPPED_AREA_TOPDOWN)
+		addr = unmapped_area_topdown(info);
+	else
+		addr = unmapped_area(info);
+
+	trace_vm_unmapped_area(addr, info);
+	return addr;
+}
+
+#ifndef arch_get_mmap_end
+#define arch_get_mmap_end(addr)	(TASK_SIZE)
+#endif
+
+#ifndef arch_get_mmap_base
+#define arch_get_mmap_base(addr, base) (base)
+#endif
+
+/* Get an address range which is currently unmapped.
+ * For shmat() with addr=0.
+ *
+ * Ugly calling convention alert:
+ * Return value with the low bits set means error value,
+ * ie
+ *	if (ret & ~PAGE_MASK)
+ *		error = ret;
+ *
+ * This function "knows" that -ENOMEM has the bits set.
+ */
+#ifndef HAVE_ARCH_UNMAPPED_AREA
+unsigned long
+arch_get_unmapped_area(struct file *filp, unsigned long addr,
+		unsigned long len, unsigned long pgoff, unsigned long flags)
+{
+	struct mm_struct *mm = current->mm;
+	struct vm_area_struct *vma, *prev;
+	struct vm_unmapped_area_info info;
+	const unsigned long mmap_end = arch_get_mmap_end(addr);
+
+	if (len > mmap_end - mmap_min_addr)
+		return -ENOMEM;
+
+	if (flags & MAP_FIXED)
+		return addr;
+
+	if (addr) {
+		addr = PAGE_ALIGN(addr);
+		vma = find_vma_prev(mm, addr, &prev);
+		if (mmap_end - len >= addr && addr >= mmap_min_addr &&
+		    (!vma || addr + len <= vm_start_gap(vma)) &&
+		    (!prev || addr >= vm_end_gap(prev)))
+			return addr;
+	}
+
+	info.flags = 0;
+	info.length = len;
+	info.low_limit = mm->mmap_base;
+	info.high_limit = mmap_end;
+	info.align_mask = 0;
+	info.align_offset = 0;
+	return vm_unmapped_area(&info);
+}
+#endif
+
+/*
+ * This mmap-allocator allocates new areas top-down from below the
+ * stack's low limit (the base):
+ */
+#ifndef HAVE_ARCH_UNMAPPED_AREA_TOPDOWN
+unsigned long
+arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
+			  unsigned long len, unsigned long pgoff,
+			  unsigned long flags)
+{
+	struct vm_area_struct *vma, *prev;
+	struct mm_struct *mm = current->mm;
+	struct vm_unmapped_area_info info;
+	const unsigned long mmap_end = arch_get_mmap_end(addr);
+
+	/* requested length too big for entire address space */
+	if (len > mmap_end - mmap_min_addr)
+		return -ENOMEM;
+
+	if (flags & MAP_FIXED)
+		return addr;
+
+	/* requesting a specific address */
+	if (addr) {
+		addr = PAGE_ALIGN(addr);
+		vma = find_vma_prev(mm, addr, &prev);
+		if (mmap_end - len >= addr && addr >= mmap_min_addr &&
+				(!vma || addr + len <= vm_start_gap(vma)) &&
+				(!prev || addr >= vm_end_gap(prev)))
+			return addr;
+	}
+
+	info.flags = VM_UNMAPPED_AREA_TOPDOWN;
+	info.length = len;
+	info.low_limit = max(PAGE_SIZE, mmap_min_addr);
+	info.high_limit = arch_get_mmap_base(addr, mm->mmap_base);
+	info.align_mask = 0;
+	info.align_offset = 0;
+	addr = vm_unmapped_area(&info);
+
+	/*
+	 * A failed mmap() very likely causes application failure,
+	 * so fall back to the bottom-up function here. This scenario
+	 * can happen with large stack limits and large mmap()
+	 * allocations.
+	 */
+	if (offset_in_page(addr)) {
+		VM_BUG_ON(addr != -ENOMEM);
+		info.flags = 0;
+		info.low_limit = TASK_UNMAPPED_BASE;
+		info.high_limit = mmap_end;
+		addr = vm_unmapped_area(&info);
+	}
+
+	return addr;
+}
+#endif
+
 //unsigned long
 //get_unmapped_area(struct file *file, unsigned long addr, unsigned long len,
 //		unsigned long pgoff, unsigned long flags)
@@ -2292,25 +2287,25 @@ struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 }
 
 
-///*
-// * Same as find_vma, but also return a pointer to the previous VMA in *pprev.
-// */
-//struct vm_area_struct *
-//find_vma_prev(struct mm_struct *mm, unsigned long addr,
-//			struct vm_area_struct **pprev)
-//{
-//	struct vm_area_struct *vma;
-//
-//	vma = find_vma(mm, addr);
-//	if (vma) {
-//		*pprev = vma->vm_prev;
-//	} else {
-//		struct rb_node *rb_node = rb_last(&mm->mm_rb);
-//
-//		*pprev = rb_node ? rb_entry(rb_node, struct vm_area_struct, vm_rb) : NULL;
-//	}
-//	return vma;
-//}
+/*
+ * Same as find_vma, but also return a pointer to the previous VMA in *pprev.
+ */
+struct vm_area_struct *
+find_vma_prev(struct mm_struct *mm, unsigned long addr,
+			struct vm_area_struct **pprev)
+{
+	struct vm_area_struct *vma;
+
+	vma = find_vma(mm, addr);
+	if (vma) {
+		*pprev = vma->vm_prev;
+	} else {
+		struct rb_node *rb_node = rb_last(&mm->mm_rb);
+
+		*pprev = rb_node ? rb_entry(rb_node, struct vm_area_struct, vm_rb) : NULL;
+	}
+	return vma;
+}
 
 /*
  * Verify that the stack growth is acceptable and

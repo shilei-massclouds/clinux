@@ -16,7 +16,3 @@ cl_mmap_init(void)
 EXPORT_SYMBOL(cl_mmap_init);
 
 DEFINE_ENABLE_FUNC(mmap);
-
-/* enforced gap between the expanding stack and other mappings. */
-unsigned long stack_guard_gap = 256UL<<PAGE_SHIFT;
-
