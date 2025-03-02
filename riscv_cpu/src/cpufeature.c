@@ -14,6 +14,7 @@
 #include <asm/switch_to.h>
 
 unsigned long elf_hwcap __read_mostly;
+EXPORT_SYMBOL(elf_hwcap);
 
 /* Host ISA bitmap */
 static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;

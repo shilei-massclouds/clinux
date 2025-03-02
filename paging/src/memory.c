@@ -109,20 +109,21 @@
 // */
 //void *high_memory;
 //EXPORT_SYMBOL(high_memory);
-//
-///*
-// * Randomize the address space (stacks, mmaps, brk, etc.).
-// *
-// * ( When CONFIG_COMPAT_BRK=y we exclude brk from randomization,
-// *   as ancient (libc5 based) binaries can segfault. )
-// */
-//int randomize_va_space __read_mostly =
-//#ifdef CONFIG_COMPAT_BRK
-//					1;
-//#else
-//					2;
-//#endif
-//
+
+/*
+ * Randomize the address space (stacks, mmaps, brk, etc.).
+ *
+ * ( When CONFIG_COMPAT_BRK=y we exclude brk from randomization,
+ *   as ancient (libc5 based) binaries can segfault. )
+ */
+int randomize_va_space __read_mostly =
+#ifdef CONFIG_COMPAT_BRK
+					1;
+#else
+					2;
+#endif
+EXPORT_SYMBOL(randomize_va_space);
+
 //#ifndef arch_faults_on_old_pte
 //static inline bool arch_faults_on_old_pte(void)
 //{

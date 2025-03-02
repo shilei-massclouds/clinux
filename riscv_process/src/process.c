@@ -87,6 +87,7 @@ void start_thread(struct pt_regs *regs, unsigned long pc,
 	regs->sp = sp;
 	set_fs(USER_DS);
 }
+EXPORT_SYMBOL(start_thread);
 
 void flush_thread(void)
 {
