@@ -66,7 +66,7 @@ components := \
 	block genhd partitions elevator \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap riscv_fault \
-	signal sysctl kallsyms \
+	signal sysctl kallsyms read_write \
 	virtio_mmio virtio virtio_blk ext2 \
 	early_printk printk panic bug dump_stack show_mem
 	#partitions \

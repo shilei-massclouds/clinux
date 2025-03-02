@@ -3967,7 +3967,6 @@ int shmem_init_fs_context(struct fs_context *fc)
 	fc->ops = &shmem_fs_context_ops;
 	return 0;
 }
-EXPORT_SYMBOL(shmem_init_fs_context);
 
 static struct file_system_type shmem_fs_type = {
 	.owner		= THIS_MODULE,

@@ -2291,7 +2291,6 @@ struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 	return vma;
 }
 
-EXPORT_SYMBOL(find_vma);
 
 ///*
 // * Same as find_vma, but also return a pointer to the previous VMA in *pprev.

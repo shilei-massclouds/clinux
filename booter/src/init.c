@@ -579,20 +579,6 @@ __weak void kfree_link(void *p)
 }
 EXPORT_SYMBOL(kfree_link);
 
-loff_t
-generic_file_llseek_size(struct file *file, loff_t offset, int whence,
-        loff_t maxsize, loff_t eof)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(generic_file_llseek_size);
-
-loff_t noop_llseek(struct file *file, loff_t offset, int whence)
-{
-    booter_panic("No impl in 'lib'.");
-}
-EXPORT_SYMBOL(noop_llseek);
-
 __weak int setattr_prepare(struct dentry *dentry, struct iattr *attr)
 {
     booter_panic("No impl!\n");
@@ -778,7 +764,7 @@ __weak unsigned int full_name_hash(const void *salt, const char *name, unsigned 
 }
 EXPORT_SYMBOL(full_name_hash);
 
-loff_t no_llseek(struct file *file, loff_t offset, int whence)
+__weak loff_t no_llseek(struct file *file, loff_t offset, int whence)
 {
     booter_panic("No impl.\n");
 }
@@ -1082,12 +1068,6 @@ __weak bool path_noexec(const struct path *path)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL_GPL(path_noexec);
-
-struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
-{
-    booter_panic("No impl in 'workqueue'.");
-}
-EXPORT_SYMBOL_GPL(find_vma);
 
 /*
 struct file *file_open_root(struct dentry *dentry, struct vfsmount *mnt,
@@ -1707,11 +1687,13 @@ __weak struct dentry *debugfs_create_file(const char *name, umode_t mode,
 }
 EXPORT_SYMBOL_GPL(debugfs_create_file);
 
+/*
 loff_t default_llseek(struct file *file, loff_t offset, int whence)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(default_llseek);
+*/
 
 u32 fsnotify_get_cookie(void)
 {
@@ -2878,3 +2860,44 @@ void migration_entry_wait(struct mm_struct *mm, pmd_t *pmd,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(migration_entry_wait);
+
+__weak struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(find_vma);
+
+__weak loff_t noop_llseek(struct file *file, loff_t offset, int whence)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(noop_llseek);
+
+__weak loff_t
+generic_file_llseek_size(struct file *file, loff_t offset, int whence,
+		loff_t maxsize, loff_t eof)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(generic_file_llseek_size);
+
+__weak loff_t generic_file_llseek(struct file *file, loff_t offset, int whence)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(generic_file_llseek);
+
+__weak int shmem_init_fs_context(struct fs_context *fc)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(shmem_init_fs_context);
+
+__weak ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
+			      unsigned long nr_segs, unsigned long fast_segs,
+			      struct iovec *fast_pointer,
+			      struct iovec **ret_pointer)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(rw_copy_check_uvector);

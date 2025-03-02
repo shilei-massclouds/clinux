@@ -16,10 +16,12 @@ cl_tty_init(void)
 }
 EXPORT_SYMBOL(cl_tty_init);
 
+/*
 ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_t *pos)
 {
     booter_panic("No impl.\n");
 }
+*/
 int ptm_open_peer(struct file *master, struct tty_struct *tty, int flags)
 {
     booter_panic("No impl.\n");

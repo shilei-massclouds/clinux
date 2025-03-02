@@ -25,11 +25,13 @@ int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
 }
 EXPORT_SYMBOL(simple_xattr_set);
 
+/*
 loff_t generic_file_llseek(struct file *file, loff_t offset, int whence)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(generic_file_llseek);
+*/
 
 ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
               char *buffer, size_t size)

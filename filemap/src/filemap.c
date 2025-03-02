@@ -3244,6 +3244,7 @@ int generic_remap_checks(struct file *file_in, loff_t pos_in,
 	*req_count = count;
 	return 0;
 }
+EXPORT_SYMBOL(generic_remap_checks);
 
 
 /*
@@ -3268,6 +3269,7 @@ int generic_file_rw_checks(struct file *file_in, struct file *file_out)
 
 	return 0;
 }
+EXPORT_SYMBOL(generic_file_rw_checks);
 
 /*
  * Performs necessary checks before doing a file copy
@@ -3321,6 +3323,7 @@ int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
 	*req_count = count;
 	return 0;
 }
+EXPORT_SYMBOL(generic_copy_file_checks);
 
 int pagecache_write_begin(struct file *file, struct address_space *mapping,
 				loff_t pos, unsigned len, unsigned flags,

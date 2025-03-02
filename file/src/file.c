@@ -943,11 +943,13 @@ unsigned long __fdget_pos(unsigned int fd)
 	}
 	return v;
 }
+EXPORT_SYMBOL(__fdget_pos);
 
 void __f_unlock_pos(struct file *f)
 {
 	mutex_unlock(&f->f_pos_lock);
 }
+EXPORT_SYMBOL(__f_unlock_pos);
 
 /*
  * We only lock f_pos if we have threads or if the file might be

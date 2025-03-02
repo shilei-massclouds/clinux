@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(arch_pick_mmap_layout)
-CL_MINE(kernel_read)
 CL_MINE(membarrier_exec_mmap)
 CL_MINE(move_page_tables)
 CL_MINE(mprotect_fixup)

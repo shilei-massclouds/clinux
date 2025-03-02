@@ -35,7 +35,9 @@ void __sched console_conditional_schedule(void)
     booter_panic("No impl!\n");
 }
 
+/*
 loff_t fixed_size_llseek(struct file *file, loff_t offset, int whence, loff_t size)
 {
     booter_panic("No impl!\n");
 }
+*/
