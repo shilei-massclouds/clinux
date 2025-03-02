@@ -3204,44 +3204,45 @@ out:
 //	}
 //	vm_unacct_memory(nr_accounted);
 //}
-//
-///* Insert vm structure into process list sorted by address
-// * and into the inode's i_mmap tree.  If vm_file is non-NULL
-// * then i_mmap_rwsem is taken here.
-// */
-//int insert_vm_struct(struct mm_struct *mm, struct vm_area_struct *vma)
-//{
-//	struct vm_area_struct *prev;
-//	struct rb_node **rb_link, *rb_parent;
-//
-//	if (find_vma_links(mm, vma->vm_start, vma->vm_end,
-//			   &prev, &rb_link, &rb_parent))
-//		return -ENOMEM;
-//	if ((vma->vm_flags & VM_ACCOUNT) &&
-//	     security_vm_enough_memory_mm(mm, vma_pages(vma)))
-//		return -ENOMEM;
-//
-//	/*
-//	 * The vm_pgoff of a purely anonymous vma should be irrelevant
-//	 * until its first write fault, when page's anon_vma and index
-//	 * are set.  But now set the vm_pgoff it will almost certainly
-//	 * end up with (unless mremap moves it elsewhere before that
-//	 * first wfault), so /proc/pid/maps tells a consistent story.
-//	 *
-//	 * By setting it to reflect the virtual start address of the
-//	 * vma, merges and splits can happen in a seamless way, just
-//	 * using the existing file pgoff checks and manipulations.
-//	 * Similarly in do_mmap and in do_brk.
-//	 */
-//	if (vma_is_anonymous(vma)) {
-//		BUG_ON(vma->anon_vma);
-//		vma->vm_pgoff = vma->vm_start >> PAGE_SHIFT;
-//	}
-//
-//	vma_link(mm, vma, prev, rb_link, rb_parent);
-//	return 0;
-//}
-//
+
+/* Insert vm structure into process list sorted by address
+ * and into the inode's i_mmap tree.  If vm_file is non-NULL
+ * then i_mmap_rwsem is taken here.
+ */
+int insert_vm_struct(struct mm_struct *mm, struct vm_area_struct *vma)
+{
+	struct vm_area_struct *prev;
+	struct rb_node **rb_link, *rb_parent;
+
+	if (find_vma_links(mm, vma->vm_start, vma->vm_end,
+			   &prev, &rb_link, &rb_parent))
+		return -ENOMEM;
+	if ((vma->vm_flags & VM_ACCOUNT) &&
+	     security_vm_enough_memory_mm(mm, vma_pages(vma)))
+		return -ENOMEM;
+
+	/*
+	 * The vm_pgoff of a purely anonymous vma should be irrelevant
+	 * until its first write fault, when page's anon_vma and index
+	 * are set.  But now set the vm_pgoff it will almost certainly
+	 * end up with (unless mremap moves it elsewhere before that
+	 * first wfault), so /proc/pid/maps tells a consistent story.
+	 *
+	 * By setting it to reflect the virtual start address of the
+	 * vma, merges and splits can happen in a seamless way, just
+	 * using the existing file pgoff checks and manipulations.
+	 * Similarly in do_mmap and in do_brk.
+	 */
+	if (vma_is_anonymous(vma)) {
+		BUG_ON(vma->anon_vma);
+		vma->vm_pgoff = vma->vm_start >> PAGE_SHIFT;
+	}
+
+	vma_link(mm, vma, prev, rb_link, rb_parent);
+	return 0;
+}
+EXPORT_SYMBOL(insert_vm_struct);
+
 ///*
 // * Copy the vma structure to a new location in the same mm,
 // * prior to moving page table entries, to effect an mremap move.
