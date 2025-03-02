@@ -12,6 +12,7 @@
 #include <linux/tty.h>
 #include <linux/module.h>
 #include <linux/fs.h>
+#include <linux/xattr.h>
 #include <linux/fs_context.h>
 #include <linux/ipc_namespace.h>
 #include <linux/user_namespace.h>
@@ -2901,3 +2902,55 @@ __weak ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvect
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(rw_copy_check_uvector);
+
+__weak int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
+             const void *value, size_t size, int flags,
+             ssize_t *removed_size)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_xattr_set);
+
+__weak ssize_t
+__vfs_getxattr(struct dentry *dentry, struct inode *inode, const char *name,
+	       void *value, size_t size)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__vfs_getxattr);
+
+__weak ssize_t
+vfs_getxattr_alloc(struct dentry *dentry, const char *name, char **xattr_value,
+		   size_t xattr_size, gfp_t flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(vfs_getxattr_alloc);
+
+__weak int
+__vfs_removexattr(struct dentry *dentry, const char *name)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__vfs_removexattr);
+
+__weak const char *xattr_full_name(const struct xattr_handler *handler,
+                const char *name)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(xattr_full_name);
+
+__weak int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
+             void *buffer, size_t size)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_xattr_get);
+
+__weak ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
+              char *buffer, size_t size)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(simple_xattr_list);

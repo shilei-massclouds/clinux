@@ -521,6 +521,7 @@ int cap_convert_nscap(struct dentry *dentry, void **ivalue, size_t size)
 	*ivalue = nscap;
 	return newsize;
 }
+EXPORT_SYMBOL(cap_convert_nscap);
 
 /*
  * Calculate the new process capability sets from the capability sets attached
@@ -933,6 +934,7 @@ int cap_inode_setxattr(struct dentry *dentry, const char *name,
 		return -EPERM;
 	return 0;
 }
+EXPORT_SYMBOL(cap_inode_setxattr);
 
 /**
  * cap_inode_removexattr - Determine whether an xattr may be removed
@@ -968,6 +970,7 @@ int cap_inode_removexattr(struct dentry *dentry, const char *name)
 		return -EPERM;
 	return 0;
 }
+EXPORT_SYMBOL(cap_inode_removexattr);
 
 /*
  * cap_emulate_setxuid() fixes the effective / permitted capabilities of

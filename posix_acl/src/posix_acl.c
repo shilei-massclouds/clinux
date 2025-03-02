@@ -713,6 +713,7 @@ void posix_acl_fix_xattr_from_user(void *value, size_t size)
 		return;
 	posix_acl_fix_xattr_userns(&init_user_ns, user_ns, value, size);
 }
+EXPORT_SYMBOL(posix_acl_fix_xattr_from_user);
 
 void posix_acl_fix_xattr_to_user(void *value, size_t size)
 {
@@ -721,6 +722,7 @@ void posix_acl_fix_xattr_to_user(void *value, size_t size)
 		return;
 	posix_acl_fix_xattr_userns(user_ns, &init_user_ns, value, size);
 }
+EXPORT_SYMBOL(posix_acl_fix_xattr_to_user);
 
 /*
  * Convert from extended attribute to in-memory representation.

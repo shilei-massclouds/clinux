@@ -17,14 +17,6 @@ cl_kernfs_init(void)
 }
 EXPORT_SYMBOL(cl_kernfs_init);
 
-int simple_xattr_set(struct simple_xattrs *xattrs, const char *name,
-             const void *value, size_t size, int flags,
-             ssize_t *removed_size)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(simple_xattr_set);
-
 /*
 loff_t generic_file_llseek(struct file *file, loff_t offset, int whence)
 {
@@ -32,24 +24,3 @@ loff_t generic_file_llseek(struct file *file, loff_t offset, int whence)
 }
 EXPORT_SYMBOL(generic_file_llseek);
 */
-
-ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
-              char *buffer, size_t size)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(simple_xattr_list);
-
-const char *xattr_full_name(const struct xattr_handler *handler,
-                const char *name)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(xattr_full_name);
-
-int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
-             void *buffer, size_t size)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(simple_xattr_get);
