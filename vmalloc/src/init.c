@@ -41,8 +41,10 @@ int __printk_ratelimit(const char *func)
 }
 EXPORT_SYMBOL(__printk_ratelimit);
 
+/*
 void flush_icache_pte(pte_t pte)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(flush_icache_pte);
+*/
