@@ -48,7 +48,7 @@ components := \
 	of of_irq irq_work tty vt earlycon dummycon input \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess capability security \
-	clocksource pid seq_file errseq futex \
+	clocksource pid seq_file errseq futex dnotify \
 	cpu task cgroup ksysfs dma up notify fs_attr fs_stat fs_writeback \
 	jump_label extable vdso utsname keys ucount umh locks \
 	early_sched sched task_work \

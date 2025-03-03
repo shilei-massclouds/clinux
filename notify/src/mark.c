@@ -150,6 +150,7 @@ void fsnotify_recalc_mask(struct fsnotify_mark_connector *conn)
 		__fsnotify_update_child_dentry_flags(
 					fsnotify_conn_inode(conn));
 }
+EXPORT_SYMBOL(fsnotify_recalc_mask);
 
 /* Free all connectors queued for freeing once SRCU period ends */
 static void fsnotify_connector_destroy_workfn(struct work_struct *work)
@@ -396,6 +397,7 @@ void fsnotify_detach_mark(struct fsnotify_mark *mark)
 	/* Drop mark reference acquired in fsnotify_add_mark_locked() */
 	fsnotify_put_mark(mark);
 }
+EXPORT_SYMBOL(fsnotify_detach_mark);
 
 /*
  * Free fsnotify mark. The mark is actually only marked as being freed.  The
@@ -426,6 +428,7 @@ void fsnotify_free_mark(struct fsnotify_mark *mark)
 	if (group->ops->freeing_mark)
 		group->ops->freeing_mark(mark, group);
 }
+EXPORT_SYMBOL(fsnotify_free_mark);
 
 void fsnotify_destroy_mark(struct fsnotify_mark *mark,
 			   struct fsnotify_group *group)
@@ -679,6 +682,7 @@ err:
 	fsnotify_put_mark(mark);
 	return ret;
 }
+EXPORT_SYMBOL(fsnotify_add_mark_locked);
 
 int fsnotify_add_mark(struct fsnotify_mark *mark, fsnotify_connp_t *connp,
 		      unsigned int type, int allow_dups, __kernel_fsid_t *fsid)

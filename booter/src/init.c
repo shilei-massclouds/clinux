@@ -1694,18 +1694,12 @@ __weak struct dentry *debugfs_create_file(const char *name, umode_t mode,
 EXPORT_SYMBOL_GPL(debugfs_create_file);
 
 /*
-loff_t default_llseek(struct file *file, loff_t offset, int whence)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(default_llseek);
-*/
-
 u32 fsnotify_get_cookie(void)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(fsnotify_get_cookie);
+*/
 
 __weak int expand_stack(struct vm_area_struct *vma, unsigned long address)
 {
