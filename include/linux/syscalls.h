@@ -207,6 +207,7 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
 	SYSCALL_METADATA(_##sname, 0);				\
 	asmlinkage long sys_##sname(void);			\
 	ALLOW_ERROR_INJECTION(sys_##sname, ERRNO);		\
+    EXPORT_SYMBOL(sys_##sname);                 \
 	asmlinkage long sys_##sname(void)
 #endif /* SYSCALL_DEFINE0 */
 
@@ -248,6 +249,7 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
 		return ret;						\
 	}								\
 	__diag_pop();							\
+    EXPORT_SYMBOL(sys##name);       \
 	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
 #endif /* __SYSCALL_DEFINEx */
 
