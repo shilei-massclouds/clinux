@@ -1076,6 +1076,7 @@ int cap_task_fix_setuid(struct cred *new, const struct cred *old, int flags)
 
 	return 0;
 }
+EXPORT_SYMBOL(cap_task_fix_setuid);
 
 /*
  * Rationale: code calling task_setscheduler, task_setioprio, and
@@ -1139,6 +1140,7 @@ int cap_task_setnice(struct task_struct *p, int nice)
 {
 	return cap_safe_nice(p);
 }
+EXPORT_SYMBOL(cap_task_setnice);
 
 /*
  * Implement PR_CAPBSET_DROP.  Attempt to remove the specified capability from
@@ -1296,6 +1298,7 @@ int cap_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 		return -ENOSYS;
 	}
 }
+EXPORT_SYMBOL(cap_task_prctl);
 
 /**
  * cap_vm_enough_memory - Determine whether a new virtual mapping is permitted

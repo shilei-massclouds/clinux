@@ -23,6 +23,8 @@
 #include <net/sock.h>
 
 unsigned int sysctl_nr_open __read_mostly = 1024*1024;
+EXPORT_SYMBOL(sysctl_nr_open);
+
 unsigned int sysctl_nr_open_min = BITS_PER_LONG;
 /* our min() is unusable in constant expressions ;-/ */
 #define __const_min(x, y) ((x) < (y) ? (x) : (y))

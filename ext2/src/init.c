@@ -16,14 +16,3 @@ cl_ext2_init(void)
 EXPORT_SYMBOL(cl_ext2_init);
 
 DEFINE_ENABLE_FUNC(ext2);
-
-/*
- * the same as above, but for filesystems which can only store a 16-bit
- * UID and GID. as such, this is needed on all architectures
- */
-
-int fs_overflowuid = DEFAULT_FS_OVERFLOWUID;
-int fs_overflowgid = DEFAULT_FS_OVERFLOWGID;
-
-EXPORT_SYMBOL(fs_overflowuid);
-EXPORT_SYMBOL(fs_overflowgid);

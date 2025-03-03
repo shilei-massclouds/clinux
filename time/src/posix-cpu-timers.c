@@ -44,6 +44,7 @@ void update_rlimit_cpu(struct task_struct *task, unsigned long rlim_new)
 	set_process_cpu_timer(task, CPUCLOCK_PROF, &nsecs, NULL);
 	spin_unlock_irq(&task->sighand->siglock);
 }
+EXPORT_SYMBOL(update_rlimit_cpu);
 
 /*
  * Functions for validating access to tasks.

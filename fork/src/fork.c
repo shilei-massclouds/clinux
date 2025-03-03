@@ -2728,6 +2728,7 @@ up:
 out:
 	read_unlock(&tasklist_lock);
 }
+EXPORT_SYMBOL(walk_process_tree);
 
 #ifndef ARCH_MIN_MMSTRUCT_ALIGN
 #define ARCH_MIN_MMSTRUCT_ALIGN 0

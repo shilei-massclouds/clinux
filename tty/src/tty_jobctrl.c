@@ -80,6 +80,7 @@ void proc_clear_tty(struct task_struct *p)
 	spin_unlock_irqrestore(&p->sighand->siglock, flags);
 	tty_kref_put(tty);
 }
+EXPORT_SYMBOL(proc_clear_tty);
 
 /**
  * proc_set_tty -  set the controlling terminal

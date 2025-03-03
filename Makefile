@@ -68,6 +68,7 @@ components := \
 	buffer swap riscv_fault \
 	signal sysctl kallsyms read_write \
 	virtio_mmio virtio virtio_blk ext2 binfmt_elf \
+	sys \
 	early_printk printk panic bug dump_stack show_mem
 	#partitions \
 

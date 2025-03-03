@@ -3054,3 +3054,30 @@ static union {
 } vdso_data_store __page_aligned_data;
 struct vdso_data *vdso_data = &vdso_data_store.data;
 EXPORT_SYMBOL(vdso_data);
+
+// From kernel/sys
+/*
+ * the same as above, but for filesystems which can only store a 16-bit
+ * UID and GID. as such, this is needed on all architectures
+ */
+
+int fs_overflowuid = DEFAULT_FS_OVERFLOWUID;
+int fs_overflowgid = DEFAULT_FS_OVERFLOWGID;
+
+EXPORT_SYMBOL(fs_overflowuid);
+EXPORT_SYMBOL(fs_overflowgid);
+
+// From kernel/sys
+/*
+ * this is where the system-wide overflow UID and GID are defined, for
+ * architectures that now have 32-bit UID/GID but didn't in the past
+ */
+
+int overflowuid = DEFAULT_OVERFLOWUID;
+int overflowgid = DEFAULT_OVERFLOWGID;
+EXPORT_SYMBOL(overflowuid);
+EXPORT_SYMBOL(overflowgid);
+
+// From kernel/sys
+DECLARE_RWSEM(uts_sem);
+EXPORT_SYMBOL(uts_sem);

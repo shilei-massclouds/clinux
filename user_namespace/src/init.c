@@ -16,10 +16,6 @@ cl_user_namespace_init(void)
 }
 EXPORT_SYMBOL(cl_user_namespace_init);
 
-int overflowuid = DEFAULT_OVERFLOWUID;
-int overflowgid = DEFAULT_OVERFLOWGID;
-
-
 void *memdup_user_nul(const void __user *src, size_t len)
 {
     booter_panic("No impl!\n");
