@@ -494,42 +494,42 @@ EXPORT_SYMBOL(arch_pick_mmap_layout);
 //	return ret;
 //}
 //EXPORT_SYMBOL_GPL(account_locked_vm);
-//
-//unsigned long vm_mmap_pgoff(struct file *file, unsigned long addr,
-//	unsigned long len, unsigned long prot,
-//	unsigned long flag, unsigned long pgoff)
-//{
-//	unsigned long ret;
-//	struct mm_struct *mm = current->mm;
-//	unsigned long populate;
-//	LIST_HEAD(uf);
-//
-//	ret = security_mmap_file(file, prot, flag);
-//	if (!ret) {
-//		if (mmap_write_lock_killable(mm))
-//			return -EINTR;
-//		ret = do_mmap(file, addr, len, prot, flag, pgoff, &populate,
-//			      &uf);
-//		mmap_write_unlock(mm);
-//		userfaultfd_unmap_complete(mm, &uf);
-//		if (populate)
-//			mm_populate(ret, populate);
-//	}
-//	return ret;
-//}
-//
-//unsigned long vm_mmap(struct file *file, unsigned long addr,
-//	unsigned long len, unsigned long prot,
-//	unsigned long flag, unsigned long offset)
-//{
-//	if (unlikely(offset + PAGE_ALIGN(len) < offset))
-//		return -EINVAL;
-//	if (unlikely(offset_in_page(offset)))
-//		return -EINVAL;
-//
-//	return vm_mmap_pgoff(file, addr, len, prot, flag, offset >> PAGE_SHIFT);
-//}
-//EXPORT_SYMBOL(vm_mmap);
+
+unsigned long vm_mmap_pgoff(struct file *file, unsigned long addr,
+	unsigned long len, unsigned long prot,
+	unsigned long flag, unsigned long pgoff)
+{
+	unsigned long ret;
+	struct mm_struct *mm = current->mm;
+	unsigned long populate;
+	LIST_HEAD(uf);
+
+	ret = security_mmap_file(file, prot, flag);
+	if (!ret) {
+		if (mmap_write_lock_killable(mm))
+			return -EINTR;
+		ret = do_mmap(file, addr, len, prot, flag, pgoff, &populate,
+			      &uf);
+		mmap_write_unlock(mm);
+		userfaultfd_unmap_complete(mm, &uf);
+		if (populate)
+			mm_populate(ret, populate);
+	}
+	return ret;
+}
+
+unsigned long vm_mmap(struct file *file, unsigned long addr,
+	unsigned long len, unsigned long prot,
+	unsigned long flag, unsigned long offset)
+{
+	if (unlikely(offset + PAGE_ALIGN(len) < offset))
+		return -EINVAL;
+	if (unlikely(offset_in_page(offset)))
+		return -EINVAL;
+
+	return vm_mmap_pgoff(file, addr, len, prot, flag, offset >> PAGE_SHIFT);
+}
+EXPORT_SYMBOL(vm_mmap);
 
 /**
  * kvmalloc_node - attempt to allocate physically contiguous memory, but upon

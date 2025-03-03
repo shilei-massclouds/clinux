@@ -3032,3 +3032,26 @@ __weak void free_pages_and_swap_cache(struct page **pages, int nr)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(free_pages_and_swap_cache);
+
+__weak unsigned long do_mmap(struct file *file, unsigned long addr,
+			unsigned long len, unsigned long prot,
+			unsigned long flags, unsigned long pgoff,
+			unsigned long *populate, struct list_head *uf)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(do_mmap);
+
+__weak void page_add_file_rmap(struct page *page, bool compound)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(page_add_file_rmap);
+
+__weak unsigned long shmem_get_unmapped_area(struct file *file,
+				      unsigned long uaddr, unsigned long len,
+				      unsigned long pgoff, unsigned long flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(shmem_get_unmapped_area);
