@@ -23,6 +23,11 @@
 #include <linux/parser.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
+#ifdef GENERIC_TIME_VSYSCALL
+#include <../vdso/datapage.h>
+#else
+#include <asm/vdso.h>
+#endif
 #include <cl_hook.h>
 #include "booter.h"
 #include "../fs/internal.h"
@@ -3061,3 +3066,13 @@ __weak int shmem_zero_setup(struct vm_area_struct *vma)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(shmem_zero_setup);
+
+/*
+ * The vDSO data page.
+ */
+static union {
+	struct vdso_data	data;
+	u8			page[PAGE_SIZE];
+} vdso_data_store __page_aligned_data;
+struct vdso_data *vdso_data = &vdso_data_store.data;
+EXPORT_SYMBOL(vdso_data);

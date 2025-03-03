@@ -18,20 +18,11 @@
 #include <asm/vdso.h>
 #endif
 
-//extern char vdso_start[], vdso_end[];
-//
-//static unsigned int vdso_pages;
-//static struct page **vdso_pagelist;
+extern char vdso_start[], vdso_end[];
 
-/*
- * The vDSO data page.
- */
-static union {
-	struct vdso_data	data;
-	u8			page[PAGE_SIZE];
-} vdso_data_store __page_aligned_data;
-struct vdso_data *vdso_data = &vdso_data_store.data;
-EXPORT_SYMBOL(vdso_data);
+static unsigned int vdso_pages;
+static struct page **vdso_pagelist;
+
 
 //static int __init vdso_init(void)
 //{
@@ -56,51 +47,52 @@ EXPORT_SYMBOL(vdso_data);
 //	return 0;
 //}
 //arch_initcall(vdso_init);
-//
-//int arch_setup_additional_pages(struct linux_binprm *bprm,
-//	int uses_interp)
-//{
-//	struct mm_struct *mm = current->mm;
-//	unsigned long vdso_base, vdso_len;
-//	int ret;
-//
-//	vdso_len = (vdso_pages + 1) << PAGE_SHIFT;
-//
-//	mmap_write_lock(mm);
-//	vdso_base = get_unmapped_area(NULL, 0, vdso_len, 0, 0);
-//	if (IS_ERR_VALUE(vdso_base)) {
-//		ret = vdso_base;
-//		goto end;
-//	}
-//
-//	/*
-//	 * Put vDSO base into mm struct. We need to do this before calling
-//	 * install_special_mapping or the perf counter mmap tracking code
-//	 * will fail to recognise it as a vDSO (since arch_vma_name fails).
-//	 */
-//	mm->context.vdso = (void *)vdso_base;
-//
-//	ret =
-//	   install_special_mapping(mm, vdso_base, vdso_pages << PAGE_SHIFT,
-//		(VM_READ | VM_EXEC | VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC),
-//		vdso_pagelist);
-//
-//	if (unlikely(ret)) {
-//		mm->context.vdso = NULL;
-//		goto end;
-//	}
-//
-//	vdso_base += (vdso_pages << PAGE_SHIFT);
-//	ret = install_special_mapping(mm, vdso_base, PAGE_SIZE,
-//		(VM_READ | VM_MAYREAD), &vdso_pagelist[vdso_pages]);
-//
-//	if (unlikely(ret))
-//		mm->context.vdso = NULL;
-//end:
-//	mmap_write_unlock(mm);
-//	return ret;
-//}
-//
+
+int arch_setup_additional_pages(struct linux_binprm *bprm,
+	int uses_interp)
+{
+	struct mm_struct *mm = current->mm;
+	unsigned long vdso_base, vdso_len;
+	int ret;
+
+	vdso_len = (vdso_pages + 1) << PAGE_SHIFT;
+
+	mmap_write_lock(mm);
+	vdso_base = get_unmapped_area(NULL, 0, vdso_len, 0, 0);
+	if (IS_ERR_VALUE(vdso_base)) {
+		ret = vdso_base;
+		goto end;
+	}
+
+	/*
+	 * Put vDSO base into mm struct. We need to do this before calling
+	 * install_special_mapping or the perf counter mmap tracking code
+	 * will fail to recognise it as a vDSO (since arch_vma_name fails).
+	 */
+	mm->context.vdso = (void *)vdso_base;
+
+	ret =
+	   install_special_mapping(mm, vdso_base, vdso_pages << PAGE_SHIFT,
+		(VM_READ | VM_EXEC | VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC),
+		vdso_pagelist);
+
+	if (unlikely(ret)) {
+		mm->context.vdso = NULL;
+		goto end;
+	}
+
+	vdso_base += (vdso_pages << PAGE_SHIFT);
+	ret = install_special_mapping(mm, vdso_base, PAGE_SIZE,
+		(VM_READ | VM_MAYREAD), &vdso_pagelist[vdso_pages]);
+
+	if (unlikely(ret))
+		mm->context.vdso = NULL;
+end:
+	mmap_write_unlock(mm);
+	return ret;
+}
+EXPORT_SYMBOL(arch_setup_additional_pages);
+
 //const char *arch_vma_name(struct vm_area_struct *vma)
 //{
 //	if (vma->vm_mm && (vma->vm_start == (long)vma->vm_mm->context.vdso))

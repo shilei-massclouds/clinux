@@ -3099,33 +3099,33 @@ out:
 	return 0;
 }
 
-//int vm_brk_flags(unsigned long addr, unsigned long request, unsigned long flags)
-//{
-//	struct mm_struct *mm = current->mm;
-//	unsigned long len;
-//	int ret;
-//	bool populate;
-//	LIST_HEAD(uf);
-//
-//	len = PAGE_ALIGN(request);
-//	if (len < request)
-//		return -ENOMEM;
-//	if (!len)
-//		return 0;
-//
-//	if (mmap_write_lock_killable(mm))
-//		return -EINTR;
-//
-//	ret = do_brk_flags(addr, len, flags, &uf);
-//	populate = ((mm->def_flags & VM_LOCKED) != 0);
-//	mmap_write_unlock(mm);
-//	userfaultfd_unmap_complete(mm, &uf);
-//	if (populate && !ret)
-//		mm_populate(addr, len);
-//	return ret;
-//}
-//EXPORT_SYMBOL(vm_brk_flags);
-//
+int vm_brk_flags(unsigned long addr, unsigned long request, unsigned long flags)
+{
+	struct mm_struct *mm = current->mm;
+	unsigned long len;
+	int ret;
+	bool populate;
+	LIST_HEAD(uf);
+
+	len = PAGE_ALIGN(request);
+	if (len < request)
+		return -ENOMEM;
+	if (!len)
+		return 0;
+
+	if (mmap_write_lock_killable(mm))
+		return -EINTR;
+
+	ret = do_brk_flags(addr, len, flags, &uf);
+	populate = ((mm->def_flags & VM_LOCKED) != 0);
+	mmap_write_unlock(mm);
+	userfaultfd_unmap_complete(mm, &uf);
+	if (populate && !ret)
+		mm_populate(addr, len);
+	return ret;
+}
+EXPORT_SYMBOL(vm_brk_flags);
+
 //int vm_brk(unsigned long addr, unsigned long len)
 //{
 //	return vm_brk_flags(addr, len, 0);
@@ -3362,153 +3362,154 @@ void vm_stat_account(struct mm_struct *mm, vm_flags_t flags, long npages)
 		mm->data_vm += npages;
 }
 
-//static vm_fault_t special_mapping_fault(struct vm_fault *vmf);
-//
-///*
-// * Having a close hook prevents vma merging regardless of flags.
-// */
-//static void special_mapping_close(struct vm_area_struct *vma)
-//{
-//}
-//
-//static const char *special_mapping_name(struct vm_area_struct *vma)
-//{
-//	return ((struct vm_special_mapping *)vma->vm_private_data)->name;
-//}
-//
-//static int special_mapping_mremap(struct vm_area_struct *new_vma)
-//{
-//	struct vm_special_mapping *sm = new_vma->vm_private_data;
-//
-//	if (WARN_ON_ONCE(current->mm != new_vma->vm_mm))
-//		return -EFAULT;
-//
-//	if (sm->mremap)
-//		return sm->mremap(sm, new_vma);
-//
-//	return 0;
-//}
-//
-//static const struct vm_operations_struct special_mapping_vmops = {
-//	.close = special_mapping_close,
-//	.fault = special_mapping_fault,
-//	.mremap = special_mapping_mremap,
-//	.name = special_mapping_name,
-//	/* vDSO code relies that VVAR can't be accessed remotely */
-//	.access = NULL,
-//};
-//
-//static const struct vm_operations_struct legacy_special_mapping_vmops = {
-//	.close = special_mapping_close,
-//	.fault = special_mapping_fault,
-//};
-//
-//static vm_fault_t special_mapping_fault(struct vm_fault *vmf)
-//{
-//	struct vm_area_struct *vma = vmf->vma;
-//	pgoff_t pgoff;
-//	struct page **pages;
-//
-//	if (vma->vm_ops == &legacy_special_mapping_vmops) {
-//		pages = vma->vm_private_data;
-//	} else {
-//		struct vm_special_mapping *sm = vma->vm_private_data;
-//
-//		if (sm->fault)
-//			return sm->fault(sm, vmf->vma, vmf);
-//
-//		pages = sm->pages;
-//	}
-//
-//	for (pgoff = vmf->pgoff; pgoff && *pages; ++pages)
-//		pgoff--;
-//
-//	if (*pages) {
-//		struct page *page = *pages;
-//		get_page(page);
-//		vmf->page = page;
-//		return 0;
-//	}
-//
-//	return VM_FAULT_SIGBUS;
-//}
-//
-//static struct vm_area_struct *__install_special_mapping(
-//	struct mm_struct *mm,
-//	unsigned long addr, unsigned long len,
-//	unsigned long vm_flags, void *priv,
-//	const struct vm_operations_struct *ops)
-//{
-//	int ret;
-//	struct vm_area_struct *vma;
-//
-//	vma = vm_area_alloc(mm);
-//	if (unlikely(vma == NULL))
-//		return ERR_PTR(-ENOMEM);
-//
-//	vma->vm_start = addr;
-//	vma->vm_end = addr + len;
-//
-//	vma->vm_flags = vm_flags | mm->def_flags | VM_DONTEXPAND | VM_SOFTDIRTY;
-//	vma->vm_page_prot = vm_get_page_prot(vma->vm_flags);
-//
-//	vma->vm_ops = ops;
-//	vma->vm_private_data = priv;
-//
-//	ret = insert_vm_struct(mm, vma);
-//	if (ret)
-//		goto out;
-//
-//	vm_stat_account(mm, vma->vm_flags, len >> PAGE_SHIFT);
-//
-//	perf_event_mmap(vma);
-//
-//	return vma;
-//
-//out:
-//	vm_area_free(vma);
-//	return ERR_PTR(ret);
-//}
-//
-//bool vma_is_special_mapping(const struct vm_area_struct *vma,
-//	const struct vm_special_mapping *sm)
-//{
-//	return vma->vm_private_data == sm &&
-//		(vma->vm_ops == &special_mapping_vmops ||
-//		 vma->vm_ops == &legacy_special_mapping_vmops);
-//}
-//
-///*
-// * Called with mm->mmap_lock held for writing.
-// * Insert a new vma covering the given region, with the given flags.
-// * Its pages are supplied by the given array of struct page *.
-// * The array can be shorter than len >> PAGE_SHIFT if it's null-terminated.
-// * The region past the last page supplied will always produce SIGBUS.
-// * The array pointer and the pages it points to are assumed to stay alive
-// * for as long as this mapping might exist.
-// */
-//struct vm_area_struct *_install_special_mapping(
-//	struct mm_struct *mm,
-//	unsigned long addr, unsigned long len,
-//	unsigned long vm_flags, const struct vm_special_mapping *spec)
-//{
-//	return __install_special_mapping(mm, addr, len, vm_flags, (void *)spec,
-//					&special_mapping_vmops);
-//}
-//
-//int install_special_mapping(struct mm_struct *mm,
-//			    unsigned long addr, unsigned long len,
-//			    unsigned long vm_flags, struct page **pages)
-//{
-//	struct vm_area_struct *vma = __install_special_mapping(
-//		mm, addr, len, vm_flags, (void *)pages,
-//		&legacy_special_mapping_vmops);
-//
-//	return PTR_ERR_OR_ZERO(vma);
-//}
-//
-//static DEFINE_MUTEX(mm_all_locks_mutex);
-//
+static vm_fault_t special_mapping_fault(struct vm_fault *vmf);
+
+/*
+ * Having a close hook prevents vma merging regardless of flags.
+ */
+static void special_mapping_close(struct vm_area_struct *vma)
+{
+}
+
+static const char *special_mapping_name(struct vm_area_struct *vma)
+{
+	return ((struct vm_special_mapping *)vma->vm_private_data)->name;
+}
+
+static int special_mapping_mremap(struct vm_area_struct *new_vma)
+{
+	struct vm_special_mapping *sm = new_vma->vm_private_data;
+
+	if (WARN_ON_ONCE(current->mm != new_vma->vm_mm))
+		return -EFAULT;
+
+	if (sm->mremap)
+		return sm->mremap(sm, new_vma);
+
+	return 0;
+}
+
+static const struct vm_operations_struct special_mapping_vmops = {
+	.close = special_mapping_close,
+	.fault = special_mapping_fault,
+	.mremap = special_mapping_mremap,
+	.name = special_mapping_name,
+	/* vDSO code relies that VVAR can't be accessed remotely */
+	.access = NULL,
+};
+
+static const struct vm_operations_struct legacy_special_mapping_vmops = {
+	.close = special_mapping_close,
+	.fault = special_mapping_fault,
+};
+
+static vm_fault_t special_mapping_fault(struct vm_fault *vmf)
+{
+	struct vm_area_struct *vma = vmf->vma;
+	pgoff_t pgoff;
+	struct page **pages;
+
+	if (vma->vm_ops == &legacy_special_mapping_vmops) {
+		pages = vma->vm_private_data;
+	} else {
+		struct vm_special_mapping *sm = vma->vm_private_data;
+
+		if (sm->fault)
+			return sm->fault(sm, vmf->vma, vmf);
+
+		pages = sm->pages;
+	}
+
+	for (pgoff = vmf->pgoff; pgoff && *pages; ++pages)
+		pgoff--;
+
+	if (*pages) {
+		struct page *page = *pages;
+		get_page(page);
+		vmf->page = page;
+		return 0;
+	}
+
+	return VM_FAULT_SIGBUS;
+}
+
+static struct vm_area_struct *__install_special_mapping(
+	struct mm_struct *mm,
+	unsigned long addr, unsigned long len,
+	unsigned long vm_flags, void *priv,
+	const struct vm_operations_struct *ops)
+{
+	int ret;
+	struct vm_area_struct *vma;
+
+	vma = vm_area_alloc(mm);
+	if (unlikely(vma == NULL))
+		return ERR_PTR(-ENOMEM);
+
+	vma->vm_start = addr;
+	vma->vm_end = addr + len;
+
+	vma->vm_flags = vm_flags | mm->def_flags | VM_DONTEXPAND | VM_SOFTDIRTY;
+	vma->vm_page_prot = vm_get_page_prot(vma->vm_flags);
+
+	vma->vm_ops = ops;
+	vma->vm_private_data = priv;
+
+	ret = insert_vm_struct(mm, vma);
+	if (ret)
+		goto out;
+
+	vm_stat_account(mm, vma->vm_flags, len >> PAGE_SHIFT);
+
+	perf_event_mmap(vma);
+
+	return vma;
+
+out:
+	vm_area_free(vma);
+	return ERR_PTR(ret);
+}
+
+bool vma_is_special_mapping(const struct vm_area_struct *vma,
+	const struct vm_special_mapping *sm)
+{
+	return vma->vm_private_data == sm &&
+		(vma->vm_ops == &special_mapping_vmops ||
+		 vma->vm_ops == &legacy_special_mapping_vmops);
+}
+
+/*
+ * Called with mm->mmap_lock held for writing.
+ * Insert a new vma covering the given region, with the given flags.
+ * Its pages are supplied by the given array of struct page *.
+ * The array can be shorter than len >> PAGE_SHIFT if it's null-terminated.
+ * The region past the last page supplied will always produce SIGBUS.
+ * The array pointer and the pages it points to are assumed to stay alive
+ * for as long as this mapping might exist.
+ */
+struct vm_area_struct *_install_special_mapping(
+	struct mm_struct *mm,
+	unsigned long addr, unsigned long len,
+	unsigned long vm_flags, const struct vm_special_mapping *spec)
+{
+	return __install_special_mapping(mm, addr, len, vm_flags, (void *)spec,
+					&special_mapping_vmops);
+}
+
+int install_special_mapping(struct mm_struct *mm,
+			    unsigned long addr, unsigned long len,
+			    unsigned long vm_flags, struct page **pages)
+{
+	struct vm_area_struct *vma = __install_special_mapping(
+		mm, addr, len, vm_flags, (void *)pages,
+		&legacy_special_mapping_vmops);
+
+	return PTR_ERR_OR_ZERO(vma);
+}
+EXPORT_SYMBOL(install_special_mapping);
+
+static DEFINE_MUTEX(mm_all_locks_mutex);
+
 //static void vm_lock_anon_vma(struct mm_struct *mm, struct anon_vma *anon_vma)
 //{
 //	if (!test_bit(0, (unsigned long *) &anon_vma->root->rb_root.rb_root.rb_node)) {

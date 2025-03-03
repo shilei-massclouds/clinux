@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(arch_setup_additional_pages)
 CL_MINE(arch_vma_name)
 CL_MINE(dump_align)
 CL_MINE(dump_emit)
@@ -14,5 +13,4 @@ CL_MINE(elf_core_write_extra_phdrs)
 CL_MINE(regset_get)
 CL_MINE(regset_get_alloc)
 CL_MINE(task_user_regset_view)
-CL_MINE(vm_brk_flags)
 CL_MINE(vm_munmap)

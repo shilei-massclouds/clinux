@@ -46,10 +46,3 @@ void flush_icache_pte(pte_t pte)
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(flush_icache_pte);
-/*
-void warn_alloc(gfp_t gfp_mask, nodemask_t *nodemask, const char *fmt, ...)
-{
-    booter_panic("No impl 'slub'.");
-}
-*/
-
