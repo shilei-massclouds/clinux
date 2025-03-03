@@ -10,3 +10,4 @@ obj_y += pageattr.o
 obj_y += pagewalk.o
 obj_y += debug.o
 obj_y += vmacache.o
+obj_y += mmu_gather.o
