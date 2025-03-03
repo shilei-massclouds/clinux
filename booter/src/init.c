@@ -689,18 +689,12 @@ __weak void kernfs_kill_sb(struct super_block *sb)
 EXPORT_SYMBOL(kernfs_kill_sb);
 
 /*
-unsigned long __fdget(unsigned int fd)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(__fdget);
-*/
-
 void free_uid(struct user_struct *up)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(free_uid);
+*/
 
 __weak struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
 					   unsigned long *flags)
