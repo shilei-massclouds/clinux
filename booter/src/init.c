@@ -533,12 +533,14 @@ __weak void mntput(struct vfsmount *mnt)
 }
 EXPORT_SYMBOL(mntput);
 
+/*
 int
 task_work_add(struct task_struct *task, struct callback_head *work, int notify)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(task_work_add);
+*/
 
 __weak
 struct vfsmount *vfs_kern_mount(struct file_system_type *type,
@@ -1019,11 +1021,13 @@ __weak void __wake_up_parent(struct task_struct *p, struct task_struct *parent)
 }
 EXPORT_SYMBOL(__wake_up_parent);
 
+/*
 void task_work_run(void)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(task_work_run);
+*/
 
 __weak void put_task_struct_rcu_user(struct task_struct *task)
 {
@@ -3075,3 +3079,9 @@ EXPORT_SYMBOL(overflowgid);
 // From kernel/sys
 DECLARE_RWSEM(uts_sem);
 EXPORT_SYMBOL(uts_sem);
+
+__weak void signal_wake_up_state(struct task_struct *t, unsigned int state)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(signal_wake_up_state);
