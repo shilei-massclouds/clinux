@@ -3,3 +3,4 @@
 obj_y := init.o
 obj_y += vdso.o
 obj_y += vdso_embed.o
+obj_y += vdso-syms.o

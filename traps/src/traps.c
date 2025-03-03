@@ -20,8 +20,6 @@
 #include <asm/ptrace.h>
 #include <asm/csr.h>
 
-int show_unhandled_signals = 1;
-
 extern asmlinkage void handle_exception(void);
 
 static DEFINE_SPINLOCK(die_lock);

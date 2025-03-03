@@ -23,10 +23,12 @@ __visible int do_syscall_trace_enter(struct pt_regs *regs)
     booter_panic("No impl!\n");
 }
 
+/*
 void do_notify_resume(struct pt_regs *regs)
 {
     booter_panic("No impl!\n");
 }
+*/
 asmlinkage long sys_ni_syscall(void)
 {
     booter_panic("No impl!\n");

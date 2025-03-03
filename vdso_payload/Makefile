@@ -21,7 +21,17 @@ CFLAGS_vgettimeofday.o := -fPIC
 obj-vdso := $(patsubst %, %.o, $(vdso-syms)) note.o
 obj-vdso := $(addprefix $(TARGET_DIR)/, $(obj-vdso))
 
-all: $(TARGET_DIR)/vdso.so
+all: $(TARGET_DIR)/vdso.so $(TARGET_DIR)/vdso-syms.o
+
+$(TARGET_DIR)/vdso-syms.o: $(TARGET_DIR)/vdso-dummy.o FORCE
+	@$(LD) -r --just-symbols $< -o $@
+	@mkdir -p ./target/vdso
+	@cp $@ ./target/vdso/
+
+$(TARGET_DIR)/vdso-dummy.o: $(TARGET_DIR)/vdso.lds $(TARGET_DIR)/rt_sigreturn.o FORCE
+	@$(CC) $(CFLAGS) -no-pie -nostdlib -nostartfiles -Wl,-T,$(filter-out FORCE,$^) -o $@.tmp && \
+		$(OBJCOPY) $(patsubst %, -G __vdso_%, $(vdso-syms)) $@.tmp $@ && \
+		rm $@.tmp
 
 $(TARGET_DIR)/vdso.so: $(TARGET_DIR)/vdso.so.dbg
 	@printf "CP\t$<\n"
@@ -47,31 +57,3 @@ $(TARGET_DIR)/%.o: $(obj)/src/%.S
 FORCE:
 
 .PHONY: $(PHONY)
-
-#PHONY := all clean run
-#
-#SUBDIRS := find_dep mk_rootfs json2md
-#
-#CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS))
-#RUN_DIRS := $(addprefix _run_, $(SUBDIRS))
-#
-#all: $(SUBDIRS)
-#	@:
-#
-#PHONY += $(SUBDIRS)
-#$(SUBDIRS):
-#	@$(MAKE) -C $@
-#
-#PHONY += $(CLEAN_DIRS)
-#$(CLEAN_DIRS):
-#	@$(MAKE) -C $(subst _clean_, , $@) clean
-#
-#clean: $(CLEAN_DIRS)
-#
-#PHONY += $(RUN_DIRS)
-#$(RUN_DIRS):
-#	@$(MAKE) -C $(subst _run_, , $@) run
-#
-#run: $(RUN_DIRS)
-#
-#.PHONY: $(PHONY)

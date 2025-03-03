@@ -3085,3 +3085,6 @@ __weak void signal_wake_up_state(struct task_struct *t, unsigned int state)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(signal_wake_up_state);
+
+int show_unhandled_signals = 1;
+EXPORT_SYMBOL(show_unhandled_signals);

@@ -2,5 +2,6 @@
 
 obj_y := init.o
 obj_y += signal.o
+obj_y += riscv_signal.o
 
 obj_y += mine.o
