@@ -1992,41 +1992,17 @@ __weak void unlink_anon_vmas(struct vm_area_struct *vma)
 }
 EXPORT_SYMBOL(unlink_anon_vmas);
 
-void pmd_clear_bad(pmd_t *pmd)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(pmd_clear_bad);
-
 int swap_readpage(struct page *page, bool synchronous)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(swap_readpage);
 
-/*
-void tlb_finish_mmu(struct mmu_gather *tlb,
-        unsigned long start, unsigned long end)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(tlb_finish_mmu);
-*/
-
 __weak void workingset_refault(struct page *page, void *shadow)
 {
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(workingset_refault);
-
-/*
-void tlb_gather_mmu(struct mmu_gather *tlb, struct mm_struct *mm,
-            unsigned long start, unsigned long end)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(tlb_gather_mmu);
-*/
 
 int __page_mapcount(struct page *page)
 {
@@ -2427,12 +2403,14 @@ __weak bool try_to_unmap(struct page *page, enum ttu_flags flags)
 }
 EXPORT_SYMBOL_GPL(try_to_unmap);
 
+/*
 pte_t ptep_clear_flush(struct vm_area_struct *vma, unsigned long address,
                pte_t *ptep)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(ptep_clear_flush);
+*/
 
 __cacheline_aligned_in_smp DEFINE_SPINLOCK(mmlist_lock);
 EXPORT_SYMBOL(mmlist_lock);
