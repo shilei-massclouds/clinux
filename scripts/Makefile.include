@@ -18,12 +18,12 @@ CFLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-asynchronous-unwind-tables -fno-unwind-tables \
 	-fno-common -fno-stack-protector -mcmodel=medany -D__KERNEL__ \
 	-O2 -Wno-stringop-overflow -Wno-format-truncation -Wno-format-security \
-	-Werror=implicit-function-declaration -Wno-address-of-packed-member
+	-Werror=implicit-function-declaration -Wno-address-of-packed-member -Werror=implicit-function-declaration
 
 AS_FLAGS := -nostdinc -fno-PIE -mabi=lp64d -march=rv64imafdc \
 	-fno-asynchronous-unwind-tables -fno-unwind-tables \
 	-fno-stack-protector -mcmodel=medany -D__ASSEMBLY__ \
-	-Werror=implicit-function-declaration -Wno-address-of-packed-member
+	-Werror=implicit-function-declaration -Wno-address-of-packed-member -Werror=implicit-function-declaration
 
 LDFLAGS := -melf64lriscv --build-id=none --strip-debug
 OBJCOPYFLAGS := -O binary -R .note -R .note.gnu.build-id -R .comment -S

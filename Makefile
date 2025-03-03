@@ -20,6 +20,7 @@ export DEBUG_INC
 DISK_IMG := $(CURDIR)/tools/mk_rootfs/rootfs.ext2
 
 include ./scripts/Makefile.include
+include include/config/auto.conf
 
 # QEMU
 QEMU := qemu-system-$(ARCH)
@@ -77,7 +78,7 @@ CL_INIT := $(KMODULE_DIR)cl_init
 
 all: build
 
-build: preclean predirs tools target/kernel.bin
+build: preclean predirs tools vdso_payload target/kernel.bin
 
 target/kernel.bin: target/kernel.elf target/kernel.map
 	@printf "CP\t$@\n"
@@ -120,6 +121,10 @@ top_component: FORCE
 predirs:
 	@mkdir -p ./target/_bootrd
 
+vdso_payload:
+	@mkdir -p ./target/$@
+	$(MAKE) -f ./vdso_payload/Makefile obj=$@
+
 run: build
 	$(QEMU) $(QEMU_ARGS)
 
@@ -132,4 +137,4 @@ preclean:
 
 FORCE:
 
-.PHONY: all build tools necessities components predirs clean top_component FORCE
+.PHONY: all build tools necessities components predirs vdso_payload clean top_component FORCE
