@@ -74,10 +74,6 @@ static DECLARE_RWSEM(namespace_sem);
 static HLIST_HEAD(unmounted);	/* protected by namespace_sem */
 static LIST_HEAD(ex_mountpoints); /* protected by namespace_sem */
 
-/* /sys/fs */
-struct kobject *fs_kobj;
-EXPORT_SYMBOL_GPL(fs_kobj);
-
 /*
  * vfsmount lock may be taken for read to prevent changes to the
  * vfsmount hash, ie. during mountpoint lookups or walking back

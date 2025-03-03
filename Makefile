@@ -52,7 +52,7 @@ components := \
 	jump_label extable vdso utsname keys ucount umh locks \
 	early_sched sched \
 	percpu percpu_refcount workqueue_itf workqueue notifier workingset \
-	memblock paging rmap backing_dev riscv_mm_context \
+	memblock paging rmap backing_dev riscv_mm_context mprotect \
 	page_alloc slub vmalloc mm_util vmscan ioremap gup \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
 	ipc_sem watchdog noinitramfs \

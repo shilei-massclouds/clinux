@@ -130,6 +130,7 @@ void vma_set_page_prot(struct vm_area_struct *vma)
 	/* remove_protection_ptes reads vma->vm_page_prot without mmap_lock */
 	WRITE_ONCE(vma->vm_page_prot, vm_page_prot);
 }
+EXPORT_SYMBOL(vma_set_page_prot);
 
 /*
  * Requires inode->i_mapping->i_mmap_rwsem
@@ -1203,6 +1204,7 @@ struct vm_area_struct *vma_merge(struct mm_struct *mm,
 
 	return NULL;
 }
+EXPORT_SYMBOL(vma_merge);
 
 /*
  * Rough compatibility check to quickly see if it's even worth looking
@@ -1629,45 +1631,46 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 //			       a.offset >> PAGE_SHIFT);
 //}
 //#endif /* __ARCH_WANT_SYS_OLD_MMAP */
-//
-///*
-// * Some shared mappings will want the pages marked read-only
-// * to track write events. If so, we'll downgrade vm_page_prot
-// * to the private version (using protection_map[] without the
-// * VM_SHARED bit).
-// */
-//int vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot)
-//{
-//	vm_flags_t vm_flags = vma->vm_flags;
-//	const struct vm_operations_struct *vm_ops = vma->vm_ops;
-//
-//	/* If it was private or non-writable, the write bit is already clear */
-//	if ((vm_flags & (VM_WRITE|VM_SHARED)) != ((VM_WRITE|VM_SHARED)))
-//		return 0;
-//
-//	/* The backer wishes to know when pages are first written to? */
-//	if (vm_ops && (vm_ops->page_mkwrite || vm_ops->pfn_mkwrite))
-//		return 1;
-//
-//	/* The open routine did something to the protections that pgprot_modify
-//	 * won't preserve? */
-//	if (pgprot_val(vm_page_prot) !=
-//	    pgprot_val(vm_pgprot_modify(vm_page_prot, vm_flags)))
-//		return 0;
-//
-//	/* Do we need to track softdirty? */
-//	if (IS_ENABLED(CONFIG_MEM_SOFT_DIRTY) && !(vm_flags & VM_SOFTDIRTY))
-//		return 1;
-//
-//	/* Specialty mapping? */
-//	if (vm_flags & VM_PFNMAP)
-//		return 0;
-//
-//	/* Can the mapping track the dirty pages? */
-//	return vma->vm_file && vma->vm_file->f_mapping &&
-//		mapping_cap_account_dirty(vma->vm_file->f_mapping);
-//}
-//
+
+/*
+ * Some shared mappings will want the pages marked read-only
+ * to track write events. If so, we'll downgrade vm_page_prot
+ * to the private version (using protection_map[] without the
+ * VM_SHARED bit).
+ */
+int vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot)
+{
+	vm_flags_t vm_flags = vma->vm_flags;
+	const struct vm_operations_struct *vm_ops = vma->vm_ops;
+
+	/* If it was private or non-writable, the write bit is already clear */
+	if ((vm_flags & (VM_WRITE|VM_SHARED)) != ((VM_WRITE|VM_SHARED)))
+		return 0;
+
+	/* The backer wishes to know when pages are first written to? */
+	if (vm_ops && (vm_ops->page_mkwrite || vm_ops->pfn_mkwrite))
+		return 1;
+
+	/* The open routine did something to the protections that pgprot_modify
+	 * won't preserve? */
+	if (pgprot_val(vm_page_prot) !=
+	    pgprot_val(vm_pgprot_modify(vm_page_prot, vm_flags)))
+		return 0;
+
+	/* Do we need to track softdirty? */
+	if (IS_ENABLED(CONFIG_MEM_SOFT_DIRTY) && !(vm_flags & VM_SOFTDIRTY))
+		return 1;
+
+	/* Specialty mapping? */
+	if (vm_flags & VM_PFNMAP)
+		return 0;
+
+	/* Can the mapping track the dirty pages? */
+	return vma->vm_file && vma->vm_file->f_mapping &&
+		mapping_cap_account_dirty(vma->vm_file->f_mapping);
+}
+EXPORT_SYMBOL(vma_wants_writenotify);
+
 ///*
 // * We account for memory if it's a private writeable mapping,
 // * not hugepages and VM_NORESERVE wasn't set.
@@ -2680,84 +2683,85 @@ EXPORT_SYMBOL_GPL(find_extend_vma);
 //		return false;
 //	return true;
 //}
-//
-///*
-// * __split_vma() bypasses sysctl_max_map_count checking.  We use this where it
-// * has already been checked or doesn't make sense to fail.
-// */
-//int __split_vma(struct mm_struct *mm, struct vm_area_struct *vma,
-//		unsigned long addr, int new_below)
-//{
-//	struct vm_area_struct *new;
-//	int err;
-//
-//	if (vma->vm_ops && vma->vm_ops->split) {
-//		err = vma->vm_ops->split(vma, addr);
-//		if (err)
-//			return err;
-//	}
-//
-//	new = vm_area_dup(vma);
-//	if (!new)
-//		return -ENOMEM;
-//
-//	if (new_below)
-//		new->vm_end = addr;
-//	else {
-//		new->vm_start = addr;
-//		new->vm_pgoff += ((addr - vma->vm_start) >> PAGE_SHIFT);
-//	}
-//
-//	err = vma_dup_policy(vma, new);
-//	if (err)
-//		goto out_free_vma;
-//
-//	err = anon_vma_clone(new, vma);
-//	if (err)
-//		goto out_free_mpol;
-//
-//	if (new->vm_file)
-//		get_file(new->vm_file);
-//
-//	if (new->vm_ops && new->vm_ops->open)
-//		new->vm_ops->open(new);
-//
-//	if (new_below)
-//		err = vma_adjust(vma, addr, vma->vm_end, vma->vm_pgoff +
-//			((addr - new->vm_start) >> PAGE_SHIFT), new);
-//	else
-//		err = vma_adjust(vma, vma->vm_start, addr, vma->vm_pgoff, new);
-//
-//	/* Success. */
-//	if (!err)
-//		return 0;
-//
-//	/* Clean everything up if vma_adjust failed. */
-//	if (new->vm_ops && new->vm_ops->close)
-//		new->vm_ops->close(new);
-//	if (new->vm_file)
-//		fput(new->vm_file);
-//	unlink_anon_vmas(new);
-// out_free_mpol:
-//	mpol_put(vma_policy(new));
-// out_free_vma:
-//	vm_area_free(new);
-//	return err;
-//}
-//
-///*
-// * Split a vma into two pieces at address 'addr', a new vma is allocated
-// * either for the first part or the tail.
-// */
-//int split_vma(struct mm_struct *mm, struct vm_area_struct *vma,
-//	      unsigned long addr, int new_below)
-//{
-//	if (mm->map_count >= sysctl_max_map_count)
-//		return -ENOMEM;
-//
-//	return __split_vma(mm, vma, addr, new_below);
-//}
-//
+
+/*
+ * __split_vma() bypasses sysctl_max_map_count checking.  We use this where it
+ * has already been checked or doesn't make sense to fail.
+ */
+int __split_vma(struct mm_struct *mm, struct vm_area_struct *vma,
+		unsigned long addr, int new_below)
+{
+	struct vm_area_struct *new;
+	int err;
+
+	if (vma->vm_ops && vma->vm_ops->split) {
+		err = vma->vm_ops->split(vma, addr);
+		if (err)
+			return err;
+	}
+
+	new = vm_area_dup(vma);
+	if (!new)
+		return -ENOMEM;
+
+	if (new_below)
+		new->vm_end = addr;
+	else {
+		new->vm_start = addr;
+		new->vm_pgoff += ((addr - vma->vm_start) >> PAGE_SHIFT);
+	}
+
+	err = vma_dup_policy(vma, new);
+	if (err)
+		goto out_free_vma;
+
+	err = anon_vma_clone(new, vma);
+	if (err)
+		goto out_free_mpol;
+
+	if (new->vm_file)
+		get_file(new->vm_file);
+
+	if (new->vm_ops && new->vm_ops->open)
+		new->vm_ops->open(new);
+
+	if (new_below)
+		err = vma_adjust(vma, addr, vma->vm_end, vma->vm_pgoff +
+			((addr - new->vm_start) >> PAGE_SHIFT), new);
+	else
+		err = vma_adjust(vma, vma->vm_start, addr, vma->vm_pgoff, new);
+
+	/* Success. */
+	if (!err)
+		return 0;
+
+	/* Clean everything up if vma_adjust failed. */
+	if (new->vm_ops && new->vm_ops->close)
+		new->vm_ops->close(new);
+	if (new->vm_file)
+		fput(new->vm_file);
+	unlink_anon_vmas(new);
+ out_free_mpol:
+	mpol_put(vma_policy(new));
+ out_free_vma:
+	vm_area_free(new);
+	return err;
+}
+
+/*
+ * Split a vma into two pieces at address 'addr', a new vma is allocated
+ * either for the first part or the tail.
+ */
+int split_vma(struct mm_struct *mm, struct vm_area_struct *vma,
+	      unsigned long addr, int new_below)
+{
+	if (mm->map_count >= sysctl_max_map_count)
+		return -ENOMEM;
+
+	return __split_vma(mm, vma, addr, new_below);
+}
+EXPORT_SYMBOL(split_vma);
+
 ///* Munmap is split into 2 main parts -- this part which finds
 // * what needs doing, and the areas themselves, which do the
 // * work.  This now handles partial unmappings.
@@ -3315,35 +3319,36 @@ EXPORT_SYMBOL(insert_vm_struct);
 //out:
 //	return NULL;
 //}
-//
-///*
-// * Return true if the calling process may expand its vm space by the passed
-// * number of pages
-// */
-//bool may_expand_vm(struct mm_struct *mm, vm_flags_t flags, unsigned long npages)
-//{
-//	if (mm->total_vm + npages > rlimit(RLIMIT_AS) >> PAGE_SHIFT)
-//		return false;
-//
-//	if (is_data_mapping(flags) &&
-//	    mm->data_vm + npages > rlimit(RLIMIT_DATA) >> PAGE_SHIFT) {
-//		/* Workaround for Valgrind */
-//		if (rlimit(RLIMIT_DATA) == 0 &&
-//		    mm->data_vm + npages <= rlimit_max(RLIMIT_DATA) >> PAGE_SHIFT)
-//			return true;
-//
-//		pr_warn_once("%s (%d): VmData %lu exceed data ulimit %lu. Update limits%s.\n",
-//			     current->comm, current->pid,
-//			     (mm->data_vm + npages) << PAGE_SHIFT,
-//			     rlimit(RLIMIT_DATA),
-//			     ignore_rlimit_data ? "" : " or use boot option ignore_rlimit_data");
-//
-//		if (!ignore_rlimit_data)
-//			return false;
-//	}
-//
-//	return true;
-//}
+
+/*
+ * Return true if the calling process may expand its vm space by the passed
+ * number of pages
+ */
+bool may_expand_vm(struct mm_struct *mm, vm_flags_t flags, unsigned long npages)
+{
+	if (mm->total_vm + npages > rlimit(RLIMIT_AS) >> PAGE_SHIFT)
+		return false;
+
+	if (is_data_mapping(flags) &&
+	    mm->data_vm + npages > rlimit(RLIMIT_DATA) >> PAGE_SHIFT) {
+		/* Workaround for Valgrind */
+		if (rlimit(RLIMIT_DATA) == 0 &&
+		    mm->data_vm + npages <= rlimit_max(RLIMIT_DATA) >> PAGE_SHIFT)
+			return true;
+
+		pr_warn_once("%s (%d): VmData %lu exceed data ulimit %lu. Update limits%s.\n",
+			     current->comm, current->pid,
+			     (mm->data_vm + npages) << PAGE_SHIFT,
+			     rlimit(RLIMIT_DATA),
+			     ignore_rlimit_data ? "" : " or use boot option ignore_rlimit_data");
+
+		if (!ignore_rlimit_data)
+			return false;
+	}
+
+	return true;
+}
+EXPORT_SYMBOL(may_expand_vm);
 
 void vm_stat_account(struct mm_struct *mm, vm_flags_t flags, long npages)
 {

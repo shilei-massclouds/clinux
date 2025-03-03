@@ -3023,3 +3023,13 @@ randomize_page(unsigned long start, unsigned long range)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(randomize_page);
+
+/* /sys/fs */
+struct kobject *fs_kobj;
+EXPORT_SYMBOL_GPL(fs_kobj);
+
+__weak struct vm_area_struct *vm_area_dup(struct vm_area_struct *orig)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(vm_area_dup);
