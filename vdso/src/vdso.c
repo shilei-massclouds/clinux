@@ -23,30 +23,31 @@ extern char vdso_start[], vdso_end[];
 static unsigned int vdso_pages;
 static struct page **vdso_pagelist;
 
+extern struct vdso_data *vdso_data;
 
-//static int __init vdso_init(void)
-//{
-//	unsigned int i;
-//
-//	vdso_pages = (vdso_end - vdso_start) >> PAGE_SHIFT;
-//	vdso_pagelist =
-//		kcalloc(vdso_pages + 1, sizeof(struct page *), GFP_KERNEL);
-//	if (unlikely(vdso_pagelist == NULL)) {
-//		pr_err("vdso: pagelist allocation failed\n");
-//		return -ENOMEM;
-//	}
-//
-//	for (i = 0; i < vdso_pages; i++) {
-//		struct page *pg;
-//
-//		pg = virt_to_page(vdso_start + (i << PAGE_SHIFT));
-//		vdso_pagelist[i] = pg;
-//	}
-//	vdso_pagelist[i] = virt_to_page(vdso_data);
-//
-//	return 0;
-//}
-//arch_initcall(vdso_init);
+static int __init vdso_init(void)
+{
+	unsigned int i;
+
+	vdso_pages = (vdso_end - vdso_start) >> PAGE_SHIFT;
+	vdso_pagelist =
+		kcalloc(vdso_pages + 1, sizeof(struct page *), GFP_KERNEL);
+	if (unlikely(vdso_pagelist == NULL)) {
+		pr_err("vdso: pagelist allocation failed\n");
+		return -ENOMEM;
+	}
+
+	for (i = 0; i < vdso_pages; i++) {
+		struct page *pg;
+
+		pg = virt_to_page(vdso_start + (i << PAGE_SHIFT));
+		vdso_pagelist[i] = pg;
+	}
+	vdso_pagelist[i] = virt_to_page(vdso_data);
+
+	return 0;
+}
+arch_initcall(vdso_init);
 
 int arch_setup_additional_pages(struct linux_binprm *bprm,
 	int uses_interp)
