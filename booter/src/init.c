@@ -3055,3 +3055,9 @@ __weak unsigned long shmem_get_unmapped_area(struct file *file,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(shmem_get_unmapped_area);
+
+__weak int shmem_zero_setup(struct vm_area_struct *vma)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(shmem_zero_setup);

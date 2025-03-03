@@ -263,3 +263,18 @@ __weak int __pte_alloc(struct mm_struct *mm, pmd_t *pmd)
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(__pte_alloc);
+
+__weak void unmap_vmas(struct mmu_gather *tlb,
+		struct vm_area_struct *vma, unsigned long start_addr,
+		unsigned long end_addr)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(unmap_vmas);
+
+__weak void free_pgtables(struct mmu_gather *tlb, struct vm_area_struct *vma,
+		unsigned long floor, unsigned long ceiling)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(free_pgtables);

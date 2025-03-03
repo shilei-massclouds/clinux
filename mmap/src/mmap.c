@@ -1671,211 +1671,211 @@ int vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot)
 }
 EXPORT_SYMBOL(vma_wants_writenotify);
 
-///*
-// * We account for memory if it's a private writeable mapping,
-// * not hugepages and VM_NORESERVE wasn't set.
-// */
-//static inline int accountable_mapping(struct file *file, vm_flags_t vm_flags)
-//{
-//	/*
-//	 * hugetlb has its own accounting separate from the core VM
-//	 * VM_HUGETLB may not be set yet so we cannot check for that flag.
-//	 */
-//	if (file && is_file_hugepages(file))
-//		return 0;
-//
-//	return (vm_flags & (VM_NORESERVE | VM_SHARED | VM_WRITE)) == VM_WRITE;
-//}
-//
-//unsigned long mmap_region(struct file *file, unsigned long addr,
-//		unsigned long len, vm_flags_t vm_flags, unsigned long pgoff,
-//		struct list_head *uf)
-//{
-//	struct mm_struct *mm = current->mm;
-//	struct vm_area_struct *vma, *prev, *merge;
-//	int error;
-//	struct rb_node **rb_link, *rb_parent;
-//	unsigned long charged = 0;
-//
-//	/* Check against address space limit. */
-//	if (!may_expand_vm(mm, vm_flags, len >> PAGE_SHIFT)) {
-//		unsigned long nr_pages;
-//
-//		/*
-//		 * MAP_FIXED may remove pages of mappings that intersects with
-//		 * requested mapping. Account for the pages it would unmap.
-//		 */
-//		nr_pages = count_vma_pages_range(mm, addr, addr + len);
-//
-//		if (!may_expand_vm(mm, vm_flags,
-//					(len >> PAGE_SHIFT) - nr_pages))
-//			return -ENOMEM;
-//	}
-//
-//	/* Clear old maps */
-//	while (find_vma_links(mm, addr, addr + len, &prev, &rb_link,
-//			      &rb_parent)) {
-//		if (do_munmap(mm, addr, len, uf))
-//			return -ENOMEM;
-//	}
-//
-//	/*
-//	 * Private writable mapping: check memory availability
-//	 */
-//	if (accountable_mapping(file, vm_flags)) {
-//		charged = len >> PAGE_SHIFT;
-//		if (security_vm_enough_memory_mm(mm, charged))
-//			return -ENOMEM;
-//		vm_flags |= VM_ACCOUNT;
-//	}
-//
-//	/*
-//	 * Can we just expand an old mapping?
-//	 */
-//	vma = vma_merge(mm, prev, addr, addr + len, vm_flags,
-//			NULL, file, pgoff, NULL, NULL_VM_UFFD_CTX);
-//	if (vma)
-//		goto out;
-//
-//	/*
-//	 * Determine the object being mapped and call the appropriate
-//	 * specific mapper. the address has already been validated, but
-//	 * not unmapped, but the maps are removed from the list.
-//	 */
-//	vma = vm_area_alloc(mm);
-//	if (!vma) {
-//		error = -ENOMEM;
-//		goto unacct_error;
-//	}
-//
-//	vma->vm_start = addr;
-//	vma->vm_end = addr + len;
-//	vma->vm_flags = vm_flags;
-//	vma->vm_page_prot = vm_get_page_prot(vm_flags);
-//	vma->vm_pgoff = pgoff;
-//
-//	if (file) {
-//		if (vm_flags & VM_DENYWRITE) {
-//			error = deny_write_access(file);
-//			if (error)
-//				goto free_vma;
-//		}
-//		if (vm_flags & VM_SHARED) {
-//			error = mapping_map_writable(file->f_mapping);
-//			if (error)
-//				goto allow_write_and_free_vma;
-//		}
-//
-//		/* ->mmap() can change vma->vm_file, but must guarantee that
-//		 * vma_link() below can deny write-access if VM_DENYWRITE is set
-//		 * and map writably if VM_SHARED is set. This usually means the
-//		 * new file must not have been exposed to user-space, yet.
-//		 */
-//		vma->vm_file = get_file(file);
-//		error = call_mmap(file, vma);
-//		if (error)
-//			goto unmap_and_free_vma;
-//
-//		/* If vm_flags changed after call_mmap(), we should try merge vma again
-//		 * as we may succeed this time.
-//		 */
-//		if (unlikely(vm_flags != vma->vm_flags && prev)) {
-//			merge = vma_merge(mm, prev, vma->vm_start, vma->vm_end, vma->vm_flags,
-//				NULL, vma->vm_file, vma->vm_pgoff, NULL, NULL_VM_UFFD_CTX);
-//			if (merge) {
-//				/* ->mmap() can change vma->vm_file and fput the original file. So
-//				 * fput the vma->vm_file here or we would add an extra fput for file
-//				 * and cause general protection fault ultimately.
-//				 */
-//				fput(vma->vm_file);
-//				vm_area_free(vma);
-//				vma = merge;
-//				/* Update vm_flags and possible addr to pick up the change. We don't
-//				 * warn here if addr changed as the vma is not linked by vma_link().
-//				 */
-//				addr = vma->vm_start;
-//				vm_flags = vma->vm_flags;
-//				goto unmap_writable;
-//			}
-//		}
-//
-//		/* Can addr have changed??
-//		 *
-//		 * Answer: Yes, several device drivers can do it in their
-//		 *         f_op->mmap method. -DaveM
-//		 * Bug: If addr is changed, prev, rb_link, rb_parent should
-//		 *      be updated for vma_link()
-//		 */
-//		WARN_ON_ONCE(addr != vma->vm_start);
-//
-//		addr = vma->vm_start;
-//		vm_flags = vma->vm_flags;
-//	} else if (vm_flags & VM_SHARED) {
-//		error = shmem_zero_setup(vma);
-//		if (error)
-//			goto free_vma;
-//	} else {
-//		vma_set_anonymous(vma);
-//	}
-//
-//	vma_link(mm, vma, prev, rb_link, rb_parent);
-//	/* Once vma denies write, undo our temporary denial count */
-//	if (file) {
-//unmap_writable:
-//		if (vm_flags & VM_SHARED)
-//			mapping_unmap_writable(file->f_mapping);
-//		if (vm_flags & VM_DENYWRITE)
-//			allow_write_access(file);
-//	}
-//	file = vma->vm_file;
-//out:
-//	perf_event_mmap(vma);
-//
-//	vm_stat_account(mm, vm_flags, len >> PAGE_SHIFT);
-//	if (vm_flags & VM_LOCKED) {
-//		if ((vm_flags & VM_SPECIAL) || vma_is_dax(vma) ||
-//					is_vm_hugetlb_page(vma) ||
-//					vma == get_gate_vma(current->mm))
-//			vma->vm_flags &= VM_LOCKED_CLEAR_MASK;
-//		else
-//			mm->locked_vm += (len >> PAGE_SHIFT);
-//	}
-//
-//	if (file)
-//		uprobe_mmap(vma);
-//
-//	/*
-//	 * New (or expanded) vma always get soft dirty status.
-//	 * Otherwise user-space soft-dirty page tracker won't
-//	 * be able to distinguish situation when vma area unmapped,
-//	 * then new mapped in-place (which must be aimed as
-//	 * a completely new data area).
-//	 */
-//	vma->vm_flags |= VM_SOFTDIRTY;
-//
-//	vma_set_page_prot(vma);
-//
-//	return addr;
-//
-//unmap_and_free_vma:
-//	vma->vm_file = NULL;
-//	fput(file);
-//
-//	/* Undo any partial mapping done by a device driver. */
-//	unmap_region(mm, vma, prev, vma->vm_start, vma->vm_end);
-//	charged = 0;
-//	if (vm_flags & VM_SHARED)
-//		mapping_unmap_writable(file->f_mapping);
-//allow_write_and_free_vma:
-//	if (vm_flags & VM_DENYWRITE)
-//		allow_write_access(file);
-//free_vma:
-//	vm_area_free(vma);
-//unacct_error:
-//	if (charged)
-//		vm_unacct_memory(charged);
-//	return error;
-//}
+/*
+ * We account for memory if it's a private writeable mapping,
+ * not hugepages and VM_NORESERVE wasn't set.
+ */
+static inline int accountable_mapping(struct file *file, vm_flags_t vm_flags)
+{
+	/*
+	 * hugetlb has its own accounting separate from the core VM
+	 * VM_HUGETLB may not be set yet so we cannot check for that flag.
+	 */
+	if (file && is_file_hugepages(file))
+		return 0;
+
+	return (vm_flags & (VM_NORESERVE | VM_SHARED | VM_WRITE)) == VM_WRITE;
+}
+
+unsigned long mmap_region(struct file *file, unsigned long addr,
+		unsigned long len, vm_flags_t vm_flags, unsigned long pgoff,
+		struct list_head *uf)
+{
+	struct mm_struct *mm = current->mm;
+	struct vm_area_struct *vma, *prev, *merge;
+	int error;
+	struct rb_node **rb_link, *rb_parent;
+	unsigned long charged = 0;
+
+	/* Check against address space limit. */
+	if (!may_expand_vm(mm, vm_flags, len >> PAGE_SHIFT)) {
+		unsigned long nr_pages;
+
+		/*
+		 * MAP_FIXED may remove pages of mappings that intersects with
+		 * requested mapping. Account for the pages it would unmap.
+		 */
+		nr_pages = count_vma_pages_range(mm, addr, addr + len);
+
+		if (!may_expand_vm(mm, vm_flags,
+					(len >> PAGE_SHIFT) - nr_pages))
+			return -ENOMEM;
+	}
+
+	/* Clear old maps */
+	while (find_vma_links(mm, addr, addr + len, &prev, &rb_link,
+			      &rb_parent)) {
+		if (do_munmap(mm, addr, len, uf))
+			return -ENOMEM;
+	}
+
+	/*
+	 * Private writable mapping: check memory availability
+	 */
+	if (accountable_mapping(file, vm_flags)) {
+		charged = len >> PAGE_SHIFT;
+		if (security_vm_enough_memory_mm(mm, charged))
+			return -ENOMEM;
+		vm_flags |= VM_ACCOUNT;
+	}
+
+	/*
+	 * Can we just expand an old mapping?
+	 */
+	vma = vma_merge(mm, prev, addr, addr + len, vm_flags,
+			NULL, file, pgoff, NULL, NULL_VM_UFFD_CTX);
+	if (vma)
+		goto out;
+
+	/*
+	 * Determine the object being mapped and call the appropriate
+	 * specific mapper. the address has already been validated, but
+	 * not unmapped, but the maps are removed from the list.
+	 */
+	vma = vm_area_alloc(mm);
+	if (!vma) {
+		error = -ENOMEM;
+		goto unacct_error;
+	}
+
+	vma->vm_start = addr;
+	vma->vm_end = addr + len;
+	vma->vm_flags = vm_flags;
+	vma->vm_page_prot = vm_get_page_prot(vm_flags);
+	vma->vm_pgoff = pgoff;
+
+	if (file) {
+		if (vm_flags & VM_DENYWRITE) {
+			error = deny_write_access(file);
+			if (error)
+				goto free_vma;
+		}
+		if (vm_flags & VM_SHARED) {
+			error = mapping_map_writable(file->f_mapping);
+			if (error)
+				goto allow_write_and_free_vma;
+		}
+
+		/* ->mmap() can change vma->vm_file, but must guarantee that
+		 * vma_link() below can deny write-access if VM_DENYWRITE is set
+		 * and map writably if VM_SHARED is set. This usually means the
+		 * new file must not have been exposed to user-space, yet.
+		 */
+		vma->vm_file = get_file(file);
+		error = call_mmap(file, vma);
+		if (error)
+			goto unmap_and_free_vma;
+
+		/* If vm_flags changed after call_mmap(), we should try merge vma again
+		 * as we may succeed this time.
+		 */
+		if (unlikely(vm_flags != vma->vm_flags && prev)) {
+			merge = vma_merge(mm, prev, vma->vm_start, vma->vm_end, vma->vm_flags,
+				NULL, vma->vm_file, vma->vm_pgoff, NULL, NULL_VM_UFFD_CTX);
+			if (merge) {
+				/* ->mmap() can change vma->vm_file and fput the original file. So
+				 * fput the vma->vm_file here or we would add an extra fput for file
+				 * and cause general protection fault ultimately.
+				 */
+				fput(vma->vm_file);
+				vm_area_free(vma);
+				vma = merge;
+				/* Update vm_flags and possible addr to pick up the change. We don't
+				 * warn here if addr changed as the vma is not linked by vma_link().
+				 */
+				addr = vma->vm_start;
+				vm_flags = vma->vm_flags;
+				goto unmap_writable;
+			}
+		}
+
+		/* Can addr have changed??
+		 *
+		 * Answer: Yes, several device drivers can do it in their
+		 *         f_op->mmap method. -DaveM
+		 * Bug: If addr is changed, prev, rb_link, rb_parent should
+		 *      be updated for vma_link()
+		 */
+		WARN_ON_ONCE(addr != vma->vm_start);
+
+		addr = vma->vm_start;
+		vm_flags = vma->vm_flags;
+	} else if (vm_flags & VM_SHARED) {
+		error = shmem_zero_setup(vma);
+		if (error)
+			goto free_vma;
+	} else {
+		vma_set_anonymous(vma);
+	}
+
+	vma_link(mm, vma, prev, rb_link, rb_parent);
+	/* Once vma denies write, undo our temporary denial count */
+	if (file) {
+unmap_writable:
+		if (vm_flags & VM_SHARED)
+			mapping_unmap_writable(file->f_mapping);
+		if (vm_flags & VM_DENYWRITE)
+			allow_write_access(file);
+	}
+	file = vma->vm_file;
+out:
+	perf_event_mmap(vma);
+
+	vm_stat_account(mm, vm_flags, len >> PAGE_SHIFT);
+	if (vm_flags & VM_LOCKED) {
+		if ((vm_flags & VM_SPECIAL) || vma_is_dax(vma) ||
+					is_vm_hugetlb_page(vma) ||
+					vma == get_gate_vma(current->mm))
+			vma->vm_flags &= VM_LOCKED_CLEAR_MASK;
+		else
+			mm->locked_vm += (len >> PAGE_SHIFT);
+	}
+
+	if (file)
+		uprobe_mmap(vma);
+
+	/*
+	 * New (or expanded) vma always get soft dirty status.
+	 * Otherwise user-space soft-dirty page tracker won't
+	 * be able to distinguish situation when vma area unmapped,
+	 * then new mapped in-place (which must be aimed as
+	 * a completely new data area).
+	 */
+	vma->vm_flags |= VM_SOFTDIRTY;
+
+	vma_set_page_prot(vma);
+
+	return addr;
+
+unmap_and_free_vma:
+	vma->vm_file = NULL;
+	fput(file);
+
+	/* Undo any partial mapping done by a device driver. */
+	unmap_region(mm, vma, prev, vma->vm_start, vma->vm_end);
+	charged = 0;
+	if (vm_flags & VM_SHARED)
+		mapping_unmap_writable(file->f_mapping);
+allow_write_and_free_vma:
+	if (vm_flags & VM_DENYWRITE)
+		allow_write_access(file);
+free_vma:
+	vm_area_free(vma);
+unacct_error:
+	if (charged)
+		vm_unacct_memory(charged);
+	return error;
+}
 
 static unsigned long unmapped_area(struct vm_unmapped_area_info *info)
 {
@@ -2597,92 +2597,92 @@ find_extend_vma(struct mm_struct *mm, unsigned long addr)
 
 EXPORT_SYMBOL_GPL(find_extend_vma);
 
-///*
-// * Ok - we have the memory areas we should free on the vma list,
-// * so release them, and do the vma updates.
-// *
-// * Called with the mm semaphore held.
-// */
-//static void remove_vma_list(struct mm_struct *mm, struct vm_area_struct *vma)
-//{
-//	unsigned long nr_accounted = 0;
-//
-//	/* Update high watermark before we lower total_vm */
-//	update_hiwater_vm(mm);
-//	do {
-//		long nrpages = vma_pages(vma);
-//
-//		if (vma->vm_flags & VM_ACCOUNT)
-//			nr_accounted += nrpages;
-//		vm_stat_account(mm, vma->vm_flags, -nrpages);
-//		vma = remove_vma(vma);
-//	} while (vma);
-//	vm_unacct_memory(nr_accounted);
-//	validate_mm(mm);
-//}
-//
-///*
-// * Get rid of page table information in the indicated region.
-// *
-// * Called with the mm semaphore held.
-// */
-//static void unmap_region(struct mm_struct *mm,
-//		struct vm_area_struct *vma, struct vm_area_struct *prev,
-//		unsigned long start, unsigned long end)
-//{
-//	struct vm_area_struct *next = prev ? prev->vm_next : mm->mmap;
-//	struct mmu_gather tlb;
-//
-//	lru_add_drain();
-//	tlb_gather_mmu(&tlb, mm, start, end);
-//	update_hiwater_rss(mm);
-//	unmap_vmas(&tlb, vma, start, end);
-//	free_pgtables(&tlb, vma, prev ? prev->vm_end : FIRST_USER_ADDRESS,
-//				 next ? next->vm_start : USER_PGTABLES_CEILING);
-//	tlb_finish_mmu(&tlb, start, end);
-//}
-//
-///*
-// * Create a list of vma's touched by the unmap, removing them from the mm's
-// * vma list as we go..
-// */
-//static bool
-//detach_vmas_to_be_unmapped(struct mm_struct *mm, struct vm_area_struct *vma,
-//	struct vm_area_struct *prev, unsigned long end)
-//{
-//	struct vm_area_struct **insertion_point;
-//	struct vm_area_struct *tail_vma = NULL;
-//
-//	insertion_point = (prev ? &prev->vm_next : &mm->mmap);
-//	vma->vm_prev = NULL;
-//	do {
-//		vma_rb_erase(vma, &mm->mm_rb);
-//		mm->map_count--;
-//		tail_vma = vma;
-//		vma = vma->vm_next;
-//	} while (vma && vma->vm_start < end);
-//	*insertion_point = vma;
-//	if (vma) {
-//		vma->vm_prev = prev;
-//		vma_gap_update(vma);
-//	} else
-//		mm->highest_vm_end = prev ? vm_end_gap(prev) : 0;
-//	tail_vma->vm_next = NULL;
-//
-//	/* Kill the cache */
-//	vmacache_invalidate(mm);
-//
-//	/*
-//	 * Do not downgrade mmap_lock if we are next to VM_GROWSDOWN or
-//	 * VM_GROWSUP VMA. Such VMAs can change their size under
-//	 * down_read(mmap_lock) and collide with the VMA we are about to unmap.
-//	 */
-//	if (vma && (vma->vm_flags & VM_GROWSDOWN))
-//		return false;
-//	if (prev && (prev->vm_flags & VM_GROWSUP))
-//		return false;
-//	return true;
-//}
+/*
+ * Ok - we have the memory areas we should free on the vma list,
+ * so release them, and do the vma updates.
+ *
+ * Called with the mm semaphore held.
+ */
+static void remove_vma_list(struct mm_struct *mm, struct vm_area_struct *vma)
+{
+	unsigned long nr_accounted = 0;
+
+	/* Update high watermark before we lower total_vm */
+	update_hiwater_vm(mm);
+	do {
+		long nrpages = vma_pages(vma);
+
+		if (vma->vm_flags & VM_ACCOUNT)
+			nr_accounted += nrpages;
+		vm_stat_account(mm, vma->vm_flags, -nrpages);
+		vma = remove_vma(vma);
+	} while (vma);
+	vm_unacct_memory(nr_accounted);
+	validate_mm(mm);
+}
+
+/*
+ * Get rid of page table information in the indicated region.
+ *
+ * Called with the mm semaphore held.
+ */
+static void unmap_region(struct mm_struct *mm,
+		struct vm_area_struct *vma, struct vm_area_struct *prev,
+		unsigned long start, unsigned long end)
+{
+	struct vm_area_struct *next = prev ? prev->vm_next : mm->mmap;
+	struct mmu_gather tlb;
+
+	lru_add_drain();
+	tlb_gather_mmu(&tlb, mm, start, end);
+	update_hiwater_rss(mm);
+	unmap_vmas(&tlb, vma, start, end);
+	free_pgtables(&tlb, vma, prev ? prev->vm_end : FIRST_USER_ADDRESS,
+				 next ? next->vm_start : USER_PGTABLES_CEILING);
+	tlb_finish_mmu(&tlb, start, end);
+}
+
+/*
+ * Create a list of vma's touched by the unmap, removing them from the mm's
+ * vma list as we go..
+ */
+static bool
+detach_vmas_to_be_unmapped(struct mm_struct *mm, struct vm_area_struct *vma,
+	struct vm_area_struct *prev, unsigned long end)
+{
+	struct vm_area_struct **insertion_point;
+	struct vm_area_struct *tail_vma = NULL;
+
+	insertion_point = (prev ? &prev->vm_next : &mm->mmap);
+	vma->vm_prev = NULL;
+	do {
+		vma_rb_erase(vma, &mm->mm_rb);
+		mm->map_count--;
+		tail_vma = vma;
+		vma = vma->vm_next;
+	} while (vma && vma->vm_start < end);
+	*insertion_point = vma;
+	if (vma) {
+		vma->vm_prev = prev;
+		vma_gap_update(vma);
+	} else
+		mm->highest_vm_end = prev ? vm_end_gap(prev) : 0;
+	tail_vma->vm_next = NULL;
+
+	/* Kill the cache */
+	vmacache_invalidate(mm);
+
+	/*
+	 * Do not downgrade mmap_lock if we are next to VM_GROWSDOWN or
+	 * VM_GROWSUP VMA. Such VMAs can change their size under
+	 * down_read(mmap_lock) and collide with the VMA we are about to unmap.
+	 */
+	if (vma && (vma->vm_flags & VM_GROWSDOWN))
+		return false;
+	if (prev && (prev->vm_flags & VM_GROWSUP))
+		return false;
+	return true;
+}
 
 /*
  * __split_vma() bypasses sysctl_max_map_count checking.  We use this where it
