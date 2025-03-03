@@ -257,3 +257,9 @@ __weak struct page *vm_normal_page(struct vm_area_struct *vma, unsigned long add
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(vm_normal_page);
+
+__weak int __pte_alloc(struct mm_struct *mm, pmd_t *pmd)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(__pte_alloc);
