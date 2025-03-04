@@ -56,7 +56,7 @@ components := \
 	memblock paging rmap backing_dev riscv_mm_context mprotect \
 	page_alloc slub vmalloc mm_util vmscan ioremap gup \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
-	ipc_sem watchdog noinitramfs oom_kill \
+	ipc_sem ipc_shm watchdog noinitramfs oom_kill \
 	fs inode dcache file_table do_mounts file \
 	open readahead async xattr user \
 	cred groups posix_acl user_namespace nsproxy fs_namespace pid_namespace \

@@ -865,6 +865,7 @@ void shmem_unlock_mapping(struct address_space *mapping)
 		cond_resched();
 	}
 }
+EXPORT_SYMBOL(shmem_unlock_mapping);
 
 /*
  * Check whether a hole-punch or truncation needs to split a huge page,
@@ -2245,6 +2246,7 @@ int shmem_lock(struct file *file, int lock, struct user_struct *user)
 out_nomem:
 	return retval;
 }
+EXPORT_SYMBOL(shmem_lock);
 
 static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
 {
@@ -4220,6 +4222,7 @@ struct file *shmem_kernel_file_setup(const char *name, loff_t size, unsigned lon
 {
 	return __shmem_file_setup(shm_mnt, name, size, flags, S_PRIVATE);
 }
+EXPORT_SYMBOL(shmem_kernel_file_setup);
 
 /**
  * shmem_file_setup - get an unlinked file living in tmpfs

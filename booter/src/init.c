@@ -32,6 +32,7 @@
 #include <cl_hook.h>
 #include "booter.h"
 #include "../fs/internal.h"
+#include "../ipc/util.h"
 
 #define UL_STR_SIZE 19  /* prefix with '0x' and end with '\0' */
 
@@ -997,18 +998,12 @@ __weak void __mnt_drop_write(struct vfsmount *mnt)
 EXPORT_SYMBOL(__mnt_drop_write);
 
 /*
-void exit_io_context(struct task_struct *task)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(exit_io_context);
-*/
-
 void exit_shm(struct task_struct *task)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(exit_shm);
+*/
 
 __weak void do_group_exit(int exit_code)
 {
@@ -1021,14 +1016,6 @@ __weak void __wake_up_parent(struct task_struct *p, struct task_struct *parent)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(__wake_up_parent);
-
-/*
-void task_work_run(void)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(task_work_run);
-*/
 
 __weak void put_task_struct_rcu_user(struct task_struct *task)
 {
@@ -3276,3 +3263,95 @@ __weak bool __oom_reap_task_mm(struct mm_struct *mm)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__oom_reap_task_mm);
+
+struct kern_ipc_perm *ipcctl_obtain_check(struct ipc_namespace *ns,
+                    struct ipc_ids *ids, int id, int cmd,
+                    struct ipc64_perm *perm, int extra_perm)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipcctl_obtain_check);
+
+void ipc_init_ids(struct ipc_ids *ids)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_init_ids);
+
+struct kern_ipc_perm *ipc_obtain_object_idr(struct ipc_ids *ids, int id)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_obtain_object_idr);
+
+int ipc_addid(struct ipc_ids *ids, struct kern_ipc_perm *new, int limit)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_addid);
+
+struct kern_ipc_perm *ipc_obtain_object_check(struct ipc_ids *ids, int id)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_obtain_object_check);
+
+int ipc_update_perm(struct ipc64_perm *in, struct kern_ipc_perm *out)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_update_perm);
+
+int ipcperms(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp, short flag)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipcperms);
+
+int ipcget(struct ipc_namespace *ns, struct ipc_ids *ids,
+            const struct ipc_ops *ops, struct ipc_params *params)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipcget);
+
+void __init ipc_init_proc_interface(const char *path, const char *header,
+        int ids, int (*show)(struct seq_file *, void *))
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_init_proc_interface);
+
+void kernel_to_ipc64_perm(struct kern_ipc_perm *in, struct ipc64_perm *out)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(kernel_to_ipc64_perm);
+
+void ipc_rmid(struct ipc_ids *ids, struct kern_ipc_perm *ipcp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_rmid);
+
+void ipc_rcu_putref(struct kern_ipc_perm *ptr,
+            void (*func)(struct rcu_head *head))
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipc_rcu_putref);
+
+__weak void shm_init_ns(struct ipc_namespace *ns)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(shm_init_ns);
+
+__weak void shm_exit_ns(struct ipc_namespace *ns)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(shm_exit_ns);
+
+int ipc_mni = IPCMNI;
+EXPORT_SYMBOL(ipc_mni);
