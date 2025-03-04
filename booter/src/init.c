@@ -220,18 +220,6 @@ void __weak irq_work_tick(void)
 }
 EXPORT_SYMBOL(irq_work_tick);
 
-void kill_fasync(struct fasync_struct **fp, int sig, int band)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(kill_fasync);
-
-int fasync_helper(int fd, struct file * filp, int on, struct fasync_struct **fapp)
-{
-    booter_panic("No impl in 'lib'.");
-}
-EXPORT_SYMBOL(fasync_helper);
-
 __weak void proc_free_inum(unsigned int inum)
 {
     booter_panic("No impl.\n");
@@ -2147,12 +2135,14 @@ __weak void locks_remove_file(struct file *filp)
 }
 EXPORT_SYMBOL(locks_remove_file);
 
+/*
 void __f_setown(struct file *filp, struct pid *pid, enum pid_type type,
         int force)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__f_setown);
+*/
 
 __weak void __do_page_cache_readahead(struct address_space *mapping,
 		struct file *file, pgoff_t index, unsigned long nr_to_read,
@@ -3375,3 +3365,33 @@ int anon_inode_getfd(const char *name, const struct file_operations *fops,
 }
 EXPORT_SYMBOL_GPL(anon_inode_getfd);
 
+__weak int fcntl_getlease(struct file *filp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fcntl_getlease);
+
+__weak int fcntl_setlease(unsigned int fd, struct file *filp, long arg)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fcntl_setlease);
+
+__weak int fcntl_setlk(unsigned int fd, struct file *filp, unsigned int cmd,
+		struct flock *flock)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fcntl_setlk);
+
+__weak int fcntl_getlk(struct file *filp, unsigned int cmd, struct flock *flock)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fcntl_getlk);
+
+__weak int fcntl_dirnotify(int fd, struct file *filp, unsigned long arg)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fcntl_dirnotify);

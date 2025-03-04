@@ -69,7 +69,7 @@ components := \
 	buffer swap riscv_fault aio signalfd \
 	signal sysctl kallsyms read_write \
 	virtio_mmio virtio virtio_blk ext2 binfmt_elf \
-	sys ioctl \
+	sys ioctl fcntl \
 	early_printk printk panic bug dump_stack show_mem
 	#partitions \
 
