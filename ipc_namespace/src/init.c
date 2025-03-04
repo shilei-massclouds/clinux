@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/spinlock.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -13,5 +14,7 @@ cl_ipc_namespace_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_ipc_namespace_init);
+
+DEFINE_ENABLE_FUNC(ipc_namespace);
 
 DEFINE_SPINLOCK(mq_lock);

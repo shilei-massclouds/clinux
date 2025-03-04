@@ -83,7 +83,6 @@ struct ipc_namespace *copy_ipcs(unsigned long flags,
 		return get_ipc_ns(ns);
 	return create_ipc_ns(user_ns, ns);
 }
-EXPORT_SYMBOL(copy_ipcs);
 
 /*
  * free_ipcs - free all ipcs of one type
@@ -173,7 +172,6 @@ void put_ipc_ns(struct ipc_namespace *ns)
 			schedule_work(&free_ipc_work);
 	}
 }
-EXPORT_SYMBOL(put_ipc_ns);
 
 static inline struct ipc_namespace *to_ipc_ns(struct ns_common *ns)
 {

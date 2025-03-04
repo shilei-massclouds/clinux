@@ -2299,7 +2299,6 @@ int copy_semundo(unsigned long clone_flags, struct task_struct *tsk)
 
 	return 0;
 }
-EXPORT_SYMBOL(copy_semundo);
 
 /*
  * add semadj values to semaphores, free undo structures.
@@ -2425,7 +2424,6 @@ void exit_sem(struct task_struct *tsk)
 	}
 	kfree(ulp);
 }
-EXPORT_SYMBOL(exit_sem);
 
 #ifdef CONFIG_PROC_FS
 static int sysvipc_sem_proc_show(struct seq_file *s, void *it)

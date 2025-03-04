@@ -158,7 +158,6 @@ int nr_processes(void)
 
 	return total;
 }
-EXPORT_SYMBOL_GPL(nr_processes);
 
 void __weak arch_release_task_struct(struct task_struct *tsk)
 {
@@ -680,7 +679,6 @@ void __mmdrop(struct mm_struct *mm)
 	put_user_ns(mm->user_ns);
 	free_mm(mm);
 }
-EXPORT_SYMBOL_GPL(__mmdrop);
 
 static void mmdrop_async_fn(struct work_struct *work)
 {

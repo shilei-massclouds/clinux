@@ -501,7 +501,6 @@ struct proc_dir_entry *proc_mkdir(const char *name,
 {
 	return proc_mkdir_data(name, 0, parent, NULL);
 }
-EXPORT_SYMBOL(proc_mkdir);
 
 struct proc_dir_entry *proc_create_mount_point(const char *name)
 {
@@ -558,7 +557,6 @@ struct proc_dir_entry *proc_create_data(const char *name, umode_t mode,
 	pde_set_flags(p);
 	return proc_register(parent, p);
 }
-EXPORT_SYMBOL(proc_create_data);
  
 struct proc_dir_entry *proc_create(const char *name, umode_t mode,
 				   struct proc_dir_entry *parent,
@@ -778,7 +776,6 @@ void *PDE_DATA(const struct inode *inode)
 {
 	return __PDE_DATA(inode);
 }
-EXPORT_SYMBOL(PDE_DATA);
 
 /*
  * Pull a user buffer into memory and pass it to the file's write handler if
