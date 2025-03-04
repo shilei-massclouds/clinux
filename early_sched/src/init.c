@@ -496,3 +496,9 @@ __weak void sched_show_task(struct task_struct *p)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(sched_show_task);
+
+__weak void rt_mutex_setprio(struct task_struct *p, struct task_struct *pi_task)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(rt_mutex_setprio);

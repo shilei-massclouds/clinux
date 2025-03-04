@@ -55,7 +55,7 @@ components := \
 	percpu percpu_refcount workqueue_itf workqueue notifier workingset \
 	memblock paging rmap backing_dev riscv_mm_context mprotect \
 	page_alloc slub vmalloc mm_util vmscan ioremap gup \
-	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref \
+	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref rtmutex \
 	ipc ipc_sem ipc_shm watchdog noinitramfs oom_kill \
 	fs inode dcache file_table do_mounts file \
 	open readahead async xattr user \

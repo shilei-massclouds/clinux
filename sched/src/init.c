@@ -66,10 +66,12 @@ struct proc_dir_entry *proc_create_seq_private(const char *name, umode_t mode,
 }
 */
 
+/*
 void rt_mutex_adjust_pi(struct task_struct *task)
 {
     booter_panic("No impl in 'sched'.");
 }
+*/
 
 /*
 void __cgroup_account_cputime_field(struct cgroup *cgrp,
