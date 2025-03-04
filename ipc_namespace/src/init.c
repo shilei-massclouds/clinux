@@ -16,5 +16,3 @@ cl_ipc_namespace_init(void)
 EXPORT_SYMBOL(cl_ipc_namespace_init);
 
 DEFINE_ENABLE_FUNC(ipc_namespace);
-
-DEFINE_SPINLOCK(mq_lock);

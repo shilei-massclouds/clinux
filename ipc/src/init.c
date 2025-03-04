@@ -16,10 +16,5 @@ cl_ipc_init(void)
 }
 EXPORT_SYMBOL(cl_ipc_init);
 
-void __init msg_init(void)
-{
-    booter_panic("No impl.\n");
-}
-
 int ipc_mni_shift = IPCMNI_SHIFT;
 int ipc_min_cycle = RADIX_TREE_MAP_SIZE;
