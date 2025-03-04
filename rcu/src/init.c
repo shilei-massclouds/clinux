@@ -14,11 +14,6 @@ cl_rcu_init(void)
 }
 EXPORT_SYMBOL(cl_rcu_init);
 
-void resched_cpu(int cpu)
-{
-    booter_panic("No impl in 'rcu'.");
-}
-
 void __weak open_softirq(int nr, void (*action)(struct softirq_action *))
 {
     booter_panic("No impl in 'rcu'.");

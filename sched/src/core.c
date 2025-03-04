@@ -629,17 +629,17 @@ void resched_curr(struct rq *rq)
 		trace_sched_wake_idle_without_ipi(cpu);
 }
 
-//void resched_cpu(int cpu)
-//{
-//	struct rq *rq = cpu_rq(cpu);
-//	unsigned long flags;
-//
-//	raw_spin_lock_irqsave(&rq->lock, flags);
-//	if (cpu_online(cpu) || cpu == smp_processor_id())
-//		resched_curr(rq);
-//	raw_spin_unlock_irqrestore(&rq->lock, flags);
-//}
-//
+void resched_cpu(int cpu)
+{
+	struct rq *rq = cpu_rq(cpu);
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	if (cpu_online(cpu) || cpu == smp_processor_id())
+		resched_curr(rq);
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+}
+
 #ifdef CONFIG_SMP
 #ifdef CONFIG_NO_HZ_COMMON
 ///*

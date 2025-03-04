@@ -502,3 +502,9 @@ __weak void rt_mutex_setprio(struct task_struct *p, struct task_struct *pi_task)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(rt_mutex_setprio);
+
+__weak void resched_cpu(int cpu)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(resched_cpu);
