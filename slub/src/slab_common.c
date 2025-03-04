@@ -895,167 +895,168 @@ EXPORT_SYMBOL(kmalloc_order);
 //	cachep->random_seq = NULL;
 //}
 //#endif /* CONFIG_SLAB_FREELIST_RANDOM */
-//
-//#if defined(CONFIG_SLAB) || defined(CONFIG_SLUB_DEBUG)
-//#ifdef CONFIG_SLAB
-//#define SLABINFO_RIGHTS (0600)
-//#else
-//#define SLABINFO_RIGHTS (0400)
-//#endif
-//
-//static void print_slabinfo_header(struct seq_file *m)
-//{
-//	/*
-//	 * Output format version, so at least we can change it
-//	 * without _too_ many complaints.
-//	 */
-//#ifdef CONFIG_DEBUG_SLAB
-//	seq_puts(m, "slabinfo - version: 2.1 (statistics)\n");
-//#else
-//	seq_puts(m, "slabinfo - version: 2.1\n");
-//#endif
-//	seq_puts(m, "# name            <active_objs> <num_objs> <objsize> <objperslab> <pagesperslab>");
-//	seq_puts(m, " : tunables <limit> <batchcount> <sharedfactor>");
-//	seq_puts(m, " : slabdata <active_slabs> <num_slabs> <sharedavail>");
-//#ifdef CONFIG_DEBUG_SLAB
-//	seq_puts(m, " : globalstat <listallocs> <maxobjs> <grown> <reaped> <error> <maxfreeable> <nodeallocs> <remotefrees> <alienoverflow>");
-//	seq_puts(m, " : cpustat <allochit> <allocmiss> <freehit> <freemiss>");
-//#endif
-//	seq_putc(m, '\n');
-//}
-//
-//void *slab_start(struct seq_file *m, loff_t *pos)
-//{
-//	mutex_lock(&slab_mutex);
-//	return seq_list_start(&slab_caches, *pos);
-//}
-//
-//void *slab_next(struct seq_file *m, void *p, loff_t *pos)
-//{
-//	return seq_list_next(p, &slab_caches, pos);
-//}
-//
-//void slab_stop(struct seq_file *m, void *p)
-//{
-//	mutex_unlock(&slab_mutex);
-//}
-//
-//static void cache_show(struct kmem_cache *s, struct seq_file *m)
-//{
-//	struct slabinfo sinfo;
-//
-//	memset(&sinfo, 0, sizeof(sinfo));
-//	get_slabinfo(s, &sinfo);
-//
-//	seq_printf(m, "%-17s %6lu %6lu %6u %4u %4d",
-//		   s->name, sinfo.active_objs, sinfo.num_objs, s->size,
-//		   sinfo.objects_per_slab, (1 << sinfo.cache_order));
-//
-//	seq_printf(m, " : tunables %4u %4u %4u",
-//		   sinfo.limit, sinfo.batchcount, sinfo.shared);
-//	seq_printf(m, " : slabdata %6lu %6lu %6lu",
-//		   sinfo.active_slabs, sinfo.num_slabs, sinfo.shared_avail);
-//	slabinfo_show_stats(m, s);
-//	seq_putc(m, '\n');
-//}
-//
-//static int slab_show(struct seq_file *m, void *p)
-//{
-//	struct kmem_cache *s = list_entry(p, struct kmem_cache, list);
-//
-//	if (p == slab_caches.next)
-//		print_slabinfo_header(m);
-//	cache_show(s, m);
-//	return 0;
-//}
-//
-//void dump_unreclaimable_slab(void)
-//{
-//	struct kmem_cache *s, *s2;
-//	struct slabinfo sinfo;
-//
-//	/*
-//	 * Here acquiring slab_mutex is risky since we don't prefer to get
-//	 * sleep in oom path. But, without mutex hold, it may introduce a
-//	 * risk of crash.
-//	 * Use mutex_trylock to protect the list traverse, dump nothing
-//	 * without acquiring the mutex.
-//	 */
-//	if (!mutex_trylock(&slab_mutex)) {
-//		pr_warn("excessive unreclaimable slab but cannot dump stats\n");
-//		return;
-//	}
-//
-//	pr_info("Unreclaimable slab info:\n");
-//	pr_info("Name                      Used          Total\n");
-//
-//	list_for_each_entry_safe(s, s2, &slab_caches, list) {
-//		if (s->flags & SLAB_RECLAIM_ACCOUNT)
-//			continue;
-//
-//		get_slabinfo(s, &sinfo);
-//
-//		if (sinfo.num_objs > 0)
-//			pr_info("%-17s %10luKB %10luKB\n", s->name,
-//				(sinfo.active_objs * s->size) / 1024,
-//				(sinfo.num_objs * s->size) / 1024);
-//	}
-//	mutex_unlock(&slab_mutex);
-//}
-//
-//#if defined(CONFIG_MEMCG_KMEM)
-//int memcg_slab_show(struct seq_file *m, void *p)
-//{
-//	/*
-//	 * Deprecated.
-//	 * Please, take a look at tools/cgroup/slabinfo.py .
-//	 */
-//	return 0;
-//}
-//#endif
-//
-///*
-// * slabinfo_op - iterator that generates /proc/slabinfo
-// *
-// * Output layout:
-// * cache-name
-// * num-active-objs
-// * total-objs
-// * object size
-// * num-active-slabs
-// * total-slabs
-// * num-pages-per-slab
-// * + further values on SMP and with statistics enabled
-// */
-//static const struct seq_operations slabinfo_op = {
-//	.start = slab_start,
-//	.next = slab_next,
-//	.stop = slab_stop,
-//	.show = slab_show,
-//};
-//
-//static int slabinfo_open(struct inode *inode, struct file *file)
-//{
-//	return seq_open(file, &slabinfo_op);
-//}
-//
-//static const struct proc_ops slabinfo_proc_ops = {
-//	.proc_flags	= PROC_ENTRY_PERMANENT,
-//	.proc_open	= slabinfo_open,
-//	.proc_read	= seq_read,
-//	.proc_write	= slabinfo_write,
-//	.proc_lseek	= seq_lseek,
-//	.proc_release	= seq_release,
-//};
-//
-//static int __init slab_proc_init(void)
-//{
-//	proc_create("slabinfo", SLABINFO_RIGHTS, NULL, &slabinfo_proc_ops);
-//	return 0;
-//}
-//module_init(slab_proc_init);
-//
-//#endif /* CONFIG_SLAB || CONFIG_SLUB_DEBUG */
+
+#if defined(CONFIG_SLAB) || defined(CONFIG_SLUB_DEBUG)
+#ifdef CONFIG_SLAB
+#define SLABINFO_RIGHTS (0600)
+#else
+#define SLABINFO_RIGHTS (0400)
+#endif
+
+static void print_slabinfo_header(struct seq_file *m)
+{
+	/*
+	 * Output format version, so at least we can change it
+	 * without _too_ many complaints.
+	 */
+#ifdef CONFIG_DEBUG_SLAB
+	seq_puts(m, "slabinfo - version: 2.1 (statistics)\n");
+#else
+	seq_puts(m, "slabinfo - version: 2.1\n");
+#endif
+	seq_puts(m, "# name            <active_objs> <num_objs> <objsize> <objperslab> <pagesperslab>");
+	seq_puts(m, " : tunables <limit> <batchcount> <sharedfactor>");
+	seq_puts(m, " : slabdata <active_slabs> <num_slabs> <sharedavail>");
+#ifdef CONFIG_DEBUG_SLAB
+	seq_puts(m, " : globalstat <listallocs> <maxobjs> <grown> <reaped> <error> <maxfreeable> <nodeallocs> <remotefrees> <alienoverflow>");
+	seq_puts(m, " : cpustat <allochit> <allocmiss> <freehit> <freemiss>");
+#endif
+	seq_putc(m, '\n');
+}
+
+void *slab_start(struct seq_file *m, loff_t *pos)
+{
+	mutex_lock(&slab_mutex);
+	return seq_list_start(&slab_caches, *pos);
+}
+
+void *slab_next(struct seq_file *m, void *p, loff_t *pos)
+{
+	return seq_list_next(p, &slab_caches, pos);
+}
+
+void slab_stop(struct seq_file *m, void *p)
+{
+	mutex_unlock(&slab_mutex);
+}
+
+static void cache_show(struct kmem_cache *s, struct seq_file *m)
+{
+	struct slabinfo sinfo;
+
+	memset(&sinfo, 0, sizeof(sinfo));
+	get_slabinfo(s, &sinfo);
+
+	seq_printf(m, "%-17s %6lu %6lu %6u %4u %4d",
+		   s->name, sinfo.active_objs, sinfo.num_objs, s->size,
+		   sinfo.objects_per_slab, (1 << sinfo.cache_order));
+
+	seq_printf(m, " : tunables %4u %4u %4u",
+		   sinfo.limit, sinfo.batchcount, sinfo.shared);
+	seq_printf(m, " : slabdata %6lu %6lu %6lu",
+		   sinfo.active_slabs, sinfo.num_slabs, sinfo.shared_avail);
+	slabinfo_show_stats(m, s);
+	seq_putc(m, '\n');
+}
+
+static int slab_show(struct seq_file *m, void *p)
+{
+	struct kmem_cache *s = list_entry(p, struct kmem_cache, list);
+
+	if (p == slab_caches.next)
+		print_slabinfo_header(m);
+	cache_show(s, m);
+	return 0;
+}
+
+void dump_unreclaimable_slab(void)
+{
+	struct kmem_cache *s, *s2;
+	struct slabinfo sinfo;
+
+	/*
+	 * Here acquiring slab_mutex is risky since we don't prefer to get
+	 * sleep in oom path. But, without mutex hold, it may introduce a
+	 * risk of crash.
+	 * Use mutex_trylock to protect the list traverse, dump nothing
+	 * without acquiring the mutex.
+	 */
+	if (!mutex_trylock(&slab_mutex)) {
+		pr_warn("excessive unreclaimable slab but cannot dump stats\n");
+		return;
+	}
+
+	pr_info("Unreclaimable slab info:\n");
+	pr_info("Name                      Used          Total\n");
+
+	list_for_each_entry_safe(s, s2, &slab_caches, list) {
+		if (s->flags & SLAB_RECLAIM_ACCOUNT)
+			continue;
+
+		get_slabinfo(s, &sinfo);
+
+		if (sinfo.num_objs > 0)
+			pr_info("%-17s %10luKB %10luKB\n", s->name,
+				(sinfo.active_objs * s->size) / 1024,
+				(sinfo.num_objs * s->size) / 1024);
+	}
+	mutex_unlock(&slab_mutex);
+}
+EXPORT_SYMBOL(dump_unreclaimable_slab);
+
+#if defined(CONFIG_MEMCG_KMEM)
+int memcg_slab_show(struct seq_file *m, void *p)
+{
+	/*
+	 * Deprecated.
+	 * Please, take a look at tools/cgroup/slabinfo.py .
+	 */
+	return 0;
+}
+#endif
+
+/*
+ * slabinfo_op - iterator that generates /proc/slabinfo
+ *
+ * Output layout:
+ * cache-name
+ * num-active-objs
+ * total-objs
+ * object size
+ * num-active-slabs
+ * total-slabs
+ * num-pages-per-slab
+ * + further values on SMP and with statistics enabled
+ */
+static const struct seq_operations slabinfo_op = {
+	.start = slab_start,
+	.next = slab_next,
+	.stop = slab_stop,
+	.show = slab_show,
+};
+
+static int slabinfo_open(struct inode *inode, struct file *file)
+{
+	return seq_open(file, &slabinfo_op);
+}
+
+static const struct proc_ops slabinfo_proc_ops = {
+	.proc_flags	= PROC_ENTRY_PERMANENT,
+	.proc_open	= slabinfo_open,
+	.proc_read	= seq_read,
+	.proc_write	= slabinfo_write,
+	.proc_lseek	= seq_lseek,
+	.proc_release	= seq_release,
+};
+
+static int __init slab_proc_init(void)
+{
+	proc_create("slabinfo", SLABINFO_RIGHTS, NULL, &slabinfo_proc_ops);
+	return 0;
+}
+module_init(slab_proc_init);
+
+#endif /* CONFIG_SLAB || CONFIG_SLUB_DEBUG */
 
 static __always_inline void *__do_krealloc(const void *p, size_t new_size,
 					   gfp_t flags)

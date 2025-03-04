@@ -5722,40 +5722,40 @@ static int sysfs_slab_alias(struct kmem_cache *s, const char *name)
 //
 //__initcall(slab_sysfs_init);
 #endif /* CONFIG_SYSFS */
-//
-///*
-// * The /proc/slabinfo ABI
-// */
-//#ifdef CONFIG_SLUB_DEBUG
-//void get_slabinfo(struct kmem_cache *s, struct slabinfo *sinfo)
-//{
-//	unsigned long nr_slabs = 0;
-//	unsigned long nr_objs = 0;
-//	unsigned long nr_free = 0;
-//	int node;
-//	struct kmem_cache_node *n;
-//
-//	for_each_kmem_cache_node(s, node, n) {
-//		nr_slabs += node_nr_slabs(n);
-//		nr_objs += node_nr_objs(n);
-//		nr_free += count_partial(n, count_free);
-//	}
-//
-//	sinfo->active_objs = nr_objs - nr_free;
-//	sinfo->num_objs = nr_objs;
-//	sinfo->active_slabs = nr_slabs;
-//	sinfo->num_slabs = nr_slabs;
-//	sinfo->objects_per_slab = oo_objects(s->oo);
-//	sinfo->cache_order = oo_order(s->oo);
-//}
-//
-//void slabinfo_show_stats(struct seq_file *m, struct kmem_cache *s)
-//{
-//}
-//
-//ssize_t slabinfo_write(struct file *file, const char __user *buffer,
-//		       size_t count, loff_t *ppos)
-//{
-//	return -EIO;
-//}
-//#endif /* CONFIG_SLUB_DEBUG */
+
+/*
+ * The /proc/slabinfo ABI
+ */
+#ifdef CONFIG_SLUB_DEBUG
+void get_slabinfo(struct kmem_cache *s, struct slabinfo *sinfo)
+{
+	unsigned long nr_slabs = 0;
+	unsigned long nr_objs = 0;
+	unsigned long nr_free = 0;
+	int node;
+	struct kmem_cache_node *n;
+
+	for_each_kmem_cache_node(s, node, n) {
+		nr_slabs += node_nr_slabs(n);
+		nr_objs += node_nr_objs(n);
+		nr_free += count_partial(n, count_free);
+	}
+
+	sinfo->active_objs = nr_objs - nr_free;
+	sinfo->num_objs = nr_objs;
+	sinfo->active_slabs = nr_slabs;
+	sinfo->num_slabs = nr_slabs;
+	sinfo->objects_per_slab = oo_objects(s->oo);
+	sinfo->cache_order = oo_order(s->oo);
+}
+
+void slabinfo_show_stats(struct seq_file *m, struct kmem_cache *s)
+{
+}
+
+ssize_t slabinfo_write(struct file *file, const char __user *buffer,
+		       size_t count, loff_t *ppos)
+{
+	return -EIO;
+}
+#endif /* CONFIG_SLUB_DEBUG */

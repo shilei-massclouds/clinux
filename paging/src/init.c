@@ -278,3 +278,12 @@ __weak void free_pgtables(struct mmu_gather *tlb, struct vm_area_struct *vma,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(free_pgtables);
+
+__weak void unmap_page_range(struct mmu_gather *tlb,
+			     struct vm_area_struct *vma,
+			     unsigned long addr, unsigned long end,
+			     struct zap_details *details)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(unmap_page_range);

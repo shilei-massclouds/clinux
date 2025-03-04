@@ -110,6 +110,7 @@ void show_stack(struct task_struct *task, unsigned long *sp, const char *loglvl)
 	pr_cont("Call Trace:\n");
 	walk_stackframe(task, NULL, print_trace_address, (void *)loglvl);
 }
+EXPORT_SYMBOL(show_stack);
 
 static bool save_wchan(unsigned long pc, void *arg)
 {

@@ -6416,37 +6416,36 @@ void __sched io_schedule(void)
 //	return retval;
 //}
 //#endif
-//
-//void sched_show_task(struct task_struct *p)
-//{
-//	unsigned long free = 0;
-//	int ppid;
-//
-//	if (!try_get_task_stack(p))
-//		return;
-//
-//	pr_info("task:%-15.15s state:%c", p->comm, task_state_to_char(p));
-//
-//	if (p->state == TASK_RUNNING)
-//		pr_cont("  running task    ");
-//#ifdef CONFIG_DEBUG_STACK_USAGE
-//	free = stack_not_used(p);
-//#endif
-//	ppid = 0;
-//	rcu_read_lock();
-//	if (pid_alive(p))
-//		ppid = task_pid_nr(rcu_dereference(p->real_parent));
-//	rcu_read_unlock();
-//	pr_cont(" stack:%5lu pid:%5d ppid:%6d flags:0x%08lx\n",
-//		free, task_pid_nr(p), ppid,
-//		(unsigned long)task_thread_info(p)->flags);
-//
-//	print_worker_info(KERN_INFO, p);
-//	show_stack(p, NULL, KERN_INFO);
-//	put_task_stack(p);
-//}
-//EXPORT_SYMBOL_GPL(sched_show_task);
-//
+
+void sched_show_task(struct task_struct *p)
+{
+	unsigned long free = 0;
+	int ppid;
+
+	if (!try_get_task_stack(p))
+		return;
+
+	pr_info("task:%-15.15s state:%c", p->comm, task_state_to_char(p));
+
+	if (p->state == TASK_RUNNING)
+		pr_cont("  running task    ");
+#ifdef CONFIG_DEBUG_STACK_USAGE
+	free = stack_not_used(p);
+#endif
+	ppid = 0;
+	rcu_read_lock();
+	if (pid_alive(p))
+		ppid = task_pid_nr(rcu_dereference(p->real_parent));
+	rcu_read_unlock();
+	pr_cont(" stack:%5lu pid:%5d ppid:%6d flags:0x%08lx\n",
+		free, task_pid_nr(p), ppid,
+		(unsigned long)task_thread_info(p)->flags);
+
+	print_worker_info(KERN_INFO, p);
+	show_stack(p, NULL, KERN_INFO);
+	put_task_stack(p);
+}
+
 //static inline bool
 //state_filter_match(unsigned long state_filter, struct task_struct *p)
 //{

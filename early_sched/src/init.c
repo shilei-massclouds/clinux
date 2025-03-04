@@ -490,3 +490,9 @@ __weak unsigned long nr_iowait_cpu(int cpu)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(nr_iowait_cpu);
+
+__weak void sched_show_task(struct task_struct *p)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(sched_show_task);

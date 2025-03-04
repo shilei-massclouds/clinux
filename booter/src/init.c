@@ -3263,3 +3263,16 @@ __weak void __set_current_blocked(const sigset_t *newset)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__set_current_blocked);
+
+__weak int do_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p,
+			enum pid_type type)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(do_send_sig_info);
+
+__weak bool __oom_reap_task_mm(struct mm_struct *mm)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__oom_reap_task_mm);
