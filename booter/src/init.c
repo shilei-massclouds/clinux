@@ -3251,3 +3251,15 @@ __weak void rtmsg_ifinfo_send(struct sk_buff *skb, struct net_device *dev, gfp_t
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(rtmsg_ifinfo_send);
+
+__weak int set_user_sigmask(const sigset_t __user *umask, size_t sigsetsize)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(set_user_sigmask);
+
+__weak void __set_current_blocked(const sigset_t *newset)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__set_current_blocked);
