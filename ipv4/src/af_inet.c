@@ -161,7 +161,6 @@ void inet_sock_destruct(struct sock *sk)
 	dst_release(sk->sk_rx_dst);
 	sk_refcnt_debug_dec(sk);
 }
-EXPORT_SYMBOL(inet_sock_destruct);
 
 /*
  *	The routines beyond this point handle the behaviour of an AF_INET
@@ -1945,14 +1944,17 @@ static int __init inet_init(void)
 	if (rc)
 		goto out;
 
+    printk("---------------------------> %s: ...\n", __func__);
 	rc = proto_register(&udp_prot, 1);
 	if (rc)
 		goto out_unregister_tcp_proto;
 
+    printk("---------------------------> %s: ...\n", __func__);
 	rc = proto_register(&raw_prot, 1);
 	if (rc)
 		goto out_unregister_udp_proto;
 
+    printk("---------------------------> %s: ...\n", __func__);
 	rc = proto_register(&ping_prot, 1);
 	if (rc)
 		goto out_unregister_raw_proto;

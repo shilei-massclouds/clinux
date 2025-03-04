@@ -24,6 +24,7 @@
 #include <linux/parser.h>
 #include <linux/poll.h>
 #include <net/netlink.h>
+#include <net/icmp.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #ifdef GENERIC_TIME_VSYSCALL
@@ -3483,3 +3484,48 @@ __weak struct proc_dir_entry *proc_create(const char *name, umode_t mode,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(proc_create);
+
+const struct icmp_err icmp_err_convert[1];
+EXPORT_SYMBOL(icmp_err_convert);
+
+int ip_getsockopt(struct sock *sk, int level,
+          int optname, char __user *optval, int __user *optlen)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_getsockopt);
+
+void ip_icmp_error(struct sock *sk, struct sk_buff *skb, int err,
+           __be16 port, u32 info, u8 *payload)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_icmp_error);
+
+__weak void inet_sock_destruct(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_sock_destruct);
+
+int ip_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_recv_error);
+
+int ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
+        unsigned int optlen)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_setsockopt);
+
+void reuseport_detach_sock(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(reuseport_detach_sock);
+
+DEFINE_STATIC_KEY_FALSE(bpf_stats_enabled_key);
+EXPORT_SYMBOL(bpf_stats_enabled_key);

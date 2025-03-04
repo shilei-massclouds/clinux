@@ -250,27 +250,27 @@ static void __static_key_slow_dec_cpuslocked(struct static_key *key)
 	jump_label_unlock();
 }
 
-//static void __static_key_slow_dec(struct static_key *key)
-//{
-//	cpus_read_lock();
-//	__static_key_slow_dec_cpuslocked(key);
-//	cpus_read_unlock();
-//}
-//
-//void jump_label_update_timeout(struct work_struct *work)
-//{
-//	struct static_key_deferred *key =
-//		container_of(work, struct static_key_deferred, work.work);
-//	__static_key_slow_dec(&key->key);
-//}
-//EXPORT_SYMBOL_GPL(jump_label_update_timeout);
-//
-//void static_key_slow_dec(struct static_key *key)
-//{
-//	STATIC_KEY_CHECK_USE(key);
-//	__static_key_slow_dec(key);
-//}
-//EXPORT_SYMBOL_GPL(static_key_slow_dec);
+static void __static_key_slow_dec(struct static_key *key)
+{
+	cpus_read_lock();
+	__static_key_slow_dec_cpuslocked(key);
+	cpus_read_unlock();
+}
+
+void jump_label_update_timeout(struct work_struct *work)
+{
+	struct static_key_deferred *key =
+		container_of(work, struct static_key_deferred, work.work);
+	__static_key_slow_dec(&key->key);
+}
+EXPORT_SYMBOL_GPL(jump_label_update_timeout);
+
+void static_key_slow_dec(struct static_key *key)
+{
+	STATIC_KEY_CHECK_USE(key);
+	__static_key_slow_dec(key);
+}
+EXPORT_SYMBOL_GPL(static_key_slow_dec);
 
 void static_key_slow_dec_cpuslocked(struct static_key *key)
 {

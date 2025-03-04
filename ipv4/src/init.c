@@ -21,7 +21,6 @@ DEFINE_ENABLE_FUNC(ipv4);
 
 struct proto raw_prot;
 struct proto ping_prot;
-struct proto udp_prot;
 struct pingv6_ops pingv6_ops;
 EXPORT_SYMBOL_GPL(pingv6_ops);
 

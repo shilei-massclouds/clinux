@@ -3,7 +3,6 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <net/tcp.h>
-#include <net/icmp.h>
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
@@ -44,4 +43,3 @@ EXPORT_SYMBOL(sysctl_tcp_mem);
 DEFINE_STATIC_KEY_FALSE(tcp_tx_delay_enabled);
 EXPORT_SYMBOL(tcp_tx_delay_enabled);
 
-const struct icmp_err icmp_err_convert[1];

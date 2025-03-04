@@ -29,7 +29,6 @@ EXPORT_SYMBOL(nda_policy);
 const struct dst_metrics dst_default_metrics;
 EXPORT_SYMBOL(dst_default_metrics);
 
-DEFINE_STATIC_KEY_FALSE(bpf_stats_enabled_key);
 struct pernet_operations __net_initdata loopback_net_ops;
 
 atomic_t genl_sk_destructing_cnt = ATOMIC_INIT(0);
