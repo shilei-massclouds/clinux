@@ -156,32 +156,32 @@ char *kmemdup_nul(const char *s, size_t len, gfp_t gfp)
 }
 EXPORT_SYMBOL(kmemdup_nul);
 
-///**
-// * memdup_user - duplicate memory region from user space
-// *
-// * @src: source address in user space
-// * @len: number of bytes to copy
-// *
-// * Return: an ERR_PTR() on failure.  Result is physically
-// * contiguous, to be freed by kfree().
-// */
-//void *memdup_user(const void __user *src, size_t len)
-//{
-//	void *p;
-//
-//	p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
-//	if (!p)
-//		return ERR_PTR(-ENOMEM);
-//
-//	if (copy_from_user(p, src, len)) {
-//		kfree(p);
-//		return ERR_PTR(-EFAULT);
-//	}
-//
-//	return p;
-//}
-//EXPORT_SYMBOL(memdup_user);
-//
+/**
+ * memdup_user - duplicate memory region from user space
+ *
+ * @src: source address in user space
+ * @len: number of bytes to copy
+ *
+ * Return: an ERR_PTR() on failure.  Result is physically
+ * contiguous, to be freed by kfree().
+ */
+void *memdup_user(const void __user *src, size_t len)
+{
+	void *p;
+
+	p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
+	if (!p)
+		return ERR_PTR(-ENOMEM);
+
+	if (copy_from_user(p, src, len)) {
+		kfree(p);
+		return ERR_PTR(-EFAULT);
+	}
+
+	return p;
+}
+EXPORT_SYMBOL(memdup_user);
+
 ///**
 // * vmemdup_user - duplicate memory region from user space
 // *

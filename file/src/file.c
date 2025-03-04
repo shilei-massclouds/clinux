@@ -971,6 +971,7 @@ void set_close_on_exec(unsigned int fd, int flag)
 		__clear_close_on_exec(fd, fdt);
 	spin_unlock(&files->file_lock);
 }
+EXPORT_SYMBOL(set_close_on_exec);
 
 bool get_close_on_exec(unsigned int fd)
 {
