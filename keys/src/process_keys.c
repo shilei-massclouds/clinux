@@ -953,10 +953,8 @@ void key_change_session_keyring(struct callback_head *twork)
  */
 static int __init init_root_keyring(void)
 {
-    printk("%s: Disable this initcall temporarily.\n", __func__);
-    return 0;
-    //printk("%s: ...\n", __func__);
-	//return look_up_user_keyrings(NULL, NULL);
+    printk("%s: ...\n", __func__);
+	return look_up_user_keyrings(NULL, NULL);
 }
 
 late_initcall(init_root_keyring);
