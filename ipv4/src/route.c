@@ -2302,7 +2302,6 @@ int ip_route_input_noref(struct sk_buff *skb, __be32 daddr, __be32 saddr,
 
 	return err;
 }
-EXPORT_SYMBOL(ip_route_input_noref);
 
 /* called with rcu_read_lock held */
 int ip_route_input_rcu(struct sk_buff *skb, __be32 daddr, __be32 saddr,

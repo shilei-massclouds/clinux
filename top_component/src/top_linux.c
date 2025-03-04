@@ -1123,6 +1123,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(tcp_ipv4);
     REQUIRE_COMPONENT(udp);
     REQUIRE_COMPONENT(ping);
+    REQUIRE_COMPONENT(arp);
 
     //
     // start_kernel (init/main.c)

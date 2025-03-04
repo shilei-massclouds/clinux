@@ -3703,3 +3703,48 @@ EXPORT_SYMBOL(icmp_out_count);
 
 struct net_protocol __rcu *inet_protos[MAX_INET_PROTOS] __read_mostly;
 EXPORT_SYMBOL(inet_protos);
+
+__weak void __init arp_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(arp_init);
+
+__weak int ip_route_input_noref(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+			 u8 tos, struct net_device *dev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_route_input_noref);
+
+int inet_addr_onlink(struct in_device *in_dev, __be32 a, __be32 b)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_addr_onlink);
+
+__weak void rt_cache_flush(struct net *net)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rt_cache_flush);
+
+__be32 inet_select_addr(const struct net_device *dev, __be32 dst, int scope)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_select_addr);
+
+struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
+                 struct net_device *dev, bool want_ref)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__neigh_create);
+
+void neigh_destroy(struct neighbour *neigh)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(neigh_destroy);
+

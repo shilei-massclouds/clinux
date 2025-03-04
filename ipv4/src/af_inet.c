@@ -1952,19 +1952,16 @@ static int __init inet_init(void)
 	if (rc)
 		goto out_unregister_udp_proto;
 
-    printk("---------------------------> %s: ...\n", __func__);
 	rc = proto_register(&ping_prot, 1);
 	if (rc)
 		goto out_unregister_raw_proto;
 
-    printk("---------------------------> %s: ...\n", __func__);
 	/*
 	 *	Tell SOCKET that we are alive...
 	 */
 
 	(void)sock_register(&inet_family_ops);
 
-    printk("---------------------------> %s: ...\n", __func__);
 #ifdef CONFIG_SYSCTL
 	ip_static_sysctl_init();
 #endif
