@@ -702,7 +702,6 @@ int dequeue_signal(struct task_struct *tsk, sigset_t *mask, kernel_siginfo_t *in
 #endif
 	return signr;
 }
-EXPORT_SYMBOL_GPL(dequeue_signal);
 
 static int dequeue_synchronous_signal(kernel_siginfo_t *info)
 {

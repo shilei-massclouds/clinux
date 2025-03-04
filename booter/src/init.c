@@ -3349,3 +3349,29 @@ __weak void *PDE_DATA(const struct inode *inode)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(PDE_DATA);
+
+__weak int dequeue_signal(struct task_struct *tsk, sigset_t *mask, kernel_siginfo_t *info)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(dequeue_signal);
+
+__weak int next_signal(struct sigpending *pending, sigset_t *mask)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(next_signal);
+
+__weak enum siginfo_layout siginfo_layout(unsigned sig, int si_code)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(siginfo_layout);
+
+int anon_inode_getfd(const char *name, const struct file_operations *fops,
+             void *priv, int flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(anon_inode_getfd);
+

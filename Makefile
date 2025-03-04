@@ -66,7 +66,7 @@ components := \
 	net_core netlink string_helpers net_namespace \
 	block genhd partitions elevator sysctl_net \
 	fork mmap filemap kthread riscv_process exit exec \
-	buffer swap riscv_fault aio \
+	buffer swap riscv_fault aio signalfd \
 	signal sysctl kallsyms read_write \
 	virtio_mmio virtio virtio_blk ext2 binfmt_elf \
 	sys ioctl \
