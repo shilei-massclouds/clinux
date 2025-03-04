@@ -3040,54 +3040,52 @@ bool sock_is_registered(int family)
 
 static int __init sock_init(void)
 {
-    printk("%s: ================> Disable it temporarily.\n", __func__);
-    return 0;
-//	int err;
-//    printk("%s: +++++++++++++++++\n", __func__);
-//	/*
-//	 *      Initialize the network sysctl infrastructure.
-//	 */
-//	err = net_sysctl_init();
-//	if (err)
-//		goto out;
-//
-//	/*
-//	 *      Initialize skbuff SLAB cache
-//	 */
-//	skb_init();
-//
-//	/*
-//	 *      Initialize the protocols module.
-//	 */
-//
-//	init_inodecache();
-//
-//	err = register_filesystem(&sock_fs_type);
-//	if (err)
-//		goto out;
-//	sock_mnt = kern_mount(&sock_fs_type);
-//	if (IS_ERR(sock_mnt)) {
-//		err = PTR_ERR(sock_mnt);
-//		goto out_mount;
-//	}
-//
-//	/* The real protocol initialization is performed in later initcalls.
-//	 */
-//
-//#ifdef CONFIG_NETFILTER
-//	err = netfilter_init();
-//	if (err)
-//		goto out;
-//#endif
-//
-//	ptp_classifier_init();
-//
-//out:
-//	return err;
-//
-//out_mount:
-//	unregister_filesystem(&sock_fs_type);
-//	goto out;
+	int err;
+    printk("%s: +++++++++++++++++\n", __func__);
+	/*
+	 *      Initialize the network sysctl infrastructure.
+	 */
+	err = net_sysctl_init();
+	if (err)
+		goto out;
+
+	/*
+	 *      Initialize skbuff SLAB cache
+	 */
+	skb_init();
+
+	/*
+	 *      Initialize the protocols module.
+	 */
+
+	init_inodecache();
+
+	err = register_filesystem(&sock_fs_type);
+	if (err)
+		goto out;
+	sock_mnt = kern_mount(&sock_fs_type);
+	if (IS_ERR(sock_mnt)) {
+		err = PTR_ERR(sock_mnt);
+		goto out_mount;
+	}
+
+	/* The real protocol initialization is performed in later initcalls.
+	 */
+
+#ifdef CONFIG_NETFILTER
+	err = netfilter_init();
+	if (err)
+		goto out;
+#endif
+
+	ptp_classifier_init();
+
+out:
+	return err;
+
+out_mount:
+	unregister_filesystem(&sock_fs_type);
+	goto out;
 }
 
 core_initcall(sock_init);	/* early initcall */

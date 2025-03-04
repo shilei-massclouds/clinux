@@ -1117,6 +1117,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(ext2);
     REQUIRE_COMPONENT(binfmt_elf);
     REQUIRE_COMPONENT(xattr);
+    REQUIRE_COMPONENT(net_namespace);
 
     //
     // start_kernel (init/main.c)

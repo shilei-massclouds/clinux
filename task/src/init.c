@@ -296,3 +296,6 @@ EXPORT_SYMBOL(sighand_cachep);
 
 struct pid *cad_pid;
 EXPORT_SYMBOL(cad_pid);
+
+LIST_HEAD(net_namespace_list);
+EXPORT_SYMBOL_GPL(net_namespace_list);

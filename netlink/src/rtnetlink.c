@@ -71,13 +71,11 @@ void rtnl_lock(void)
 {
 	mutex_lock(&rtnl_mutex);
 }
-EXPORT_SYMBOL(rtnl_lock);
 
 int rtnl_lock_killable(void)
 {
 	return mutex_lock_killable(&rtnl_mutex);
 }
-EXPORT_SYMBOL(rtnl_lock_killable);
 
 static struct sk_buff *defer_kfree_skb_list;
 void rtnl_kfree_skbs(struct sk_buff *head, struct sk_buff *tail)
@@ -111,19 +109,16 @@ void rtnl_unlock(void)
 	/* This fellow will unlock it for us. */
 	netdev_run_todo();
 }
-EXPORT_SYMBOL(rtnl_unlock);
 
 int rtnl_trylock(void)
 {
 	return mutex_trylock(&rtnl_mutex);
 }
-EXPORT_SYMBOL(rtnl_trylock);
 
 int rtnl_is_locked(void)
 {
 	return mutex_is_locked(&rtnl_mutex);
 }
-EXPORT_SYMBOL(rtnl_is_locked);
 
 bool refcount_dec_and_rtnl_lock(refcount_t *r)
 {
@@ -276,6 +271,7 @@ void rtnl_register(int protocol, int msgtype,
 		pr_err("Unable to register rtnetlink message handler, "
 		       "protocol = %d, message type = %d\n", protocol, msgtype);
 }
+EXPORT_SYMBOL(rtnl_register);
 
 /**
  * rtnl_unregister - Unregister a rtnetlink message type

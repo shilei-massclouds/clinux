@@ -32,9 +32,6 @@
 static LIST_HEAD(pernet_list);
 static struct list_head *first_device = &pernet_list;
 
-LIST_HEAD(net_namespace_list);
-EXPORT_SYMBOL_GPL(net_namespace_list);
-
 /* Protects net_namespace_list. Nests iside rtnl_lock() */
 DECLARE_RWSEM(net_rwsem);
 EXPORT_SYMBOL_GPL(net_rwsem);
@@ -55,14 +52,6 @@ EXPORT_SYMBOL(init_net);
 */
 
 static bool init_net_initialized;
-/*
- * pernet_ops_rwsem: protects: pernet_list, net_generic_ids,
- * init_net_initialized and first_device pointer.
- * This is internal net namespace object. Please, don't use it
- * outside.
- */
-DECLARE_RWSEM(pernet_ops_rwsem);
-EXPORT_SYMBOL_GPL(pernet_ops_rwsem);
 
 #define MIN_PERNET_OPS_ID	\
 	((sizeof(struct net_generic) + sizeof(void *) - 1) / sizeof(void *))
@@ -281,7 +270,6 @@ int peernet2id_alloc(struct net *net, struct net *peer, gfp_t gfp)
 
 	return id;
 }
-EXPORT_SYMBOL_GPL(peernet2id_alloc);
 
 /* This function returns, if assigned, the id of a peer netns. */
 int peernet2id(const struct net *net, struct net *peer)
@@ -294,7 +282,6 @@ int peernet2id(const struct net *net, struct net *peer)
 
 	return id;
 }
-EXPORT_SYMBOL(peernet2id);
 
 /* This function returns true is the peer netns has an id assigned into the
  * current netns.
@@ -523,7 +510,6 @@ void net_ns_get_ownership(const struct net *net, kuid_t *uid, kgid_t *gid)
 		*gid = GLOBAL_ROOT_GID;
 	}
 }
-EXPORT_SYMBOL_GPL(net_ns_get_ownership);
 
 static void unhash_nsid(struct net *net, struct net *last)
 {
@@ -677,7 +663,6 @@ struct net *get_net_ns_by_fd(int fd)
 	return ERR_PTR(-EINVAL);
 }
 #endif
-EXPORT_SYMBOL_GPL(get_net_ns_by_fd);
 
 struct net *get_net_ns_by_pid(pid_t pid)
 {
@@ -699,7 +684,6 @@ struct net *get_net_ns_by_pid(pid_t pid)
 	rcu_read_unlock();
 	return net;
 }
-EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
 
 static __net_init int net_ns_net_init(struct net *net)
 {
@@ -1309,7 +1293,6 @@ int register_pernet_device(struct pernet_operations *ops)
 	up_write(&pernet_ops_rwsem);
 	return error;
 }
-EXPORT_SYMBOL_GPL(register_pernet_device);
 
 /**
  *      unregister_pernet_device - unregister a network namespace netdevice

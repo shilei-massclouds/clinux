@@ -315,6 +315,7 @@ struct sk_buff *__build_skb(void *data, unsigned int frag_size)
 
 	return __build_skb_around(skb, data, frag_size);
 }
+EXPORT_SYMBOL(__build_skb);
 
 /* build_skb() is wrapper over __build_skb(), that specifically
  * takes care of skb->head and skb->pfmemalloc

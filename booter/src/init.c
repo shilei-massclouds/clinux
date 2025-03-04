@@ -21,6 +21,7 @@
 #include <linux/backing-dev-defs.h>
 #include <linux/backing-dev.h>
 #include <linux/parser.h>
+#include <net/netlink.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #ifdef GENERIC_TIME_VSYSCALL
@@ -3082,3 +3083,171 @@ EXPORT_SYMBOL(signal_wake_up_state);
 
 int show_unhandled_signals = 1;
 EXPORT_SYMBOL(show_unhandled_signals);
+
+__weak void rtnl_unlock(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_unlock);
+
+__weak int rtnl_is_locked(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_is_locked);
+
+__weak int rtnl_trylock(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_trylock);
+
+__weak int rtnl_lock_killable(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_lock_killable);
+
+__weak void rtnl_lock(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_lock);
+
+__weak void net_ns_get_ownership(const struct net *net, kuid_t *uid, kgid_t *gid)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(net_ns_get_ownership);
+
+__weak int peernet2id_alloc(struct net *net, struct net *peer, gfp_t gfp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(peernet2id_alloc);
+
+__weak int register_pernet_device(struct pernet_operations *ops)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(register_pernet_device);
+
+__weak int peernet2id(const struct net *net, struct net *peer)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(peernet2id);
+
+__weak struct net *get_net_ns_by_pid(pid_t pid)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
+
+__weak struct net *get_net_ns_by_fd(int fd)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(get_net_ns_by_fd);
+
+/*
+ * pernet_ops_rwsem: protects: pernet_list, net_generic_ids,
+ * init_net_initialized and first_device pointer.
+ * This is internal net namespace object. Please, don't use it
+ * outside.
+ */
+DECLARE_RWSEM(pernet_ops_rwsem);
+EXPORT_SYMBOL_GPL(pernet_ops_rwsem);
+
+int __nla_parse(struct nlattr **tb, int maxtype,
+        const struct nlattr *head, int len,
+        const struct nla_policy *policy, unsigned int validate,
+        struct netlink_ext_ack *extack)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__nla_parse);
+
+int nla_put(struct sk_buff *skb, int attrtype, int attrlen, const void *data)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(nla_put);
+
+__weak bool peernet_has_id(const struct net *net, struct net *peer)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(peernet_has_id);
+
+__weak void net_drop_ns(void *p)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(net_drop_ns);
+
+__weak struct net *get_net_ns_by_id(const struct net *net, int id)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(get_net_ns_by_id);
+
+__weak void rtmsg_ifinfo(int type, struct net_device *dev, unsigned int change,
+		  gfp_t flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtmsg_ifinfo);
+
+__weak struct sk_buff *rtmsg_ifinfo_build_skb(int type, struct net_device *dev,
+				       unsigned int change,
+				       u32 event, gfp_t flags, int *new_nsid,
+				       int new_ifindex)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtmsg_ifinfo_build_skb);
+
+int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+               struct iov_iter *to, int len)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(skb_copy_datagram_iter);
+
+int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sk_filter_trim_cap);
+
+__weak void rtmsg_ifinfo_newnet(int type, struct net_device *dev, unsigned int change,
+			 gfp_t flags, int *new_nsid, int new_ifindex)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtmsg_ifinfo_newnet);
+
+__weak void __rtnl_unlock(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__rtnl_unlock);
+
+int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(put_cmsg);
+
+int net_ratelimit(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(net_ratelimit);
+
+__weak void rtmsg_ifinfo_send(struct sk_buff *skb, struct net_device *dev, gfp_t flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtmsg_ifinfo_send);

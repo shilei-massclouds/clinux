@@ -1373,6 +1373,7 @@ rollback:
 
 	return err;
 }
+EXPORT_SYMBOL(dev_change_name);
 
 /**
  *	dev_set_alias - change ifalias of a device
@@ -1432,6 +1433,7 @@ int dev_get_alias(const struct net_device *dev, char *name, size_t len)
 
 	return ret;
 }
+EXPORT_SYMBOL(dev_get_alias);
 
 /**
  *	netdev_features_change - device changes features
@@ -8372,6 +8374,7 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags,
 
 	return ret;
 }
+EXPORT_SYMBOL(__dev_change_flags);
 
 void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
 			unsigned int gchanges)
@@ -8400,6 +8403,7 @@ void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
 		call_netdevice_notifiers_info(NETDEV_CHANGE, &change_info.info);
 	}
 }
+EXPORT_SYMBOL(__dev_notify_flags);
 
 /**
  *	dev_change_flags - change device settings
@@ -8454,6 +8458,7 @@ int dev_validate_mtu(struct net_device *dev, int new_mtu,
 	}
 	return 0;
 }
+EXPORT_SYMBOL(dev_validate_mtu);
 
 /**
  *	dev_set_mtu_ext - Change maximum transfer unit
@@ -8501,6 +8506,7 @@ int dev_set_mtu_ext(struct net_device *dev, int new_mtu,
 	}
 	return err;
 }
+EXPORT_SYMBOL(dev_set_mtu_ext);
 
 int dev_set_mtu(struct net_device *dev, int new_mtu)
 {
@@ -8546,6 +8552,7 @@ err_rollback:
 	dev->tx_queue_len = orig_len;
 	return res;
 }
+EXPORT_SYMBOL(dev_change_tx_queue_len);
 
 /**
  *	dev_set_group - Change group this device belongs to
@@ -8852,6 +8859,7 @@ u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode)
 
 	return prog ? prog->aux->id : 0;
 }
+EXPORT_SYMBOL(dev_xdp_prog_id);
 
 static void dev_xdp_set_link(struct net_device *dev, enum bpf_xdp_mode mode,
 			     struct bpf_xdp_link *link)
@@ -9262,6 +9270,7 @@ err_out:
 		bpf_prog_put(old_prog);
 	return err;
 }
+EXPORT_SYMBOL(dev_change_xdp_fd);
 
 /**
  *	dev_new_index	-	allocate an ifindex
@@ -9286,6 +9295,7 @@ static int dev_new_index(struct net *net)
 /* Delayed registration/unregisteration */
 static LIST_HEAD(net_todo_list);
 DECLARE_WAIT_QUEUE_HEAD(netdev_unregistering_wq);
+EXPORT_SYMBOL(netdev_unregistering_wq);
 
 static void net_set_todo(struct net_device *dev)
 {
@@ -10189,6 +10199,7 @@ void netdev_run_todo(void)
 		kobject_put(&dev->dev.kobj);
 	}
 }
+EXPORT_SYMBOL(netdev_run_todo);
 
 /* Convert net_device_stats to rtnl_link_stats64. rtnl_link_stats64 has
  * all the same fields in the same order as net_device_stats, with only
