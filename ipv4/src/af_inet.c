@@ -1308,7 +1308,6 @@ int inet_sk_rebuild_header(struct sock *sk)
 
 	return err;
 }
-EXPORT_SYMBOL(inet_sk_rebuild_header);
 
 void inet_sk_set_state(struct sock *sk, int state)
 {
@@ -1662,7 +1661,6 @@ int inet_ctl_sock_create(struct sock **sk, unsigned short family,
 	}
 	return rc;
 }
-EXPORT_SYMBOL_GPL(inet_ctl_sock_create);
 
 u64 snmp_get_cpu_field(void __percpu *mib, int cpu, int offt)
 {

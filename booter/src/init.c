@@ -3409,3 +3409,67 @@ void dst_release(struct dst_entry *dst)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(dst_release);
+
+__weak int tcp_v4_early_demux(struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_v4_early_demux);
+
+struct rtable *ip_route_output_flow(struct net *net, struct flowi4 *flp4,
+                    const struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ip_route_output_flow);
+
+void sock_edemux(struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sock_edemux);
+
+struct rtable *ip_route_output_key_hash(struct net *net, struct flowi4 *fl4,
+                    const struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_route_output_key_hash);
+
+__weak int tcp_v4_err(struct sk_buff *skb, u32 info)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_v4_err);
+
+__weak int __init tcp4_proc_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp4_proc_init);
+
+__weak void tcp4_proc_exit(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp4_proc_exit);
+
+__weak int tcp_v4_rcv(struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_v4_rcv);
+
+__weak int inet_ctl_sock_create(struct sock **sk, unsigned short family,
+			 unsigned short type, unsigned char protocol,
+			 struct net *net)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(inet_ctl_sock_create);
+
+__weak int inet_sk_rebuild_header(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_sk_rebuild_header);
