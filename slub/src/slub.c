@@ -3831,57 +3831,57 @@ error:
 	return -EINVAL;
 }
 
-//static void list_slab_objects(struct kmem_cache *s, struct page *page,
-//			      const char *text)
-//{
-//#ifdef CONFIG_SLUB_DEBUG
-//	void *addr = page_address(page);
-//	unsigned long *map;
-//	void *p;
-//
-//	slab_err(s, page, text, s->name);
-//	slab_lock(page);
-//
-//	map = get_map(s, page);
-//	for_each_object(p, s, addr, page->objects) {
-//
-//		if (!test_bit(__obj_to_index(s, addr, p), map)) {
-//			pr_err("INFO: Object 0x%p @offset=%tu\n", p, p - addr);
-//			print_tracking(s, p);
-//		}
-//	}
-//	put_map(map);
-//	slab_unlock(page);
-//#endif
-//}
-//
-///*
-// * Attempt to free all partial slabs on a node.
-// * This is called from __kmem_cache_shutdown(). We must take list_lock
-// * because sysfs file might still access partial list after the shutdowning.
-// */
-//static void free_partial(struct kmem_cache *s, struct kmem_cache_node *n)
-//{
-//	LIST_HEAD(discard);
-//	struct page *page, *h;
-//
-//	BUG_ON(irqs_disabled());
-//	spin_lock_irq(&n->list_lock);
-//	list_for_each_entry_safe(page, h, &n->partial, slab_list) {
-//		if (!page->inuse) {
-//			remove_partial(n, page);
-//			list_add(&page->slab_list, &discard);
-//		} else {
-//			list_slab_objects(s, page,
-//			  "Objects remaining in %s on __kmem_cache_shutdown()");
-//		}
-//	}
-//	spin_unlock_irq(&n->list_lock);
-//
-//	list_for_each_entry_safe(page, h, &discard, slab_list)
-//		discard_slab(s, page);
-//}
-//
+static void list_slab_objects(struct kmem_cache *s, struct page *page,
+			      const char *text)
+{
+#ifdef CONFIG_SLUB_DEBUG
+	void *addr = page_address(page);
+	unsigned long *map;
+	void *p;
+
+	slab_err(s, page, text, s->name);
+	slab_lock(page);
+
+	map = get_map(s, page);
+	for_each_object(p, s, addr, page->objects) {
+
+		if (!test_bit(__obj_to_index(s, addr, p), map)) {
+			pr_err("INFO: Object 0x%p @offset=%tu\n", p, p - addr);
+			print_tracking(s, p);
+		}
+	}
+	put_map(map);
+	slab_unlock(page);
+#endif
+}
+
+/*
+ * Attempt to free all partial slabs on a node.
+ * This is called from __kmem_cache_shutdown(). We must take list_lock
+ * because sysfs file might still access partial list after the shutdowning.
+ */
+static void free_partial(struct kmem_cache *s, struct kmem_cache_node *n)
+{
+	LIST_HEAD(discard);
+	struct page *page, *h;
+
+	BUG_ON(irqs_disabled());
+	spin_lock_irq(&n->list_lock);
+	list_for_each_entry_safe(page, h, &n->partial, slab_list) {
+		if (!page->inuse) {
+			remove_partial(n, page);
+			list_add(&page->slab_list, &discard);
+		} else {
+			list_slab_objects(s, page,
+			  "Objects remaining in %s on __kmem_cache_shutdown()");
+		}
+	}
+	spin_unlock_irq(&n->list_lock);
+
+	list_for_each_entry_safe(page, h, &discard, slab_list)
+		discard_slab(s, page);
+}
+
 //bool __kmem_cache_empty(struct kmem_cache *s)
 //{
 //	int node;
@@ -3892,25 +3892,25 @@ error:
 //			return false;
 //	return true;
 //}
-//
-///*
-// * Release all resources used by a slab cache.
-// */
-//int __kmem_cache_shutdown(struct kmem_cache *s)
-//{
-//	int node;
-//	struct kmem_cache_node *n;
-//
-//	flush_all(s);
-//	/* Attempt to free all objects */
-//	for_each_kmem_cache_node(s, node, n) {
-//		free_partial(s, n);
-//		if (n->nr_partial || slabs_node(s, node))
-//			return 1;
-//	}
-//	return 0;
-//}
-//
+
+/*
+ * Release all resources used by a slab cache.
+ */
+int __kmem_cache_shutdown(struct kmem_cache *s)
+{
+	int node;
+	struct kmem_cache_node *n;
+
+	flush_all(s);
+	/* Attempt to free all objects */
+	for_each_kmem_cache_node(s, node, n) {
+		free_partial(s, n);
+		if (n->nr_partial || slabs_node(s, node))
+			return 1;
+	}
+	return 0;
+}
+
 ///********************************************************************
 // *		Kmalloc subsystem
 // *******************************************************************/
@@ -5634,17 +5634,17 @@ out_del_kobj:
 	goto out;
 }
 
-//void sysfs_slab_unlink(struct kmem_cache *s)
-//{
-//	if (slab_state >= FULL)
-//		kobject_del(&s->kobj);
-//}
-//
-//void sysfs_slab_release(struct kmem_cache *s)
-//{
-//	if (slab_state >= FULL)
-//		kobject_put(&s->kobj);
-//}
+void sysfs_slab_unlink(struct kmem_cache *s)
+{
+	if (slab_state >= FULL)
+		kobject_del(&s->kobj);
+}
+
+void sysfs_slab_release(struct kmem_cache *s)
+{
+	if (slab_state >= FULL)
+		kobject_put(&s->kobj);
+}
 
 /*
  * Need to buffer aliases during bootup until sysfs becomes

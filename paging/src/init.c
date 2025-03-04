@@ -287,3 +287,21 @@ __weak void unmap_page_range(struct mmu_gather *tlb,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(unmap_page_range);
+
+unsigned int _debug_guardpage_minorder;
+EXPORT_SYMBOL(_debug_guardpage_minorder);
+
+#ifdef CONFIG_INIT_ON_ALLOC_DEFAULT_ON
+DEFINE_STATIC_KEY_TRUE(init_on_alloc);
+#else
+DEFINE_STATIC_KEY_FALSE(init_on_alloc);
+#endif
+EXPORT_SYMBOL(init_on_alloc);
+
+#ifdef CONFIG_INIT_ON_FREE_DEFAULT_ON
+DEFINE_STATIC_KEY_TRUE(init_on_free);
+#else
+DEFINE_STATIC_KEY_FALSE(init_on_free);
+#endif
+EXPORT_SYMBOL(init_on_free);
+

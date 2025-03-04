@@ -120,19 +120,19 @@ EXPORT_SYMBOL(latent_entropy);
 int percpu_pagelist_fraction;
 //gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
 //EXPORT_SYMBOL(gfp_allowed_mask);
-#ifdef CONFIG_INIT_ON_ALLOC_DEFAULT_ON
-DEFINE_STATIC_KEY_TRUE(init_on_alloc);
-#else
-DEFINE_STATIC_KEY_FALSE(init_on_alloc);
-#endif
-EXPORT_SYMBOL(init_on_alloc);
+//#ifdef CONFIG_INIT_ON_ALLOC_DEFAULT_ON
+//DEFINE_STATIC_KEY_TRUE(init_on_alloc);
+//#else
+//DEFINE_STATIC_KEY_FALSE(init_on_alloc);
+//#endif
+//EXPORT_SYMBOL(init_on_alloc);
 
-#ifdef CONFIG_INIT_ON_FREE_DEFAULT_ON
-DEFINE_STATIC_KEY_TRUE(init_on_free);
-#else
-DEFINE_STATIC_KEY_FALSE(init_on_free);
-#endif
-EXPORT_SYMBOL(init_on_free);
+//#ifdef CONFIG_INIT_ON_FREE_DEFAULT_ON
+//DEFINE_STATIC_KEY_TRUE(init_on_free);
+//#else
+//DEFINE_STATIC_KEY_FALSE(init_on_free);
+//#endif
+//EXPORT_SYMBOL(init_on_free);
 
 //static int __init early_init_on_alloc(char *buf)
 //{
@@ -670,8 +670,8 @@ void prep_compound_page(struct page *page, unsigned int order)
 }
 
 #ifdef CONFIG_DEBUG_PAGEALLOC
-unsigned int _debug_guardpage_minorder;
-EXPORT_SYMBOL(_debug_guardpage_minorder);
+//unsigned int _debug_guardpage_minorder;
+//EXPORT_SYMBOL(_debug_guardpage_minorder);
 
 //bool _debug_pagealloc_enabled_early __read_mostly
 //			= IS_ENABLED(CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT);

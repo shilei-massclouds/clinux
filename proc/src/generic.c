@@ -564,7 +564,6 @@ struct proc_dir_entry *proc_create(const char *name, umode_t mode,
 {
 	return proc_create_data(name, mode, parent, proc_ops, NULL);
 }
-EXPORT_SYMBOL(proc_create);
 
 static int proc_seq_open(struct inode *inode, struct file *file)
 {

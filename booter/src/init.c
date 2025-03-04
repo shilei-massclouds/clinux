@@ -1596,11 +1596,13 @@ void kfree_sensitive(const void *p)
 }
 EXPORT_SYMBOL(kfree_sensitive);
 
+/*
 void kmem_cache_destroy(struct kmem_cache *s)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(kmem_cache_destroy);
+*/
 
 __weak void *__vmalloc_node(unsigned long size, unsigned long align,
 			    gfp_t gfp_mask, int node, const void *caller)
@@ -3473,3 +3475,11 @@ __weak int inet_sk_rebuild_header(struct sock *sk)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_sk_rebuild_header);
+
+__weak struct proc_dir_entry *proc_create(const char *name, umode_t mode,
+				   struct proc_dir_entry *parent,
+				   const struct proc_ops *proc_ops)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(proc_create);

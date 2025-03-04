@@ -44,9 +44,9 @@ MODULE_PARM_DESC(usercopy_fallback,
 #endif
 
 static LIST_HEAD(slab_caches_to_rcu_destroy);
-//static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work);
-//static DECLARE_WORK(slab_caches_to_rcu_destroy_work,
-//		    slab_caches_to_rcu_destroy_workfn);
+static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work);
+static DECLARE_WORK(slab_caches_to_rcu_destroy_work,
+		    slab_caches_to_rcu_destroy_workfn);
 
 /*
  * Set of flags that will prevent slab merging
@@ -409,65 +409,65 @@ kmem_cache_create(const char *name, unsigned int size, unsigned int align,
 					  ctor);
 }
 
-//static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work)
-//{
-//	LIST_HEAD(to_destroy);
-//	struct kmem_cache *s, *s2;
-//
-//	/*
-//	 * On destruction, SLAB_TYPESAFE_BY_RCU kmem_caches are put on the
-//	 * @slab_caches_to_rcu_destroy list.  The slab pages are freed
-//	 * through RCU and the associated kmem_cache are dereferenced
-//	 * while freeing the pages, so the kmem_caches should be freed only
-//	 * after the pending RCU operations are finished.  As rcu_barrier()
-//	 * is a pretty slow operation, we batch all pending destructions
-//	 * asynchronously.
-//	 */
-//	mutex_lock(&slab_mutex);
-//	list_splice_init(&slab_caches_to_rcu_destroy, &to_destroy);
-//	mutex_unlock(&slab_mutex);
-//
-//	if (list_empty(&to_destroy))
-//		return;
-//
-//	rcu_barrier();
-//
-//	list_for_each_entry_safe(s, s2, &to_destroy, list) {
-//#ifdef SLAB_SUPPORTS_SYSFS
-//		sysfs_slab_release(s);
-//#else
-//		slab_kmem_cache_release(s);
-//#endif
-//	}
-//}
-//
-//static int shutdown_cache(struct kmem_cache *s)
-//{
-//	/* free asan quarantined objects */
-//	kasan_cache_shutdown(s);
-//
-//	if (__kmem_cache_shutdown(s) != 0)
-//		return -EBUSY;
-//
-//	list_del(&s->list);
-//
-//	if (s->flags & SLAB_TYPESAFE_BY_RCU) {
-//#ifdef SLAB_SUPPORTS_SYSFS
-//		sysfs_slab_unlink(s);
-//#endif
-//		list_add_tail(&s->list, &slab_caches_to_rcu_destroy);
-//		schedule_work(&slab_caches_to_rcu_destroy_work);
-//	} else {
-//#ifdef SLAB_SUPPORTS_SYSFS
-//		sysfs_slab_unlink(s);
-//		sysfs_slab_release(s);
-//#else
-//		slab_kmem_cache_release(s);
-//#endif
-//	}
-//
-//	return 0;
-//}
+static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work)
+{
+	LIST_HEAD(to_destroy);
+	struct kmem_cache *s, *s2;
+
+	/*
+	 * On destruction, SLAB_TYPESAFE_BY_RCU kmem_caches are put on the
+	 * @slab_caches_to_rcu_destroy list.  The slab pages are freed
+	 * through RCU and the associated kmem_cache are dereferenced
+	 * while freeing the pages, so the kmem_caches should be freed only
+	 * after the pending RCU operations are finished.  As rcu_barrier()
+	 * is a pretty slow operation, we batch all pending destructions
+	 * asynchronously.
+	 */
+	mutex_lock(&slab_mutex);
+	list_splice_init(&slab_caches_to_rcu_destroy, &to_destroy);
+	mutex_unlock(&slab_mutex);
+
+	if (list_empty(&to_destroy))
+		return;
+
+	rcu_barrier();
+
+	list_for_each_entry_safe(s, s2, &to_destroy, list) {
+#ifdef SLAB_SUPPORTS_SYSFS
+		sysfs_slab_release(s);
+#else
+		slab_kmem_cache_release(s);
+#endif
+	}
+}
+
+static int shutdown_cache(struct kmem_cache *s)
+{
+	/* free asan quarantined objects */
+	kasan_cache_shutdown(s);
+
+	if (__kmem_cache_shutdown(s) != 0)
+		return -EBUSY;
+
+	list_del(&s->list);
+
+	if (s->flags & SLAB_TYPESAFE_BY_RCU) {
+#ifdef SLAB_SUPPORTS_SYSFS
+		sysfs_slab_unlink(s);
+#endif
+		list_add_tail(&s->list, &slab_caches_to_rcu_destroy);
+		schedule_work(&slab_caches_to_rcu_destroy_work);
+	} else {
+#ifdef SLAB_SUPPORTS_SYSFS
+		sysfs_slab_unlink(s);
+		sysfs_slab_release(s);
+#else
+		slab_kmem_cache_release(s);
+#endif
+	}
+
+	return 0;
+}
 
 void slab_kmem_cache_release(struct kmem_cache *s)
 {
@@ -476,35 +476,35 @@ void slab_kmem_cache_release(struct kmem_cache *s)
 	kmem_cache_free(kmem_cache, s);
 }
 
-//void kmem_cache_destroy(struct kmem_cache *s)
-//{
-//	int err;
-//
-//	if (unlikely(!s))
-//		return;
-//
-//	get_online_cpus();
-//	get_online_mems();
-//
-//	mutex_lock(&slab_mutex);
-//
-//	s->refcount--;
-//	if (s->refcount)
-//		goto out_unlock;
-//
-//	err = shutdown_cache(s);
-//	if (err) {
-//		pr_err("kmem_cache_destroy %s: Slab cache still has objects\n",
-//		       s->name);
-//		dump_stack();
-//	}
-//out_unlock:
-//	mutex_unlock(&slab_mutex);
-//
-//	put_online_mems();
-//	put_online_cpus();
-//}
-//EXPORT_SYMBOL(kmem_cache_destroy);
+void kmem_cache_destroy(struct kmem_cache *s)
+{
+	int err;
+
+	if (unlikely(!s))
+		return;
+
+	get_online_cpus();
+	get_online_mems();
+
+	mutex_lock(&slab_mutex);
+
+	s->refcount--;
+	if (s->refcount)
+		goto out_unlock;
+
+	err = shutdown_cache(s);
+	if (err) {
+		pr_err("kmem_cache_destroy %s: Slab cache still has objects\n",
+		       s->name);
+		dump_stack();
+	}
+out_unlock:
+	mutex_unlock(&slab_mutex);
+
+	put_online_mems();
+	put_online_cpus();
+}
+EXPORT_SYMBOL(kmem_cache_destroy);
 
 /**
  * kmem_cache_shrink - Shrink a cache.
