@@ -33,6 +33,10 @@
 #include <linux/debugfs.h>
 #include <asm/sections.h>
 
+#ifdef CONFIG_RISCV
+#include "../booter/src/booter.h"
+#endif
+
 #define PANIC_TIMER_STEP 100
 #define PANIC_BLINK_SPD 18
 
@@ -350,6 +354,11 @@ void panic(const char *fmt, ...)
 	disabled_wait();
 #endif
 	pr_emerg("---[ end Kernel panic - not syncing: %s ]---\n", buf);
+
+    /* Note: cLinux shutdowns kernel ahead of time. */
+#if defined(CONFIG_RISCV_SBI)
+    booter_panic("[cLinux]: Shutdown kernel ahead of time.\n");
+#endif
 
 	/* Do not scroll important messages printed above */
 	suppress_printk = 1;
