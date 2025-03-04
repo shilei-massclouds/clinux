@@ -2174,7 +2174,6 @@ __nlmsg_put(struct sk_buff *skb, u32 portid, u32 seq, int type, int len, int fla
 		memset(nlmsg_data(nlh) + len, 0, NLMSG_ALIGN(size) - size);
 	return nlh;
 }
-EXPORT_SYMBOL(__nlmsg_put);
 
 /*
  * It looks a bit ugly.

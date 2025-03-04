@@ -17,7 +17,6 @@ CL_MINE(stack_trace_save_tsk)
 CL_MINE(task_current_syscall)
 
 CL_MINE(__cgroup_bpf_run_filter_sysctl)
-CL_MINE(proc_dointvec_userhz_jiffies)
 CL_MINE(proc_douintvec)
 CL_MINE(proc_douintvec_minmax)
 CL_MINE(proc_doulongvec_ms_jiffies_minmax)

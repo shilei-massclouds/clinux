@@ -3735,16 +3735,85 @@ __be32 inet_select_addr(const struct net_device *dev, __be32 dst, int scope)
 }
 EXPORT_SYMBOL(inet_select_addr);
 
+/*
 struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
                  struct net_device *dev, bool want_ref)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__neigh_create);
+*/
 
+/*
 void neigh_destroy(struct neighbour *neigh)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(neigh_destroy);
+*/
 
+int call_netevent_notifiers(unsigned long val, void *v)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(call_netevent_notifiers);
+
+int proc_dointvec_userhz_jiffies(struct ctl_table *table, int write,
+                 void *buffer, size_t *lenp, loff_t *ppos)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(proc_dointvec_userhz_jiffies);
+
+int nla_memcpy(void *dest, const struct nlattr *src, int count)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(nla_memcpy);
+
+struct nlattr *nla_find(const struct nlattr *head, int len, int attrtype)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(nla_find);
+
+__weak struct nlmsghdr *
+__nlmsg_put(struct sk_buff *skb, u32 portid, u32 seq, int type, int len, int flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__nlmsg_put);
+
+__weak void rtnl_set_sk_err(struct net *net, u32 group, int error)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_set_sk_err);
+
+__weak int rtnl_unicast(struct sk_buff *skb, struct net *net, u32 pid)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_unicast);
+
+__weak void rtnl_register(int protocol, int msgtype,
+		   rtnl_doit_func doit, rtnl_dumpit_func dumpit,
+		   unsigned int flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_register);
+
+__weak void rtnl_notify(struct sk_buff *skb, struct net *net, u32 pid, u32 group,
+		 struct nlmsghdr *nlh, gfp_t flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rtnl_notify);
+
+int nla_put_64bit(struct sk_buff *skb, int attrtype, int attrlen,
+          const void *data, int padattr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(nla_put_64bit);

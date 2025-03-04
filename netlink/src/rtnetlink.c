@@ -271,7 +271,6 @@ void rtnl_register(int protocol, int msgtype,
 		pr_err("Unable to register rtnetlink message handler, "
 		       "protocol = %d, message type = %d\n", protocol, msgtype);
 }
-EXPORT_SYMBOL(rtnl_register);
 
 /**
  * rtnl_unregister - Unregister a rtnetlink message type
@@ -719,7 +718,6 @@ int rtnl_unicast(struct sk_buff *skb, struct net *net, u32 pid)
 
 	return nlmsg_unicast(rtnl, skb, pid);
 }
-EXPORT_SYMBOL(rtnl_unicast);
 
 void rtnl_notify(struct sk_buff *skb, struct net *net, u32 pid, u32 group,
 		 struct nlmsghdr *nlh, gfp_t flags)
@@ -732,7 +730,6 @@ void rtnl_notify(struct sk_buff *skb, struct net *net, u32 pid, u32 group,
 
 	nlmsg_notify(rtnl, skb, pid, group, report, flags);
 }
-EXPORT_SYMBOL(rtnl_notify);
 
 void rtnl_set_sk_err(struct net *net, u32 group, int error)
 {
@@ -740,7 +737,6 @@ void rtnl_set_sk_err(struct net *net, u32 group, int error)
 
 	netlink_set_err(rtnl, 0, group, error);
 }
-EXPORT_SYMBOL(rtnl_set_sk_err);
 
 int rtnetlink_put_metrics(struct sk_buff *skb, u32 *metrics)
 {

@@ -24,8 +24,6 @@ DEFINE_ENABLE_FUNC(net_core);
 
 struct pipe_buf_operations;
 const struct pipe_buf_operations nosteal_pipe_buf_ops;
-const struct nla_policy nda_policy[1];
-EXPORT_SYMBOL(nda_policy);
 const struct dst_metrics dst_default_metrics;
 EXPORT_SYMBOL(dst_default_metrics);
 
