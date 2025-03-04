@@ -1027,32 +1027,33 @@ EXPORT_SYMBOL_GPL(kset_create_and_add);
 static DEFINE_SPINLOCK(kobj_ns_type_lock);
 static const struct kobj_ns_type_operations *kobj_ns_ops_tbl[KOBJ_NS_TYPES];
 
-//int kobj_ns_type_register(const struct kobj_ns_type_operations *ops)
-//{
-//	enum kobj_ns_type type = ops->type;
-//	int error;
-//
-//	spin_lock(&kobj_ns_type_lock);
-//
-//	error = -EINVAL;
-//	if (type >= KOBJ_NS_TYPES)
-//		goto out;
-//
-//	error = -EINVAL;
-//	if (type <= KOBJ_NS_TYPE_NONE)
-//		goto out;
-//
-//	error = -EBUSY;
-//	if (kobj_ns_ops_tbl[type])
-//		goto out;
-//
-//	error = 0;
-//	kobj_ns_ops_tbl[type] = ops;
-//
-//out:
-//	spin_unlock(&kobj_ns_type_lock);
-//	return error;
-//}
+int kobj_ns_type_register(const struct kobj_ns_type_operations *ops)
+{
+	enum kobj_ns_type type = ops->type;
+	int error;
+
+	spin_lock(&kobj_ns_type_lock);
+
+	error = -EINVAL;
+	if (type >= KOBJ_NS_TYPES)
+		goto out;
+
+	error = -EINVAL;
+	if (type <= KOBJ_NS_TYPE_NONE)
+		goto out;
+
+	error = -EBUSY;
+	if (kobj_ns_ops_tbl[type])
+		goto out;
+
+	error = 0;
+	kobj_ns_ops_tbl[type] = ops;
+
+out:
+	spin_unlock(&kobj_ns_type_lock);
+	return error;
+}
+EXPORT_SYMBOL(kobj_ns_type_register);
 
 int kobj_ns_type_registered(enum kobj_ns_type type)
 {
