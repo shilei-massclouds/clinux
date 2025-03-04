@@ -1944,7 +1944,6 @@ static int __init inet_init(void)
 	if (rc)
 		goto out;
 
-    printk("---------------------------> %s: ...\n", __func__);
 	rc = proto_register(&udp_prot, 1);
 	if (rc)
 		goto out_unregister_tcp_proto;
@@ -1959,6 +1958,7 @@ static int __init inet_init(void)
 	if (rc)
 		goto out_unregister_raw_proto;
 
+    printk("---------------------------> %s: ...\n", __func__);
 	/*
 	 *	Tell SOCKET that we are alive...
 	 */

@@ -3419,7 +3419,7 @@ __weak int tcp_v4_early_demux(struct sk_buff *skb)
 }
 EXPORT_SYMBOL(tcp_v4_early_demux);
 
-struct rtable *ip_route_output_flow(struct net *net, struct flowi4 *flp4,
+__weak struct rtable *ip_route_output_flow(struct net *net, struct flowi4 *flp4,
                     const struct sock *sk)
 {
     booter_panic("No impl!\n");
@@ -3431,13 +3431,6 @@ void sock_edemux(struct sk_buff *skb)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(sock_edemux);
-
-struct rtable *ip_route_output_key_hash(struct net *net, struct flowi4 *fl4,
-                    const struct sk_buff *skb)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(ip_route_output_key_hash);
 
 __weak int tcp_v4_err(struct sk_buff *skb, u32 info)
 {
@@ -3529,3 +3522,156 @@ EXPORT_SYMBOL(reuseport_detach_sock);
 
 DEFINE_STATIC_KEY_FALSE(bpf_stats_enabled_key);
 EXPORT_SYMBOL(bpf_stats_enabled_key);
+
+const struct ipv6_stub *ipv6_stub __read_mostly;
+EXPORT_SYMBOL(ipv6_stub);
+
+__weak void ipv4_sk_redirect(struct sk_buff *skb, struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ipv4_sk_redirect);
+
+__weak struct rtable *ip_route_output_key_hash(struct net *net, struct flowi4 *fl4,
+					const struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ip_route_output_key_hash);
+
+bool __do_once_start(bool *done, unsigned long *flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(__do_once_start);
+
+struct sk_buff *skb_recv_datagram(struct sock *sk, unsigned int flags,
+                  int noblock, int *err)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(skb_recv_datagram);
+
+__weak void ipv4_sk_update_pmtu(struct sk_buff *skb, struct sock *sk, u32 mtu)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ipv4_sk_update_pmtu);
+
+void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+         const struct ip_options *opt)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(__icmp_send);
+
+int
+ip_generic_getfrag(void *from, char *to, int offset, int len, int odd, struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ip_generic_getfrag);
+
+int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip4_datagram_connect);
+
+void ip_flush_pending_frames(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_flush_pending_frames);
+
+int ip_mc_sf_allow(struct sock *sk, __be32 loc_addr, __be32 rmt_addr,
+           int dif, int sdif)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_mc_sf_allow);
+
+void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
+             struct sk_buff *skb, int tlen, int offset)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_cmsg_recv_offset);
+
+int ip_append_data(struct sock *sk, struct flowi4 *fl4,
+           int getfrag(void *from, char *to, int offset, int len,
+                   int odd, struct sk_buff *skb),
+           void *from, int length, int transhdrlen,
+           struct ipcm_cookie *ipc, struct rtable **rtp,
+           unsigned int flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_append_data);
+
+int ip_check_mc_rcu(struct in_device *in_dev, __be32 mc_addr, __be32 src_addr, u8 proto)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_check_mc_rcu);
+
+__weak int ip_mc_validate_source(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+			  u8 tos, struct net_device *dev,
+			  struct in_device *in_dev, u32 *itag)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_mc_validate_source);
+
+void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ipv4_pktinfo_prepare);
+
+int proc_dointvec_ms_jiffies(struct ctl_table *table, int write, void *buffer,
+        size_t *lenp, loff_t *ppos)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(proc_dointvec_ms_jiffies);
+
+int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
+         bool allow_ipv6)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_cmsg_send);
+
+struct nlattr *nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(nla_reserve);
+
+void ip4_datagram_release_cb(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip4_datagram_release_cb);
+
+int proc_dointvec_jiffies(struct ctl_table *table, int write,
+              void *buffer, size_t *lenp, loff_t *ppos)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(proc_dointvec_jiffies);
+
+void skb_free_datagram(struct sock *sk, struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(skb_free_datagram);
+
+void __do_once_done(bool *done, struct static_key_true *once_key,
+            unsigned long *flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__do_once_done);
+

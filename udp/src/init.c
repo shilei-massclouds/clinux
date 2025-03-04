@@ -23,8 +23,6 @@ DEFINE_ENABLE_FUNC(udp);
 DEFINE_STATIC_KEY_FALSE(bpf_sk_lookup_enabled);
 EXPORT_SYMBOL(bpf_sk_lookup_enabled);
 
-const struct ipv6_stub *ipv6_stub __read_mostly;
-
 const struct ip_tunnel_encap_ops __rcu *
         iptun_encaps[MAX_IPTUN_ENCAP_OPS] __read_mostly;
 EXPORT_SYMBOL(iptun_encaps);
