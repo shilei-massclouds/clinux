@@ -20,9 +20,6 @@ EXPORT_SYMBOL(cl_ipv4_init);
 
 DEFINE_ENABLE_FUNC(ipv4);
 
-const struct net_offload __rcu *inet_offloads[MAX_INET_PROTOS] __read_mostly;
-EXPORT_SYMBOL(inet_offloads);
-
 struct net_device *blackhole_netdev;
 EXPORT_SYMBOL(blackhole_netdev);
 

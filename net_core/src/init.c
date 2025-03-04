@@ -35,7 +35,3 @@ atomic_t genl_sk_destructing_cnt = ATOMIC_INIT(0);
 EXPORT_SYMBOL(genl_sk_destructing_cnt);
 DECLARE_WAIT_QUEUE_HEAD(genl_sk_destructing_waitq);
 EXPORT_SYMBOL(genl_sk_destructing_waitq);
-
-struct net_protocol __rcu *inet_protos[1] __read_mostly;
-EXPORT_SYMBOL(inet_protos);
-

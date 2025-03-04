@@ -25,6 +25,8 @@
 #include <linux/poll.h>
 #include <net/netlink.h>
 #include <net/icmp.h>
+#include <net/icmp.h>
+#include <net/protocol.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #ifdef GENERIC_TIME_VSYSCALL
@@ -3699,3 +3701,5 @@ void icmp_out_count(struct net *net, unsigned char type)
 }
 EXPORT_SYMBOL(icmp_out_count);
 
+struct net_protocol __rcu *inet_protos[MAX_INET_PROTOS] __read_mostly;
+EXPORT_SYMBOL(inet_protos);
