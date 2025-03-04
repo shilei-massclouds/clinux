@@ -22,6 +22,7 @@
 #include <linux/backing-dev-defs.h>
 #include <linux/backing-dev.h>
 #include <linux/parser.h>
+#include <linux/poll.h>
 #include <net/netlink.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
@@ -3395,3 +3396,16 @@ __weak int fcntl_dirnotify(int fd, struct file *filp, unsigned long arg)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(fcntl_dirnotify);
+
+__poll_t datagram_poll(struct file *file, struct socket *sock,
+               poll_table *wait)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(datagram_poll);
+
+void dst_release(struct dst_entry *dst)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(dst_release);

@@ -1119,6 +1119,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(xattr);
     REQUIRE_COMPONENT(net_namespace);
     REQUIRE_COMPONENT(ipc_namespace);
+    REQUIRE_COMPONENT(ipv4);
 
     //
     // start_kernel (init/main.c)

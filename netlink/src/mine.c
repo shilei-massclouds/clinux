@@ -16,7 +16,6 @@ CL_MINE(__nla_validate)
 CL_MINE(refcount_dec_and_mutex_lock)
 CL_MINE(tcp_ca_get_name_by_key)
 
-CL_MINE(datagram_poll)
 CL_MINE(__scm_destroy)
 CL_MINE(scm_detach_fds)
 CL_MINE(__scm_send)
