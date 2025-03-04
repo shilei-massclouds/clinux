@@ -3675,3 +3675,27 @@ void __do_once_done(bool *done, struct static_key_true *once_key,
 }
 EXPORT_SYMBOL(__do_once_done);
 
+__weak int inet_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_recv_error);
+
+int ip_push_pending_frames(struct sock *sk, struct flowi4 *fl4)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_push_pending_frames);
+
+unsigned int inet_addr_type(struct net *net, __be32 addr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_addr_type);
+
+void icmp_out_count(struct net *net, unsigned char type)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(icmp_out_count);
+

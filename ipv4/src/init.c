@@ -20,10 +20,6 @@ EXPORT_SYMBOL(cl_ipv4_init);
 
 DEFINE_ENABLE_FUNC(ipv4);
 
-struct proto ping_prot;
-struct pingv6_ops pingv6_ops;
-EXPORT_SYMBOL_GPL(pingv6_ops);
-
 const struct net_offload __rcu *inet_offloads[MAX_INET_PROTOS] __read_mostly;
 EXPORT_SYMBOL(inet_offloads);
 
