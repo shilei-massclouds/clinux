@@ -2863,7 +2863,6 @@ __sum16 __skb_checksum_complete(struct sk_buff *skb)
 
 	return sum;
 }
-EXPORT_SYMBOL(__skb_checksum_complete);
 
 static __wsum warn_crc32c_csum_update(const void *buff, int len, __wsum sum)
 {

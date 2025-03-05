@@ -8,10 +8,6 @@ CL_MINE(udpv4_offload_init)
 
 CL_MINE(ip_ra_control)
 
-CL_MINE(dst_alloc)
-CL_MINE(dst_cache_get_ip4)
-CL_MINE(dst_cache_set_ip4)
-CL_MINE(dst_discard_out)
 CL_MINE(ip_forward)
 CL_MINE(ip_local_deliver)
 CL_MINE(__ip_options_compile)

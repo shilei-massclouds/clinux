@@ -863,7 +863,6 @@ struct net_device *__dev_get_by_name(struct net *net, const char *name)
 	node_name = netdev_name_node_lookup(net, name);
 	return node_name ? node_name->dev : NULL;
 }
-EXPORT_SYMBOL(__dev_get_by_name);
 
 /**
  * dev_get_by_name_rcu	- find a device by its name
@@ -934,7 +933,6 @@ struct net_device *__dev_get_by_index(struct net *net, int ifindex)
 
 	return NULL;
 }
-EXPORT_SYMBOL(__dev_get_by_index);
 
 /**
  *	dev_get_by_index_rcu - find a device by its ifindex

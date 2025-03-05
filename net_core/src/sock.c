@@ -2178,7 +2178,6 @@ kuid_t sock_i_uid(struct sock *sk)
 	read_unlock_bh(&sk->sk_callback_lock);
 	return uid;
 }
-EXPORT_SYMBOL(sock_i_uid);
 
 unsigned long sock_i_ino(struct sock *sk)
 {

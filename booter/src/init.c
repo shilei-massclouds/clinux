@@ -3396,11 +3396,13 @@ __poll_t datagram_poll(struct file *file, struct socket *sock,
 }
 EXPORT_SYMBOL(datagram_poll);
 
+/*
 void dst_release(struct dst_entry *dst)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(dst_release);
+*/
 
 __weak int tcp_v4_early_demux(struct sk_buff *skb)
 {
@@ -3771,19 +3773,12 @@ __weak __be32 inet_confirm_addr(struct net *net, struct in_device *in_dev,
 EXPORT_SYMBOL(inet_confirm_addr);
 
 /*
-int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
-             struct fib_result *res, int fib_flags)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(fib_table_lookup);
-*/
-
 void dst_dev_put(struct dst_entry *dst)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(dst_dev_put);
+*/
 
 __weak void rt_flush_dev(struct net_device *dev)
 {
@@ -4303,12 +4298,14 @@ __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
 }
 EXPORT_SYMBOL(csum_ipv6_magic);
 
+/*
 struct metadata_dst *metadata_dst_alloc(u8 optslen, enum metadata_type type,
                     gfp_t flags)
 {
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(metadata_dst_alloc);
+*/
 
 __weak struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
 					     gfp_t flags)
@@ -4390,3 +4387,37 @@ __weak bool tcp_fastopen_cookie_check(struct sock *sk, u16 *mss,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(tcp_fastopen_cookie_check);
+
+__weak __sum16 __skb_checksum_complete(struct sk_buff *skb)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__skb_checksum_complete);
+
+__weak kuid_t sock_i_uid(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sock_i_uid);
+
+__weak struct net_device *__dev_get_by_name(struct net *net, const char *name)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__dev_get_by_name);
+
+__weak int call_fib_notifiers(struct net *net, enum fib_event_type event_type,
+		       struct fib_notifier_info *info)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(call_fib_notifiers);
+
+__weak struct net_device *__dev_get_by_index(struct net *net, int ifindex)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__dev_get_by_index);
+
+struct net_device *blackhole_netdev;
+EXPORT_SYMBOL(blackhole_netdev);

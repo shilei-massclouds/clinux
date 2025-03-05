@@ -24,8 +24,6 @@ DEFINE_ENABLE_FUNC(net_core);
 
 struct pipe_buf_operations;
 const struct pipe_buf_operations nosteal_pipe_buf_ops;
-const struct dst_metrics dst_default_metrics;
-EXPORT_SYMBOL(dst_default_metrics);
 
 struct pernet_operations __net_initdata loopback_net_ops;
 

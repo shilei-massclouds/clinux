@@ -20,5 +20,3 @@ EXPORT_SYMBOL(cl_ipv4_init);
 
 DEFINE_ENABLE_FUNC(ipv4);
 
-struct net_device *blackhole_netdev;
-EXPORT_SYMBOL(blackhole_netdev);

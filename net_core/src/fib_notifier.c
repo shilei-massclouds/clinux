@@ -35,7 +35,6 @@ int call_fib_notifiers(struct net *net, enum fib_event_type event_type,
 	err = atomic_notifier_call_chain(&fn_net->fib_chain, event_type, info);
 	return notifier_to_errno(err);
 }
-EXPORT_SYMBOL(call_fib_notifiers);
 
 static unsigned int fib_seq_sum(struct net *net)
 {
