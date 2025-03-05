@@ -72,7 +72,7 @@ components := \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap riscv_fault aio signalfd \
 	signal sysctl kallsyms read_write \
-	virtio_mmio virtio virtio_blk ext2 binfmt_elf \
+	virtio_mmio virtio virtio_blk virtio_net ext2 binfmt_elf \
 	sys ioctl fcntl nlattr \
 	early_printk printk panic bug dump_stack show_mem
 	#partitions \

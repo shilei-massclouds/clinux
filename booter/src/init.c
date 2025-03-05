@@ -4421,3 +4421,41 @@ EXPORT_SYMBOL(__dev_get_by_index);
 
 struct net_device *blackhole_netdev;
 EXPORT_SYMBOL(blackhole_netdev);
+
+void bpf_warn_invalid_xdp_action(u32 act)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(bpf_warn_invalid_xdp_action);
+
+__be16 eth_type_trans(struct sk_buff *skb, struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(eth_type_trans);
+
+void xdp_rxq_info_unreg(struct xdp_rxq_info *xdp_rxq)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(xdp_rxq_info_unreg);
+
+void netif_carrier_off(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netif_carrier_off);
+
+void netif_carrier_on(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netif_carrier_on);
+
+int xdp_rxq_info_reg(struct xdp_rxq_info *xdp_rxq,
+             struct net_device *dev, u32 queue_index)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(xdp_rxq_info_reg);
+
