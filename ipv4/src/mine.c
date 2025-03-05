@@ -11,7 +11,6 @@ CL_MINE(ip_misc_proc_init)
 CL_MINE(ip_rcv)
 CL_MINE(ip_tunnel_core_init)
 CL_MINE(tcpv4_offload_init)
-CL_MINE(udplite4_register)
 CL_MINE(udpv4_offload_init)
 
 CL_MINE(ip_ra_control)

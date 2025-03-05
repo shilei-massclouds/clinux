@@ -1195,7 +1195,6 @@ out_illegal:
 	       p->type);
 	goto out;
 }
-EXPORT_SYMBOL(inet_register_protosw);
 
 void inet_unregister_protosw(struct inet_protosw *p)
 {

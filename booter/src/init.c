@@ -4142,3 +4142,14 @@ __weak void tcp_wfree(struct sk_buff *skb)
 }
 EXPORT_SYMBOL(tcp_wfree);
 
+__weak void inet_register_protosw(struct inet_protosw *p)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_register_protosw);
+
+__weak void __init udplite4_register(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(udplite4_register);

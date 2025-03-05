@@ -109,7 +109,7 @@
 #include <linux/btf_ids.h>
 #include <trace/events/skb.h>
 #include <net/busy_poll.h>
-#include "udp_impl.h"
+#include "../ipv4/udp_impl.h"
 #include <net/sock_reuseport.h>
 #include <net/addrconf.h>
 #include <net/udp_tunnel.h>
@@ -353,6 +353,7 @@ int udp_v4_get_port(struct sock *sk, unsigned short snum)
 	udp_sk(sk)->udp_portaddr_hash = hash2_partial;
 	return udp_lib_get_port(sk, snum, hash2_nulladdr);
 }
+EXPORT_SYMBOL(udp_v4_get_port);
 
 static int compute_score(struct sock *sk, struct net *net,
 			 __be32 saddr, __be16 sport,
@@ -775,6 +776,7 @@ int __udp4_lib_err(struct sk_buff *skb, u32 info, struct udp_table *udptable)
 out:
 	return 0;
 }
+EXPORT_SYMBOL(__udp4_lib_err);
 
 int udp_err(struct sk_buff *skb, u32 info)
 {
@@ -1352,6 +1354,7 @@ out:
 	release_sock(sk);
 	return ret;
 }
+EXPORT_SYMBOL(udp_sendpage);
 
 #define UDP_SKB_IS_STATELESS 0x80000000
 
@@ -1891,6 +1894,7 @@ csum_copy_err:
 	msg->msg_flags &= ~MSG_TRUNC;
 	goto try_again;
 }
+EXPORT_SYMBOL(udp_recvmsg);
 
 int udp_pre_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 {
@@ -2018,6 +2022,7 @@ void udp_v4_rehash(struct sock *sk)
 					  inet_sk(sk)->inet_num);
 	udp_lib_rehash(sk, new_hash);
 }
+EXPORT_SYMBOL(udp_v4_rehash);
 
 static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
 {
@@ -2435,6 +2440,7 @@ drop:
 	kfree_skb(skb);
 	return 0;
 }
+EXPORT_SYMBOL(__udp4_lib_rcv);
 
 /* We can only early demux multicast if there is a single matching socket.
  * If more than one socket found returns NULL
@@ -2584,6 +2590,7 @@ void udp_destroy_sock(struct sock *sk)
 			static_branch_dec(&udp_encap_needed_key);
 	}
 }
+EXPORT_SYMBOL(udp_destroy_sock);
 
 /*
  *	Socket option code for UDP
@@ -2713,6 +2720,7 @@ int udp_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
 					  udp_push_pending_frames);
 	return ip_setsockopt(sk, level, optname, optval, optlen);
 }
+EXPORT_SYMBOL(udp_setsockopt);
 
 int udp_lib_getsockopt(struct sock *sk, int level, int optname,
 		       char __user *optval, int __user *optlen)
@@ -2778,6 +2786,7 @@ int udp_getsockopt(struct sock *sk, int level, int optname,
 		return udp_lib_getsockopt(sk, level, optname, optval, optlen);
 	return ip_getsockopt(sk, level, optname, optval, optlen);
 }
+EXPORT_SYMBOL(udp_getsockopt);
 
 /**
  * 	udp_poll - wait for a UDP event.
@@ -3151,6 +3160,7 @@ void __init udp_table_init(struct udp_table *table, const char *name)
 		spin_lock_init(&table->hash2[i].lock);
 	}
 }
+EXPORT_SYMBOL(udp_table_init);
 
 u32 udp_flow_hashrnd(void)
 {
