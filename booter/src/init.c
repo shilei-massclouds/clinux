@@ -4507,8 +4507,50 @@ __weak int __ethtool_get_link_ksettings(struct net_device *dev,
 }
 EXPORT_SYMBOL(__ethtool_get_link_ksettings);
 
-void linkwatch_fire_event(struct net_device *dev)
+__weak void linkwatch_fire_event(struct net_device *dev)
 {
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(linkwatch_fire_event);
+
+__weak int dev_get_iflink(const struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_get_iflink);
+
+__weak void netdev_state_change(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_state_change);
+
+__weak void linkwatch_init_dev(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(linkwatch_init_dev);
+
+__weak void linkwatch_run_queue(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(linkwatch_run_queue);
+
+__weak void linkwatch_forget_dev(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(linkwatch_forget_dev);
+
+void dev_activate(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_activate);
+
+void dev_deactivate(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_deactivate);

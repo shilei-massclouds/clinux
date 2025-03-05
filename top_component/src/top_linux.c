@@ -1134,6 +1134,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(tcp_output);
     REQUIRE_COMPONENT(ipv4_proc);
     REQUIRE_COMPONENT(ethtool);
+    REQUIRE_COMPONENT(link_watch);
 
     //
     // start_kernel (init/main.c)

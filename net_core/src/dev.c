@@ -817,7 +817,6 @@ int dev_get_iflink(const struct net_device *dev)
 
 	return dev->ifindex;
 }
-EXPORT_SYMBOL(dev_get_iflink);
 
 /**
  *	dev_fill_metadata_dst - Retrieve tunnel egress information.
@@ -1466,7 +1465,6 @@ void netdev_state_change(struct net_device *dev)
 		rtmsg_ifinfo(RTM_NEWLINK, dev, 0, GFP_KERNEL);
 	}
 }
-EXPORT_SYMBOL(netdev_state_change);
 
 /**
  * netdev_notify_peers - notify network peers about existence of @dev
