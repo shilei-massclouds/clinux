@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(inet_csk_listen_start)
 CL_MINE(ip_list_rcv)
 CL_MINE(ip_rcv)
 CL_MINE(tcpv4_offload_init)

@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(inet_csk_listen_stop)
 CL_MINE(reqsk_fastopen_remove)
 CL_MINE(sk_stream_error)
 CL_MINE(sk_stream_wait_close)

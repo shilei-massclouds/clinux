@@ -27,6 +27,7 @@
 #include <net/icmp.h>
 #include <net/icmp.h>
 #include <net/protocol.h>
+#include <net/inet_hashtables.h>
 #include <net/dst_metadata.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
@@ -3880,11 +3881,13 @@ int dev_mc_del(struct net_device *dev, const unsigned char *addr)
 }
 EXPORT_SYMBOL(dev_mc_del);
 
+/*
 void inet_csk_reqsk_queue_drop(struct sock *sk, struct request_sock *req)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_csk_reqsk_queue_drop);
+*/
 
 __weak int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
 			  int addr_len, int flags, int is_sendmsg)
@@ -3929,11 +3932,13 @@ __weak int tcp_connect(struct sock *sk)
 }
 EXPORT_SYMBOL(tcp_connect);
 
+/*
 void inet_csk_clear_xmit_timers(struct sock *sk)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_csk_clear_xmit_timers);
+*/
 
 __weak struct sk_buff *tcp_get_timestamping_opt_stats(const struct sock *sk,
 					       const struct sk_buff *orig_skb)
@@ -3978,11 +3983,13 @@ __weak void inet_sk_set_state(struct sock *sk, int state)
 }
 EXPORT_SYMBOL(inet_sk_set_state);
 
+/*
 void inet_csk_destroy_sock(struct sock *sk)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_csk_destroy_sock);
+*/
 
 int reuseport_alloc(struct sock *sk, bool bind_inany)
 {
@@ -3990,11 +3997,13 @@ int reuseport_alloc(struct sock *sk, bool bind_inany)
 }
 EXPORT_SYMBOL(reuseport_alloc);
 
+/*
 bool inet_rcv_saddr_any(const struct sock *sk)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_rcv_saddr_any);
+*/
 
 int reuseport_add_sock(struct sock *sk, struct sock *sk2, bool bind_inany)
 {
@@ -4002,12 +4011,14 @@ int reuseport_add_sock(struct sock *sk, struct sock *sk2, bool bind_inany)
 }
 EXPORT_SYMBOL(reuseport_add_sock);
 
+/*
 bool inet_rcv_saddr_equal(const struct sock *sk, const struct sock *sk2,
               bool match_wildcard)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_rcv_saddr_equal);
+*/
 
 struct sock *reuseport_select_sock(struct sock *sk,
                    u32 hash,
@@ -4018,11 +4029,13 @@ struct sock *reuseport_select_sock(struct sock *sk,
 }
 EXPORT_SYMBOL(reuseport_select_sock);
 
+/*
 void inet_get_local_port_range(struct net *net, int *low, int *high)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_get_local_port_range);
+*/
 
 __weak void __init inet_hashinfo2_init(struct inet_hashinfo *h, const char *name,
 				unsigned long numentries, int scale,
@@ -4312,11 +4325,13 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
 }
 EXPORT_SYMBOL(tcp_time_wait);
 
+/*
 void inet_csk_reset_keepalive_timer(struct sock *sk, unsigned long len)
 {
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(inet_csk_reset_keepalive_timer);
+*/
 
 __weak void tcp_delack_timer_handler(struct sock *sk)
 {
@@ -4329,3 +4344,26 @@ __weak void tcp_write_timer_handler(struct sock *sk)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(tcp_write_timer_handler);
+
+__weak bool inet_ehash_insert(struct sock *sk, struct sock *osk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(inet_ehash_insert);
+
+__weak void inet_bind_hash(struct sock *sk, struct inet_bind_bucket *tb,
+		    const unsigned short snum)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(inet_bind_hash);
+
+__weak struct inet_bind_bucket *inet_bind_bucket_create(struct kmem_cache *cachep,
+						 struct net *net,
+						 struct inet_bind_hashbucket *head,
+						 const unsigned short snum,
+						 int l3mdev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(inet_bind_bucket_create);

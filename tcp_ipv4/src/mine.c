@@ -1,14 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(inet_csk_accept)
-CL_MINE(inet_csk_addr2sockaddr)
-CL_MINE(inet_csk_get_port)
-CL_MINE(inet_csk_prepare_forced_close)
-CL_MINE(inet_csk_reqsk_queue_drop_and_put)
-CL_MINE(inet_csk_route_child_sock)
-CL_MINE(inet_csk_route_req)
-CL_MINE(inet_csk_update_pmtu)
 CL_MINE(inet_twsk_purge)
 CL_MINE(inet_twsk_put)
 CL_MINE(secure_tcp_seq)
