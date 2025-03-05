@@ -597,19 +597,19 @@ static __latent_entropy void tasklet_hi_action(struct softirq_action *a)
 //	t->data = 0;
 //}
 //EXPORT_SYMBOL(tasklet_setup);
-//
-//void tasklet_init(struct tasklet_struct *t,
-//		  void (*func)(unsigned long), unsigned long data)
-//{
-//	t->next = NULL;
-//	t->state = 0;
-//	atomic_set(&t->count, 0);
-//	t->func = func;
-//	t->use_callback = false;
-//	t->data = data;
-//}
-//EXPORT_SYMBOL(tasklet_init);
-//
+
+void tasklet_init(struct tasklet_struct *t,
+		  void (*func)(unsigned long), unsigned long data)
+{
+	t->next = NULL;
+	t->state = 0;
+	atomic_set(&t->count, 0);
+	t->func = func;
+	t->use_callback = false;
+	t->data = data;
+}
+EXPORT_SYMBOL(tasklet_init);
+
 //void tasklet_kill(struct tasklet_struct *t)
 //{
 //	if (in_interrupt())

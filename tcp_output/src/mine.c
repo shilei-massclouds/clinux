@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(tasklet_init)
 CL_MINE(tcp_delack_timer_handler)
 CL_MINE(tcp_enter_cwr)
 CL_MINE(tcp_fastopen_cookie_check)
