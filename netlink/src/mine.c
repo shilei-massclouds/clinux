@@ -11,3 +11,8 @@ CL_MINE(__scm_destroy)
 CL_MINE(scm_detach_fds)
 CL_MINE(__scm_send)
 CL_MINE(yield)
+
+CL_MINE(netlink_policy_dump_loop)
+CL_MINE(netlink_policy_dump_start)
+CL_MINE(netlink_policy_dump_free)
+CL_MINE(netlink_policy_dump_write)

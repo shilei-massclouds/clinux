@@ -29,7 +29,3 @@ EXPORT_SYMBOL(dst_default_metrics);
 
 struct pernet_operations __net_initdata loopback_net_ops;
 
-atomic_t genl_sk_destructing_cnt = ATOMIC_INIT(0);
-EXPORT_SYMBOL(genl_sk_destructing_cnt);
-DECLARE_WAIT_QUEUE_HEAD(genl_sk_destructing_waitq);
-EXPORT_SYMBOL(genl_sk_destructing_waitq);
