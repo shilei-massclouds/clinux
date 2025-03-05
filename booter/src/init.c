@@ -3676,11 +3676,13 @@ int ip_push_pending_frames(struct sock *sk, struct flowi4 *fl4)
 EXPORT_SYMBOL(ip_push_pending_frames);
 */
 
+/*
 unsigned int inet_addr_type(struct net *net, __be32 addr)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_addr_type);
+*/
 
 void icmp_out_count(struct net *net, unsigned char type)
 {
@@ -3820,3 +3822,54 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
 }
 EXPORT_SYMBOL(fib_table_lookup);
 
+void dst_dev_put(struct dst_entry *dst)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(dst_dev_put);
+
+__weak void rt_flush_dev(struct net_device *dev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rt_flush_dev);
+
+__weak struct in_device *inetdev_by_index(struct net *net, int ifindex)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inetdev_by_index);
+
+__weak int register_inetaddr_notifier(struct notifier_block *nb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(register_inetaddr_notifier);
+
+__weak struct in_ifaddr *inet_ifa_byprefix(struct in_device *in_dev, __be32 prefix,
+				    __be32 mask)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_ifa_byprefix);
+
+__weak struct in_ifaddr *inet_lookup_ifaddr_rcu(struct net *net, __be32 addr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_lookup_ifaddr_rcu);
+
+__weak int netlink_unicast(struct sock *ssk, struct sk_buff *skb,
+		    u32 portid, int nonblock)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(netlink_unicast);
+
+__weak unsigned int inet_addr_type_dev_table(struct net *net,
+				      const struct net_device *dev,
+				      __be32 addr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_addr_type_dev_table);

@@ -597,7 +597,6 @@ struct in_device *inetdev_by_index(struct net *net, int ifindex)
 	rcu_read_unlock();
 	return in_dev;
 }
-EXPORT_SYMBOL(inetdev_by_index);
 
 /* Called only from RTNL semaphored context. No locks. */
 
@@ -1451,7 +1450,6 @@ int register_inetaddr_notifier(struct notifier_block *nb)
 {
 	return blocking_notifier_chain_register(&inetaddr_chain, nb);
 }
-EXPORT_SYMBOL(register_inetaddr_notifier);
 
 int unregister_inetaddr_notifier(struct notifier_block *nb)
 {

@@ -1343,7 +1343,6 @@ retry:
 
 	return netlink_sendskb(sk, skb);
 }
-EXPORT_SYMBOL(netlink_unicast);
 
 int netlink_has_listeners(struct sock *sk, unsigned int group)
 {

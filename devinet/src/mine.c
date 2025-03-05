@@ -1,9 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(fib_add_ifaddr)
-CL_MINE(fib_del_ifaddr)
-CL_MINE(fib_modify_prefix_metric)
 CL_MINE(ip_mc_destroy_dev)
 CL_MINE(ip_mc_down)
 CL_MINE(ip_mc_init_dev)

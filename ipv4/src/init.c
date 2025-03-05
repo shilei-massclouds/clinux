@@ -22,6 +22,3 @@ DEFINE_ENABLE_FUNC(ipv4);
 
 struct net_device *blackhole_netdev;
 EXPORT_SYMBOL(blackhole_netdev);
-
-const struct fib_prop fib_props[RTN_MAX + 1];
-const struct nla_policy rtm_ipv4_policy[RTA_MAX + 1];
