@@ -271,7 +271,9 @@ EXPORT_SYMBOL(sysctl_wmem_max);
 __u32 sysctl_rmem_max __read_mostly = SK_RMEM_MAX;
 EXPORT_SYMBOL(sysctl_rmem_max);
 __u32 sysctl_wmem_default __read_mostly = SK_WMEM_MAX;
+EXPORT_SYMBOL(sysctl_wmem_default);
 __u32 sysctl_rmem_default __read_mostly = SK_RMEM_MAX;
+EXPORT_SYMBOL(sysctl_rmem_default);
 
 /* Maximal space eaten by iovec or ancillary data plus some space */
 int sysctl_optmem_max __read_mostly = sizeof(unsigned long)*(2*UIO_MAXIOV+512);

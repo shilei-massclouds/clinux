@@ -3567,12 +3567,14 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
 }
 EXPORT_SYMBOL_GPL(__icmp_send);
 
+/*
 int
 ip_generic_getfrag(void *from, char *to, int offset, int len, int odd, struct sk_buff *skb)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(ip_generic_getfrag);
+*/
 
 int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 {
@@ -3580,11 +3582,13 @@ int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 }
 EXPORT_SYMBOL(ip4_datagram_connect);
 
+/*
 void ip_flush_pending_frames(struct sock *sk)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(ip_flush_pending_frames);
+*/
 
 int ip_mc_sf_allow(struct sock *sk, __be32 loc_addr, __be32 rmt_addr,
            int dif, int sdif)
@@ -3600,6 +3604,7 @@ void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
 }
 EXPORT_SYMBOL(ip_cmsg_recv_offset);
 
+/*
 int ip_append_data(struct sock *sk, struct flowi4 *fl4,
            int getfrag(void *from, char *to, int offset, int len,
                    int odd, struct sk_buff *skb),
@@ -3610,6 +3615,7 @@ int ip_append_data(struct sock *sk, struct flowi4 *fl4,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(ip_append_data);
+*/
 
 int ip_check_mc_rcu(struct in_device *in_dev, __be32 mc_addr, __be32 src_addr, u8 proto)
 {
@@ -3683,11 +3689,13 @@ __weak int inet_recv_error(struct sock *sk, struct msghdr *msg, int len, int *ad
 }
 EXPORT_SYMBOL(inet_recv_error);
 
+/*
 int ip_push_pending_frames(struct sock *sk, struct flowi4 *fl4)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(ip_push_pending_frames);
+*/
 
 unsigned int inet_addr_type(struct net *net, __be32 addr)
 {
@@ -3817,3 +3825,36 @@ int nla_put_64bit(struct sk_buff *skb, int attrtype, int attrlen,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(nla_put_64bit);
+
+__weak void __ip_select_ident(struct net *net, struct iphdr *iph, int segs)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__ip_select_ident);
+
+__weak struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(rt_dst_clone);
+
+__weak int __init ip_rt_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_rt_init);
+
+void ip_local_error(struct sock *sk, int err, __be32 daddr, __be16 port, u32 info)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_local_error);
+
+int __ip_options_echo(struct net *net, struct ip_options *dopt,
+              struct sk_buff *skb, const struct ip_options *sopt)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__ip_options_echo);
+
+

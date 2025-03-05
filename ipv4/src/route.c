@@ -520,7 +520,6 @@ void __ip_select_ident(struct net *net, struct iphdr *iph, int segs)
 	id = ip_idents_reserve(hash, segs);
 	iph->id = htons(id);
 }
-EXPORT_SYMBOL(__ip_select_ident);
 
 static void __build_flow_key(const struct net *net, struct flowi4 *fl4,
 			     const struct sock *sk,
@@ -1687,7 +1686,6 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
 	}
 	return new_rt;
 }
-EXPORT_SYMBOL(rt_dst_clone);
 
 /* called in rcu_read_lock() section */
 int ip_mc_validate_source(struct sk_buff *skb, __be32 daddr, __be32 saddr,
