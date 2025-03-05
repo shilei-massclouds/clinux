@@ -12,5 +12,3 @@ CL_MINE(ip_forward)
 CL_MINE(ip_local_deliver)
 CL_MINE(__ip_options_compile)
 CL_MINE(rtm_getroute_parse_ip_proto)
-
-CL_MINE(dev_mc_add)

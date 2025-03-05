@@ -2059,7 +2059,6 @@ int call_netdevice_notifiers(unsigned long val, struct net_device *dev)
 {
 	return call_netdevice_notifiers_extack(val, dev, NULL);
 }
-EXPORT_SYMBOL(call_netdevice_notifiers);
 
 /**
  *	call_netdevice_notifiers_mtu - call all network notifier blocks
@@ -8583,7 +8582,6 @@ int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
 	rc = call_netdevice_notifiers_info(NETDEV_PRE_CHANGEADDR, &info.info);
 	return notifier_to_errno(rc);
 }
-EXPORT_SYMBOL(dev_pre_changeaddr_notify);
 
 /**
  *	dev_set_mac_address - Change Media Access Control Address

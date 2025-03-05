@@ -3870,18 +3870,12 @@ __weak int __init igmp_mc_init(void)
 }
 EXPORT_SYMBOL(igmp_mc_init);
 
+/*
 int dev_mc_del(struct net_device *dev, const unsigned char *addr)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(dev_mc_del);
-
-/*
-void inet_csk_reqsk_queue_drop(struct sock *sk, struct request_sock *req)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(inet_csk_reqsk_queue_drop);
 */
 
 __weak int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
@@ -3890,14 +3884,6 @@ __weak int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(__inet_stream_connect);
-
-/*
-void tcp_fastopen_init_key_once(struct net *net)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(tcp_fastopen_init_key_once);
-*/
 
 __weak void inet_sk_state_store(struct sock *sk, int newstate)
 {
@@ -4478,3 +4464,22 @@ bool __skb_flow_dissect(const struct net *net,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(__skb_flow_dissect);
+
+__weak int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
+			      struct netlink_ext_ack *extack)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_pre_changeaddr_notify);
+
+__weak void __dev_set_rx_mode(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__dev_set_rx_mode);
+
+__weak int call_netdevice_notifiers(unsigned long val, struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(call_netdevice_notifiers);
