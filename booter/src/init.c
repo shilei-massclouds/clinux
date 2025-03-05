@@ -4487,3 +4487,28 @@ __weak int call_netdevice_notifiers(unsigned long val, struct net_device *dev)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(call_netdevice_notifiers);
+
+__weak int ethtool_check_ops(const struct ethtool_ops *ops)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ethtool_check_ops);
+
+__weak int dev_ethtool(struct net *net, struct ifreq *ifr)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_ethtool);
+
+__weak int __ethtool_get_link_ksettings(struct net_device *dev,
+				 struct ethtool_link_ksettings *link_ksettings)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__ethtool_get_link_ksettings);
+
+void linkwatch_fire_event(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(linkwatch_fire_event);

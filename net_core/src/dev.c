@@ -9614,6 +9614,7 @@ sync_lower:
 
 	return err < 0 ? 0 : 1;
 }
+EXPORT_SYMBOL(__netdev_update_features);
 
 /**
  *	netdev_update_features - recalculate device features

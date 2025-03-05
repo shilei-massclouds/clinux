@@ -1133,6 +1133,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(inet_hashtables);
     REQUIRE_COMPONENT(tcp_output);
     REQUIRE_COMPONENT(ipv4_proc);
+    REQUIRE_COMPONENT(ethtool);
 
     //
     // start_kernel (init/main.c)
