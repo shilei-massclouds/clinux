@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(tcp_enter_cwr)
-CL_MINE(tcp_fastopen_cookie_check)
 CL_MINE(tcp_finish_connect)
 CL_MINE(tcp_init_cwnd)
 CL_MINE(tcp_rate_skb_sent)

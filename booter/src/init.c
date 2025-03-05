@@ -3896,11 +3896,13 @@ __weak int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
 }
 EXPORT_SYMBOL(__inet_stream_connect);
 
+/*
 void tcp_fastopen_init_key_once(struct net *net)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(tcp_fastopen_init_key_once);
+*/
 
 __weak void inet_sk_state_store(struct sock *sk, int newstate)
 {
@@ -3920,11 +3922,13 @@ __weak void __init tcp_v4_init(void)
 }
 EXPORT_SYMBOL(tcp_v4_init);
 
+/*
 void tcp_fastopen_active_disable_ofo_check(struct sock *sk)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(tcp_fastopen_active_disable_ofo_check);
+*/
 
 __weak int tcp_connect(struct sock *sk)
 {
@@ -4367,3 +4371,22 @@ __weak struct inet_bind_bucket *inet_bind_bucket_create(struct kmem_cache *cache
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(inet_bind_bucket_create);
+
+void tcp_fin(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(tcp_fin);
+
+void tcp_init_transfer(struct sock *sk, int bpf_op)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(tcp_init_transfer);
+
+__weak bool tcp_fastopen_cookie_check(struct sock *sk, u16 *mss,
+			       struct tcp_fastopen_cookie *cookie)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(tcp_fastopen_cookie_check);

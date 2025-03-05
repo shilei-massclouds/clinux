@@ -562,6 +562,7 @@ void tcp_fastopen_cache_get(struct sock *sk, u16 *mss,
 	}
 	rcu_read_unlock();
 }
+EXPORT_SYMBOL(tcp_fastopen_cache_get);
 
 void tcp_fastopen_cache_set(struct sock *sk, u16 mss,
 			    struct tcp_fastopen_cookie *cookie, bool syn_lost,

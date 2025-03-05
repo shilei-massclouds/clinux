@@ -16,6 +16,7 @@ int main()
         exit(-1);
     }
 
+    printf("Close socket ...\n");
     close(fd);
     printf("Test socket ok!\n");
     return 0;
