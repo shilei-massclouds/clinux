@@ -4428,12 +4428,6 @@ void bpf_warn_invalid_xdp_action(u32 act)
 }
 EXPORT_SYMBOL_GPL(bpf_warn_invalid_xdp_action);
 
-__be16 eth_type_trans(struct sk_buff *skb, struct net_device *dev)
-{
-    booter_panic("No impl.");
-}
-EXPORT_SYMBOL_GPL(eth_type_trans);
-
 void xdp_rxq_info_unreg(struct xdp_rxq_info *xdp_rxq)
 {
     booter_panic("No impl.");
@@ -4459,3 +4453,28 @@ int xdp_rxq_info_reg(struct xdp_rxq_info *xdp_rxq,
 }
 EXPORT_SYMBOL(xdp_rxq_info_reg);
 
+struct flow_dissector flow_keys_basic_dissector __read_mostly;
+EXPORT_SYMBOL(flow_keys_basic_dissector);
+
+__weak __be16 eth_type_trans(struct sk_buff *skb, struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(eth_type_trans);
+
+__weak ssize_t sysfs_format_mac(char *buf, const unsigned char *addr, int len)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sysfs_format_mac);
+
+bool __skb_flow_dissect(const struct net *net,
+            const struct sk_buff *skb,
+            struct flow_dissector *flow_dissector,
+            void *target_container,
+            void *data, __be16 proto, int nhoff, int hlen,
+            unsigned int flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__skb_flow_dissect);

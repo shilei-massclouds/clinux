@@ -792,6 +792,7 @@ int __init netdev_boot_setup(char *str)
 	/* Add new entry to the list */
 	return netdev_boot_setup_add(str, &map);
 }
+EXPORT_SYMBOL(netdev_boot_setup);
 
 __setup("netdev=", netdev_boot_setup);
 

@@ -16,5 +16,3 @@ cl_virtio_net_init(void)
 EXPORT_SYMBOL(cl_virtio_net_init);
 
 DEFINE_ENABLE_FUNC(virtio_net);
-
-struct flow_dissector flow_keys_basic_dissector __read_mostly;
