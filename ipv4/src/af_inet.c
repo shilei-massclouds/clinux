@@ -1312,7 +1312,6 @@ void inet_sk_set_state(struct sock *sk, int state)
 	trace_inet_sock_set_state(sk, sk->sk_state, state);
 	sk->sk_state = state;
 }
-EXPORT_SYMBOL(inet_sk_set_state);
 
 void inet_sk_state_store(struct sock *sk, int newstate)
 {

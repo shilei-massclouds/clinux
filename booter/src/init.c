@@ -3413,12 +3413,6 @@ __weak struct rtable *ip_route_output_flow(struct net *net, struct flowi4 *flp4,
 }
 EXPORT_SYMBOL_GPL(ip_route_output_flow);
 
-void sock_edemux(struct sk_buff *skb)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(sock_edemux);
-
 __weak int tcp_v4_err(struct sk_buff *skb, u32 info)
 {
     booter_panic("No impl!\n");
@@ -3968,12 +3962,6 @@ unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu)
 }
 EXPORT_SYMBOL(tcp_sync_mss);
 
-void inet_put_port(struct sock *sk)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(inet_put_port);
-
 void inet_csk_clear_xmit_timers(struct sock *sk)
 {
     booter_panic("No impl!\n");
@@ -3992,3 +3980,106 @@ void put_cmsg_scm_timestamping(struct msghdr *msg, struct scm_timestamping_inter
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(put_cmsg_scm_timestamping);
+
+__weak void sock_edemux(struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sock_edemux);
+
+__weak void inet_put_port(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_put_port);
+
+__weak void inet_hashinfo_init(struct inet_hashinfo *h)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(inet_hashinfo_init);
+
+__weak void inet_unhash(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(inet_unhash);
+
+__weak void inet_sk_set_state(struct sock *sk, int state)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_sk_set_state);
+
+void inet_csk_destroy_sock(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_csk_destroy_sock);
+
+int reuseport_alloc(struct sock *sk, bool bind_inany)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(reuseport_alloc);
+
+bool inet_rcv_saddr_any(const struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_rcv_saddr_any);
+
+int reuseport_add_sock(struct sock *sk, struct sock *sk2, bool bind_inany)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(reuseport_add_sock);
+
+bool inet_rcv_saddr_equal(const struct sock *sk, const struct sock *sk2,
+              bool match_wildcard)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_rcv_saddr_equal);
+
+struct sock *reuseport_select_sock(struct sock *sk,
+                   u32 hash,
+                   struct sk_buff *skb,
+                   int hdr_len)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(reuseport_select_sock);
+
+void inet_get_local_port_range(struct net *net, int *low, int *high)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_get_local_port_range);
+
+__weak void __init inet_hashinfo2_init(struct inet_hashinfo *h, const char *name,
+				unsigned long numentries, int scale,
+				unsigned long low_limit,
+				unsigned long high_limit)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_hashinfo2_init);
+
+void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_twsk_deschedule_put);
+
+__weak void sock_gen_put(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(sock_gen_put);
+
+__weak int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(inet_ehash_locks_alloc);

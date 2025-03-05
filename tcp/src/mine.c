@@ -1,12 +1,8 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(inet_csk_destroy_sock)
 CL_MINE(inet_csk_listen_stop)
 CL_MINE(inet_csk_reset_keepalive_timer)
-CL_MINE(inet_ehash_locks_alloc)
-CL_MINE(inet_hashinfo2_init)
-CL_MINE(inet_hashinfo_init)
 CL_MINE(reqsk_fastopen_remove)
 CL_MINE(sk_forced_mem_schedule)
 CL_MINE(sk_stream_error)

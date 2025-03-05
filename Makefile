@@ -65,7 +65,7 @@ components := \
 	ipc_namespace drv_char 8250 serial drv_clk \
 	net_core netlink string_helpers net_namespace \
 	ipv4 tcp tcp_ipv4 udp ping arp ip_output devinet fib \
-	block genhd partitions elevator sysctl_net \
+	block genhd partitions elevator sysctl_net inet_hashtables \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap riscv_fault aio signalfd \
 	signal sysctl kallsyms read_write \
