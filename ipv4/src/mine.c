@@ -1,7 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(devinet_ioctl)
 CL_MINE(icmp_err)
 CL_MINE(icmp_init)
 CL_MINE(icmp_rcv)
@@ -31,7 +30,6 @@ CL_MINE(udpv4_offload_init)
 
 CL_MINE(ip_ra_control)
 
-CL_MINE(devinet_init)
 CL_MINE(dst_alloc)
 CL_MINE(dst_cache_get_ip4)
 CL_MINE(dst_cache_set_ip4)
@@ -40,13 +38,11 @@ CL_MINE(dst_discard_out)
 CL_MINE(fib_dump_info)
 CL_MINE(fib_result_prefsrc)
 CL_MINE(fib_select_path)
-CL_MINE(fib_table_lookup)
 CL_MINE(fib_validate_source)
 CL_MINE(inet_getpeer)
 CL_MINE(inet_peer_base_init)
 CL_MINE(inetpeer_invalidate_tree)
 CL_MINE(inet_putpeer)
-CL_MINE(__ip_dev_find)
 CL_MINE(ip_fib_check_default)
 CL_MINE(ip_fib_init)
 CL_MINE(ip_forward)

@@ -1274,6 +1274,7 @@ void arp_ifdown(struct net_device *dev)
 {
 	neigh_ifdown(&arp_tbl, dev);
 }
+EXPORT_SYMBOL(arp_ifdown);
 
 
 /*

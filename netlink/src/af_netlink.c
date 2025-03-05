@@ -1369,7 +1369,6 @@ bool netlink_strict_get_check(struct sk_buff *skb)
 
 	return nlk->flags & NETLINK_F_STRICT_CHK;
 }
-EXPORT_SYMBOL_GPL(netlink_strict_get_check);
 
 static int netlink_broadcast_deliver(struct sock *sk, struct sk_buff *skb)
 {

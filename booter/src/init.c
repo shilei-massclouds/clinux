@@ -3725,7 +3725,7 @@ __weak int ip_route_input_noref(struct sk_buff *skb, __be32 daddr, __be32 saddr,
 }
 EXPORT_SYMBOL(ip_route_input_noref);
 
-int inet_addr_onlink(struct in_device *in_dev, __be32 a, __be32 b)
+__weak int inet_addr_onlink(struct in_device *in_dev, __be32 a, __be32 b)
 {
     booter_panic("No impl!\n");
 }
@@ -3736,29 +3736,6 @@ __weak void rt_cache_flush(struct net *net)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(rt_cache_flush);
-
-__be32 inet_select_addr(const struct net_device *dev, __be32 dst, int scope)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(inet_select_addr);
-
-/*
-struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
-                 struct net_device *dev, bool want_ref)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(__neigh_create);
-*/
-
-/*
-void neigh_destroy(struct neighbour *neigh)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(neigh_destroy);
-*/
 
 int call_netevent_notifiers(unsigned long val, void *v)
 {
@@ -3857,4 +3834,41 @@ int __ip_options_echo(struct net *net, struct ip_options *dopt,
 }
 EXPORT_SYMBOL(__ip_options_echo);
 
+__weak bool netlink_strict_get_check(struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(netlink_strict_get_check);
+
+__weak __be32 inet_select_addr(const struct net_device *dev, __be32 dst, int scope)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_select_addr);
+
+int nla_strcmp(const struct nlattr *nla, const char *str)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(nla_strcmp);
+
+size_t nla_strlcpy(char *dst, const struct nlattr *nla, size_t dstsize)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(nla_strlcpy);
+
+__weak __be32 inet_confirm_addr(struct net *net, struct in_device *in_dev,
+			 __be32 dst, __be32 local, int scope)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_confirm_addr);
+
+int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
+             struct fib_result *res, int fib_flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fib_table_lookup);
 
