@@ -44,7 +44,7 @@ components := \
 	kasprintf random crypto uuid rhashtable iov_iter checksum \
 	sbitmap scatterlist bio mempool truncate interval_tree \
 	traps irq softirq dec_and_lock mpage \
-	kobject driver_base resource devres \
+	kobject driver_base resource devres dynamic_queue_limits \
 	of of_irq irq_work tty vt earlycon dummycon input \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess capability security \
