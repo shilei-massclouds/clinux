@@ -1166,7 +1166,6 @@ void ipv4_redirect(struct sk_buff *skb, struct net *net,
 		ip_rt_put(rt);
 	}
 }
-EXPORT_SYMBOL_GPL(ipv4_redirect);
 
 void ipv4_sk_redirect(struct sk_buff *skb, struct sock *sk)
 {

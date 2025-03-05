@@ -3459,9 +3459,6 @@ __weak struct proc_dir_entry *proc_create(const char *name, umode_t mode,
 }
 EXPORT_SYMBOL(proc_create);
 
-const struct icmp_err icmp_err_convert[1];
-EXPORT_SYMBOL(icmp_err_convert);
-
 int ip_getsockopt(struct sock *sk, int level,
           int optname, char __user *optval, int __user *optlen)
 {
@@ -3539,21 +3536,12 @@ __weak void ipv4_sk_update_pmtu(struct sk_buff *skb, struct sock *sk, u32 mtu)
 }
 EXPORT_SYMBOL_GPL(ipv4_sk_update_pmtu);
 
-void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+__weak void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
          const struct ip_options *opt)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(__icmp_send);
-
-/*
-int
-ip_generic_getfrag(void *from, char *to, int offset, int len, int odd, struct sk_buff *skb)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL_GPL(ip_generic_getfrag);
-*/
 
 int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 {
@@ -3649,23 +3637,7 @@ __weak int inet_recv_error(struct sock *sk, struct msghdr *msg, int len, int *ad
 }
 EXPORT_SYMBOL(inet_recv_error);
 
-/*
-int ip_push_pending_frames(struct sock *sk, struct flowi4 *fl4)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(ip_push_pending_frames);
-*/
-
-/*
-unsigned int inet_addr_type(struct net *net, __be32 addr)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(inet_addr_type);
-*/
-
-void icmp_out_count(struct net *net, unsigned char type)
+__weak void icmp_out_count(struct net *net, unsigned char type)
 {
     booter_panic("No impl!\n");
 }
@@ -4153,3 +4125,142 @@ __weak void __init udplite4_register(void)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(udplite4_register);
+
+__weak void inet_putpeer(struct inet_peer *p)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(inet_putpeer);
+
+__weak struct inet_peer *inet_getpeer(struct inet_peer_base *base,
+			       const struct inetpeer_addr *daddr,
+			       int create)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(inet_getpeer);
+
+__weak void ipv4_redirect(struct sk_buff *skb, struct net *net,
+		   int oif, u8 protocol)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ipv4_redirect);
+
+__weak int ip_append_data(struct sock *sk, struct flowi4 *fl4,
+		   int getfrag(void *from, char *to, int offset, int len,
+			       int odd, struct sk_buff *skb),
+		   void *from, int length, int transhdrlen,
+		   struct ipcm_cookie *ipc, struct rtable **rtp,
+		   unsigned int flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(ip_append_data);
+
+__weak void raw_icmp_error(struct sk_buff *skb, int protocol, u32 info)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(raw_icmp_error);
+
+__weak void ping_err(struct sk_buff *skb, int offset, u32 info)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL_GPL(ping_err);
+
+__weak __be32 inet_current_timestamp(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_current_timestamp);
+
+/* An array of errno for error messages from dest unreach. */
+/* RFC 1122: 3.2.2.1 States that NET_UNREACH, HOST_UNREACH and SR_FAILED MUST be considered 'transient errs'. */
+
+const struct icmp_err icmp_err_convert[] = {
+	{
+		.errno = ENETUNREACH,	/* ICMP_NET_UNREACH */
+		.fatal = 0,
+	},
+	{
+		.errno = EHOSTUNREACH,	/* ICMP_HOST_UNREACH */
+		.fatal = 0,
+	},
+	{
+		.errno = ENOPROTOOPT	/* ICMP_PROT_UNREACH */,
+		.fatal = 1,
+	},
+	{
+		.errno = ECONNREFUSED,	/* ICMP_PORT_UNREACH */
+		.fatal = 1,
+	},
+	{
+		.errno = EMSGSIZE,	/* ICMP_FRAG_NEEDED */
+		.fatal = 0,
+	},
+	{
+		.errno = EOPNOTSUPP,	/* ICMP_SR_FAILED */
+		.fatal = 0,
+	},
+	{
+		.errno = ENETUNREACH,	/* ICMP_NET_UNKNOWN */
+		.fatal = 1,
+	},
+	{
+		.errno = EHOSTDOWN,	/* ICMP_HOST_UNKNOWN */
+		.fatal = 1,
+	},
+	{
+		.errno = ENONET,	/* ICMP_HOST_ISOLATED */
+		.fatal = 1,
+	},
+	{
+		.errno = ENETUNREACH,	/* ICMP_NET_ANO	*/
+		.fatal = 1,
+	},
+	{
+		.errno = EHOSTUNREACH,	/* ICMP_HOST_ANO */
+		.fatal = 1,
+	},
+	{
+		.errno = ENETUNREACH,	/* ICMP_NET_UNR_TOS */
+		.fatal = 0,
+	},
+	{
+		.errno = EHOSTUNREACH,	/* ICMP_HOST_UNR_TOS */
+		.fatal = 0,
+	},
+	{
+		.errno = EHOSTUNREACH,	/* ICMP_PKT_FILTERED */
+		.fatal = 1,
+	},
+	{
+		.errno = EHOSTUNREACH,	/* ICMP_PREC_VIOLATION */
+		.fatal = 1,
+	},
+	{
+		.errno = EHOSTUNREACH,	/* ICMP_PREC_CUTOFF */
+		.fatal = 1,
+	},
+};
+EXPORT_SYMBOL(icmp_err_convert);
+
+__weak int __init icmp_init(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(icmp_init);
+
+__weak int icmp_rcv(struct sk_buff *skb)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(icmp_rcv);
+
+__weak int icmp_err(struct sk_buff *skb, u32 info)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(icmp_err);

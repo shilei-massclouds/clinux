@@ -1,9 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(icmp_err)
-CL_MINE(icmp_init)
-CL_MINE(icmp_rcv)
 CL_MINE(inet_csk_listen_start)
 CL_MINE(ipfrag_init)
 CL_MINE(ip_list_rcv)

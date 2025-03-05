@@ -1124,6 +1124,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(tcp);
     REQUIRE_COMPONENT(udp);
     REQUIRE_COMPONENT(udplite);
+    REQUIRE_COMPONENT(icmp);
     REQUIRE_COMPONENT(ping);
     REQUIRE_COMPONENT(arp);
     REQUIRE_COMPONENT(devinet);

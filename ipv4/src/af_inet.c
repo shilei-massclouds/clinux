@@ -1583,7 +1583,6 @@ __be32 inet_current_timestamp(void)
 	/* Convert to network byte order. */
 	return htonl(msecs);
 }
-EXPORT_SYMBOL(inet_current_timestamp);
 
 int inet_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
 {

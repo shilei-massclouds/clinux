@@ -64,7 +64,8 @@ components := \
 	fs_context fs_parser fs_struct namei libfs debugfs \
 	ipc_namespace drv_char 8250 serial drv_clk \
 	net_core netlink string_helpers net_namespace \
-	ipv4 tcp tcp_ipv4 udp udplite ping arp ip_output devinet fib tcp_metrics tcp_cong \
+	ipv4 tcp tcp_ipv4 udp udplite icmp ping arp ip_output \
+	devinet fib tcp_metrics tcp_cong \
 	block genhd partitions elevator sysctl_net inet_hashtables tcp_output \
 	fork mmap filemap kthread riscv_process exit exec \
 	buffer swap riscv_fault aio signalfd \

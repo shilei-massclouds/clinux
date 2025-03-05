@@ -587,7 +587,6 @@ void ping_err(struct sk_buff *skb, int offset, u32 info)
 out:
 	sock_put(sk);
 }
-EXPORT_SYMBOL_GPL(ping_err);
 
 /*
  *	Copy and checksum an ICMP Echo packet from user space into a buffer

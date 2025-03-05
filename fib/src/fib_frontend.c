@@ -303,6 +303,7 @@ __be32 fib_compute_spec_dst(struct sk_buff *skb)
 
 	return inet_select_addr(dev, ip_hdr(skb)->saddr, scope);
 }
+EXPORT_SYMBOL(fib_compute_spec_dst);
 
 bool fib_info_nh_uses_dev(struct fib_info *fi, const struct net_device *dev)
 {

@@ -1326,7 +1326,6 @@ int ip_append_data(struct sock *sk, struct flowi4 *fl4,
 				sk_page_frag(sk), getfrag,
 				from, length, transhdrlen, flags);
 }
-EXPORT_SYMBOL(ip_append_data);
 
 ssize_t	ip_append_page(struct sock *sk, struct flowi4 *fl4, struct page *page,
 		       int offset, size_t size, int flags)
