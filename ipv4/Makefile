@@ -6,5 +6,6 @@ obj_y += raw.o
 obj_y += route.o
 obj_y += protocol.o
 obj_y += inetpeer.o
+obj_y += igmp.o
 
 obj_y += mine.o

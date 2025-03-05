@@ -1124,6 +1124,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(udp);
     REQUIRE_COMPONENT(ping);
     REQUIRE_COMPONENT(arp);
+    REQUIRE_COMPONENT(devinet);
 
     //
     // start_kernel (init/main.c)

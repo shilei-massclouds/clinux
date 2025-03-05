@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/cache.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -13,5 +14,7 @@ cl_devinet_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_devinet_init);
+
+DEFINE_ENABLE_FUNC(devinet);
 
 int sysctl_devconf_inherit_init_net __read_mostly;

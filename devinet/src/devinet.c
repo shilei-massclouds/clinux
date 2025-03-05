@@ -175,7 +175,6 @@ struct net_device *__ip_dev_find(struct net *net, __be32 addr, bool devref)
 	rcu_read_unlock();
 	return result;
 }
-EXPORT_SYMBOL(__ip_dev_find);
 
 /* called under RCU lock */
 struct in_ifaddr *inet_lookup_ifaddr_rcu(struct net *net, __be32 addr)
@@ -247,7 +246,6 @@ void in_dev_finish_destroy(struct in_device *idev)
 	else
 		kfree(idev);
 }
-EXPORT_SYMBOL(in_dev_finish_destroy);
 
 static struct in_device *inetdev_init(struct net_device *dev)
 {
@@ -1242,7 +1240,6 @@ done:
 out:
 	return ret;
 }
-EXPORT_SYMBOL(devinet_ioctl);
 
 static int inet_gifconf(struct net_device *dev, char __user *buf, int len, int size)
 {
@@ -2773,4 +2770,3 @@ void __init devinet_init(void)
 	rtnl_register(PF_INET, RTM_GETNETCONF, inet_netconf_get_devconf,
 		      inet_netconf_dump_devconf, 0);
 }
-EXPORT_SYMBOL(devinet_init);

@@ -203,6 +203,7 @@ int arp_mc_map(__be32 addr, u8 *haddr, struct net_device *dev, int dir)
 	}
 	return -EINVAL;
 }
+EXPORT_SYMBOL(arp_mc_map);
 
 
 static u32 arp_hash(const void *pkey,

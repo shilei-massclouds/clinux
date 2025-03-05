@@ -3575,7 +3575,7 @@ void ip_flush_pending_frames(struct sock *sk)
 EXPORT_SYMBOL(ip_flush_pending_frames);
 */
 
-int ip_mc_sf_allow(struct sock *sk, __be32 loc_addr, __be32 rmt_addr,
+__weak int ip_mc_sf_allow(struct sock *sk, __be32 loc_addr, __be32 rmt_addr,
            int dif, int sdif)
 {
     booter_panic("No impl!\n");
@@ -3589,20 +3589,7 @@ void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
 }
 EXPORT_SYMBOL(ip_cmsg_recv_offset);
 
-/*
-int ip_append_data(struct sock *sk, struct flowi4 *fl4,
-           int getfrag(void *from, char *to, int offset, int len,
-                   int odd, struct sk_buff *skb),
-           void *from, int length, int transhdrlen,
-           struct ipcm_cookie *ipc, struct rtable **rtp,
-           unsigned int flags)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(ip_append_data);
-*/
-
-int ip_check_mc_rcu(struct in_device *in_dev, __be32 mc_addr, __be32 src_addr, u8 proto)
+__weak int ip_check_mc_rcu(struct in_device *in_dev, __be32 mc_addr, __be32 src_addr, u8 proto)
 {
     booter_panic("No impl!\n");
 }
@@ -3889,3 +3876,39 @@ __weak void __init inet_initpeers(void)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_initpeers);
+
+__weak struct net_device *__ip_dev_find(struct net *net, __be32 addr, bool devref)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__ip_dev_find);
+
+__weak int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(devinet_ioctl);
+
+__weak void in_dev_finish_destroy(struct in_device *idev)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(in_dev_finish_destroy);
+
+__weak void __init devinet_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(devinet_init);
+
+__weak int __init igmp_mc_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(igmp_mc_init);
+
+int dev_mc_del(struct net_device *dev, const unsigned char *addr)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(dev_mc_del);

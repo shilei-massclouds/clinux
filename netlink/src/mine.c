@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(dev_mc_add_excl)
-CL_MINE(dev_mc_del)
 CL_MINE(dev_uc_add_excl)
 CL_MINE(dev_uc_del)
 CL_MINE(refcount_dec_and_mutex_lock)
