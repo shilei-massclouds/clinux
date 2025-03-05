@@ -4414,11 +4414,13 @@ void bpf_warn_invalid_xdp_action(u32 act)
 }
 EXPORT_SYMBOL_GPL(bpf_warn_invalid_xdp_action);
 
+/*
 void xdp_rxq_info_unreg(struct xdp_rxq_info *xdp_rxq)
 {
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(xdp_rxq_info_unreg);
+*/
 
 void netif_carrier_off(struct net_device *dev)
 {
@@ -4432,12 +4434,14 @@ void netif_carrier_on(struct net_device *dev)
 }
 EXPORT_SYMBOL(netif_carrier_on);
 
+/*
 int xdp_rxq_info_reg(struct xdp_rxq_info *xdp_rxq,
              struct net_device *dev, u32 queue_index)
 {
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(xdp_rxq_info_reg);
+*/
 
 struct flow_dissector flow_keys_basic_dissector __read_mostly;
 EXPORT_SYMBOL(flow_keys_basic_dissector);

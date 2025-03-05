@@ -5053,18 +5053,18 @@ void free_pages(unsigned long addr, unsigned int order)
 //	return nc->va + offset;
 //}
 //EXPORT_SYMBOL(page_frag_alloc);
-//
-///*
-// * Frees a page fragment allocated out of either a compound or order 0 page.
-// */
-//void page_frag_free(void *addr)
-//{
-//	struct page *page = virt_to_head_page(addr);
-//
-//	if (unlikely(put_page_testzero(page)))
-//		free_the_page(page, compound_order(page));
-//}
-//EXPORT_SYMBOL(page_frag_free);
+
+/*
+ * Frees a page fragment allocated out of either a compound or order 0 page.
+ */
+void page_frag_free(void *addr)
+{
+	struct page *page = virt_to_head_page(addr);
+
+	if (unlikely(put_page_testzero(page)))
+		free_the_page(page, compound_order(page));
+}
+EXPORT_SYMBOL(page_frag_free);
 
 static void *make_alloc_exact(unsigned long addr, unsigned int order,
 		size_t size)
