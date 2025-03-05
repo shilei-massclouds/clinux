@@ -1127,6 +1127,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(arp);
     REQUIRE_COMPONENT(devinet);
     REQUIRE_COMPONENT(inet_hashtables);
+    REQUIRE_COMPONENT(tcp_output);
 
     //
     // start_kernel (init/main.c)

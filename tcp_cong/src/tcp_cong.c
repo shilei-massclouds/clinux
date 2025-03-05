@@ -62,6 +62,7 @@ struct tcp_congestion_ops *tcp_ca_find_key(u32 key)
 
 	return NULL;
 }
+EXPORT_SYMBOL(tcp_ca_find_key);
 
 /*
  * Attach new congestion control algorithm to the list

@@ -309,19 +309,10 @@ struct tcp_splice_state {
 	unsigned int flags;
 };
 
-/*
- * Pressure flag: try to collapse.
- * Technical note: it is used by multiple contexts non atomically.
- * All the __sk_mem_schedule() is of this nature: accounting
- * is strict, actions are advisory and have some latency.
- */
-unsigned long tcp_memory_pressure __read_mostly;
-EXPORT_SYMBOL_GPL(tcp_memory_pressure);
 
 DEFINE_STATIC_KEY_FALSE(tcp_rx_skb_cache_key);
 EXPORT_SYMBOL(tcp_rx_skb_cache_key);
 
-DEFINE_STATIC_KEY_FALSE(tcp_tx_skb_cache_key);
 
 void tcp_enter_memory_pressure(struct sock *sk)
 {
@@ -2628,7 +2619,6 @@ void tcp_write_queue_purge(struct sock *sk)
 	tcp_sk(sk)->packets_out = 0;
 	inet_csk(sk)->icsk_backoff = 0;
 }
-EXPORT_SYMBOL(tcp_write_queue_purge);
 
 int tcp_disconnect(struct sock *sk, int flags)
 {
@@ -2849,8 +2839,6 @@ static int tcp_repair_options_est(struct sock *sk, sockptr_t optbuf,
 	return 0;
 }
 
-DEFINE_STATIC_KEY_FALSE(tcp_tx_delay_enabled);
-EXPORT_SYMBOL(tcp_tx_delay_enabled);
 
 static void tcp_enable_tx_delay(void)
 {

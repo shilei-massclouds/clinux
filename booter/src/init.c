@@ -3950,17 +3950,11 @@ void tcp_fastopen_active_disable_ofo_check(struct sock *sk)
 }
 EXPORT_SYMBOL(tcp_fastopen_active_disable_ofo_check);
 
-int tcp_connect(struct sock *sk)
+__weak int tcp_connect(struct sock *sk)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(tcp_connect);
-
-unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(tcp_sync_mss);
 
 void inet_csk_clear_xmit_timers(struct sock *sk)
 {
@@ -4083,3 +4077,68 @@ __weak int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(inet_ehash_locks_alloc);
+
+__weak unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_sync_mss);
+
+__weak void __init tcp_tasklet_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_tasklet_init);
+
+__weak void tcp_send_active_reset(struct sock *sk, gfp_t priority)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_send_active_reset);
+
+__weak void tcp_write_queue_purge(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_write_queue_purge);
+
+/*
+ * Pressure flag: try to collapse.
+ * Technical note: it is used by multiple contexts non atomically.
+ * All the __sk_mem_schedule() is of this nature: accounting
+ * is strict, actions are advisory and have some latency.
+ */
+unsigned long tcp_memory_pressure __read_mostly;
+EXPORT_SYMBOL_GPL(tcp_memory_pressure);
+
+DEFINE_STATIC_KEY_FALSE(tcp_tx_skb_cache_key);
+EXPORT_SYMBOL(tcp_tx_skb_cache_key);
+
+DEFINE_STATIC_KEY_FALSE(tcp_tx_delay_enabled);
+EXPORT_SYMBOL(tcp_tx_delay_enabled);
+
+__weak struct sk_buff *sk_stream_alloc_skb(struct sock *sk, int size, gfp_t gfp,
+				    bool force_schedule)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(sk_stream_alloc_skb);
+
+void tcp_initialize_rcv_mss(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_initialize_rcv_mss);
+
+void tcp_clear_retrans(struct tcp_sock *tp)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_clear_retrans);
+
+__weak void tcp_wfree(struct sk_buff *skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_wfree);
+
