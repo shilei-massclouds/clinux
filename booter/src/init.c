@@ -3143,21 +3143,6 @@ EXPORT_SYMBOL_GPL(get_net_ns_by_fd);
 DECLARE_RWSEM(pernet_ops_rwsem);
 EXPORT_SYMBOL_GPL(pernet_ops_rwsem);
 
-int __nla_parse(struct nlattr **tb, int maxtype,
-        const struct nlattr *head, int len,
-        const struct nla_policy *policy, unsigned int validate,
-        struct netlink_ext_ack *extack)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(__nla_parse);
-
-int nla_put(struct sk_buff *skb, int attrtype, int attrlen, const void *data)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(nla_put);
-
 __weak bool peernet_has_id(const struct net *net, struct net *peer)
 {
     booter_panic("No impl!\n");
@@ -3651,12 +3636,6 @@ int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
 }
 EXPORT_SYMBOL(ip_cmsg_send);
 
-struct nlattr *nla_reserve(struct sk_buff *skb, int attrtype, int attrlen)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(nla_reserve);
-
 void ip4_datagram_release_cb(struct sock *sk)
 {
     booter_panic("No impl!\n");
@@ -3750,18 +3729,6 @@ int proc_dointvec_userhz_jiffies(struct ctl_table *table, int write,
 }
 EXPORT_SYMBOL(proc_dointvec_userhz_jiffies);
 
-int nla_memcpy(void *dest, const struct nlattr *src, int count)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(nla_memcpy);
-
-struct nlattr *nla_find(const struct nlattr *head, int len, int attrtype)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(nla_find);
-
 __weak struct nlmsghdr *
 __nlmsg_put(struct sk_buff *skb, u32 portid, u32 seq, int type, int len, int flags)
 {
@@ -3795,13 +3762,6 @@ __weak void rtnl_notify(struct sk_buff *skb, struct net *net, u32 pid, u32 group
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(rtnl_notify);
-
-int nla_put_64bit(struct sk_buff *skb, int attrtype, int attrlen,
-          const void *data, int padattr)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(nla_put_64bit);
 
 __weak void __ip_select_ident(struct net *net, struct iphdr *iph, int segs)
 {
@@ -3845,18 +3805,6 @@ __weak __be32 inet_select_addr(const struct net_device *dev, __be32 dst, int sco
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_select_addr);
-
-int nla_strcmp(const struct nlattr *nla, const char *str)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(nla_strcmp);
-
-size_t nla_strlcpy(char *dst, const struct nlattr *nla, size_t dstsize)
-{
-    booter_panic("No impl!\n");
-}
-EXPORT_SYMBOL(nla_strlcpy);
 
 __weak __be32 inet_confirm_addr(struct net *net, struct in_device *in_dev,
 			 __be32 dst, __be32 local, int scope)
