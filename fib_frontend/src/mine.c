@@ -9,7 +9,3 @@ CL_MINE(ip_fib_metrics_init)
 CL_MINE(nexthop_free_rcu)
 CL_MINE(tcp_ca_get_key_by_name)
 
-CL_MINE(call_fib_notifiers)
-CL_MINE(call_fib_notifier)
-CL_MINE(fib_notifier_ops_unregister)
-CL_MINE(fib_notifier_ops_register)
