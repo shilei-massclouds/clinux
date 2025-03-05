@@ -1043,6 +1043,7 @@ enum hrtimer_restart tcp_pace_kick(struct hrtimer *timer)
 
 	return HRTIMER_NORESTART;
 }
+EXPORT_SYMBOL(tcp_pace_kick);
 
 static void tcp_update_skb_after_send(struct sock *sk, struct sk_buff *skb,
 				      u64 prior_wstamp)
@@ -1575,6 +1576,7 @@ int tcp_mtu_to_mss(struct sock *sk, int pmtu)
 	return __tcp_mtu_to_mss(sk, pmtu) -
 	       (tcp_sk(sk)->tcp_header_len - sizeof(struct tcphdr));
 }
+EXPORT_SYMBOL(tcp_mtu_to_mss);
 
 /* Inverse of above */
 int tcp_mss_to_mtu(struct sock *sk, int mss)
@@ -2691,6 +2693,7 @@ probe_sent:
 rearm_timer:
 	tcp_rearm_rto(sk);
 }
+EXPORT_SYMBOL(tcp_send_loss_probe);
 
 /* Push out any pending frames which were held back due to
  * TCP_CORK or attempt at coalescing tiny packets.
@@ -3121,6 +3124,7 @@ int tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
 	tp->undo_retrans += tcp_skb_pcount(skb);
 	return err;
 }
+EXPORT_SYMBOL(tcp_retransmit_skb);
 
 /* This gets called after a retransmit timeout, and the initially
  * retransmitted data is acknowledged.  It tries to continue
@@ -3902,6 +3906,7 @@ int tcp_write_wakeup(struct sock *sk, int mib)
 		return tcp_xmit_probe_skb(sk, 0, mib);
 	}
 }
+EXPORT_SYMBOL(tcp_write_wakeup);
 
 /* A window probe timeout has occurred.  If window is not closed send
  * a partial packet else a zero probe.
@@ -3936,6 +3941,7 @@ void tcp_send_probe0(struct sock *sk)
 	}
 	tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0, timeout, TCP_RTO_MAX);
 }
+EXPORT_SYMBOL(tcp_send_probe0);
 
 int tcp_rtx_synack(const struct sock *sk, struct request_sock *req)
 {

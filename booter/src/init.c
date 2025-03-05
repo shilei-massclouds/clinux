@@ -4299,3 +4299,33 @@ __weak struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(iptunnel_metadata_reply);
+
+__weak void tcp_init_xmit_timers(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(tcp_init_xmit_timers);
+
+void tcp_time_wait(struct sock *sk, int state, int timeo)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(tcp_time_wait);
+
+void inet_csk_reset_keepalive_timer(struct sock *sk, unsigned long len)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(inet_csk_reset_keepalive_timer);
+
+__weak void tcp_delack_timer_handler(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(tcp_delack_timer_handler);
+
+__weak void tcp_write_timer_handler(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(tcp_write_timer_handler);

@@ -2396,6 +2396,7 @@ bool tcp_check_oom(struct sock *sk, int shift)
 		net_info_ratelimited("out of memory -- consider tuning tcp_mem\n");
 	return too_many_orphans || out_of_socket_memory;
 }
+EXPORT_SYMBOL(tcp_check_oom);
 
 void tcp_close(struct sock *sk, long timeout)
 {
