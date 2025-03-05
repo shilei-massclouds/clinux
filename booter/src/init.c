@@ -3883,3 +3883,9 @@ __weak int fib_dump_info_fnhe(struct sk_buff *skb, struct netlink_callback *cb,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(fib_dump_info_fnhe);
+
+__weak void __init inet_initpeers(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_initpeers);
