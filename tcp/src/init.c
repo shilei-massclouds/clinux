@@ -17,9 +17,6 @@ EXPORT_SYMBOL(cl_tcp_init);
 
 DEFINE_ENABLE_FUNC(tcp);
 
-struct tcp_congestion_ops tcp_reno;
-EXPORT_SYMBOL(tcp_reno);
-
 int sysctl_tcp_max_orphans __read_mostly = NR_FILE;
 
 struct inet_hashinfo tcp_hashinfo;
