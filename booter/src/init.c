@@ -3815,12 +3815,14 @@ __weak __be32 inet_confirm_addr(struct net *net, struct in_device *in_dev,
 }
 EXPORT_SYMBOL(inet_confirm_addr);
 
+/*
 int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
              struct fib_result *res, int fib_flags)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(fib_table_lookup);
+*/
 
 void dst_dev_put(struct dst_entry *dst)
 {
@@ -3873,3 +3875,11 @@ __weak unsigned int inet_addr_type_dev_table(struct net *net,
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(inet_addr_type_dev_table);
+
+__weak int fib_dump_info_fnhe(struct sk_buff *skb, struct netlink_callback *cb,
+		       u32 table_id, struct fib_info *fi,
+		       int *fa_index, int fa_start, unsigned int flags)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(fib_dump_info_fnhe);
