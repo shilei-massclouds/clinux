@@ -4264,3 +4264,9 @@ __weak int icmp_err(struct sk_buff *skb, u32 info)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(icmp_err);
+
+__weak int __init ip_misc_proc_init(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_misc_proc_init);

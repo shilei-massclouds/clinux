@@ -1130,6 +1130,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(devinet);
     REQUIRE_COMPONENT(inet_hashtables);
     REQUIRE_COMPONENT(tcp_output);
+    REQUIRE_COMPONENT(ipv4_proc);
 
     //
     // start_kernel (init/main.c)

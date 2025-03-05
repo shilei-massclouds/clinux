@@ -964,6 +964,7 @@ struct proto raw_prot = {
 #endif
 	.diag_destroy	   = raw_abort,
 };
+EXPORT_SYMBOL_GPL(raw_prot);
 
 #ifdef CONFIG_PROC_FS
 static struct sock *raw_get_first(struct seq_file *seq)
