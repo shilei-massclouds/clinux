@@ -2,7 +2,6 @@
 #include "../../booter/src/booter.h"
 
 CL_MINE(inet_csk_listen_start)
-CL_MINE(ipfrag_init)
 CL_MINE(ip_list_rcv)
 CL_MINE(ip_rcv)
 CL_MINE(ip_tunnel_core_init)
