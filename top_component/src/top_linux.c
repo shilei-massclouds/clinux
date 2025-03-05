@@ -1121,6 +1121,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(ipc_namespace);
     REQUIRE_COMPONENT(ipv4);
     REQUIRE_COMPONENT(tcp_ipv4);
+    REQUIRE_COMPONENT(tcp);
     REQUIRE_COMPONENT(udp);
     REQUIRE_COMPONENT(ping);
     REQUIRE_COMPONENT(arp);

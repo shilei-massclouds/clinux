@@ -3912,3 +3912,83 @@ int dev_mc_del(struct net_device *dev, const unsigned char *addr)
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(dev_mc_del);
+
+void inet_csk_reqsk_queue_drop(struct sock *sk, struct request_sock *req)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_csk_reqsk_queue_drop);
+
+__weak int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+			  int addr_len, int flags, int is_sendmsg)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(__inet_stream_connect);
+
+void tcp_fastopen_init_key_once(struct net *net)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_fastopen_init_key_once);
+
+__weak void inet_sk_state_store(struct sock *sk, int newstate)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_sk_state_store);
+
+void put_cmsg_scm_timestamping64(struct msghdr *msg, struct scm_timestamping_internal *tss_internal)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(put_cmsg_scm_timestamping64);
+
+__weak void __init tcp_v4_init(void)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_v4_init);
+
+void tcp_fastopen_active_disable_ofo_check(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_fastopen_active_disable_ofo_check);
+
+int tcp_connect(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_connect);
+
+unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_sync_mss);
+
+void inet_put_port(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_put_port);
+
+void inet_csk_clear_xmit_timers(struct sock *sk)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(inet_csk_clear_xmit_timers);
+
+__weak struct sk_buff *tcp_get_timestamping_opt_stats(const struct sock *sk,
+					       const struct sk_buff *orig_skb)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(tcp_get_timestamping_opt_stats);
+
+void put_cmsg_scm_timestamping(struct msghdr *msg, struct scm_timestamping_internal *tss_internal)
+{
+    booter_panic("No impl!\n");
+}
+EXPORT_SYMBOL(put_cmsg_scm_timestamping);

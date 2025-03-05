@@ -2557,6 +2557,7 @@ void __release_sock(struct sock *sk)
 	 */
 	sk->sk_backlog.len = 0;
 }
+EXPORT_SYMBOL(__release_sock);
 
 void __sk_flush_backlog(struct sock *sk)
 {
@@ -2564,6 +2565,7 @@ void __sk_flush_backlog(struct sock *sk)
 	__release_sock(sk);
 	spin_unlock_bh(&sk->sk_lock.slock);
 }
+EXPORT_SYMBOL(__sk_flush_backlog);
 
 /**
  * sk_wait_data - wait for data to arrive at sk_receive_queue

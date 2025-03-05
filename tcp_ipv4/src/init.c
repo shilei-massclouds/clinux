@@ -16,30 +16,3 @@ cl_tcp_ipv4_init(void)
 EXPORT_SYMBOL(cl_tcp_ipv4_init);
 
 DEFINE_ENABLE_FUNC(tcp_ipv4);
-
-struct tcp_congestion_ops tcp_reno;
-
-struct percpu_counter tcp_sockets_allocated;
-EXPORT_SYMBOL(tcp_sockets_allocated);
-
-/*
- * Pressure flag: try to collapse.
- * Technical note: it is used by multiple contexts non atomically.
- * All the __sk_mem_schedule() is of this nature: accounting
- * is strict, actions are advisory and have some latency.
- */
-unsigned long tcp_memory_pressure __read_mostly;
-EXPORT_SYMBOL_GPL(tcp_memory_pressure);
-
-atomic_long_t tcp_memory_allocated; /* Current allocated memory. */
-EXPORT_SYMBOL(tcp_memory_allocated);
-
-struct percpu_counter tcp_orphan_count;
-EXPORT_SYMBOL_GPL(tcp_orphan_count);
-
-long sysctl_tcp_mem[3] __read_mostly;
-EXPORT_SYMBOL(sysctl_tcp_mem);
-
-DEFINE_STATIC_KEY_FALSE(tcp_tx_delay_enabled);
-EXPORT_SYMBOL(tcp_tx_delay_enabled);
-

@@ -713,7 +713,6 @@ sock_error:
 		sock->state = SS_DISCONNECTING;
 	goto out;
 }
-EXPORT_SYMBOL(__inet_stream_connect);
 
 int inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
 			int addr_len, int flags)
