@@ -27,6 +27,7 @@
 #include <net/icmp.h>
 #include <net/icmp.h>
 #include <net/protocol.h>
+#include <net/dst_metadata.h>
 #include <asm/sbi.h>
 #include <asm/current.h>
 #ifdef GENERIC_TIME_VSYSCALL
@@ -4270,3 +4271,31 @@ __weak int __init ip_misc_proc_init(void)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(ip_misc_proc_init);
+
+int __ipv6_addr_type(const struct in6_addr *addr)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__ipv6_addr_type);
+
+__sum16 csum_ipv6_magic(const struct in6_addr *saddr,
+            const struct in6_addr *daddr,
+            __u32 len, __u8 proto, __wsum csum)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(csum_ipv6_magic);
+
+struct metadata_dst *metadata_dst_alloc(u8 optslen, enum metadata_type type,
+                    gfp_t flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(metadata_dst_alloc);
+
+__weak struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
+					     gfp_t flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(iptunnel_metadata_reply);

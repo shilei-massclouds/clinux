@@ -4,7 +4,6 @@
 CL_MINE(inet_csk_listen_start)
 CL_MINE(ip_list_rcv)
 CL_MINE(ip_rcv)
-CL_MINE(ip_tunnel_core_init)
 CL_MINE(tcpv4_offload_init)
 CL_MINE(udpv4_offload_init)
 
