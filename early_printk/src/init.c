@@ -4,6 +4,7 @@
 #include <linux/module.h>
 #include <linux/console.h>
 #include <linux/serial_core.h>
+#include <linux/netdevice.h>
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
@@ -159,3 +160,76 @@ __weak struct tty_driver *console_device(int *index)
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(console_device);
+
+__weak const char *dev_driver_string(const struct device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_driver_string);
+
+__weak int dev_printk_emit(int level, const struct device *dev, const char *fmt, ...)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_printk_emit);
+
+static void __netdev_printk(const char *level, const struct net_device *dev,
+			    struct va_format *vaf)
+{
+	if (dev && dev->dev.parent) {
+		dev_printk_emit(level[1] - '0',
+				dev->dev.parent,
+				"%s %s %s%s: %pV",
+				dev_driver_string(dev->dev.parent),
+				dev_name(dev->dev.parent),
+				netdev_name(dev), netdev_reg_state(dev),
+				vaf);
+	} else if (dev) {
+		printk("%s%s%s: %pV",
+		       level, netdev_name(dev), netdev_reg_state(dev), vaf);
+	} else {
+		printk("%s(NULL net_device): %pV", level, vaf);
+	}
+}
+
+void netdev_printk(const char *level, const struct net_device *dev,
+		   const char *format, ...)
+{
+	struct va_format vaf;
+	va_list args;
+
+	va_start(args, format);
+
+	vaf.fmt = format;
+	vaf.va = &args;
+
+	__netdev_printk(level, dev, &vaf);
+
+	va_end(args);
+}
+EXPORT_SYMBOL(netdev_printk);
+
+#define define_netdev_printk_level(func, level)			\
+void func(const struct net_device *dev, const char *fmt, ...)	\
+{								\
+	struct va_format vaf;					\
+	va_list args;						\
+								\
+	va_start(args, fmt);					\
+								\
+	vaf.fmt = fmt;						\
+	vaf.va = &args;						\
+								\
+	__netdev_printk(level, dev, &vaf);			\
+								\
+	va_end(args);						\
+}								\
+EXPORT_SYMBOL(func);
+
+define_netdev_printk_level(netdev_emerg, KERN_EMERG);
+define_netdev_printk_level(netdev_alert, KERN_ALERT);
+define_netdev_printk_level(netdev_crit, KERN_CRIT);
+define_netdev_printk_level(netdev_err, KERN_ERR);
+define_netdev_printk_level(netdev_warn, KERN_WARNING);
+define_netdev_printk_level(netdev_notice, KERN_NOTICE);
+define_netdev_printk_level(netdev_info, KERN_INFO);

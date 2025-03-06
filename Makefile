@@ -63,7 +63,7 @@ components := \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
 	fs_context fs_parser fs_struct namei libfs debugfs \
 	ipc_namespace drv_char 8250 serial drv_clk \
-	net_core netlink string_helpers net_namespace \
+	net_core netlink string_helpers net_namespace net_sched \
 	ipv4 tcp tcp_ipv4 udp udplite icmp ping arp ip_output \
 	devinet fib tcp_metrics tcp_cong ipv4_proc ip_tunnel \
 	tcp_timer inet_connection_sock tcp_ulp tcp_fastopen \

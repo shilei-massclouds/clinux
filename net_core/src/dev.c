@@ -3039,7 +3039,6 @@ void __netif_schedule(struct Qdisc *q)
 	if (!test_and_set_bit(__QDISC_STATE_SCHED, &q->state))
 		__netif_reschedule(q);
 }
-EXPORT_SYMBOL(__netif_schedule);
 
 struct dev_kfree_skb_cb {
 	enum skb_free_reason reason;
@@ -3060,7 +3059,6 @@ void netif_schedule_queue(struct netdev_queue *txq)
 	}
 	rcu_read_unlock();
 }
-EXPORT_SYMBOL(netif_schedule_queue);
 
 void netif_tx_wake_queue(struct netdev_queue *dev_queue)
 {
@@ -3691,7 +3689,6 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
 	}
 	return head;
 }
-EXPORT_SYMBOL_GPL(validate_xmit_skb_list);
 
 static void qdisc_pkt_len_init(struct sk_buff *skb)
 {
@@ -4230,7 +4227,6 @@ int weight_p __read_mostly = 64;           /* old backlog weight */
 int dev_weight_rx_bias __read_mostly = 1;  /* bias for backlog weight */
 int dev_weight_tx_bias __read_mostly = 1;  /* bias for output_queue quota */
 int dev_rx_weight __read_mostly = 64;
-int dev_tx_weight __read_mostly = 64;
 /* Maximum number of GRO_NORMAL skbs to batch up for list-RX */
 int gro_normal_batch __read_mostly = 8;
 
@@ -10254,7 +10250,6 @@ struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
 	storage->rx_nohandler += (unsigned long)atomic_long_read(&dev->rx_nohandler);
 	return storage;
 }
-EXPORT_SYMBOL(dev_get_stats);
 
 struct netdev_queue *dev_ingress_queue_create(struct net_device *dev)
 {
@@ -10472,7 +10467,6 @@ void synchronize_net(void)
 	else
 		synchronize_rcu();
 }
-EXPORT_SYMBOL(synchronize_net);
 
 /**
  *	unregister_netdevice_queue - remove device from the kernel
@@ -10829,66 +10823,66 @@ const char *netdev_drivername(const struct net_device *dev)
 	return empty;
 }
 
-static void __netdev_printk(const char *level, const struct net_device *dev,
-			    struct va_format *vaf)
-{
-	if (dev && dev->dev.parent) {
-		dev_printk_emit(level[1] - '0',
-				dev->dev.parent,
-				"%s %s %s%s: %pV",
-				dev_driver_string(dev->dev.parent),
-				dev_name(dev->dev.parent),
-				netdev_name(dev), netdev_reg_state(dev),
-				vaf);
-	} else if (dev) {
-		printk("%s%s%s: %pV",
-		       level, netdev_name(dev), netdev_reg_state(dev), vaf);
-	} else {
-		printk("%s(NULL net_device): %pV", level, vaf);
-	}
-}
+//static void __netdev_printk(const char *level, const struct net_device *dev,
+//			    struct va_format *vaf)
+//{
+//	if (dev && dev->dev.parent) {
+//		dev_printk_emit(level[1] - '0',
+//				dev->dev.parent,
+//				"%s %s %s%s: %pV",
+//				dev_driver_string(dev->dev.parent),
+//				dev_name(dev->dev.parent),
+//				netdev_name(dev), netdev_reg_state(dev),
+//				vaf);
+//	} else if (dev) {
+//		printk("%s%s%s: %pV",
+//		       level, netdev_name(dev), netdev_reg_state(dev), vaf);
+//	} else {
+//		printk("%s(NULL net_device): %pV", level, vaf);
+//	}
+//}
+//
+//void netdev_printk(const char *level, const struct net_device *dev,
+//		   const char *format, ...)
+//{
+//	struct va_format vaf;
+//	va_list args;
+//
+//	va_start(args, format);
+//
+//	vaf.fmt = format;
+//	vaf.va = &args;
+//
+//	__netdev_printk(level, dev, &vaf);
+//
+//	va_end(args);
+//}
+//EXPORT_SYMBOL(netdev_printk);
 
-void netdev_printk(const char *level, const struct net_device *dev,
-		   const char *format, ...)
-{
-	struct va_format vaf;
-	va_list args;
-
-	va_start(args, format);
-
-	vaf.fmt = format;
-	vaf.va = &args;
-
-	__netdev_printk(level, dev, &vaf);
-
-	va_end(args);
-}
-EXPORT_SYMBOL(netdev_printk);
-
-#define define_netdev_printk_level(func, level)			\
-void func(const struct net_device *dev, const char *fmt, ...)	\
-{								\
-	struct va_format vaf;					\
-	va_list args;						\
-								\
-	va_start(args, fmt);					\
-								\
-	vaf.fmt = fmt;						\
-	vaf.va = &args;						\
-								\
-	__netdev_printk(level, dev, &vaf);			\
-								\
-	va_end(args);						\
-}								\
-EXPORT_SYMBOL(func);
-
-define_netdev_printk_level(netdev_emerg, KERN_EMERG);
-define_netdev_printk_level(netdev_alert, KERN_ALERT);
-define_netdev_printk_level(netdev_crit, KERN_CRIT);
-define_netdev_printk_level(netdev_err, KERN_ERR);
-define_netdev_printk_level(netdev_warn, KERN_WARNING);
-define_netdev_printk_level(netdev_notice, KERN_NOTICE);
-define_netdev_printk_level(netdev_info, KERN_INFO);
+//#define define_netdev_printk_level(func, level)			\
+//void func(const struct net_device *dev, const char *fmt, ...)	\
+//{								\
+//	struct va_format vaf;					\
+//	va_list args;						\
+//								\
+//	va_start(args, fmt);					\
+//								\
+//	vaf.fmt = fmt;						\
+//	vaf.va = &args;						\
+//								\
+//	__netdev_printk(level, dev, &vaf);			\
+//								\
+//	va_end(args);						\
+//}								\
+//EXPORT_SYMBOL(func);
+//
+//define_netdev_printk_level(netdev_emerg, KERN_EMERG);
+//define_netdev_printk_level(netdev_alert, KERN_ALERT);
+//define_netdev_printk_level(netdev_crit, KERN_CRIT);
+//define_netdev_printk_level(netdev_err, KERN_ERR);
+//define_netdev_printk_level(netdev_warn, KERN_WARNING);
+//define_netdev_printk_level(netdev_notice, KERN_NOTICE);
+//define_netdev_printk_level(netdev_info, KERN_INFO);
 
 static void __net_exit netdev_exit(struct net *net)
 {

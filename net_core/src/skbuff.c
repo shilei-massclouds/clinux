@@ -706,7 +706,6 @@ void kfree_skb_list(struct sk_buff *segs)
 		segs = next;
 	}
 }
-EXPORT_SYMBOL(kfree_skb_list);
 
 /* Dump skb information and contents.
  *

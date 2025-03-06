@@ -4420,7 +4420,6 @@ void xdp_rxq_info_unreg(struct xdp_rxq_info *xdp_rxq)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(xdp_rxq_info_unreg);
-*/
 
 void netif_carrier_off(struct net_device *dev)
 {
@@ -4433,6 +4432,7 @@ void netif_carrier_on(struct net_device *dev)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(netif_carrier_on);
+*/
 
 /*
 int xdp_rxq_info_reg(struct xdp_rxq_info *xdp_rxq,
@@ -4543,6 +4543,7 @@ __weak void linkwatch_forget_dev(struct net_device *dev)
 }
 EXPORT_SYMBOL(linkwatch_forget_dev);
 
+/*
 void dev_activate(struct net_device *dev)
 {
     booter_panic("No impl.");
@@ -4554,3 +4555,63 @@ void dev_deactivate(struct net_device *dev)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(dev_deactivate);
+*/
+
+__weak void __netif_schedule(struct Qdisc *q)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__netif_schedule);
+
+__weak struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
+					struct rtnl_link_stats64 *storage)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_get_stats);
+
+__weak bool refcount_dec_and_rtnl_lock(refcount_t *r)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(refcount_dec_and_rtnl_lock);
+
+__weak void netif_schedule_queue(struct netdev_queue *txq)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netif_schedule_queue);
+
+int dev_tx_weight __read_mostly = 64;
+EXPORT_SYMBOL(dev_tx_weight);
+
+__weak struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *dev, bool *again)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(validate_xmit_skb_list);
+
+__weak void kfree_skb_list(struct sk_buff *segs)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(kfree_skb_list);
+
+__weak void synchronize_net(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(synchronize_net);
+
+__weak const char *netdev_drivername(const struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(netdev_drivername);
+
+__weak struct sk_buff *dev_hard_start_xmit(struct sk_buff *first, struct net_device *dev,
+				    struct netdev_queue *txq, int *ret)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(dev_hard_start_xmit);

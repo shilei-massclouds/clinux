@@ -1642,7 +1642,6 @@ const char *dev_driver_string(const struct device *dev)
 			(dev->bus ? dev->bus->name :
 			(dev->class ? dev->class->name : ""));
 }
-EXPORT_SYMBOL(dev_driver_string);
 
 #define to_dev_attr(_attr) container_of(_attr, struct device_attribute, attr)
 
@@ -4132,7 +4131,6 @@ int dev_printk_emit(int level, const struct device *dev, const char *fmt, ...)
 
 	return r;
 }
-EXPORT_SYMBOL(dev_printk_emit);
 
 static void __dev_printk(const char *level, const struct device *dev,
 			struct va_format *vaf)
