@@ -4482,22 +4482,23 @@ EXPORT_SYMBOL_GPL(workqueue_set_max_active);
 //	return worker ? worker->current_work : NULL;
 //}
 //EXPORT_SYMBOL(current_work);
-//
-///**
-// * current_is_workqueue_rescuer - is %current workqueue rescuer?
-// *
-// * Determine whether %current is a workqueue rescuer.  Can be used from
-// * work functions to determine whether it's being run off the rescuer task.
-// *
-// * Return: %true if %current is a workqueue rescuer. %false otherwise.
-// */
-//bool current_is_workqueue_rescuer(void)
-//{
-//	struct worker *worker = current_wq_worker();
-//
-//	return worker && worker->rescue_wq;
-//}
-//
+
+/**
+ * current_is_workqueue_rescuer - is %current workqueue rescuer?
+ *
+ * Determine whether %current is a workqueue rescuer.  Can be used from
+ * work functions to determine whether it's being run off the rescuer task.
+ *
+ * Return: %true if %current is a workqueue rescuer. %false otherwise.
+ */
+bool current_is_workqueue_rescuer(void)
+{
+	struct worker *worker = current_wq_worker();
+
+	return worker && worker->rescue_wq;
+}
+EXPORT_SYMBOL(current_is_workqueue_rescuer);
+
 ///**
 // * workqueue_congested - test whether a workqueue is congested
 // * @cpu: CPU in question
@@ -4573,29 +4574,29 @@ EXPORT_SYMBOL_GPL(workqueue_set_max_active);
 //	return ret;
 //}
 //EXPORT_SYMBOL_GPL(work_busy);
-//
-///**
-// * set_worker_desc - set description for the current work item
-// * @fmt: printf-style format string
-// * @...: arguments for the format string
-// *
-// * This function can be called by a running work function to describe what
-// * the work item is about.  If the worker task gets dumped, this
-// * information will be printed out together to help debugging.  The
-// * description can be at most WORKER_DESC_LEN including the trailing '\0'.
-// */
-//void set_worker_desc(const char *fmt, ...)
-//{
-//	struct worker *worker = current_wq_worker();
-//	va_list args;
-//
-//	if (worker) {
-//		va_start(args, fmt);
-//		vsnprintf(worker->desc, sizeof(worker->desc), fmt, args);
-//		va_end(args);
-//	}
-//}
-//EXPORT_SYMBOL_GPL(set_worker_desc);
+
+/**
+ * set_worker_desc - set description for the current work item
+ * @fmt: printf-style format string
+ * @...: arguments for the format string
+ *
+ * This function can be called by a running work function to describe what
+ * the work item is about.  If the worker task gets dumped, this
+ * information will be printed out together to help debugging.  The
+ * description can be at most WORKER_DESC_LEN including the trailing '\0'.
+ */
+void set_worker_desc(const char *fmt, ...)
+{
+	struct worker *worker = current_wq_worker();
+	va_list args;
+
+	if (worker) {
+		va_start(args, fmt);
+		vsnprintf(worker->desc, sizeof(worker->desc), fmt, args);
+		va_end(args);
+	}
+}
+EXPORT_SYMBOL_GPL(set_worker_desc);
 
 /**
  * print_worker_info - print out worker information and description

@@ -895,14 +895,14 @@ void bdi_put(struct backing_dev_info *bdi)
 	kref_put(&bdi->refcnt, release_bdi);
 }
 
-//const char *bdi_dev_name(struct backing_dev_info *bdi)
-//{
-//	if (!bdi || !bdi->dev)
-//		return bdi_unknown_name;
-//	return bdi->dev_name;
-//}
-//EXPORT_SYMBOL_GPL(bdi_dev_name);
-//
+const char *bdi_dev_name(struct backing_dev_info *bdi)
+{
+	if (!bdi || !bdi->dev)
+		return bdi_unknown_name;
+	return bdi->dev_name;
+}
+EXPORT_SYMBOL_GPL(bdi_dev_name);
+
 //static wait_queue_head_t congestion_wqh[2] = {
 //		__WAIT_QUEUE_HEAD_INITIALIZER(congestion_wqh[0]),
 //		__WAIT_QUEUE_HEAD_INITIALIZER(congestion_wqh[1])
