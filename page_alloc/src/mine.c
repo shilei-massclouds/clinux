@@ -1,8 +1,6 @@
 #include <linux/types.h>
 #include "../../booter/src/booter.h"
 
-CL_MINE(extfrag_for_order)
-CL_MINE(fragmentation_index)
 CL_MINE(__isolate_free_page)
 CL_MINE(isolate_movable_page)
 CL_MINE(migrate_pages)
