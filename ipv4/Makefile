@@ -9,5 +9,6 @@ obj_y += inetpeer.o
 obj_y += igmp.o
 obj_y += ip_fragment.o
 obj_y += inet_fragment.o
+obj_y += metrics.o
 
 obj_y += mine.o

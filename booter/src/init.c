@@ -4604,3 +4604,11 @@ __weak char *__d_path(const struct path *path,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(__d_path);
+
+__weak struct dst_metrics *ip_fib_metrics_init(struct net *net, struct nlattr *fc_mx,
+					int fc_mx_len,
+					struct netlink_ext_ack *extack)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(ip_fib_metrics_init);
