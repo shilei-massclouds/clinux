@@ -858,11 +858,13 @@ __weak void recalc_sigpending(void)
 }
 EXPORT_SYMBOL(recalc_sigpending);
 
+/*
 void cgroup_enter_frozen(void)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(cgroup_enter_frozen);
+*/
 
 __weak void ptrace_notify(int exit_code)
 {
@@ -889,18 +891,12 @@ __weak bool task_set_jobctl_pending(struct task_struct *task, unsigned long mask
 }
 EXPORT_SYMBOL(task_set_jobctl_pending);
 
+/*
 void cgroup_leave_frozen(bool always_leave)
 {
     booter_panic("No impl.\n");
 }
 EXPORT_SYMBOL(cgroup_leave_frozen);
-
-/*
-int cap_vm_enough_memory(struct mm_struct *mm, long pages)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(cap_vm_enough_memory);
 */
 
 __weak void __noreturn do_exit(long code)
