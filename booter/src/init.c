@@ -739,7 +739,7 @@ __weak int is_current_pgrp_orphaned(void)
 }
 EXPORT_SYMBOL(is_current_pgrp_orphaned);
 
-char *d_path(const struct path *path, char *buf, int buflen)
+__weak char *d_path(const struct path *path, char *buf, int buflen)
 {
     booter_panic("No impl 'sched'.");
 }
@@ -2020,27 +2020,6 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(generic_file_splice_read);
-
-char *dynamic_dname(struct dentry *dentry, char *buffer, int buflen,
-            const char *fmt, ...)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(dynamic_dname);
-
-/*
-errseq_t errseq_sample(errseq_t *eseq)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(errseq_sample);
-*/
-
-char *simple_dname(struct dentry *dentry, char *buffer, int buflen)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL(simple_dname);
 
 __weak void __init files_maxfiles_init(void)
 {
@@ -4615,3 +4594,17 @@ __weak struct sk_buff *dev_hard_start_xmit(struct sk_buff *first, struct net_dev
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(dev_hard_start_xmit);
+
+__weak char *dentry_path(struct dentry *dentry, char *buf, int buflen)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dentry_path);
+
+__weak char *__d_path(const struct path *path,
+	       const struct path *root,
+	       char *buf, int buflen)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(__d_path);

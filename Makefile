@@ -59,7 +59,7 @@ components := \
 	page_alloc slub vmalloc mm_util vmscan ioremap gup \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref rtmutex \
 	ipc ipc_sem ipc_shm watchdog noinitramfs oom_kill \
-	fs inode dcache file_table do_mounts file \
+	fs inode dcache d_path file_table do_mounts file \
 	open readahead async xattr user \
 	cred groups posix_acl user_namespace nsproxy fs_namespace pid_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \

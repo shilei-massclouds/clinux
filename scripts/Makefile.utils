@@ -29,6 +29,8 @@ define riscv64_install_apps
   @mkdir -p ./mnt
   @sudo mount $(1) ./mnt
 
+  -@sudo cp -rf ../../gitWork/busybox/output_riscv64/* ./mnt/
+
   @sudo mkdir -p ./mnt/bin
   @sudo mkdir -p ./mnt/sbin
   @sudo mkdir -p ./mnt/lib
@@ -37,7 +39,9 @@ define riscv64_install_apps
   @sudo mkdir -p ./mnt/opt
 
   @sudo cp -r ./linux_apps/etc ./mnt/
-  @sudo cp ./linux_apps/build/* ./mnt/sbin/
+  #@sudo cp ./linux_apps/build/* ./mnt/sbin/
+  @sudo rm -f ./mnt/sbin/init
+  -@sudo cp ../../gitWork/dash/src/dash ./mnt/sbin/init
 
   @sudo cp /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 ./mnt/lib/
   @sudo cp /usr/riscv64-linux-gnu/lib/libc.so.6 ./mnt/lib/
@@ -46,6 +50,7 @@ define riscv64_install_apps
 
   ls -l ./mnt/etc
   ls -l ./mnt/sbin
+  ls -l ./mnt/bin
   @sudo umount ./mnt
   @rm -rf ./mnt
 endef
