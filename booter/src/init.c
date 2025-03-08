@@ -3522,11 +3522,13 @@ __weak void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
 }
 EXPORT_SYMBOL_GPL(__icmp_send);
 
+/*
 int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(ip4_datagram_connect);
+*/
 
 /*
 void ip_flush_pending_frames(struct sock *sk)
@@ -3584,11 +3586,13 @@ int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
 }
 EXPORT_SYMBOL(ip_cmsg_send);
 
+/*
 void ip4_datagram_release_cb(struct sock *sk)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(ip4_datagram_release_cb);
+*/
 
 int proc_dointvec_jiffies(struct ctl_table *table, int write,
               void *buffer, size_t *lenp, loff_t *ppos)
