@@ -3150,6 +3150,8 @@ static int virtnet_probe(struct virtio_device *vdev)
 
 	pr_debug("virtnet: registered device %s with %d RX and TX vq's\n",
 		 dev->name, max_queue_pairs);
+	printk("----------------------------> virtnet: registered device %s with %d RX and TX vq's\n",
+		 dev->name, max_queue_pairs);
 
 	return 0;
 

@@ -1,0 +1,2 @@
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /tmp tmpfs rw,nosuid,nodev,noexec,relatime 0 0

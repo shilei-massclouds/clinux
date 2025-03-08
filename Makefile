@@ -17,9 +17,11 @@ else
 endif
 export DEBUG_INC
 
-DISK_IMG := $(CURDIR)/tools/mk_rootfs/rootfs.ext2
+FS_TYPE := ext2
+DISK_IMG := disk.img
 
 include ./scripts/Makefile.include
+include ./scripts/Makefile.utils
 include include/config/auto.conf
 
 # QEMU
@@ -75,7 +77,6 @@ components := \
 	virtio_mmio virtio virtio_blk virtio_net ext2 binfmt_elf \
 	sys ioctl fcntl nlattr \
 	early_printk printk panic bug dump_stack show_mem
-	#partitions \
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init
@@ -130,6 +131,10 @@ vdso_payload:
 	$(MAKE) -f ./vdso_payload/Makefile obj=$@
 
 run: build
+ifeq ($(wildcard $(DISK_IMG)),)
+	@printf "warning: image \"$(DISK_IMG)\" needs to be built first!\n"
+	@exit 1
+endif
 	$(QEMU) $(QEMU_ARGS)
 
 clean:
@@ -139,6 +144,14 @@ clean:
 preclean:
 	@rm -f $(CL_INIT).c
 
+linux_apps:
+	@make -C $@
+
+disk_img: linux_apps
+	rm -f $(DISK_IMG)
+	$(call make_disk_image,$(FS_TYPE),$(DISK_IMG))
+	$(call $(ARCH)_install_apps,$(DISK_IMG))
+
 FORCE:
 
-.PHONY: all build tools necessities components predirs vdso_payload clean top_component FORCE
+.PHONY: all build tools necessities components predirs vdso_payload clean top_component disk_img linux_apps FORCE
