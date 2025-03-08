@@ -570,12 +570,10 @@ struct socket *sock_alloc(void)
 	struct inode *inode;
 	struct socket *sock;
 
-    printk("%s: 1 (%p)\n", __func__, sock_mnt);
 	inode = new_inode_pseudo(sock_mnt->mnt_sb);
 	if (!inode)
 		return NULL;
 
-    printk("%s: 2\n", __func__);
 	sock = SOCKET_I(inode);
 
 	inode->i_ino = get_next_ino();

@@ -508,3 +508,9 @@ __weak void resched_cpu(int cpu)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(resched_cpu);
+
+__weak int task_curr(const struct task_struct *p)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(task_curr);

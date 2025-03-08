@@ -1652,16 +1652,16 @@ static int effective_prio(struct task_struct *p)
 	return p->prio;
 }
 
-///**
-// * task_curr - is this task currently executing on a CPU?
-// * @p: the task in question.
-// *
-// * Return: 1 if the task is currently executing. 0 otherwise.
-// */
-//inline int task_curr(const struct task_struct *p)
-//{
-//	return cpu_curr(task_cpu(p)) == p;
-//}
+/**
+ * task_curr - is this task currently executing on a CPU?
+ * @p: the task in question.
+ *
+ * Return: 1 if the task is currently executing. 0 otherwise.
+ */
+int task_curr(const struct task_struct *p)
+{
+	return cpu_curr(task_cpu(p)) == p;
+}
 
 /*
  * switched_from, switched_to and prio_changed must _NOT_ drop rq->lock,
