@@ -3187,19 +3187,19 @@ int path_mount(const char *dev_name, struct path *path,
 }
 EXPORT_SYMBOL(path_mount);
 
-//long do_mount(const char *dev_name, const char __user *dir_name,
-//		const char *type_page, unsigned long flags, void *data_page)
-//{
-//	struct path path;
-//	int ret;
-//
-//	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
-//	if (ret)
-//		return ret;
-//	ret = path_mount(dev_name, &path, type_page, flags, data_page);
-//	path_put(&path);
-//	return ret;
-//}
+long do_mount(const char *dev_name, const char __user *dir_name,
+		const char *type_page, unsigned long flags, void *data_page)
+{
+	struct path path;
+	int ret;
+
+	ret = user_path_at(AT_FDCWD, dir_name, LOOKUP_FOLLOW, &path);
+	if (ret)
+		return ret;
+	ret = path_mount(dev_name, &path, type_page, flags, data_page);
+	path_put(&path);
+	return ret;
+}
 
 static struct ucounts *inc_mnt_namespaces(struct user_namespace *ns)
 {
@@ -3380,41 +3380,41 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
 //	return path.dentry;
 //}
 //EXPORT_SYMBOL(mount_subtree);
-//
-//SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
-//		char __user *, type, unsigned long, flags, void __user *, data)
-//{
-//	int ret;
-//	char *kernel_type;
-//	char *kernel_dev;
-//	void *options;
-//
-//	kernel_type = copy_mount_string(type);
-//	ret = PTR_ERR(kernel_type);
-//	if (IS_ERR(kernel_type))
-//		goto out_type;
-//
-//	kernel_dev = copy_mount_string(dev_name);
-//	ret = PTR_ERR(kernel_dev);
-//	if (IS_ERR(kernel_dev))
-//		goto out_dev;
-//
-//	options = copy_mount_options(data);
-//	ret = PTR_ERR(options);
-//	if (IS_ERR(options))
-//		goto out_data;
-//
-//	ret = do_mount(kernel_dev, dir_name, kernel_type, flags, options);
-//
-//	kfree(options);
-//out_data:
-//	kfree(kernel_dev);
-//out_dev:
-//	kfree(kernel_type);
-//out_type:
-//	return ret;
-//}
-//
+
+SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
+		char __user *, type, unsigned long, flags, void __user *, data)
+{
+	int ret;
+	char *kernel_type;
+	char *kernel_dev;
+	void *options;
+
+	kernel_type = copy_mount_string(type);
+	ret = PTR_ERR(kernel_type);
+	if (IS_ERR(kernel_type))
+		goto out_type;
+
+	kernel_dev = copy_mount_string(dev_name);
+	ret = PTR_ERR(kernel_dev);
+	if (IS_ERR(kernel_dev))
+		goto out_dev;
+
+	options = copy_mount_options(data);
+	ret = PTR_ERR(options);
+	if (IS_ERR(options))
+		goto out_data;
+
+	ret = do_mount(kernel_dev, dir_name, kernel_type, flags, options);
+
+	kfree(options);
+out_data:
+	kfree(kernel_dev);
+out_dev:
+	kfree(kernel_type);
+out_type:
+	return ret;
+}
+
 ///*
 // * Create a kernel mount representation for a new, prepared superblock
 // * (specified by fs_fd) and attach to an open_tree-like file descriptor.

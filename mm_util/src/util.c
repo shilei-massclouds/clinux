@@ -207,38 +207,38 @@ EXPORT_SYMBOL(memdup_user);
 //	return p;
 //}
 //EXPORT_SYMBOL(vmemdup_user);
-//
-///**
-// * strndup_user - duplicate an existing string from user space
-// * @s: The string to duplicate
-// * @n: Maximum number of bytes to copy, including the trailing NUL.
-// *
-// * Return: newly allocated copy of @s or an ERR_PTR() in case of error
-// */
-//char *strndup_user(const char __user *s, long n)
-//{
-//	char *p;
-//	long length;
-//
-//	length = strnlen_user(s, n);
-//
-//	if (!length)
-//		return ERR_PTR(-EFAULT);
-//
-//	if (length > n)
-//		return ERR_PTR(-EINVAL);
-//
-//	p = memdup_user(s, length);
-//
-//	if (IS_ERR(p))
-//		return p;
-//
-//	p[length - 1] = '\0';
-//
-//	return p;
-//}
-//EXPORT_SYMBOL(strndup_user);
-//
+
+/**
+ * strndup_user - duplicate an existing string from user space
+ * @s: The string to duplicate
+ * @n: Maximum number of bytes to copy, including the trailing NUL.
+ *
+ * Return: newly allocated copy of @s or an ERR_PTR() in case of error
+ */
+char *strndup_user(const char __user *s, long n)
+{
+	char *p;
+	long length;
+
+	length = strnlen_user(s, n);
+
+	if (!length)
+		return ERR_PTR(-EFAULT);
+
+	if (length > n)
+		return ERR_PTR(-EINVAL);
+
+	p = memdup_user(s, length);
+
+	if (IS_ERR(p))
+		return p;
+
+	p[length - 1] = '\0';
+
+	return p;
+}
+EXPORT_SYMBOL(strndup_user);
+
 ///**
 // * memdup_user_nul - duplicate memory region from user space and NUL-terminate
 // *
