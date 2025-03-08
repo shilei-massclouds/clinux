@@ -60,7 +60,7 @@ components := \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref rtmutex \
 	ipc ipc_sem ipc_shm watchdog noinitramfs oom_kill \
 	fs inode dcache d_path file_table do_mounts file \
-	open readahead async xattr user \
+	open readahead async xattr user readdir \
 	cred groups posix_acl user_namespace nsproxy fs_namespace pid_namespace \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
 	fs_context fs_parser fs_struct namei libfs debugfs \
