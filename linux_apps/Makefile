@@ -1,4 +1,4 @@
-TARGETS := init mount
+TARGETS := init hello
 
 CC := riscv64-linux-gnu-gcc
 STRIP := riscv64-linux-gnu-strip

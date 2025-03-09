@@ -37,11 +37,12 @@ define riscv64_install_apps
   @sudo mkdir -p ./mnt/proc
   @sudo mkdir -p ./mnt/dev
   @sudo mkdir -p ./mnt/opt
+  @sudo mkdir -p ./mnt/tmp
 
   @sudo cp -r ./linux_apps/etc ./mnt/
-  #@sudo cp ./linux_apps/build/* ./mnt/sbin/
   @sudo rm -f ./mnt/sbin/init
-  -@sudo cp ../../gitWork/dash/src/dash ./mnt/sbin/init
+  @sudo cp ./linux_apps/build/* ./mnt/sbin/
+  -@sudo cp ../../gitWork/dash/src/dash ./mnt/bin/
 
   @sudo cp /usr/riscv64-linux-gnu/lib/ld-linux-riscv64-lp64d.so.1 ./mnt/lib/
   @sudo cp /usr/riscv64-linux-gnu/lib/libc.so.6 ./mnt/lib/
