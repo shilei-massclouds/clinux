@@ -3163,7 +3163,7 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
 EXPORT_SYMBOL(skb_copy_datagram_iter);
 */
 
-int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
+__weak int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
 {
     booter_panic("No impl!\n");
 }
@@ -4397,7 +4397,7 @@ struct net_device *blackhole_netdev;
 EXPORT_SYMBOL(blackhole_netdev);
 */
 
-void bpf_warn_invalid_xdp_action(u32 act)
+__weak void bpf_warn_invalid_xdp_action(u32 act)
 {
     booter_panic("No impl.");
 }
@@ -4773,3 +4773,86 @@ __weak int ip_ra_control(struct sock *sk, unsigned char on,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(ip_ra_control);
+
+DEFINE_STATIC_KEY_FALSE(bpf_sk_lookup_enabled);
+EXPORT_SYMBOL(bpf_sk_lookup_enabled);
+
+__weak int copy_bpf_fprog_from_user(struct sock_fprog *dst, sockptr_t src, int len)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
+
+__weak int xdp_do_generic_redirect(struct net_device *dev, struct sk_buff *skb,
+			    struct xdp_buff *xdp, struct bpf_prog *xdp_prog)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(xdp_do_generic_redirect);
+
+__weak int sk_attach_bpf(u32 ufd, struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sk_attach_bpf);
+
+__weak void bpf_prog_change_xdp(struct bpf_prog *prev_prog, struct bpf_prog *prog)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(bpf_prog_change_xdp);
+
+__weak bool sk_filter_charge(struct sock *sk, struct sk_filter *fp)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sk_filter_charge);
+
+__weak int sk_detach_filter(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(sk_detach_filter);
+
+__weak void sk_filter_uncharge(struct sock *sk, struct sk_filter *fp)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sk_filter_uncharge);
+
+u64 sock_gen_cookie(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sock_gen_cookie);
+
+__weak int sk_attach_filter(struct sock_fprog *fprog, struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(sk_attach_filter);
+
+__weak int sk_reuseport_attach_filter(struct sock_fprog *fprog, struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sk_reuseport_attach_filter);
+
+void __skb_get_hash(struct sk_buff *skb)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__skb_get_hash);
+
+__weak int sk_reuseport_attach_bpf(u32 ufd, struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sk_reuseport_attach_bpf);
+
+__weak int sk_get_filter(struct sock *sk, struct sock_filter __user *ubuf,
+		  unsigned int len)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sk_get_filter);

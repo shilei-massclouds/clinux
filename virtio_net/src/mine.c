@@ -3,5 +3,3 @@
 
 CL_MINE(net_failover_create)
 CL_MINE(net_failover_destroy)
-CL_MINE(xdp_do_flush)
-CL_MINE(xdp_do_redirect)

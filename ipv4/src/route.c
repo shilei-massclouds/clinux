@@ -1419,6 +1419,7 @@ u32 ip_mtu_from_fib_result(struct fib_result *res, __be32 daddr)
 
 	return mtu - lwtunnel_headroom(nhc->nhc_lwtstate, mtu);
 }
+EXPORT_SYMBOL(ip_mtu_from_fib_result);
 
 static bool rt_bind_exception(struct rtable *rt, struct fib_nh_exception *fnhe,
 			      __be32 daddr, const bool do_cache)

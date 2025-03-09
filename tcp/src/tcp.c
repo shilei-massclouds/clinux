@@ -2974,6 +2974,7 @@ int tcp_sock_set_keepidle_locked(struct sock *sk, int val)
 
 	return 0;
 }
+EXPORT_SYMBOL(tcp_sock_set_keepidle_locked);
 
 int tcp_sock_set_keepidle(struct sock *sk, int val)
 {

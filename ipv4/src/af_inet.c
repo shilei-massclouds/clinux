@@ -553,6 +553,7 @@ out_release_sock:
 out:
 	return err;
 }
+EXPORT_SYMBOL(__inet_bind);
 
 int inet_dgram_connect(struct socket *sock, struct sockaddr *uaddr,
 		       int addr_len, int flags)

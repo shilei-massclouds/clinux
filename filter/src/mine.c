@@ -1,0 +1,21 @@
+#include <linux/types.h>
+#include "../../booter/src/booter.h"
+
+CL_MINE(__bpf_call_base)
+CL_MINE(bpf_event_output)
+CL_MINE(bpf_get_raw_cpu_id)
+CL_MINE(bpf_internal_load_pointer_neg_helper)
+CL_MINE(bpf_jit_compile)
+CL_MINE(bpf_prog_alloc)
+CL_MINE(__bpf_prog_free)
+CL_MINE(bpf_prog_free)
+CL_MINE(bpf_prog_realloc)
+CL_MINE(bpf_prog_select_runtime)
+CL_MINE(bpf_user_rnd_init_once)
+CL_MINE(bpf_user_rnd_u32)
+CL_MINE(__inet6_lookup_established)
+CL_MINE(inet6_lookup_listener)
+CL_MINE(inet_proto_csum_replace4)
+CL_MINE(inet_proto_csum_replace_by_diff)
+CL_MINE(reuseport_attach_prog)
+CL_MINE(skb_get_poff)

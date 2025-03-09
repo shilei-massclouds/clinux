@@ -73,6 +73,7 @@ u64 net_gen_cookie(struct net *net)
 		atomic64_cmpxchg(&net->net_cookie, 0, res);
 	}
 }
+EXPORT_SYMBOL(net_gen_cookie);
 
 static struct net_generic *net_alloc_generic(void)
 {

@@ -19,6 +19,3 @@ cl_udp_init(void)
 EXPORT_SYMBOL(cl_udp_init);
 
 DEFINE_ENABLE_FUNC(udp);
-
-DEFINE_STATIC_KEY_FALSE(bpf_sk_lookup_enabled);
-EXPORT_SYMBOL(bpf_sk_lookup_enabled);
