@@ -3154,115 +3154,115 @@ void kmem_cache_free(struct kmem_cache *s, void *x)
 	trace_kmem_cache_free(_RET_IP_, x);
 }
 
-//struct detached_freelist {
-//	struct page *page;
-//	void *tail;
-//	void *freelist;
-//	int cnt;
-//	struct kmem_cache *s;
-//};
-//
-///*
-// * This function progressively scans the array with free objects (with
-// * a limited look ahead) and extract objects belonging to the same
-// * page.  It builds a detached freelist directly within the given
-// * page/objects.  This can happen without any need for
-// * synchronization, because the objects are owned by running process.
-// * The freelist is build up as a single linked list in the objects.
-// * The idea is, that this detached freelist can then be bulk
-// * transferred to the real freelist(s), but only requiring a single
-// * synchronization primitive.  Look ahead in the array is limited due
-// * to performance reasons.
-// */
-//static inline
-//int build_detached_freelist(struct kmem_cache *s, size_t size,
-//			    void **p, struct detached_freelist *df)
-//{
-//	size_t first_skipped_index = 0;
-//	int lookahead = 3;
-//	void *object;
-//	struct page *page;
-//
-//	/* Always re-init detached_freelist */
-//	df->page = NULL;
-//
-//	do {
-//		object = p[--size];
-//		/* Do we need !ZERO_OR_NULL_PTR(object) here? (for kfree) */
-//	} while (!object && size);
-//
-//	if (!object)
-//		return 0;
-//
-//	page = virt_to_head_page(object);
-//	if (!s) {
-//		/* Handle kalloc'ed objects */
-//		if (unlikely(!PageSlab(page))) {
-//			BUG_ON(!PageCompound(page));
-//			kfree_hook(object);
-//			__free_pages(page, compound_order(page));
-//			p[size] = NULL; /* mark object processed */
-//			return size;
-//		}
-//		/* Derive kmem_cache from object */
-//		df->s = page->slab_cache;
-//	} else {
-//		df->s = cache_from_obj(s, object); /* Support for memcg */
-//	}
-//
-//	/* Start new detached freelist */
-//	df->page = page;
-//	set_freepointer(df->s, object, NULL);
-//	df->tail = object;
-//	df->freelist = object;
-//	p[size] = NULL; /* mark object processed */
-//	df->cnt = 1;
-//
-//	while (size) {
-//		object = p[--size];
-//		if (!object)
-//			continue; /* Skip processed objects */
-//
-//		/* df->page is always set at this point */
-//		if (df->page == virt_to_head_page(object)) {
-//			/* Opportunity build freelist */
-//			set_freepointer(df->s, object, df->freelist);
-//			df->freelist = object;
-//			df->cnt++;
-//			p[size] = NULL; /* mark object processed */
-//
-//			continue;
-//		}
-//
-//		/* Limit look ahead search */
-//		if (!--lookahead)
-//			break;
-//
-//		if (!first_skipped_index)
-//			first_skipped_index = size + 1;
-//	}
-//
-//	return first_skipped_index;
-//}
-//
-///* Note that interrupts must be enabled when calling this function. */
-//void kmem_cache_free_bulk(struct kmem_cache *s, size_t size, void **p)
-//{
-//	if (WARN_ON(!size))
-//		return;
-//
-//	do {
-//		struct detached_freelist df;
-//
-//		size = build_detached_freelist(s, size, p, &df);
-//		if (!df.page)
-//			continue;
-//
-//		slab_free(df.s, df.page, df.freelist, df.tail, df.cnt,_RET_IP_);
-//	} while (likely(size));
-//}
-//EXPORT_SYMBOL(kmem_cache_free_bulk);
-//
+struct detached_freelist {
+	struct page *page;
+	void *tail;
+	void *freelist;
+	int cnt;
+	struct kmem_cache *s;
+};
+
+/*
+ * This function progressively scans the array with free objects (with
+ * a limited look ahead) and extract objects belonging to the same
+ * page.  It builds a detached freelist directly within the given
+ * page/objects.  This can happen without any need for
+ * synchronization, because the objects are owned by running process.
+ * The freelist is build up as a single linked list in the objects.
+ * The idea is, that this detached freelist can then be bulk
+ * transferred to the real freelist(s), but only requiring a single
+ * synchronization primitive.  Look ahead in the array is limited due
+ * to performance reasons.
+ */
+static inline
+int build_detached_freelist(struct kmem_cache *s, size_t size,
+			    void **p, struct detached_freelist *df)
+{
+	size_t first_skipped_index = 0;
+	int lookahead = 3;
+	void *object;
+	struct page *page;
+
+	/* Always re-init detached_freelist */
+	df->page = NULL;
+
+	do {
+		object = p[--size];
+		/* Do we need !ZERO_OR_NULL_PTR(object) here? (for kfree) */
+	} while (!object && size);
+
+	if (!object)
+		return 0;
+
+	page = virt_to_head_page(object);
+	if (!s) {
+		/* Handle kalloc'ed objects */
+		if (unlikely(!PageSlab(page))) {
+			BUG_ON(!PageCompound(page));
+			kfree_hook(object);
+			__free_pages(page, compound_order(page));
+			p[size] = NULL; /* mark object processed */
+			return size;
+		}
+		/* Derive kmem_cache from object */
+		df->s = page->slab_cache;
+	} else {
+		df->s = cache_from_obj(s, object); /* Support for memcg */
+	}
+
+	/* Start new detached freelist */
+	df->page = page;
+	set_freepointer(df->s, object, NULL);
+	df->tail = object;
+	df->freelist = object;
+	p[size] = NULL; /* mark object processed */
+	df->cnt = 1;
+
+	while (size) {
+		object = p[--size];
+		if (!object)
+			continue; /* Skip processed objects */
+
+		/* df->page is always set at this point */
+		if (df->page == virt_to_head_page(object)) {
+			/* Opportunity build freelist */
+			set_freepointer(df->s, object, df->freelist);
+			df->freelist = object;
+			df->cnt++;
+			p[size] = NULL; /* mark object processed */
+
+			continue;
+		}
+
+		/* Limit look ahead search */
+		if (!--lookahead)
+			break;
+
+		if (!first_skipped_index)
+			first_skipped_index = size + 1;
+	}
+
+	return first_skipped_index;
+}
+
+/* Note that interrupts must be enabled when calling this function. */
+void kmem_cache_free_bulk(struct kmem_cache *s, size_t size, void **p)
+{
+	if (WARN_ON(!size))
+		return;
+
+	do {
+		struct detached_freelist df;
+
+		size = build_detached_freelist(s, size, p, &df);
+		if (!df.page)
+			continue;
+
+		slab_free(df.s, df.page, df.freelist, df.tail, df.cnt,_RET_IP_);
+	} while (likely(size));
+}
+EXPORT_SYMBOL(kmem_cache_free_bulk);
+
 ///* Note that interrupts must be enabled when calling this function. */
 //int kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t size,
 //			  void **p)

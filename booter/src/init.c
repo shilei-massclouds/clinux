@@ -3654,11 +3654,13 @@ __weak void rt_cache_flush(struct net *net)
 }
 EXPORT_SYMBOL(rt_cache_flush);
 
+/*
 int call_netevent_notifiers(unsigned long val, void *v)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(call_netevent_notifiers);
+*/
 
 int proc_dointvec_userhz_jiffies(struct ctl_table *table, int write,
                  void *buffer, size_t *lenp, loff_t *ppos)
