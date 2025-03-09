@@ -1884,7 +1884,6 @@ void *skb_push(struct sk_buff *skb, unsigned int len)
 		skb_under_panic(skb, len, __builtin_return_address(0));
 	return skb->data;
 }
-EXPORT_SYMBOL(skb_push);
 
 /**
  *	skb_pull - remove data from the start of a buffer
@@ -2166,7 +2165,6 @@ end:
 
 	return skb_tail_pointer(skb);
 }
-EXPORT_SYMBOL(__pskb_pull_tail);
 
 /**
  *	skb_copy_bits - copy bits from skb to kernel buffer
@@ -2259,7 +2257,6 @@ int skb_copy_bits(const struct sk_buff *skb, int offset, void *to, int len)
 fault:
 	return -EFAULT;
 }
-EXPORT_SYMBOL(skb_copy_bits);
 
 /*
  * Callback from splice_to_pipe(), if we need to release some pages
@@ -4722,7 +4719,6 @@ void skb_tstamp_tx(struct sk_buff *orig_skb,
 	return __skb_tstamp_tx(orig_skb, hwtstamps, orig_skb->sk,
 			       SCM_TSTAMP_SND);
 }
-EXPORT_SYMBOL_GPL(skb_tstamp_tx);
 
 void skb_complete_wifi_ack(struct sk_buff *skb, bool acked)
 {

@@ -51,7 +51,6 @@ int ethtool_op_get_ts_info(struct net_device *dev, struct ethtool_ts_info *info)
 	info->phc_index = -1;
 	return 0;
 }
-EXPORT_SYMBOL(ethtool_op_get_ts_info);
 
 /* Handlers for each ethtool command */
 

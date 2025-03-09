@@ -616,7 +616,6 @@ void dev_add_offload(struct packet_offload *po)
 	list_add_rcu(&po->list, elem->list.prev);
 	spin_unlock(&offload_lock);
 }
-EXPORT_SYMBOL(dev_add_offload);
 
 /**
  *	__dev_remove_offload	 - remove offload handler
@@ -792,7 +791,6 @@ int __init netdev_boot_setup(char *str)
 	/* Add new entry to the list */
 	return netdev_boot_setup_add(str, &map);
 }
-EXPORT_SYMBOL(netdev_boot_setup);
 
 __setup("netdev=", netdev_boot_setup);
 
@@ -4815,7 +4813,6 @@ int netif_rx(struct sk_buff *skb)
 
 	return ret;
 }
-EXPORT_SYMBOL(netif_rx);
 
 int netif_rx_ni(struct sk_buff *skb)
 {
@@ -5947,7 +5944,6 @@ struct packet_offload *gro_find_receive_by_type(__be16 type)
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(gro_find_receive_by_type);
 
 struct packet_offload *gro_find_complete_by_type(__be16 type)
 {
@@ -5961,7 +5957,6 @@ struct packet_offload *gro_find_complete_by_type(__be16 type)
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(gro_find_complete_by_type);
 
 static void napi_skb_free_stolen_head(struct sk_buff *skb)
 {
@@ -10027,7 +10022,6 @@ int register_netdev(struct net_device *dev)
 	rtnl_unlock();
 	return err;
 }
-EXPORT_SYMBOL(register_netdev);
 
 int netdev_refcnt_read(const struct net_device *dev)
 {
@@ -10407,7 +10401,6 @@ free_dev:
 	netdev_freemem(dev);
 	return NULL;
 }
-EXPORT_SYMBOL(alloc_netdev_mqs);
 
 /**
  * free_netdev - free network device
@@ -10451,7 +10444,6 @@ void free_netdev(struct net_device *dev)
 	/* will free via device release */
 	put_device(&dev->dev);
 }
-EXPORT_SYMBOL(free_netdev);
 
 /**
  *	synchronize_net -  Synchronize with packet receive processing

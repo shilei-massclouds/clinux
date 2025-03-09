@@ -179,7 +179,6 @@ void dst_release(struct dst_entry *dst)
 			call_rcu(&dst->rcu_head, dst_destroy_rcu);
 	}
 }
-EXPORT_SYMBOL(dst_release);
 
 void dst_release_immediate(struct dst_entry *dst)
 {
@@ -285,7 +284,6 @@ struct metadata_dst *metadata_dst_alloc(u8 optslen, enum metadata_type type,
 
 	return md_dst;
 }
-EXPORT_SYMBOL_GPL(metadata_dst_alloc);
 
 void metadata_dst_free(struct metadata_dst *md_dst)
 {

@@ -332,7 +332,6 @@ int eth_mac_addr(struct net_device *dev, void *p)
 	eth_commit_mac_addr_change(dev, p);
 	return 0;
 }
-EXPORT_SYMBOL(eth_mac_addr);
 
 int eth_validate_addr(struct net_device *dev)
 {
@@ -350,6 +349,7 @@ const struct header_ops eth_header_ops ____cacheline_aligned = {
 	.cache_update	= eth_header_cache_update,
 	.parse_protocol	= eth_header_parse_protocol,
 };
+EXPORT_SYMBOL(eth_header_ops);
 
 /**
  * ether_setup - setup Ethernet network device

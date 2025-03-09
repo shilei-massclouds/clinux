@@ -3375,13 +3375,11 @@ __poll_t datagram_poll(struct file *file, struct socket *sock,
 EXPORT_SYMBOL(datagram_poll);
 */
 
-/*
-void dst_release(struct dst_entry *dst)
+__weak void dst_release(struct dst_entry *dst)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(dst_release);
-*/
 
 __weak int tcp_v4_early_demux(struct sk_buff *skb)
 {
@@ -4394,8 +4392,10 @@ __weak struct net_device *__dev_get_by_index(struct net *net, int ifindex)
 }
 EXPORT_SYMBOL(__dev_get_by_index);
 
+/*
 struct net_device *blackhole_netdev;
 EXPORT_SYMBOL(blackhole_netdev);
+*/
 
 void bpf_warn_invalid_xdp_action(u32 act)
 {
@@ -4671,3 +4671,98 @@ __weak void ip_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int pr
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(ip_protocol_deliver_rcu);
+
+__weak struct metadata_dst *metadata_dst_alloc(u8 optslen, enum metadata_type type,
+					gfp_t flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(metadata_dst_alloc);
+
+__weak int eth_mac_addr(struct net_device *dev, void *p)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(eth_mac_addr);
+
+__weak void skb_tstamp_tx(struct sk_buff *orig_skb,
+		   struct skb_shared_hwtstamps *hwtstamps)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(skb_tstamp_tx);
+
+__weak int skb_copy_bits(const struct sk_buff *skb, int offset, void *to, int len)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(skb_copy_bits);
+
+__weak struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+		unsigned char name_assign_type,
+		void (*setup)(struct net_device *),
+		unsigned int txqs, unsigned int rxqs)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(alloc_netdev_mqs);
+
+__weak struct packet_offload *gro_find_complete_by_type(__be16 type)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(gro_find_complete_by_type);
+
+__weak void *skb_push(struct sk_buff *skb, unsigned int len)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(skb_push);
+
+__weak void *__pskb_pull_tail(struct sk_buff *skb, int delta)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__pskb_pull_tail);
+
+__weak int __init netdev_boot_setup(char *str)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_boot_setup);
+
+__weak void dev_add_offload(struct packet_offload *po)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_add_offload);
+
+__weak struct packet_offload *gro_find_receive_by_type(__be16 type)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(gro_find_receive_by_type);
+
+__weak int register_netdev(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(register_netdev);
+
+__weak void free_netdev(struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(free_netdev);
+
+__weak int netif_rx(struct sk_buff *skb)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netif_rx);
+
+__weak int ethtool_op_get_ts_info(struct net_device *dev, struct ethtool_ts_info *info)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ethtool_op_get_ts_info);
