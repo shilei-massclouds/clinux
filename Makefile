@@ -53,7 +53,7 @@ components := \
 	clocksource pid seq_file errseq futex dnotify \
 	cpu task cgroup ksysfs dma up notify fs_attr fs_stat fs_writeback \
 	jump_label extable vdso utsname keys ucount umh locks \
-	early_sched sched task_work \
+	early_sched sched task_work itimer \
 	percpu percpu_refcount workqueue_itf workqueue notifier workingset \
 	memblock paging rmap backing_dev riscv_mm_context mprotect \
 	page_alloc slub vmalloc mm_util vmscan ioremap gup \

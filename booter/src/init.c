@@ -4618,3 +4618,9 @@ __weak struct dst_metrics *ip_fib_metrics_init(struct net *net, struct nlattr *f
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL_GPL(ip_fib_metrics_init);
+
+__weak enum hrtimer_restart it_real_fn(struct hrtimer *timer)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(it_real_fn);

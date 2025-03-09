@@ -275,6 +275,7 @@ void thread_group_sample_cputime(struct task_struct *tsk, u64 *samples)
 
 	proc_sample_cputime_atomic(&cputimer->cputime_atomic, samples);
 }
+EXPORT_SYMBOL(thread_group_sample_cputime);
 
 /**
  * thread_group_start_cputime - Start cputime and return a sample
@@ -1365,6 +1366,7 @@ void set_process_cpu_timer(struct task_struct *tsk, unsigned int clkid,
 
 	tick_dep_set_signal(tsk->signal, TICK_DEP_BIT_POSIX_TIMER);
 }
+EXPORT_SYMBOL(set_process_cpu_timer);
 
 static int do_cpu_nanosleep(const clockid_t which_clock, int flags,
 			    const struct timespec64 *rqtp)

@@ -1288,26 +1288,26 @@ int hrtimer_cancel(struct hrtimer *timer)
 }
 EXPORT_SYMBOL_GPL(hrtimer_cancel);
 
-///**
-// * hrtimer_get_remaining - get remaining time for the timer
-// * @timer:	the timer to read
-// * @adjust:	adjust relative timers when CONFIG_TIME_LOW_RES=y
-// */
-//ktime_t __hrtimer_get_remaining(const struct hrtimer *timer, bool adjust)
-//{
-//	unsigned long flags;
-//	ktime_t rem;
-//
-//	lock_hrtimer_base(timer, &flags);
-//	if (IS_ENABLED(CONFIG_TIME_LOW_RES) && adjust)
-//		rem = hrtimer_expires_remaining_adjusted(timer);
-//	else
-//		rem = hrtimer_expires_remaining(timer);
-//	unlock_hrtimer_base(timer, &flags);
-//
-//	return rem;
-//}
-//EXPORT_SYMBOL_GPL(__hrtimer_get_remaining);
+/**
+ * hrtimer_get_remaining - get remaining time for the timer
+ * @timer:	the timer to read
+ * @adjust:	adjust relative timers when CONFIG_TIME_LOW_RES=y
+ */
+ktime_t __hrtimer_get_remaining(const struct hrtimer *timer, bool adjust)
+{
+	unsigned long flags;
+	ktime_t rem;
+
+	lock_hrtimer_base(timer, &flags);
+	if (IS_ENABLED(CONFIG_TIME_LOW_RES) && adjust)
+		rem = hrtimer_expires_remaining_adjusted(timer);
+	else
+		rem = hrtimer_expires_remaining(timer);
+	unlock_hrtimer_base(timer, &flags);
+
+	return rem;
+}
+EXPORT_SYMBOL_GPL(__hrtimer_get_remaining);
 
 #ifdef CONFIG_NO_HZ_COMMON
 /**
