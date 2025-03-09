@@ -2222,6 +2222,7 @@ int ip_mc_join_group_ssm(struct sock *sk, struct ip_mreqn *imr,
 {
 	return __ip_mc_join_group(sk, imr, mode);
 }
+EXPORT_SYMBOL(ip_mc_join_group_ssm);
 
 static int ip_mc_leave_src(struct sock *sk, struct ip_mc_socklist *iml,
 			   struct in_device *in_dev)
@@ -2426,6 +2427,7 @@ done:
 		err = ip_mc_leave_group(sk, &imr);
 	return err;
 }
+EXPORT_SYMBOL(ip_mc_source);
 
 int ip_mc_msfilter(struct sock *sk, struct ip_msfilter *msf, int ifindex)
 {
@@ -2511,6 +2513,7 @@ done:
 		err = ip_mc_leave_group(sk, &imr);
 	return err;
 }
+EXPORT_SYMBOL(ip_mc_msfilter);
 
 int ip_mc_msfget(struct sock *sk, struct ip_msfilter *msf,
 	struct ip_msfilter __user *optval, int __user *optlen)
@@ -2569,6 +2572,7 @@ int ip_mc_msfget(struct sock *sk, struct ip_msfilter *msf,
 done:
 	return err;
 }
+EXPORT_SYMBOL(ip_mc_msfget);
 
 int ip_mc_gsfget(struct sock *sk, struct group_filter *gsf,
 	struct sockaddr_storage __user *p)
@@ -2613,6 +2617,7 @@ int ip_mc_gsfget(struct sock *sk, struct group_filter *gsf,
 	}
 	return 0;
 }
+EXPORT_SYMBOL(ip_mc_gsfget);
 
 /*
  * check if a multicast source filter allows delivery for a given <src,dst,intf>

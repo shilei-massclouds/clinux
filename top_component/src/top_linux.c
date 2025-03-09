@@ -1136,6 +1136,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(ethtool);
     REQUIRE_COMPONENT(link_watch);
     REQUIRE_COMPONENT(ip_input);
+    REQUIRE_COMPONENT(ip_sockglue);
 
     //
     // start_kernel (init/main.c)

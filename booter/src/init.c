@@ -3440,14 +3440,14 @@ __weak struct proc_dir_entry *proc_create(const char *name, umode_t mode,
 }
 EXPORT_SYMBOL(proc_create);
 
-int ip_getsockopt(struct sock *sk, int level,
+__weak int ip_getsockopt(struct sock *sk, int level,
           int optname, char __user *optval, int __user *optlen)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(ip_getsockopt);
 
-void ip_icmp_error(struct sock *sk, struct sk_buff *skb, int err,
+__weak void ip_icmp_error(struct sock *sk, struct sk_buff *skb, int err,
            __be16 port, u32 info, u8 *payload)
 {
     booter_panic("No impl!\n");
@@ -3460,13 +3460,13 @@ __weak void inet_sock_destruct(struct sock *sk)
 }
 EXPORT_SYMBOL(inet_sock_destruct);
 
-int ip_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
+__weak int ip_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(ip_recv_error);
 
-int ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
+__weak int ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
         unsigned int optlen)
 {
     booter_panic("No impl!\n");
@@ -3549,7 +3549,7 @@ __weak int ip_mc_sf_allow(struct sock *sk, __be32 loc_addr, __be32 rmt_addr,
 }
 EXPORT_SYMBOL(ip_mc_sf_allow);
 
-void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
+__weak void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
              struct sk_buff *skb, int tlen, int offset)
 {
     booter_panic("No impl!\n");
@@ -3570,7 +3570,7 @@ __weak int ip_mc_validate_source(struct sk_buff *skb, __be32 daddr, __be32 saddr
 }
 EXPORT_SYMBOL(ip_mc_validate_source);
 
-void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb)
+__weak void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb)
 {
     booter_panic("No impl!\n");
 }
@@ -3583,7 +3583,7 @@ int proc_dointvec_ms_jiffies(struct ctl_table *table, int write, void *buffer,
 }
 EXPORT_SYMBOL(proc_dointvec_ms_jiffies);
 
-int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
+__weak int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
          bool allow_ipv6)
 {
     booter_panic("No impl!\n");
@@ -3727,7 +3727,7 @@ __weak int __init ip_rt_init(void)
 }
 EXPORT_SYMBOL(ip_rt_init);
 
-void ip_local_error(struct sock *sk, int err, __be32 daddr, __be16 port, u32 info)
+__weak void ip_local_error(struct sock *sk, int err, __be32 daddr, __be16 port, u32 info)
 {
     booter_panic("No impl!\n");
 }
@@ -4766,3 +4766,10 @@ __weak int ethtool_op_get_ts_info(struct net_device *dev, struct ethtool_ts_info
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(ethtool_op_get_ts_info);
+
+__weak int ip_ra_control(struct sock *sk, unsigned char on,
+		  void (*destructor)(struct sock *))
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_ra_control);
