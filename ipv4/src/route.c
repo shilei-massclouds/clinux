@@ -2062,6 +2062,7 @@ martian_source:
 	ip_handle_martian_source(dev, in_dev, skb, daddr, saddr);
 	return err;
 }
+EXPORT_SYMBOL(ip_route_use_hint);
 
 /*
  *	NOTE. We drop all the packets that has local source

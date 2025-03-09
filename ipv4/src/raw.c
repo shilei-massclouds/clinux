@@ -221,6 +221,7 @@ int raw_local_deliver(struct sk_buff *skb, int protocol)
 	return raw_sk != NULL;
 
 }
+EXPORT_SYMBOL(raw_local_deliver);
 
 static void raw_err(struct sock *sk, struct sk_buff *skb, u32 info)
 {
@@ -339,6 +340,7 @@ int raw_rcv(struct sock *sk, struct sk_buff *skb)
 	raw_rcv_skb(sk, skb);
 	return 0;
 }
+EXPORT_SYMBOL(raw_rcv);
 
 static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
 			   struct msghdr *msg, size_t length,

@@ -4632,3 +4632,42 @@ __weak enum hrtimer_restart it_real_fn(struct hrtimer *timer)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(it_real_fn);
+
+int ip_options_compile(struct net *net,
+               struct ip_options *opt, struct sk_buff *skb)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_options_compile);
+
+int ip_options_rcv_srr(struct sk_buff *skb, struct net_device *dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_options_rcv_srr);
+
+__weak void ip_list_rcv(struct list_head *head, struct packet_type *pt,
+		 struct net_device *orig_dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_list_rcv);
+
+__weak int ip_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt,
+	   struct net_device *orig_dev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_rcv);
+
+__weak int ip_local_deliver(struct sk_buff *skb)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_local_deliver);
+
+__weak void ip_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int protocol)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(ip_protocol_deliver_rcu);
