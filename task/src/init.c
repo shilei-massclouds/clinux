@@ -13,22 +13,10 @@
 #include "../../booter/src/booter.h"
 #include "../../early_sched/src/sched.h"
 
-static void
-setup_task(void)
-{
-    static bool inited = false;
-    if (!inited) {
-        riscv_current_is_tp = &init_task;
-        init_task.thread_info.cpu = 0;
-        inited = true;
-    }
-}
-
 int
 cl_task_init(void)
 {
     sbi_puts("module[task]: init begin ...\n");
-    setup_task();
     sbi_puts("module[task]: init end!\n");
     return 0;
 }

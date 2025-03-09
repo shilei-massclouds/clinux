@@ -1070,6 +1070,18 @@ static noinline void __init kernel_init_freeable(void)
     integrity_load_keys();
 }
 
+static void
+setup_task(void)
+{
+    static bool inited = false;
+    if (!inited) {
+        riscv_current_is_tp = &init_task;
+        init_task.thread_info.cpu = 0;
+        inited = true;
+    }
+}
+
+
 int
 cl_top_linux_init(void)
 {
@@ -1144,6 +1156,7 @@ cl_top_linux_init(void)
     //
 
     REQUIRE_COMPONENT(task); // Setup 'tp => init_task' here from head.S.
+    setup_task();
     parse_dtb();             // Move 'parse_dtb' here from head.S.
 
     set_task_stack_end_magic(&init_task);
