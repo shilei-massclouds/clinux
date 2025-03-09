@@ -46,12 +46,12 @@
 __visible u64 jiffies_64 __cacheline_aligned_in_smp = INITIAL_JIFFIES;
 EXPORT_SYMBOL(jiffies_64);
 
-extern int cl_init();
+extern int cl_top_init();
 
 void
 start_kernel(void)
 {
-    cl_init();
+    cl_top_init();
     booter_panic("Kernel has been terminated normally!");
 }
 
