@@ -21,5 +21,4 @@ CL_MINE(sock_diag_broadcast_destroy)
 CL_MINE(sock_gen_cookie)
 CL_MINE(splice_to_pipe)
 CL_MINE(xdp_do_generic_redirect)
-CL_MINE(__zerocopy_sg_from_iter)
 

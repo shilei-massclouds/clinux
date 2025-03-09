@@ -3154,12 +3154,14 @@ __weak struct sk_buff *rtmsg_ifinfo_build_skb(int type, struct net_device *dev,
 }
 EXPORT_SYMBOL(rtmsg_ifinfo_build_skb);
 
+/*
 int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
                struct iov_iter *to, int len)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(skb_copy_datagram_iter);
+*/
 
 int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
 {
@@ -3364,12 +3366,14 @@ __weak int fcntl_dirnotify(int fd, struct file *filp, unsigned long arg)
 }
 EXPORT_SYMBOL(fcntl_dirnotify);
 
+/*
 __poll_t datagram_poll(struct file *file, struct socket *sock,
                poll_table *wait)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(datagram_poll);
+*/
 
 /*
 void dst_release(struct dst_entry *dst)
@@ -3502,12 +3506,14 @@ bool __do_once_start(bool *done, unsigned long *flags)
 }
 EXPORT_SYMBOL_GPL(__do_once_start);
 
+/*
 struct sk_buff *skb_recv_datagram(struct sock *sk, unsigned int flags,
                   int noblock, int *err)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL_GPL(skb_recv_datagram);
+*/
 
 __weak void ipv4_sk_update_pmtu(struct sk_buff *skb, struct sock *sk, u32 mtu)
 {
@@ -3601,11 +3607,13 @@ int proc_dointvec_jiffies(struct ctl_table *table, int write,
 }
 EXPORT_SYMBOL(proc_dointvec_jiffies);
 
+/*
 void skb_free_datagram(struct sock *sk, struct sk_buff *skb)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(skb_free_datagram);
+*/
 
 void __do_once_done(bool *done, struct static_key_true *once_key,
             unsigned long *flags)
