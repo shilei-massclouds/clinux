@@ -55,4 +55,7 @@
 // Alias for ENABLE_COMPONENT
 #define REQUIRE_COMPONENT(name) ENABLE_COMPONENT(name)
 
+extern int cl_init();
+extern int cl_top_init();
+
 #endif /* _CL_HOOK_H_ */

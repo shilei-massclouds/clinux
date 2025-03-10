@@ -69,7 +69,6 @@ void show_regs(struct pt_regs *regs)
 	pr_cont("status: " REG_FMT " badaddr: " REG_FMT " cause: " REG_FMT "\n",
 		regs->status, regs->badaddr, regs->cause);
 }
-EXPORT_SYMBOL(show_regs);
 
 void start_thread(struct pt_regs *regs, unsigned long pc,
 	unsigned long sp)
@@ -87,7 +86,6 @@ void start_thread(struct pt_regs *regs, unsigned long pc,
 	regs->sp = sp;
 	set_fs(USER_DS);
 }
-EXPORT_SYMBOL(start_thread);
 
 void flush_thread(void)
 {
@@ -101,7 +99,6 @@ void flush_thread(void)
 	memset(&current->thread.fstate, 0, sizeof(current->thread.fstate));
 #endif
 }
-EXPORT_SYMBOL(flush_thread);
 
 int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {
@@ -138,4 +135,3 @@ int copy_thread(unsigned long clone_flags, unsigned long usp, unsigned long arg,
 	p->thread.sp = (unsigned long)childregs; /* kernel sp */
 	return 0;
 }
-EXPORT_SYMBOL(copy_thread);

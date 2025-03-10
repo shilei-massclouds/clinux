@@ -18,28 +18,22 @@ cl_traps_init(void)
 }
 EXPORT_SYMBOL(cl_traps_init);
 
+/* Export symbols in entry.S. */
+extern asmlinkage void ret_from_fork(void);
+EXPORT_SYMBOL(ret_from_fork);
+extern asmlinkage void ret_from_kernel_thread(void);
+EXPORT_SYMBOL(ret_from_kernel_thread);
+
 __visible int do_syscall_trace_enter(struct pt_regs *regs)
 {
     booter_panic("No impl!\n");
 }
 
-/*
-void do_notify_resume(struct pt_regs *regs)
-{
-    booter_panic("No impl!\n");
-}
-*/
 asmlinkage long sys_ni_syscall(void)
 {
     booter_panic("No impl!\n");
 }
-/*
-enum bug_trap_type report_bug(unsigned long bug_addr,
-                        struct pt_regs *regs)
-{
-    booter_panic("No impl!\n");
-}
-*/
+
 asmlinkage void do_syscall_trace_exit(void)
 {
     booter_panic("No impl!\n");

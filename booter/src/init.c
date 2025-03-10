@@ -5048,3 +5048,29 @@ __weak int sysfs_rename_dir_ns(struct kobject *kobj, const char *new_name,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(sysfs_rename_dir_ns);
+
+__weak int copy_thread(unsigned long clone_flags, unsigned long usp, unsigned long arg,
+		struct task_struct *p, unsigned long tls)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(copy_thread);
+
+__weak void show_regs(struct pt_regs *regs)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(show_regs);
+
+__weak void start_thread(struct pt_regs *regs, unsigned long pc,
+	unsigned long sp)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(start_thread);
+
+__weak void flush_thread(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(flush_thread);
