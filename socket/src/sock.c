@@ -280,6 +280,7 @@ int sysctl_optmem_max __read_mostly = sizeof(unsigned long)*(2*UIO_MAXIOV+512);
 EXPORT_SYMBOL(sysctl_optmem_max);
 
 int sysctl_tstamp_allow_data __read_mostly = 1;
+EXPORT_SYMBOL_GPL(sysctl_tstamp_allow_data);
 
 DEFINE_STATIC_KEY_FALSE(memalloc_socks_key);
 EXPORT_SYMBOL_GPL(memalloc_socks_key);
@@ -2235,6 +2236,7 @@ struct sk_buff *sock_omalloc(struct sock *sk, unsigned long size,
 	skb->destructor = sock_ofree;
 	return skb;
 }
+EXPORT_SYMBOL(sock_omalloc);
 
 /*
  * Allocate a memory block from the socket's option memory buffer.

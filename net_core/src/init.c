@@ -21,6 +21,3 @@ cl_net_core_init(void)
 EXPORT_SYMBOL(cl_net_core_init);
 
 DEFINE_ENABLE_FUNC(net_core);
-
-struct pipe_buf_operations;
-const struct pipe_buf_operations nosteal_pipe_buf_ops;

@@ -3671,84 +3671,84 @@ void device_destroy(struct class *class, dev_t devt)
 }
 EXPORT_SYMBOL_GPL(device_destroy);
 
-///**
-// * device_rename - renames a device
-// * @dev: the pointer to the struct device to be renamed
-// * @new_name: the new name of the device
-// *
-// * It is the responsibility of the caller to provide mutual
-// * exclusion between two different calls of device_rename
-// * on the same device to ensure that new_name is valid and
-// * won't conflict with other devices.
-// *
-// * Note: Don't call this function.  Currently, the networking layer calls this
-// * function, but that will change.  The following text from Kay Sievers offers
-// * some insight:
-// *
-// * Renaming devices is racy at many levels, symlinks and other stuff are not
-// * replaced atomically, and you get a "move" uevent, but it's not easy to
-// * connect the event to the old and new device. Device nodes are not renamed at
-// * all, there isn't even support for that in the kernel now.
-// *
-// * In the meantime, during renaming, your target name might be taken by another
-// * driver, creating conflicts. Or the old name is taken directly after you
-// * renamed it -- then you get events for the same DEVPATH, before you even see
-// * the "move" event. It's just a mess, and nothing new should ever rely on
-// * kernel device renaming. Besides that, it's not even implemented now for
-// * other things than (driver-core wise very simple) network devices.
-// *
-// * We are currently about to change network renaming in udev to completely
-// * disallow renaming of devices in the same namespace as the kernel uses,
-// * because we can't solve the problems properly, that arise with swapping names
-// * of multiple interfaces without races. Means, renaming of eth[0-9]* will only
-// * be allowed to some other name than eth[0-9]*, for the aforementioned
-// * reasons.
-// *
-// * Make up a "real" name in the driver before you register anything, or add
-// * some other attributes for userspace to find the device, or use udev to add
-// * symlinks -- but never rename kernel devices later, it's a complete mess. We
-// * don't even want to get into that and try to implement the missing pieces in
-// * the core. We really have other pieces to fix in the driver core mess. :)
-// */
-//int device_rename(struct device *dev, const char *new_name)
-//{
-//	struct kobject *kobj = &dev->kobj;
-//	char *old_device_name = NULL;
-//	int error;
-//
-//	dev = get_device(dev);
-//	if (!dev)
-//		return -EINVAL;
-//
-//	dev_dbg(dev, "renaming to %s\n", new_name);
-//
-//	old_device_name = kstrdup(dev_name(dev), GFP_KERNEL);
-//	if (!old_device_name) {
-//		error = -ENOMEM;
-//		goto out;
-//	}
-//
-//	if (dev->class) {
-//		error = sysfs_rename_link_ns(&dev->class->p->subsys.kobj,
-//					     kobj, old_device_name,
-//					     new_name, kobject_namespace(kobj));
-//		if (error)
-//			goto out;
-//	}
-//
-//	error = kobject_rename(kobj, new_name);
-//	if (error)
-//		goto out;
-//
-//out:
-//	put_device(dev);
-//
-//	kfree(old_device_name);
-//
-//	return error;
-//}
-//EXPORT_SYMBOL_GPL(device_rename);
-//
+/**
+ * device_rename - renames a device
+ * @dev: the pointer to the struct device to be renamed
+ * @new_name: the new name of the device
+ *
+ * It is the responsibility of the caller to provide mutual
+ * exclusion between two different calls of device_rename
+ * on the same device to ensure that new_name is valid and
+ * won't conflict with other devices.
+ *
+ * Note: Don't call this function.  Currently, the networking layer calls this
+ * function, but that will change.  The following text from Kay Sievers offers
+ * some insight:
+ *
+ * Renaming devices is racy at many levels, symlinks and other stuff are not
+ * replaced atomically, and you get a "move" uevent, but it's not easy to
+ * connect the event to the old and new device. Device nodes are not renamed at
+ * all, there isn't even support for that in the kernel now.
+ *
+ * In the meantime, during renaming, your target name might be taken by another
+ * driver, creating conflicts. Or the old name is taken directly after you
+ * renamed it -- then you get events for the same DEVPATH, before you even see
+ * the "move" event. It's just a mess, and nothing new should ever rely on
+ * kernel device renaming. Besides that, it's not even implemented now for
+ * other things than (driver-core wise very simple) network devices.
+ *
+ * We are currently about to change network renaming in udev to completely
+ * disallow renaming of devices in the same namespace as the kernel uses,
+ * because we can't solve the problems properly, that arise with swapping names
+ * of multiple interfaces without races. Means, renaming of eth[0-9]* will only
+ * be allowed to some other name than eth[0-9]*, for the aforementioned
+ * reasons.
+ *
+ * Make up a "real" name in the driver before you register anything, or add
+ * some other attributes for userspace to find the device, or use udev to add
+ * symlinks -- but never rename kernel devices later, it's a complete mess. We
+ * don't even want to get into that and try to implement the missing pieces in
+ * the core. We really have other pieces to fix in the driver core mess. :)
+ */
+int device_rename(struct device *dev, const char *new_name)
+{
+	struct kobject *kobj = &dev->kobj;
+	char *old_device_name = NULL;
+	int error;
+
+	dev = get_device(dev);
+	if (!dev)
+		return -EINVAL;
+
+	dev_dbg(dev, "renaming to %s\n", new_name);
+
+	old_device_name = kstrdup(dev_name(dev), GFP_KERNEL);
+	if (!old_device_name) {
+		error = -ENOMEM;
+		goto out;
+	}
+
+	if (dev->class) {
+		error = sysfs_rename_link_ns(&dev->class->p->subsys.kobj,
+					     kobj, old_device_name,
+					     new_name, kobject_namespace(kobj));
+		if (error)
+			goto out;
+	}
+
+	error = kobject_rename(kobj, new_name);
+	if (error)
+		goto out;
+
+out:
+	put_device(dev);
+
+	kfree(old_device_name);
+
+	return error;
+}
+EXPORT_SYMBOL_GPL(device_rename);
+
 //static int device_move_class_links(struct device *dev,
 //				   struct device *old_parent,
 //				   struct device *new_parent)

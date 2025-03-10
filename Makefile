@@ -65,10 +65,10 @@ components := \
 	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
 	fs_context fs_parser fs_struct namei libfs debugfs \
 	ipc_namespace drv_char 8250 serial drv_clk \
-	net_core netlink string_helpers net_namespace net_sched \
+	net_core net_core_dev netlink string_helpers net_namespace net_sched \
 	ipv4 tcp tcp_ipv4 udp udplite icmp ping arp ip_input ip_output \
 	devinet fib tcp_metrics tcp_cong ipv4_proc ip_tunnel \
-	datagram loopback ip_sockglue filter \
+	datagram loopback ip_sockglue filter skbuff socket \
 	tcp_timer inet_connection_sock tcp_ulp tcp_fastopen \
 	stream dst ethernet dev_addr_lists xdp ethtool link_watch \
 	block genhd partitions elevator sysctl_net inet_hashtables tcp_output \

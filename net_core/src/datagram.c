@@ -534,7 +534,6 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
 	return __skb_datagram_iter(skb, offset, to, len, false,
 			simple_copy_to_iter, NULL);
 }
-EXPORT_SYMBOL(skb_copy_datagram_iter);
 
 /**
  *	skb_copy_datagram_from_iter - Copy a datagram from an iov_iter.
@@ -660,7 +659,6 @@ int __zerocopy_sg_from_iter(struct sock *sk, struct sk_buff *skb,
 	}
 	return 0;
 }
-EXPORT_SYMBOL(__zerocopy_sg_from_iter);
 
 /**
  *	zerocopy_sg_from_iter - Build a zerocopy datagram from an iov_iter

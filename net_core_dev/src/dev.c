@@ -145,7 +145,7 @@
 #include <net/devlink.h>
 #include <linux/pm_runtime.h>
 
-#include "../net-sysfs.h"
+#include "../net_core/net-sysfs.h"
 
 #define MAX_GRO_SKBS 8
 
@@ -155,7 +155,9 @@
 static DEFINE_SPINLOCK(ptype_lock);
 static DEFINE_SPINLOCK(offload_lock);
 struct list_head ptype_base[PTYPE_HASH_SIZE] __read_mostly;
+EXPORT_SYMBOL(ptype_base);
 struct list_head ptype_all __read_mostly;	/* Taps */
+EXPORT_SYMBOL(ptype_all);
 static struct list_head offload_base __read_mostly;
 
 static int netif_rx_internal(struct sk_buff *skb);
@@ -397,8 +399,8 @@ static RAW_NOTIFIER_HEAD(netdev_chain);
  *	queue in the local softnet handler.
  */
 
-DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
-EXPORT_PER_CPU_SYMBOL(softnet_data);
+//DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+//EXPORT_PER_CPU_SYMBOL(softnet_data);
 
 #ifdef CONFIG_LOCKDEP
 /*
@@ -881,7 +883,6 @@ struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
 	node_name = netdev_name_node_lookup_rcu(net, name);
 	return node_name ? node_name->dev : NULL;
 }
-EXPORT_SYMBOL(dev_get_by_name_rcu);
 
 /**
  *	dev_get_by_name		- find a device by its name
@@ -1004,7 +1005,6 @@ struct net_device *dev_get_by_napi_id(unsigned int napi_id)
 
 	return napi ? napi->dev : NULL;
 }
-EXPORT_SYMBOL(dev_get_by_napi_id);
 
 /**
  *	netdev_get_name - get a netdevice name, knowing its ifindex.
@@ -2146,7 +2146,6 @@ void net_enable_timestamp(void)
 	static_branch_inc(&netstamp_needed_key);
 #endif
 }
-EXPORT_SYMBOL(net_enable_timestamp);
 
 void net_disable_timestamp(void)
 {
@@ -2166,7 +2165,6 @@ void net_disable_timestamp(void)
 	static_branch_dec(&netstamp_needed_key);
 #endif
 }
-EXPORT_SYMBOL(net_disable_timestamp);
 
 static inline void net_timestamp_set(struct sk_buff *skb)
 {
@@ -3100,7 +3098,6 @@ void __dev_kfree_skb_any(struct sk_buff *skb, enum skb_free_reason reason)
 	else
 		dev_kfree_skb(skb);
 }
-EXPORT_SYMBOL(__dev_kfree_skb_any);
 
 
 /**
@@ -3402,7 +3399,6 @@ void netdev_rx_csum_fault(struct net_device *dev, struct sk_buff *skb)
 		dump_stack();
 	}
 }
-EXPORT_SYMBOL(netdev_rx_csum_fault);
 #endif
 
 /* XXX: check that highmem exists at all on the given machine. */
@@ -6517,7 +6513,6 @@ count:
 out:
 	rcu_read_unlock();
 }
-EXPORT_SYMBOL(napi_busy_loop);
 
 #endif /* CONFIG_NET_RX_BUSY_POLL */
 
@@ -10280,6 +10275,7 @@ void netdev_freemem(struct net_device *dev)
 
 	kvfree(addr);
 }
+EXPORT_SYMBOL_GPL(netdev_freemem);
 
 /**
  * alloc_netdev_mqs - allocate network device

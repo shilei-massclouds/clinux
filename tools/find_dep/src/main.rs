@@ -170,8 +170,8 @@ fn build_dependency(kmod: &ModuleRef, sym_map: &HashMap<String, ModuleRef>) -> R
     assert!(kmod.undef_syms.borrow().is_empty());
     for undef in undef_syms {
         if let Some(dep) = sym_map.get(&undef) {
+            info!("{} -> {}:{}", kmod.name, dep.name, undef);
             if !find_dependency(kmod, &dep.name) {
-                info!("{} -> {}:{}", kmod.name, dep.name, undef);
                 kmod.dependencies.borrow_mut().push(dep.clone());
                 build_dependency(dep, sym_map)?;
             }

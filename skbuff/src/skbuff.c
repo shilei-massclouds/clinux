@@ -77,9 +77,10 @@
 #include <linux/user_namespace.h>
 #include <linux/indirect_call_wrapper.h>
 
-#include "../datagram.h"
+#include "../net_core/datagram.h"
 
 struct kmem_cache *skbuff_head_cache __ro_after_init;
+EXPORT_SYMBOL(skbuff_head_cache);
 static struct kmem_cache *skbuff_fclone_cache __ro_after_init;
 #ifdef CONFIG_SKB_EXTENSIONS
 static struct kmem_cache *skbuff_ext_cache __ro_after_init;
@@ -865,6 +866,7 @@ void __kfree_skb_flush(void)
 		nc->skb_count = 0;
 	}
 }
+EXPORT_SYMBOL(__kfree_skb_flush);
 
 static inline void _kfree_skb_defer(struct sk_buff *skb)
 {
@@ -892,6 +894,7 @@ void __kfree_skb_defer(struct sk_buff *skb)
 {
 	_kfree_skb_defer(skb);
 }
+EXPORT_SYMBOL(__kfree_skb_defer);
 
 void napi_consume_skb(struct sk_buff *skb, int budget)
 {
@@ -4561,7 +4564,6 @@ struct sk_buff *sock_dequeue_err_skb(struct sock *sk)
 
 	return skb;
 }
-EXPORT_SYMBOL(sock_dequeue_err_skb);
 
 /**
  * skb_clone_sk - create clone of skb, and take reference to socket
@@ -5800,7 +5802,6 @@ failure:
 	kfree_skb(skb);
 	return NULL;
 }
-EXPORT_SYMBOL(alloc_skb_with_frags);
 
 /* carve out the first off bytes from skb when off < headlen */
 static int pskb_carve_inside_header(struct sk_buff *skb, const u32 off,

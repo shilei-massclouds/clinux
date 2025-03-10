@@ -34,6 +34,7 @@ const void *kobject_namespace(struct kobject *kobj)
 
 	return kobj->ktype->namespace(kobj);
 }
+EXPORT_SYMBOL(kobject_namespace);
 
 /**
  * kobject_get_ownership() - Get sysfs ownership data for @kobj.
@@ -478,75 +479,75 @@ int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
 }
 EXPORT_SYMBOL_GPL(kobject_init_and_add);
 
-///**
-// * kobject_rename() - Change the name of an object.
-// * @kobj: object in question.
-// * @new_name: object's new name
-// *
-// * It is the responsibility of the caller to provide mutual
-// * exclusion between two different calls of kobject_rename
-// * on the same kobject and to ensure that new_name is valid and
-// * won't conflict with other kobjects.
-// */
-//int kobject_rename(struct kobject *kobj, const char *new_name)
-//{
-//	int error = 0;
-//	const char *devpath = NULL;
-//	const char *dup_name = NULL, *name;
-//	char *devpath_string = NULL;
-//	char *envp[2];
-//
-//	kobj = kobject_get(kobj);
-//	if (!kobj)
-//		return -EINVAL;
-//	if (!kobj->parent) {
-//		kobject_put(kobj);
-//		return -EINVAL;
-//	}
-//
-//	devpath = kobject_get_path(kobj, GFP_KERNEL);
-//	if (!devpath) {
-//		error = -ENOMEM;
-//		goto out;
-//	}
-//	devpath_string = kmalloc(strlen(devpath) + 15, GFP_KERNEL);
-//	if (!devpath_string) {
-//		error = -ENOMEM;
-//		goto out;
-//	}
-//	sprintf(devpath_string, "DEVPATH_OLD=%s", devpath);
-//	envp[0] = devpath_string;
-//	envp[1] = NULL;
-//
-//	name = dup_name = kstrdup_const(new_name, GFP_KERNEL);
-//	if (!name) {
-//		error = -ENOMEM;
-//		goto out;
-//	}
-//
-//	error = sysfs_rename_dir_ns(kobj, new_name, kobject_namespace(kobj));
-//	if (error)
-//		goto out;
-//
-//	/* Install the new kobject name */
-//	dup_name = kobj->name;
-//	kobj->name = name;
-//
-//	/* This function is mostly/only used for network interface.
-//	 * Some hotplug package track interfaces by their name and
-//	 * therefore want to know when the name is changed by the user. */
-//	kobject_uevent_env(kobj, KOBJ_MOVE, envp);
-//
-//out:
-//	kfree_const(dup_name);
-//	kfree(devpath_string);
-//	kfree(devpath);
-//	kobject_put(kobj);
-//
-//	return error;
-//}
-//EXPORT_SYMBOL_GPL(kobject_rename);
-//
+/**
+ * kobject_rename() - Change the name of an object.
+ * @kobj: object in question.
+ * @new_name: object's new name
+ *
+ * It is the responsibility of the caller to provide mutual
+ * exclusion between two different calls of kobject_rename
+ * on the same kobject and to ensure that new_name is valid and
+ * won't conflict with other kobjects.
+ */
+int kobject_rename(struct kobject *kobj, const char *new_name)
+{
+	int error = 0;
+	const char *devpath = NULL;
+	const char *dup_name = NULL, *name;
+	char *devpath_string = NULL;
+	char *envp[2];
+
+	kobj = kobject_get(kobj);
+	if (!kobj)
+		return -EINVAL;
+	if (!kobj->parent) {
+		kobject_put(kobj);
+		return -EINVAL;
+	}
+
+	devpath = kobject_get_path(kobj, GFP_KERNEL);
+	if (!devpath) {
+		error = -ENOMEM;
+		goto out;
+	}
+	devpath_string = kmalloc(strlen(devpath) + 15, GFP_KERNEL);
+	if (!devpath_string) {
+		error = -ENOMEM;
+		goto out;
+	}
+	sprintf(devpath_string, "DEVPATH_OLD=%s", devpath);
+	envp[0] = devpath_string;
+	envp[1] = NULL;
+
+	name = dup_name = kstrdup_const(new_name, GFP_KERNEL);
+	if (!name) {
+		error = -ENOMEM;
+		goto out;
+	}
+
+	error = sysfs_rename_dir_ns(kobj, new_name, kobject_namespace(kobj));
+	if (error)
+		goto out;
+
+	/* Install the new kobject name */
+	dup_name = kobj->name;
+	kobj->name = name;
+
+	/* This function is mostly/only used for network interface.
+	 * Some hotplug package track interfaces by their name and
+	 * therefore want to know when the name is changed by the user. */
+	kobject_uevent_env(kobj, KOBJ_MOVE, envp);
+
+out:
+	kfree_const(dup_name);
+	kfree(devpath_string);
+	kfree(devpath);
+	kobject_put(kobj);
+
+	return error;
+}
+EXPORT_SYMBOL_GPL(kobject_rename);
+
 ///**
 // * kobject_move() - Move object to another parent.
 // * @kobj: object in question.

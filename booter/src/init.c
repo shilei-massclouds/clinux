@@ -3154,14 +3154,12 @@ __weak struct sk_buff *rtmsg_ifinfo_build_skb(int type, struct net_device *dev,
 }
 EXPORT_SYMBOL(rtmsg_ifinfo_build_skb);
 
-/*
-int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+__weak int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
                struct iov_iter *to, int len)
 {
     booter_panic("No impl!\n");
 }
 EXPORT_SYMBOL(skb_copy_datagram_iter);
-*/
 
 __weak int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
 {
@@ -4856,3 +4854,197 @@ __weak int sk_get_filter(struct sock *sk, struct sock_filter __user *ubuf,
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(sk_get_filter);
+
+__weak void __init skb_init(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(skb_init);
+
+__weak struct sk_buff *sock_dequeue_err_skb(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sock_dequeue_err_skb);
+
+__weak struct sk_buff *alloc_skb_with_frags(unsigned long header_len,
+				     unsigned long data_len,
+				     int max_page_order,
+				     int *errcode,
+				     gfp_t gfp_mask)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(alloc_skb_with_frags);
+
+__weak void net_disable_timestamp(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(net_disable_timestamp);
+
+__weak struct net_device *dev_get_by_napi_id(unsigned int napi_id)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_get_by_napi_id);
+
+__weak void net_enable_timestamp(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(net_enable_timestamp);
+
+__weak void napi_busy_loop(unsigned int napi_id,
+		    bool (*loop_end)(void *, unsigned long),
+		    void *loop_end_arg)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(napi_busy_loop);
+
+__weak struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_get_by_name_rcu);
+
+DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+EXPORT_PER_CPU_SYMBOL(softnet_data);
+
+struct pipe_buf_operations;
+const struct pipe_buf_operations nosteal_pipe_buf_ops;
+EXPORT_SYMBOL(nosteal_pipe_buf_ops);
+
+__weak int __zerocopy_sg_from_iter(struct sock *sk, struct sk_buff *skb,
+			    struct iov_iter *from, size_t length)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__zerocopy_sg_from_iter);
+
+__weak void __dev_kfree_skb_any(struct sk_buff *skb, enum skb_free_reason reason)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(__dev_kfree_skb_any);
+
+__weak void netdev_rx_csum_fault(struct net_device *dev, struct sk_buff *skb)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_rx_csum_fault);
+
+__weak int netdev_queue_update_kobjects(struct net_device *dev, int old_num, int new_num)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_queue_update_kobjects);
+
+__weak int netdev_register_kobject(struct net_device *ndev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_register_kobject);
+
+__weak int
+net_rx_queue_update_kobjects(struct net_device *dev, int old_num, int new_num)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(net_rx_queue_update_kobjects);
+
+__weak int __init dev_proc_init(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_proc_init);
+
+__weak void netdev_unregister_kobject(struct net_device *ndev)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_unregister_kobject);
+
+__weak int sysfs_rename_link_ns(struct kobject *kobj, struct kobject *targ,
+			 const char *old, const char *new, const void *new_ns)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL_GPL(sysfs_rename_link_ns);
+
+__weak int netdev_change_owner(struct net_device *ndev, const struct net *net_old,
+			const struct net *net_new)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_change_owner);
+
+__weak int __init netdev_kobject_init(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_kobject_init);
+
+ssize_t generic_splice_sendpage(struct pipe_inode_info *pipe, struct file *out,
+                loff_t *ppos, size_t len, unsigned int flags)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(generic_splice_sendpage);
+
+__weak int netdev_get_name(struct net *net, char *name, int ifindex)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(netdev_get_name);
+
+void sock_diag_broadcast_destroy(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sock_diag_broadcast_destroy);
+
+__weak __be16 skb_network_protocol(struct sk_buff *skb, int *depth)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(skb_network_protocol);
+
+__weak int reuseport_detach_prog(struct sock *sk)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(reuseport_detach_prog);
+
+int poll_select_set_timeout(struct timespec64 *to, time64_t sec, long nsec)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(poll_select_set_timeout);
+
+__weak int dev_ifconf(struct net *net, struct ifconf *ifc, int size)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_ifconf);
+
+ssize_t splice_to_pipe(struct pipe_inode_info *pipe,
+               struct splice_pipe_desc *spd)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(splice_to_pipe);
+
+__weak int dev_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr, bool *need_copyout)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(dev_ioctl);
+
+__weak int sysfs_rename_dir_ns(struct kobject *kobj, const char *new_name,
+			const void *new_ns)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(sysfs_rename_dir_ns);
