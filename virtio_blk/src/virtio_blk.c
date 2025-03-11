@@ -984,7 +984,7 @@ static unsigned int features[] = {
 	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
 };
 
-static struct virtio_driver virtio_blk = {
+struct virtio_driver virtio_blk = {
 	.feature_table			= features,
 	.feature_table_size		= ARRAY_SIZE(features),
 	.feature_table_legacy		= features_legacy,
@@ -1000,6 +1000,7 @@ static struct virtio_driver virtio_blk = {
 	.restore			= virtblk_restore,
 #endif
 };
+EXPORT_SYMBOL(virtio_blk);
 
 static int __init init(void)
 {
