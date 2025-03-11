@@ -9,6 +9,7 @@ TESTCASES="
     lib
     task
     early_fdt
+    cgroup
     memblock
     params
 	spinlock
