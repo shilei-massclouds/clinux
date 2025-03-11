@@ -5,7 +5,7 @@ export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
 #TOP ?= linux
-TOP ?= of
+TOP ?= dma
 export TOP_COMPONENT := top_$(TOP)
 
 DEP ?= err

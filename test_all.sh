@@ -19,6 +19,7 @@ TESTCASES="
     paging
     resource
     of
+    dma
     linux
 "
 
