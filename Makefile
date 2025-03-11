@@ -5,7 +5,7 @@ export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
 #TOP ?= linux
-TOP ?= cpu
+TOP ?= memblock
 export TOP_COMPONENT := top_$(TOP)
 
 DEP ?= err
@@ -42,8 +42,9 @@ QEMU_ARGS += \
 
 # All component subdir
 components := \
-	prebuilt booter lib math flex_proportions crc32 \
+	prebuilt booter lib lib_user math flex_proportions crc32 \
 	radix_tree idr xarray assoc_array list_lru klist logic_pio \
+	refcount ratelimit \
 	kasprintf random crypto uuid rhashtable iov_iter checksum \
 	sbitmap scatterlist bio mempool truncate interval_tree \
 	traps irq softirq dec_and_lock mpage initcalls \
@@ -56,7 +57,7 @@ components := \
 	jump_label extable vdso utsname keys ucount umh locks \
 	early_sched sched task_work itimer \
 	percpu percpu_refcount workqueue_itf workqueue notifier workingset \
-	memblock paging rmap backing_dev riscv_mm_context mprotect \
+	memblock paging rmap backing_dev riscv_mm_context mprotect bootmem \
 	page_alloc slub vmalloc mm_util vmscan ioremap gup \
 	spinlock semaphore mutex rwsem percpu_rwsem rcu lockref rtmutex \
 	ipc ipc_sem ipc_shm watchdog noinitramfs oom_kill \

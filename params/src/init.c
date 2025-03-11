@@ -7,6 +7,7 @@
 #include <linux/string.h>
 #include <linux/moduleparam.h>
 #include <asm/setup.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 extern const struct obs_kernel_param __setup_start[], __setup_end[];
@@ -15,10 +16,13 @@ int
 cl_params_init(void)
 {
     sbi_puts("module[params]: init begin ...\n");
+    parse_early_param();
     sbi_puts("module[params]: init end!\n");
     return 0;
 }
 EXPORT_SYMBOL(cl_params_init);
+
+DEFINE_ENABLE_FUNC(params);
 
 /* Check for early params. */
 int __init do_early_param(char *param, char *val,
@@ -60,4 +64,3 @@ void __init parse_early_param(void)
     parse_early_options(tmp_cmdline);
     done = 1;
 }
-EXPORT_SYMBOL(parse_early_param);

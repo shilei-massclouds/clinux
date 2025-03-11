@@ -43,6 +43,7 @@ int __kernel_text_address(unsigned long addr)
 }
 */
 
+/*
 int in_sched_functions(unsigned long addr)
 {
   return in_lock_functions(addr) ||
@@ -50,6 +51,7 @@ int in_sched_functions(unsigned long addr)
       && addr < (unsigned long)__sched_text_end);
 }
 EXPORT_SYMBOL(in_sched_functions);
+*/
 
 __weak const char *print_tainted(void)
 {

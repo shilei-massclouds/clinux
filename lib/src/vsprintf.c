@@ -858,11 +858,12 @@ char *restricted_pointer(char *buf, char *end, const void *ptr,
 		 * leak pointer values if a binary opens a file using
 		 * %pK and then elevates privileges before reading it.
 		 */
-		cred = current_cred();
-		if (!has_capability_noaudit(current, CAP_SYSLOG) ||
-		    !uid_eq(cred->euid, cred->uid) ||
-		    !gid_eq(cred->egid, cred->gid))
-			ptr = NULL;
+		//cred = current_cred();
+		//if (!has_capability_noaudit(current, CAP_SYSLOG) ||
+		//    !uid_eq(cred->euid, cred->uid) ||
+		//    !gid_eq(cred->egid, cred->gid))
+		//	ptr = NULL;
+        booter_panic("!!! Cyclic to task. Consider move lines above to cred.\n");
 		break;
 	}
 	case 2:

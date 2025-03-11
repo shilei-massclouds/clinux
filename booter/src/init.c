@@ -1104,11 +1104,13 @@ EXPORT_SYMBOL(initrd_start);
 unsigned long initrd_end;
 EXPORT_SYMBOL(initrd_end);
 
+/*
 __weak void __init early_init_fdt_scan_reserved_mem(void)
 {
-    booter_panic("No impl in 'workqueue'.");
+    booter_panic("No impl.");
 }
 EXPORT_SYMBOL(early_init_fdt_scan_reserved_mem);
+*/
 
 __weak void __module_get(struct module *module)
 {
@@ -5074,3 +5076,16 @@ __weak void flush_thread(void)
     booter_panic("No impl.");
 }
 EXPORT_SYMBOL(flush_thread);
+
+__weak void __init parse_early_param(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(parse_early_param);
+
+__weak int access_process_vm(struct task_struct *tsk, unsigned long addr,
+		void *buf, int len, unsigned int gup_flags)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL_GPL(access_process_vm);

@@ -234,13 +234,6 @@ __weak void unmap_mapping_pages(struct address_space *mapping, pgoff_t start,
 }
 EXPORT_SYMBOL(unmap_mapping_pages);
 
-__weak int access_process_vm(struct task_struct *tsk, unsigned long addr,
-		void *buf, int len, unsigned int gup_flags)
-{
-    booter_panic("No impl 'slub'.");
-}
-EXPORT_SYMBOL_GPL(access_process_vm);
-
 __weak vm_fault_t handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
 			   unsigned int flags, struct pt_regs *regs)
 {

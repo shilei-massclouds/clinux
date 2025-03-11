@@ -117,6 +117,8 @@ static inline struct uts_namespace *to_uts_ns(struct ns_common *ns)
 
 static struct ns_common *utsns_get(struct task_struct *task)
 {
+    booter_panic("No impl 'utsns_get'.");
+    /*
 	struct uts_namespace *ns = NULL;
 	struct nsproxy *nsproxy;
 
@@ -129,6 +131,7 @@ static struct ns_common *utsns_get(struct task_struct *task)
 	task_unlock(task);
 
 	return ns ? &ns->ns : NULL;
+    */
 }
 
 static void utsns_put(struct ns_common *ns)

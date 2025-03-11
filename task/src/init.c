@@ -14,6 +14,7 @@
 #include "../../early_sched/src/sched.h"
 
 extern void setup_task(void);
+extern void setup_kernel_in_mm(void);
 
 int
 cl_task_init(void)
@@ -21,6 +22,7 @@ cl_task_init(void)
     sbi_puts("module[task]: init begin ...\n");
     setup_task();
     set_task_stack_end_magic(&init_task);
+    setup_kernel_in_mm();
     sbi_puts("module[task]: init end!\n");
     return 0;
 }
@@ -309,4 +311,3 @@ struct task_struct *get_current(void)
 {
 	return riscv_current_is_tp;
 }
-EXPORT_SYMBOL(get_current);

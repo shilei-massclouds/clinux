@@ -2,15 +2,15 @@
 #include <linux/mm_types.h>
 #include <linux/rbtree.h>
 #include <linux/rwsem.h>
-#include <linux/spinlock.h>
+//#include <linux/spinlock.h>
 #include <linux/list.h>
 #include <linux/cpumask.h>
 #include <linux/mman.h>
 #include <linux/pgtable.h>
-
 #include <linux/atomic.h>
 #include <linux/user_namespace.h>
 #include <asm/mmu.h>
+#include <asm/sections.h>
 
 #ifndef INIT_MM_CONTEXT
 #define INIT_MM_CONTEXT(name)
@@ -40,3 +40,12 @@ struct mm_struct init_mm = {
 	INIT_MM_CONTEXT(init_mm)
 };
 EXPORT_SYMBOL(init_mm);
+
+void setup_kernel_in_mm(void)
+{
+    init_mm.start_code = (unsigned long) _stext;
+    init_mm.end_code   = (unsigned long) _etext;
+    init_mm.end_data   = (unsigned long) _edata;
+    init_mm.brk        = (unsigned long) _end;
+}
+EXPORT_SYMBOL(setup_kernel_in_mm);

@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/mm.h>
+#include <linux/memblock.h>
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
@@ -16,6 +17,15 @@
 void *high_memory;
 EXPORT_SYMBOL(high_memory);
 
+#ifndef CONFIG_NEED_MULTIPLE_NODES
+/* use the per-pgdat data instead for discontigmem - mbligh */
+unsigned long max_mapnr;
+EXPORT_SYMBOL(max_mapnr);
+
+struct page *mem_map;
+EXPORT_SYMBOL(mem_map);
+#endif
+
 int
 cl_memblock_init(void)
 {
@@ -25,6 +35,8 @@ cl_memblock_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_memblock_init);
+
+DEFINE_ENABLE_FUNC(memblock);
 
 bool __weak slab_is_available(void)
 {

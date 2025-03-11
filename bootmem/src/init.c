@@ -13,15 +13,6 @@
 
 extern char _start[];
 
-#ifndef CONFIG_NEED_MULTIPLE_NODES
-/* use the per-pgdat data instead for discontigmem - mbligh */
-unsigned long max_mapnr;
-EXPORT_SYMBOL(max_mapnr);
-
-struct page *mem_map;
-EXPORT_SYMBOL(mem_map);
-#endif
-
 extern phys_addr_t dtb_early_pa;
 
 #ifndef INIT_MM_CONTEXT
@@ -36,15 +27,6 @@ cl_bootmem_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_bootmem_init);
-
-void setup_kernel_in_mm(void)
-{
-    init_mm.start_code = (unsigned long) _stext;
-    init_mm.end_code   = (unsigned long) _etext;
-    init_mm.end_data   = (unsigned long) _edata;
-    init_mm.brk        = (unsigned long) _end;
-}
-EXPORT_SYMBOL(setup_kernel_in_mm);
 
 #ifdef CONFIG_BLK_DEV_INITRD
 void __init setup_initrd(void)

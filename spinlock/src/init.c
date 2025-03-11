@@ -12,3 +12,9 @@ cl_spinlock_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_spinlock_init);
+
+__weak struct task_struct *get_current(void)
+{
+    booter_panic("No current!\n");
+}
+EXPORT_SYMBOL(get_current);
