@@ -4,16 +4,23 @@
 #include <linux/export.h>
 #include <linux/init.h>
 #include <linux/memblock.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
+
+extern void __init resource_init(void);
 
 int
 cl_resource_init(void)
 {
     sbi_puts("module[resource]: init begin ...\n");
+    REQUIRE_COMPONENT(paging);
+    resource_init();
     sbi_puts("module[resource]: init end!\n");
     return 0;
 }
 EXPORT_SYMBOL(cl_resource_init);
+
+DEFINE_ENABLE_FUNC(resource);
 
 void __init resource_init(void)
 {
