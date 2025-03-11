@@ -8,6 +8,7 @@
 #include <linux/memblock.h>
 #include <linux/of_fdt.h>
 #include <asm/sections.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 #include "../../early_fdt/src/libfdt.h"
 
@@ -23,10 +24,14 @@ int
 cl_bootmem_init(void)
 {
     sbi_puts("module[bootmem]: init begin ...\n");
+    REQUIRE_COMPONENT(params);
+    setup_bootmem();
     sbi_puts("module[bootmem]: init end!\n");
     return 0;
 }
 EXPORT_SYMBOL(cl_bootmem_init);
+
+DEFINE_ENABLE_FUNC(bootmem);
 
 #ifdef CONFIG_BLK_DEV_INITRD
 void __init setup_initrd(void)

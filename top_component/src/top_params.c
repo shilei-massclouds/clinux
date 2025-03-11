@@ -10,8 +10,8 @@ cl_top_params_init(void)
 {
     sbi_puts("module[top_params]: init begin ...\n");
     ENABLE_COMPONENT(early_printk);
-    strcpy(boot_command_line, "earlycon=sbi root=/dev/vda rw console=ttyS0");
-    parse_early_param();
+    ENABLE_COMPONENT(params);
+    cl_init();
     sbi_puts("module[top_params]: init end!\n");
     return 0;
 }

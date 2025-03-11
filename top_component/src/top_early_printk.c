@@ -11,6 +11,7 @@ cl_top_early_printk_init(void)
     int num = 101;
     sbi_puts("module[top_early_printk]: init begin ...\n");
     ENABLE_COMPONENT(early_printk);
+    cl_init();
     printk("[early_printk]: '%s' '%d' '0x%x'\n", s, num, num);
     sbi_puts("module[top_early_printk]: init end!\n");
     return 0;
