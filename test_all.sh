@@ -10,12 +10,12 @@ TESTCASES="
     task
     early_fdt
     cgroup
+    cpu
     memblock
     params
 	spinlock
     semaphore
     early_printk
-    bootmem
     paging
     linux
 "
