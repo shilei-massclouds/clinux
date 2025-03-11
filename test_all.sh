@@ -5,10 +5,14 @@ GREEN_C='\033[92;1m'
 END_C='\033[0m'
 
 TESTCASES="
-    booter lib
+    booter
+    lib
+    task
+    early_fdt
     memblock
-    early_fdt params
-	spinlock semaphore
+    params
+	spinlock
+    semaphore
     early_printk
     bootmem
     paging
