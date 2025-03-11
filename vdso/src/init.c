@@ -12,3 +12,6 @@ cl_vdso_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_vdso_init);
+
+extern char __vdso_rt_sigreturn[];
+EXPORT_SYMBOL(__vdso_rt_sigreturn);

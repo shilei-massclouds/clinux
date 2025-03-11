@@ -18,6 +18,7 @@ TESTCASES="
     early_printk
     paging
     resource
+    of
     linux
 "
 

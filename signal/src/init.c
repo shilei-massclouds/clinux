@@ -2,7 +2,6 @@
 
 #include <linux/types.h>
 #include <linux/export.h>
-#include <linux/percpu-rwsem.h>
 #include "../../booter/src/booter.h"
 
 int
