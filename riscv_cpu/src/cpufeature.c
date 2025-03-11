@@ -12,17 +12,13 @@
 #include <asm/hwcap.h>
 #include <asm/smp.h>
 #include <asm/switch_to.h>
+#include "../../booter/src/booter.h"
 
 unsigned long elf_hwcap __read_mostly;
 EXPORT_SYMBOL(elf_hwcap);
 
 /* Host ISA bitmap */
 static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;
-
-#ifdef CONFIG_FPU
-bool has_fpu __read_mostly;
-EXPORT_SYMBOL(has_fpu);
-#endif
 
 /**
  * riscv_isa_extension_base() - Get base extension word
@@ -139,12 +135,18 @@ void riscv_fill_hwcap(void)
 		if (riscv_isa[0] & BIT_MASK(i))
 			print_str[j++] = (char)('a' + i);
 	pr_info("riscv: ISA extensions %s\n", print_str);
+    sbi_puts("riscv: ISA extensions ");
+    sbi_puts(print_str);
+    sbi_puts("\n");
 
 	memset(print_str, 0, sizeof(print_str));
 	for (i = 0, j = 0; i < BITS_PER_LONG; i++)
 		if (elf_hwcap & BIT_MASK(i))
 			print_str[j++] = (char)('a' + i);
 	pr_info("riscv: ELF capabilities %s\n", print_str);
+    sbi_puts("riscv: ELF capabilities ");
+    sbi_puts(print_str);
+    sbi_puts("\n");
 
 #ifdef CONFIG_FPU
 	if (elf_hwcap & (COMPAT_HWCAP_ISA_F | COMPAT_HWCAP_ISA_D))

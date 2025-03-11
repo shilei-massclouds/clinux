@@ -20,6 +20,8 @@ TESTCASES="
     resource
     of
     dma
+    sbi
+    riscv_cpu
     linux
 "
 

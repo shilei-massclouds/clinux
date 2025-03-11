@@ -5089,3 +5089,8 @@ __weak int access_process_vm(struct task_struct *tsk, unsigned long addr,
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL_GPL(access_process_vm);
+
+#ifdef CONFIG_FPU
+bool has_fpu __read_mostly;
+EXPORT_SYMBOL(has_fpu);
+#endif
