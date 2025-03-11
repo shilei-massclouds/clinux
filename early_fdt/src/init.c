@@ -33,16 +33,14 @@ static bool initargs_found;
 char __initdata boot_command_line[COMMAND_LINE_SIZE];
 EXPORT_SYMBOL(boot_command_line);
 
+extern void parse_dtb(void);
 extern void __init setup_command_line(void);
 
 int
 cl_early_fdt_init(void)
 {
     sbi_puts("module[early_fdt]: init begin ...\n");
-    if (strlen(boot_command_line) == 0) {
-        booter_panic("NOT setup boot_command_line yet.");
-    }
-    setup_command_line();
+    parse_dtb();
     sbi_puts("module[early_fdt]: init end!\n");
     return 0;
 }

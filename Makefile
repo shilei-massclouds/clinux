@@ -5,7 +5,7 @@ export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
 #TOP ?= linux
-TOP ?= virtio_blk
+TOP ?= early_fdt
 export TOP_COMPONENT := top_$(TOP)
 
 DEP ?= err

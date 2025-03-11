@@ -20,6 +20,7 @@ cl_task_init(void)
 {
     sbi_puts("module[task]: init begin ...\n");
     setup_task();
+    set_task_stack_end_magic(&init_task);
     sbi_puts("module[task]: init end!\n");
     return 0;
 }
@@ -300,5 +301,12 @@ setup_task(void)
         init_task.thread_info.cpu = 0;
         inited = true;
     }
+    sbi_puts("setup_task ok!\n");
 }
 EXPORT_SYMBOL(setup_task);
+
+struct task_struct *get_current(void)
+{
+	return riscv_current_is_tp;
+}
+EXPORT_SYMBOL(get_current);

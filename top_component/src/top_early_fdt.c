@@ -11,14 +11,9 @@ int
 cl_top_early_fdt_init(void)
 {
     sbi_puts("module[top_early_fdt]: init begin ...\n");
+    cl_init();
 
-    ENABLE_COMPONENT(early_printk);
-
-    parse_dtb();
-
-    sbi_puts("BOOT Command Line:\n ");
-    sbi_puts(boot_command_line);
-    sbi_puts("\n");
+    printk("boot command line: [%s]\n", boot_command_line);
 
     // Enable early-option 'memblock'='debug' to dump memblock.
     do_early_param("memblock", "debug", NULL, NULL);

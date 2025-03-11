@@ -26,10 +26,11 @@ register struct task_struct *riscv_current_is_tp __asm__("tp");
  * <asm/asm-offsets.h> includes this, and I can't get the definition of "struct
  * task_struct" here due to some header ordering problems.
  */
-static __always_inline struct task_struct *get_current(void)
-{
-	return riscv_current_is_tp;
-}
+//static __always_inline struct task_struct *get_current(void)
+//{
+//	return riscv_current_is_tp;
+//}
+extern struct task_struct *get_current(void);
 
 #define current get_current()
 
