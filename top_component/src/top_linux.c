@@ -107,52 +107,11 @@ extern void init_IRQ(void);
 extern void time_init(void);
 /* Default late time init is NULL. archs can override this later. */
 void (*__initdata late_time_init)(void);
+extern void setup_zero_page(void);
+extern void __init zone_sizes_init(void);
+extern void __init resource_init(void);
 
 void __init __weak mem_encrypt_init(void) { }
-
-static void setup_zero_page(void)
-{
-    memset((void *)empty_zero_page, 0, PAGE_SIZE);
-}
-
-static void __init zone_sizes_init(void)
-{
-    unsigned long max_zone_pfns[MAX_NR_ZONES] = { 0, };
-
-#ifdef CONFIG_ZONE_DMA32
-    max_zone_pfns[ZONE_DMA32] = PFN_DOWN(min(4UL * SZ_1G,
-            (unsigned long) PFN_PHYS(max_low_pfn)));
-#endif
-    max_zone_pfns[ZONE_NORMAL] = max_low_pfn;
-
-    free_area_init(max_zone_pfns);
-}
-
-static void __init resource_init(void)
-{
-    struct memblock_region *region;
-
-    for_each_memblock(memory, region) {
-        struct resource *res;
-
-        res = memblock_alloc(sizeof(struct resource), SMP_CACHE_BYTES);
-        if (!res)
-            panic("%s: Failed to allocate %zu bytes\n", __func__,
-                  sizeof(struct resource));
-
-        if (memblock_is_nomap(region)) {
-            res->name = "reserved";
-            res->flags = IORESOURCE_MEM;
-        } else {
-            res->name = "System RAM";
-            res->flags = IORESOURCE_SYSTEM_RAM | IORESOURCE_BUSY;
-        }
-        res->start = __pfn_to_phys(memblock_region_memory_base_pfn(region));
-        res->end = __pfn_to_phys(memblock_region_memory_end_pfn(region)) - 1;
-
-        request_resource(&iomem_resource, res);
-    }
-}
 
 void __init paging_init(void)
 {

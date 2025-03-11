@@ -4,6 +4,7 @@
 #include <linux/export.h>
 #include <linux/mm.h>
 #include <linux/compaction.h>
+#include <cl_hook.h>
 #include "internal.h"
 #include "../../booter/src/booter.h"
 
@@ -11,14 +12,27 @@ unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)]
                             __page_aligned_bss;
 EXPORT_SYMBOL(empty_zero_page);
 
+extern void __init setup_vm_final(void);
+extern void setup_zero_page(void);
+extern void __init zone_sizes_init(void);
+
 int
 cl_paging_init(void)
 {
     sbi_puts("module[paging]: init begin ...\n");
+    REQUIRE_COMPONENT(bootmem);
+
+    setup_vm_final();
+    sparse_init();
+    setup_zero_page();
+    zone_sizes_init();
+
     sbi_puts("module[paging]: init end!\n");
     return 0;
 }
 EXPORT_SYMBOL(cl_paging_init);
+
+DEFINE_ENABLE_FUNC(paging);
 
 void __weak __free_pages(struct page *page, unsigned int order)
 {
@@ -298,3 +312,22 @@ DEFINE_STATIC_KEY_FALSE(init_on_free);
 #endif
 EXPORT_SYMBOL(init_on_free);
 
+void setup_zero_page(void)
+{
+    memset((void *)empty_zero_page, 0, PAGE_SIZE);
+}
+EXPORT_SYMBOL(setup_zero_page);
+
+void __init zone_sizes_init(void)
+{
+    unsigned long max_zone_pfns[MAX_NR_ZONES] = { 0, };
+
+#ifdef CONFIG_ZONE_DMA32
+    max_zone_pfns[ZONE_DMA32] = PFN_DOWN(min(4UL * SZ_1G,
+            (unsigned long) PFN_PHYS(max_low_pfn)));
+#endif
+    max_zone_pfns[ZONE_NORMAL] = max_low_pfn;
+
+    free_area_init(max_zone_pfns);
+}
+EXPORT_SYMBOL(zone_sizes_init);
