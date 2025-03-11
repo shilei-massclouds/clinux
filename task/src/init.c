@@ -13,10 +13,13 @@
 #include "../../booter/src/booter.h"
 #include "../../early_sched/src/sched.h"
 
+extern void setup_task(void);
+
 int
 cl_task_init(void)
 {
     sbi_puts("module[task]: init begin ...\n");
+    setup_task();
     sbi_puts("module[task]: init end!\n");
     return 0;
 }
@@ -287,3 +290,15 @@ EXPORT_SYMBOL(cad_pid);
 
 LIST_HEAD(net_namespace_list);
 EXPORT_SYMBOL_GPL(net_namespace_list);
+
+void
+setup_task(void)
+{
+    static bool inited = false;
+    if (!inited) {
+        riscv_current_is_tp = &init_task;
+        init_task.thread_info.cpu = 0;
+        inited = true;
+    }
+}
+EXPORT_SYMBOL(setup_task);

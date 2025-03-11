@@ -146,7 +146,7 @@ extern char *saved_command_line;
 extern unsigned int reset_devices;
 
 /* used by init/main.c */
-void setup_arch(char **);
+void setup_arch(void);
 void prepare_namespace(void);
 void __init init_rootfs(void);
 extern struct file_system_type rootfs_fs_type;

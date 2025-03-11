@@ -59,12 +59,6 @@
 #include <cl_types.h>
 #include "../../booter/src/booter.h"
 
-/*
- * Boot command-line arguments
- */
-#define MAX_INIT_ARGS CONFIG_INIT_ENV_ARG_LIMIT
-#define MAX_INIT_ENVS CONFIG_INIT_ENV_ARG_LIMIT
-
 extern initcall_entry_t __initcall_start[];
 extern initcall_entry_t __initcall0_start[];
 extern initcall_entry_t __initcall1_start[];
@@ -76,17 +70,18 @@ extern initcall_entry_t __initcall6_start[];
 extern initcall_entry_t __initcall7_start[];
 extern initcall_entry_t __initcall_end[];
 
-static initcall_entry_t *initcall_levels[] __initdata = {
-    __initcall0_start,
-    __initcall1_start,
-    __initcall2_start,
-    __initcall3_start,
-    __initcall4_start,
-    __initcall5_start,
-    __initcall6_start,
-    __initcall7_start,
-    __initcall_end,
-};
+extern void __init do_initcalls(void);
+extern void setup_task(void);
+extern void __init setup_command_line(void);
+
+extern char *static_command_line;
+extern char *extra_init_args;
+
+/*
+ * Boot command-line arguments
+ */
+#define MAX_INIT_ARGS CONFIG_INIT_ENV_ARG_LIMIT
+#define MAX_INIT_ENVS CONFIG_INIT_ENV_ARG_LIMIT
 
 #if defined(CONFIG_STRICT_KERNEL_RWX) || defined(CONFIG_STRICT_MODULE_RWX)
 bool rodata_enabled __ro_after_init = true;
@@ -99,22 +94,6 @@ __setup("rodata=", set_debug_rodata);
 
 /* Untouched saved command line (eg. for /proc) */
 extern char *saved_command_line;
-
-/* Command line for parameter parsing */
-static char *static_command_line;
-/* Untouched extra command line */
-static char *extra_command_line;
-/* Extra init arguments */
-static char *extra_init_args;
-
-#ifdef CONFIG_BOOT_CONFIG
-/* Is bootconfig on command line? */
-static bool bootconfig_found;
-static bool initargs_found;
-#else
-# define bootconfig_found false
-# define initargs_found false
-#endif
 
 //bool initcall_debug;
 //core_param(initcall_debug, initcall_debug, bool, 0644);
@@ -184,10 +163,9 @@ void __init paging_init(void)
     resource_init();
 }
 
-void __init setup_arch(char **cmdline_p)
+void __init setup_arch(void)
 {
     setup_kernel_in_mm();
-    *cmdline_p = boot_command_line;
 
     parse_early_param();
 
@@ -240,67 +218,12 @@ static void * __init get_boot_config_from_initrd(u32 *_size, u32 *_csum)
 #ifdef CONFIG_BOOT_CONFIG
 #error bad config 'CONFIG_BOOT_CONFIG'
 #else
-static void __init setup_boot_config(const char *cmdline)
+static void __init setup_boot_config(void)
 {
     /* Remove bootconfig data from initrd */
     get_boot_config_from_initrd(NULL, NULL);
 }
 #endif
-
-/*
- * We need to store the untouched command line for future reference.
- * We also need to store the touched command line since the parameter
- * parsing is performed in place, and we should allow a component to
- * store reference of name/value for future reference.
- */
-static void __init setup_command_line(char *command_line)
-{
-	size_t len, xlen = 0, ilen = 0;
-
-	if (extra_command_line)
-		xlen = strlen(extra_command_line);
-	if (extra_init_args)
-		ilen = strlen(extra_init_args) + 4; /* for " -- " */
-
-	len = xlen + strlen(boot_command_line) + 1;
-
-	saved_command_line = memblock_alloc(len + ilen, SMP_CACHE_BYTES);
-	if (!saved_command_line)
-		panic("%s: Failed to allocate %zu bytes\n", __func__, len + ilen);
-
-	static_command_line = memblock_alloc(len, SMP_CACHE_BYTES);
-	if (!static_command_line)
-		panic("%s: Failed to allocate %zu bytes\n", __func__, len);
-
-	if (xlen) {
-		/*
-		 * We have to put extra_command_line before boot command
-		 * lines because there could be dashes (separator of init
-		 * command line) in the command lines.
-		 */
-		strcpy(saved_command_line, extra_command_line);
-		strcpy(static_command_line, extra_command_line);
-	}
-	strcpy(saved_command_line + xlen, boot_command_line);
-	strcpy(static_command_line + xlen, command_line);
-
-	if (ilen) {
-		/*
-		 * Append supplemental init boot args to saved_command_line
-		 * so that user can check what command line options passed
-		 * to init.
-		 */
-		len = strlen(saved_command_line);
-		if (initargs_found) {
-			saved_command_line[len++] = ' ';
-		} else {
-			strcpy(saved_command_line + len, " -- ");
-			len += 4;
-		}
-
-		strcpy(saved_command_line + len, extra_init_args);
-	}
-}
 
 #ifndef CONFIG_SMP
 static const unsigned int setup_max_cpus = NR_CPUS;
@@ -545,155 +468,6 @@ void __init __weak arch_post_acpi_subsys_init(void) { }
 
 static noinline void __init kernel_init_freeable(void);
 
-#ifdef CONFIG_KALLSYMS
-struct blacklist_entry {
-    struct list_head next;
-    char *buf;
-};
-
-static __initdata_or_module LIST_HEAD(blacklisted_initcalls);
-
-static int __init initcall_blacklist(char *str)
-{
-    char *str_entry;
-    struct blacklist_entry *entry;
-
-    /* str argument is a comma-separated list of functions */
-    do {
-        str_entry = strsep(&str, ",");
-        if (str_entry) {
-            pr_debug("blacklisting initcall %s\n", str_entry);
-            entry = memblock_alloc(sizeof(*entry),
-                           SMP_CACHE_BYTES);
-            if (!entry)
-                panic("%s: Failed to allocate %zu bytes\n",
-                      __func__, sizeof(*entry));
-            entry->buf = memblock_alloc(strlen(str_entry) + 1,
-                            SMP_CACHE_BYTES);
-            if (!entry->buf)
-                panic("%s: Failed to allocate %zu bytes\n",
-                      __func__, strlen(str_entry) + 1);
-            strcpy(entry->buf, str_entry);
-            list_add(&entry->next, &blacklisted_initcalls);
-        }
-    } while (str_entry);
-
-    return 0;
-}
-
-static bool __init_or_module initcall_blacklisted(initcall_t fn)
-{
-    struct blacklist_entry *entry;
-    char fn_name[KSYM_SYMBOL_LEN];
-    unsigned long addr;
-
-    if (list_empty(&blacklisted_initcalls))
-        return false;
-
-    addr = (unsigned long) dereference_function_descriptor(fn);
-    sprint_symbol_no_offset(fn_name, addr);
-
-    /*
-     * fn will be "function_name [module_name]" where [module_name] is not
-     * displayed for built-in init functions.  Strip off the [module_name].
-     */
-    strreplace(fn_name, ' ', '\0');
-
-    list_for_each_entry(entry, &blacklisted_initcalls, next) {
-        if (!strcmp(fn_name, entry->buf)) {
-            pr_debug("initcall %s blacklisted\n", fn_name);
-            return true;
-        }
-    }
-
-    return false;
-}
-#endif
-
-static __init_or_module void
-trace_initcall_start_cb(void *data, initcall_t fn)
-{
-    ktime_t *calltime = (ktime_t *)data;
-
-    printk(KERN_DEBUG "calling  %pS @ %i\n", fn, task_pid_nr(current));
-    *calltime = ktime_get();
-}
-
-static __init_or_module void
-trace_initcall_finish_cb(void *data, initcall_t fn, int ret)
-{
-    ktime_t *calltime = (ktime_t *)data;
-    ktime_t delta, rettime;
-    unsigned long long duration;
-
-    rettime = ktime_get();
-    delta = ktime_sub(rettime, *calltime);
-    duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-    printk(KERN_DEBUG "initcall %pS returned %d after %lld usecs\n",
-         fn, ret, duration);
-}
-
-static ktime_t initcall_calltime;
-
-#ifdef TRACEPOINTS_ENABLED
-static void __init initcall_debug_enable(void)
-{
-    int ret;
-
-    ret = register_trace_initcall_start(trace_initcall_start_cb,
-                        &initcall_calltime);
-    ret |= register_trace_initcall_finish(trace_initcall_finish_cb,
-                          &initcall_calltime);
-    WARN(ret, "Failed to register initcall tracepoints\n");
-}
-# define do_trace_initcall_start    trace_initcall_start
-# define do_trace_initcall_finish   trace_initcall_finish
-#else
-static inline void do_trace_initcall_start(initcall_t fn)
-{
-    if (!initcall_debug)
-        return;
-    trace_initcall_start_cb(&initcall_calltime, fn);
-}
-static inline void do_trace_initcall_finish(initcall_t fn, int ret)
-{
-    if (!initcall_debug)
-        return;
-    trace_initcall_finish_cb(&initcall_calltime, fn, ret);
-}
-#endif /* !TRACEPOINTS_ENABLED */
-
-int __init_or_module do_one_initcall(initcall_t fn)
-{
-    int count = preempt_count();
-    char msgbuf[64];
-    int ret;
-
-    if (initcall_blacklisted(fn))
-        return -EPERM;
-
-    printk("=================>\n");
-    do_trace_initcall_start(fn);
-    ret = fn();
-    do_trace_initcall_finish(fn, ret);
-    printk("<=================\n");
-
-    msgbuf[0] = 0;
-
-    if (preempt_count() != count) {
-        sprintf(msgbuf, "preemption imbalance ");
-        preempt_count_set(count);
-    }
-    if (irqs_disabled()) {
-        strlcat(msgbuf, "disabled interrupts ", sizeof(msgbuf));
-        local_irq_enable();
-    }
-    WARN(msgbuf[0], "initcall %pS returned with %s\n", fn, msgbuf);
-
-    add_latent_entropy();
-    return ret;
-}
-
 #ifdef CONFIG_STRICT_KERNEL_RWX
 static void mark_readonly(void)
 {
@@ -904,24 +678,6 @@ void __init __weak arch_call_rest_init(void)
     rest_init();
 }
 
-/* Keep these in sync with initcalls in include/linux/init.h */
-static const char *initcall_level_names[] __initdata = {
-    "pure",
-    "core",
-    "postcore",
-    "arch",
-    "subsys",
-    "fs",
-    "device",
-    "late",
-};
-
-static int __init ignore_unknown_bootoption(char *param, char *val,
-                   const char *unused, void *arg)
-{
-    return 0;
-}
-
 static void __init do_pre_smp_initcalls(void)
 {
     initcall_entry_t *fn;
@@ -940,43 +696,6 @@ static void __init do_ctors(void)
     for (; fn < (ctor_fn_t *) __ctors_end; fn++)
         (*fn)();
 #endif
-}
-
-static void __init do_initcall_level(int level, char *command_line)
-{
-    initcall_entry_t *fn;
-
-    sbi_puts(initcall_level_names[level]);
-    sbi_puts("\n");
-    parse_args(initcall_level_names[level],
-           command_line, __start___param,
-           __stop___param - __start___param,
-           level, level,
-           NULL, ignore_unknown_bootoption);
-
-    trace_initcall_level(initcall_level_names[level]);
-    for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
-        do_one_initcall(initcall_from_entry(fn));
-}
-
-static void __init do_initcalls(void)
-{
-    int level;
-    size_t len = strlen(saved_command_line) + 1;
-    char *command_line;
-
-    command_line = kzalloc(len, GFP_KERNEL);
-    if (!command_line)
-        panic("%s: Failed to allocate %zu bytes\n", __func__, len);
-
-    for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++) {
-        /* Parser modifies command_line, restore it each time */
-        strcpy(command_line, saved_command_line);
-        do_initcall_level(level, command_line);
-    }
-
-    kfree(command_line);
-    printk("%s: ========== END!\n", __func__);
 }
 
 /*
@@ -1070,22 +789,9 @@ static noinline void __init kernel_init_freeable(void)
     integrity_load_keys();
 }
 
-static void
-setup_task(void)
-{
-    static bool inited = false;
-    if (!inited) {
-        riscv_current_is_tp = &init_task;
-        init_task.thread_info.cpu = 0;
-        inited = true;
-    }
-}
-
-
 int
 cl_top_linux_init(void)
 {
-    char *command_line;
     char *after_dashes;
 
     sbi_puts("module[top_linux]: init begin ...\n");
@@ -1150,14 +856,14 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(ip_input);
     REQUIRE_COMPONENT(ip_sockglue);
     REQUIRE_COMPONENT(filter);
+    REQUIRE_COMPONENT(task);
 
     //
     // start_kernel (init/main.c)
     //
 
-    REQUIRE_COMPONENT(task); // Setup 'tp => init_task' here from head.S.
-    setup_task();
-    parse_dtb();             // Move 'parse_dtb' here from head.S.
+    setup_task();   // Setup 'tp => init_task' here from head.S.
+    parse_dtb();    // Move 'parse_dtb' here from head.S.
 
     set_task_stack_end_magic(&init_task);
     smp_setup_processor_id();
@@ -1176,9 +882,9 @@ cl_top_linux_init(void)
     page_address_init();
     pr_notice("%s", linux_banner);
     early_security_init();
-    setup_arch(&command_line);
-    setup_boot_config(command_line);
-    setup_command_line(command_line);
+    setup_arch();
+    setup_boot_config();
+    setup_command_line();
     setup_nr_cpu_ids();
     setup_per_cpu_areas();
     smp_prepare_boot_cpu(); /* arch-specific boot-cpu hooks */
@@ -1278,7 +984,7 @@ cl_top_linux_init(void)
      */
     rand_initialize();
     add_latent_entropy();
-    add_device_randomness(command_line, strlen(command_line));
+    add_device_randomness(boot_command_line, strlen(boot_command_line));
     boot_init_stack_canary();
 
     time_init();

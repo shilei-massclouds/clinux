@@ -10,15 +10,39 @@
 #include "../../booter/src/booter.h"
 
 extern void *dtb_early_va;
+/* Untouched extra command line */
+static char *extra_command_line;
+/* Extra init arguments */
+char *extra_init_args;
+EXPORT_SYMBOL(extra_init_args);
+
+/* Command line for parameter parsing */
+char *static_command_line;
+EXPORT_SYMBOL(static_command_line);
+
+#ifdef CONFIG_BOOT_CONFIG
+/* Is bootconfig on command line? */
+static bool bootconfig_found;
+static bool initargs_found;
+#else
+# define bootconfig_found false
+# define initargs_found false
+#endif
 
 /* Untouched command line saved by arch-specific code. */
 char __initdata boot_command_line[COMMAND_LINE_SIZE];
 EXPORT_SYMBOL(boot_command_line);
 
+extern void __init setup_command_line(void);
+
 int
 cl_early_fdt_init(void)
 {
     sbi_puts("module[early_fdt]: init begin ...\n");
+    if (strlen(boot_command_line) == 0) {
+        booter_panic("NOT setup boot_command_line yet.");
+    }
+    setup_command_line();
     sbi_puts("module[early_fdt]: init end!\n");
     return 0;
 }
@@ -129,3 +153,59 @@ __weak int of_address_to_resource(struct device_node *dev, int index,
     booter_panic("No impl 'driver_base'.");
 }
 EXPORT_SYMBOL_GPL(of_address_to_resource);
+
+/*
+ * We need to store the untouched command line for future reference.
+ * We also need to store the touched command line since the parameter
+ * parsing is performed in place, and we should allow a component to
+ * store reference of name/value for future reference.
+ */
+void __init setup_command_line(void)
+{
+	size_t len, xlen = 0, ilen = 0;
+
+	if (extra_command_line)
+		xlen = strlen(extra_command_line);
+	if (extra_init_args)
+		ilen = strlen(extra_init_args) + 4; /* for " -- " */
+
+	len = xlen + strlen(boot_command_line) + 1;
+
+	saved_command_line = memblock_alloc(len + ilen, SMP_CACHE_BYTES);
+	if (!saved_command_line)
+		panic("%s: Failed to allocate %zu bytes\n", __func__, len + ilen);
+
+	static_command_line = memblock_alloc(len, SMP_CACHE_BYTES);
+	if (!static_command_line)
+		panic("%s: Failed to allocate %zu bytes\n", __func__, len);
+
+	if (xlen) {
+		/*
+		 * We have to put extra_command_line before boot command
+		 * lines because there could be dashes (separator of init
+		 * command line) in the command lines.
+		 */
+		strcpy(saved_command_line, extra_command_line);
+		strcpy(static_command_line, extra_command_line);
+	}
+	strcpy(saved_command_line + xlen, boot_command_line);
+	strcpy(static_command_line + xlen, boot_command_line);
+
+	if (ilen) {
+		/*
+		 * Append supplemental init boot args to saved_command_line
+		 * so that user can check what command line options passed
+		 * to init.
+		 */
+		len = strlen(saved_command_line);
+		if (initargs_found) {
+			saved_command_line[len++] = ' ';
+		} else {
+			strcpy(saved_command_line + len, " -- ");
+			len += 4;
+		}
+
+		strcpy(saved_command_line + len, extra_init_args);
+	}
+}
+EXPORT_SYMBOL(setup_command_line);

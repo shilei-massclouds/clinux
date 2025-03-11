@@ -46,7 +46,7 @@ components := \
 	radix_tree idr xarray assoc_array list_lru klist logic_pio \
 	kasprintf random crypto uuid rhashtable iov_iter checksum \
 	sbitmap scatterlist bio mempool truncate interval_tree \
-	traps irq softirq dec_and_lock mpage \
+	traps irq softirq dec_and_lock mpage initcalls \
 	kobject driver_base resource devres dynamic_queue_limits \
 	of of_irq irq_work tty vt earlycon dummycon input \
 	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \

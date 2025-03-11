@@ -10,9 +10,8 @@ cl_top_virtio_blk_init(void)
 {
     sbi_puts("module[top_virtio_blk]: init begin ...\n");
     REQUIRE_COMPONENT(virtio_blk);
-
+    REQUIRE_COMPONENT(initcalls);
     cl_init();
-
     sbi_puts("module[top_virtio_blk]: init end!\n");
     return 0;
 }
