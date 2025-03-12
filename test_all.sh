@@ -17,6 +17,7 @@ TESTCASES="
     semaphore
     early_printk
     paging
+    bootmem
     resource
     of
     dma
