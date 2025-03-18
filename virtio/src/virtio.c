@@ -430,7 +430,7 @@ err:
 EXPORT_SYMBOL_GPL(virtio_device_restore);
 #endif
 
-static int virtio_init(void)
+int virtio_init(void)
 {
 	if (bus_register(&virtio_bus) != 0)
 		panic("virtio bus registration failed");
