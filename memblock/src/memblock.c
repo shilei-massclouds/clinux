@@ -2079,3 +2079,15 @@ early_param("memblock", early_memblock);
 //__initcall(memblock_init_debugfs);
 //
 //#endif /* CONFIG_DEBUG_FS */
+
+struct page *pfn_to_page(unsigned long pfn)
+{
+    return mem_map + ((pfn) - ARCH_PFN_OFFSET);
+}
+EXPORT_SYMBOL(pfn_to_page);
+
+unsigned long page_to_pfn(const struct page *page)
+{
+    return (unsigned long)((page) - mem_map) + ARCH_PFN_OFFSET;
+}
+EXPORT_SYMBOL(page_to_pfn);

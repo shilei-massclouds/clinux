@@ -30,8 +30,8 @@
  */
 #if defined(CONFIG_FLATMEM)
 
-#define __pfn_to_page(pfn)	(mem_map + ((pfn) - ARCH_PFN_OFFSET))
-#define __page_to_pfn(page)	((unsigned long)((page) - mem_map) + \
+//#define __pfn_to_page(pfn)	(mem_map + ((pfn) - ARCH_PFN_OFFSET))
+//#define __page_to_pfn(page)	((unsigned long)((page) - mem_map) + \
 				 ARCH_PFN_OFFSET)
 #elif defined(CONFIG_DISCONTIGMEM)
 
@@ -78,8 +78,11 @@
 #define	__phys_to_pfn(paddr)	PHYS_PFN(paddr)
 #define	__pfn_to_phys(pfn)	PFN_PHYS(pfn)
 
-#define page_to_pfn __page_to_pfn
-#define pfn_to_page __pfn_to_page
+//#define page_to_pfn __page_to_pfn
+//#define pfn_to_page __pfn_to_page
+
+struct page *pfn_to_page(unsigned long pfn);
+unsigned long page_to_pfn(const struct page *page);
 
 #endif /* __ASSEMBLY__ */
 
