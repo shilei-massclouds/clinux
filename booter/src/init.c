@@ -1324,10 +1324,10 @@ __weak void *kmem_cache_alloc(struct kmem_cache *s, gfp_t gfpflags)
 }
 EXPORT_SYMBOL(kmem_cache_alloc);
 
-struct kmem_cache *
-kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1] __ro_after_init =
-{ /* initialization for https://bugs.llvm.org/show_bug.cgi?id=42570 */ };
-EXPORT_SYMBOL(kmalloc_caches);
+//struct kmem_cache *
+//kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1] __ro_after_init =
+//{ /* initialization for https://bugs.llvm.org/show_bug.cgi?id=42570 */ };
+//EXPORT_SYMBOL(kmalloc_caches);
 
 __weak struct device *get_device(struct device *dev)
 {
@@ -5094,3 +5094,15 @@ EXPORT_SYMBOL_GPL(access_process_vm);
 bool has_fpu __read_mostly;
 EXPORT_SYMBOL(has_fpu);
 #endif
+
+__weak void *kmalloc_node(size_t size, gfp_t flags, int node)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(kmalloc_node);
+
+__weak void *kmalloc(size_t size, gfp_t flags)
+{
+    booter_panic("No impl 'slub'.");
+}
+EXPORT_SYMBOL(kmalloc);

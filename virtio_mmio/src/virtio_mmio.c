@@ -544,6 +544,7 @@ static int virtio_mmio_probe(struct platform_device *pdev)
 	INIT_LIST_HEAD(&vm_dev->virtqueues);
 	spin_lock_init(&vm_dev->lock);
 
+    printk("%s: step1\n", __func__);
 	vm_dev->base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(vm_dev->base))
 		return PTR_ERR(vm_dev->base);
@@ -759,7 +760,7 @@ static struct platform_driver virtio_mmio_driver = {
 	},
 };
 
-static int __init virtio_mmio_init(void)
+int __init virtio_mmio_init(void)
 {
     sbi_puts("virtio_mmio_init: ...\n");
 	return platform_driver_register(&virtio_mmio_driver);

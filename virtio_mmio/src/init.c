@@ -6,10 +6,13 @@
 #include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
+extern int virtio_mmio_init(void);
+
 int
 cl_virtio_mmio_init(void)
 {
     sbi_puts("module[virtio_mmio]: init begin ...\n");
+    virtio_mmio_init();
     sbi_puts("module[virtio_mmio]: init end!\n");
     return 0;
 }

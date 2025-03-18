@@ -314,8 +314,8 @@ enum kmalloc_cache_type {
 };
 
 #ifndef CONFIG_SLOB
-extern struct kmem_cache *
-kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1];
+//extern struct kmem_cache *
+//kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1];
 
 static __always_inline enum kmalloc_cache_type kmalloc_type(gfp_t flags)
 {
@@ -537,45 +537,9 @@ static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
  *	Try really hard to succeed the allocation but fail
  *	eventually.
  */
-static __always_inline void *kmalloc(size_t size, gfp_t flags)
-{
-	if (__builtin_constant_p(size)) {
-#ifndef CONFIG_SLOB
-		unsigned int index;
-#endif
-		if (size > KMALLOC_MAX_CACHE_SIZE)
-			return kmalloc_large(size, flags);
-#ifndef CONFIG_SLOB
-		index = kmalloc_index(size);
+void *kmalloc(size_t size, gfp_t flags);
 
-		if (!index)
-			return ZERO_SIZE_PTR;
-
-		return kmem_cache_alloc_trace(
-				kmalloc_caches[kmalloc_type(flags)][index],
-				flags, size);
-#endif
-	}
-	return __kmalloc(size, flags);
-}
-
-static __always_inline void *kmalloc_node(size_t size, gfp_t flags, int node)
-{
-#ifndef CONFIG_SLOB
-	if (__builtin_constant_p(size) &&
-		size <= KMALLOC_MAX_CACHE_SIZE) {
-		unsigned int i = kmalloc_index(size);
-
-		if (!i)
-			return ZERO_SIZE_PTR;
-
-		return kmem_cache_alloc_node_trace(
-				kmalloc_caches[kmalloc_type(flags)][i],
-						flags, node, size);
-	}
-#endif
-	return __kmalloc_node(size, flags, node);
-}
+void *kmalloc_node(size_t size, gfp_t flags, int node);
 
 /**
  * kmalloc_array - allocate memory for an array.

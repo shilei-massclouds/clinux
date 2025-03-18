@@ -63,6 +63,11 @@ static DECLARE_WORK(slab_caches_to_rcu_destroy_work,
  */
 static bool slab_nomerge = !IS_ENABLED(CONFIG_SLAB_MERGE_DEFAULT);
 
+struct kmem_cache *
+kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1] __ro_after_init =
+{ /* initialization for https://bugs.llvm.org/show_bug.cgi?id=42570 */ };
+EXPORT_SYMBOL(kmalloc_caches);
+
 //static int __init setup_slab_nomerge(char *str)
 //{
 //	slab_nomerge = true;
@@ -1189,3 +1194,43 @@ int should_failslab(struct kmem_cache *s, gfp_t gfpflags)
 	return 0;
 }
 ALLOW_ERROR_INJECTION(should_failslab, ERRNO);
+
+void *kmalloc(size_t size, gfp_t flags)
+{
+	if (__builtin_constant_p(size)) {
+#ifndef CONFIG_SLOB
+		unsigned int index;
+#endif
+		if (size > KMALLOC_MAX_CACHE_SIZE)
+			return kmalloc_large(size, flags);
+#ifndef CONFIG_SLOB
+		index = kmalloc_index(size);
+
+		if (!index)
+			return ZERO_SIZE_PTR;
+
+		return kmem_cache_alloc_trace(
+				kmalloc_caches[kmalloc_type(flags)][index],
+				flags, size);
+#endif
+	}
+	return __kmalloc(size, flags);
+}
+
+void *kmalloc_node(size_t size, gfp_t flags, int node)
+{
+#ifndef CONFIG_SLOB
+	if (__builtin_constant_p(size) &&
+		size <= KMALLOC_MAX_CACHE_SIZE) {
+		unsigned int i = kmalloc_index(size);
+
+		if (!i)
+			return ZERO_SIZE_PTR;
+
+		return kmem_cache_alloc_node_trace(
+				kmalloc_caches[kmalloc_type(flags)][i],
+						flags, node, size);
+	}
+#endif
+	return __kmalloc_node(size, flags, node);
+}
