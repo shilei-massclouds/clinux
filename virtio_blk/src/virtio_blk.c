@@ -1037,6 +1037,11 @@ static void __exit fini(void)
 module_init(init);
 module_exit(fini);
 
+int __init virtio_blk_init(void)
+{
+    return init();
+}
+
 MODULE_DEVICE_TABLE(virtio, id_table);
 MODULE_DESCRIPTION("Virtio block driver");
 MODULE_LICENSE("GPL");
