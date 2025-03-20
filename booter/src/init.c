@@ -5106,3 +5106,9 @@ __weak void *kmalloc(size_t size, gfp_t flags)
     booter_panic("No impl 'slub'.");
 }
 EXPORT_SYMBOL(kmalloc);
+
+__weak const struct file_operations *get_def_blk_fops(void)
+{
+    booter_panic("No impl.");
+}
+EXPORT_SYMBOL(get_def_blk_fops);

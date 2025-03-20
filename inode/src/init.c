@@ -16,4 +16,3 @@ EXPORT_SYMBOL(cl_inode_init);
 
 const struct file_operations pipefifo_fops;
 int sysctl_vfs_cache_pressure __read_mostly = 100;
-const struct file_operations def_blk_fops;

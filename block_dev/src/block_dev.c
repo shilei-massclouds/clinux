@@ -1709,37 +1709,37 @@ struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
 //	return bdev;
 //}
 //EXPORT_SYMBOL(blkdev_get_by_dev);
-//
-//static int blkdev_open(struct inode * inode, struct file * filp)
-//{
-//	struct block_device *bdev;
-//
-//	/*
-//	 * Preserve backwards compatibility and allow large file access
-//	 * even if userspace doesn't ask for it explicitly. Some mkfs
-//	 * binary needs it. We might want to drop this workaround
-//	 * during an unstable branch.
-//	 */
-//	filp->f_flags |= O_LARGEFILE;
-//
-//	filp->f_mode |= FMODE_NOWAIT | FMODE_BUF_RASYNC;
-//
-//	if (filp->f_flags & O_NDELAY)
-//		filp->f_mode |= FMODE_NDELAY;
-//	if (filp->f_flags & O_EXCL)
-//		filp->f_mode |= FMODE_EXCL;
-//	if ((filp->f_flags & O_ACCMODE) == 3)
-//		filp->f_mode |= FMODE_WRITE_IOCTL;
-//
-//	bdev = bd_acquire(inode);
-//	if (bdev == NULL)
-//		return -ENOMEM;
-//
-//	filp->f_mapping = bdev->bd_inode->i_mapping;
-//	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
-//
-//	return blkdev_get(bdev, filp->f_mode, filp);
-//}
+
+static int blkdev_open(struct inode * inode, struct file * filp)
+{
+	struct block_device *bdev;
+
+	/*
+	 * Preserve backwards compatibility and allow large file access
+	 * even if userspace doesn't ask for it explicitly. Some mkfs
+	 * binary needs it. We might want to drop this workaround
+	 * during an unstable branch.
+	 */
+	filp->f_flags |= O_LARGEFILE;
+
+	filp->f_mode |= FMODE_NOWAIT | FMODE_BUF_RASYNC;
+
+	if (filp->f_flags & O_NDELAY)
+		filp->f_mode |= FMODE_NDELAY;
+	if (filp->f_flags & O_EXCL)
+		filp->f_mode |= FMODE_EXCL;
+	if ((filp->f_flags & O_ACCMODE) == 3)
+		filp->f_mode |= FMODE_WRITE_IOCTL;
+
+	bdev = bd_acquire(inode);
+	if (bdev == NULL)
+		return -ENOMEM;
+
+	filp->f_mapping = bdev->bd_inode->i_mapping;
+	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
+
+	return blkdev_get(bdev, filp->f_mode, filp);
+}
 
 static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
 {
@@ -1949,92 +1949,97 @@ static const struct address_space_operations def_blk_aops = {
 	.is_dirty_writeback = buffer_check_dirty_writeback,
 };
 
-//#define	BLKDEV_FALLOC_FL_SUPPORTED					\
-//		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
-//		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
-//
-//static long blkdev_fallocate(struct file *file, int mode, loff_t start,
-//			     loff_t len)
-//{
-//	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
-//	struct address_space *mapping;
-//	loff_t end = start + len - 1;
-//	loff_t isize;
-//	int error;
-//
-//	/* Fail if we don't recognize the flags. */
-//	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
-//		return -EOPNOTSUPP;
-//
-//	/* Don't go off the end of the device. */
-//	isize = i_size_read(bdev->bd_inode);
-//	if (start >= isize)
-//		return -EINVAL;
-//	if (end >= isize) {
-//		if (mode & FALLOC_FL_KEEP_SIZE) {
-//			len = isize - start;
-//			end = start + len - 1;
-//		} else
-//			return -EINVAL;
-//	}
-//
-//	/*
-//	 * Don't allow IO that isn't aligned to logical block size.
-//	 */
-//	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
-//		return -EINVAL;
-//
-//	/* Invalidate the page cache, including dirty pages. */
-//	mapping = bdev->bd_inode->i_mapping;
-//	truncate_inode_pages_range(mapping, start, end);
-//
-//	switch (mode) {
-//	case FALLOC_FL_ZERO_RANGE:
-//	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
-//		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-//					    GFP_KERNEL, BLKDEV_ZERO_NOUNMAP);
-//		break;
-//	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
-//		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-//					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
-//		break;
-//	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
-//		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
-//					     GFP_KERNEL, 0);
-//		break;
-//	default:
-//		return -EOPNOTSUPP;
-//	}
-//	if (error)
-//		return error;
-//
-//	/*
-//	 * Invalidate again; if someone wandered in and dirtied a page,
-//	 * the caller will be given -EBUSY.  The third argument is
-//	 * inclusive, so the rounding here is safe.
-//	 */
-//	return invalidate_inode_pages2_range(mapping,
-//					     start >> PAGE_SHIFT,
-//					     end >> PAGE_SHIFT);
-//}
-//
-//const struct file_operations def_blk_fops = {
-//	.open		= blkdev_open,
-//	.release	= blkdev_close,
-//	.llseek		= block_llseek,
-//	.read_iter	= blkdev_read_iter,
-//	.write_iter	= blkdev_write_iter,
-//	.iopoll		= blkdev_iopoll,
-//	.mmap		= generic_file_mmap,
-//	.fsync		= blkdev_fsync,
-//	.unlocked_ioctl	= block_ioctl,
-//#ifdef CONFIG_COMPAT
-//	.compat_ioctl	= compat_blkdev_ioctl,
-//#endif
-//	.splice_read	= generic_file_splice_read,
-//	.splice_write	= iter_file_splice_write,
-//	.fallocate	= blkdev_fallocate,
-//};
+#define	BLKDEV_FALLOC_FL_SUPPORTED					\
+		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
+		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
+
+static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+			     loff_t len)
+{
+	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
+	struct address_space *mapping;
+	loff_t end = start + len - 1;
+	loff_t isize;
+	int error;
+
+	/* Fail if we don't recognize the flags. */
+	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
+		return -EOPNOTSUPP;
+
+	/* Don't go off the end of the device. */
+	isize = i_size_read(bdev->bd_inode);
+	if (start >= isize)
+		return -EINVAL;
+	if (end >= isize) {
+		if (mode & FALLOC_FL_KEEP_SIZE) {
+			len = isize - start;
+			end = start + len - 1;
+		} else
+			return -EINVAL;
+	}
+
+	/*
+	 * Don't allow IO that isn't aligned to logical block size.
+	 */
+	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
+		return -EINVAL;
+
+	/* Invalidate the page cache, including dirty pages. */
+	mapping = bdev->bd_inode->i_mapping;
+	truncate_inode_pages_range(mapping, start, end);
+
+	switch (mode) {
+	case FALLOC_FL_ZERO_RANGE:
+	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
+		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+					    GFP_KERNEL, BLKDEV_ZERO_NOUNMAP);
+		break;
+	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
+		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
+		break;
+	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
+		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+					     GFP_KERNEL, 0);
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	if (error)
+		return error;
+
+	/*
+	 * Invalidate again; if someone wandered in and dirtied a page,
+	 * the caller will be given -EBUSY.  The third argument is
+	 * inclusive, so the rounding here is safe.
+	 */
+	return invalidate_inode_pages2_range(mapping,
+					     start >> PAGE_SHIFT,
+					     end >> PAGE_SHIFT);
+}
+
+const struct file_operations def_blk_fops = {
+	.open		= blkdev_open,
+	.release	= blkdev_close,
+	.llseek		= block_llseek,
+	.read_iter	= blkdev_read_iter,
+	.write_iter	= blkdev_write_iter,
+	.iopoll		= blkdev_iopoll,
+	.mmap		= generic_file_mmap,
+	.fsync		= blkdev_fsync,
+	.unlocked_ioctl	= block_ioctl,
+#ifdef CONFIG_COMPAT
+	.compat_ioctl	= compat_blkdev_ioctl,
+#endif
+	.splice_read	= generic_file_splice_read,
+	.splice_write	= iter_file_splice_write,
+	.fallocate	= blkdev_fallocate,
+};
+
+const struct file_operations *get_def_blk_fops(void)
+{
+    return &def_blk_fops;
+}
 
 /**
  * lookup_bdev  - lookup a struct block_device by name

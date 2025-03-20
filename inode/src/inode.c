@@ -24,6 +24,8 @@
 #include <trace/events/writeback.h>
 #include "internal.h"
 
+extern const struct file_operations *get_def_blk_fops(void);
+
 /*
  * Inode locking rules:
  *
@@ -2123,7 +2125,9 @@ void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
 		inode->i_fop = &def_chr_fops;
 		inode->i_rdev = rdev;
 	} else if (S_ISBLK(mode)) {
-		inode->i_fop = &def_blk_fops;
+        const struct file_operations *def_blk_fops_ptr = get_def_blk_fops();
+        BUG_ON(def_blk_fops_ptr == NULL);
+		inode->i_fop = def_blk_fops_ptr;
 		inode->i_rdev = rdev;
 	} else if (S_ISFIFO(mode))
 		inode->i_fop = &pipefifo_fops;
