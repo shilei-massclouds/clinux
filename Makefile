@@ -49,7 +49,7 @@ components := \
 	traps irq softirq dec_and_lock mpage initcalls \
 	kobject driver_base resource devres dynamic_queue_limits \
 	of of_irq irq_work tty vt earlycon dummycon input \
-	sbi time irqchip riscv_cpu timer_riscv calibrate timerqueue \
+	sbi time irq_riscv_intc irq_sifive_plic riscv_cpu timer_riscv calibrate timerqueue \
 	early_fdt params module patch maccess capability security \
 	clocksource pid seq_file errseq futex dnotify \
 	cpu task cgroup ksysfs dma up notify fs_attr fs_stat fs_writeback \

@@ -748,6 +748,7 @@ static noinline void __init kernel_init_freeable(void)
     integrity_load_keys();
 
     // Note: Just for testing virtio_blk. Remove it later!
+    /*
     {
         struct file *f = filp_open("/dev/vda", O_RDONLY, 0);
         if (f == NULL) {
@@ -767,6 +768,7 @@ static noinline void __init kernel_init_freeable(void)
         printk("++++++++++++++++++++++++++++++++++++++++\n");
         booter_panic("Read /dev/vda OK!");
     }
+    */
 }
 
 int
@@ -777,7 +779,8 @@ cl_top_linux_init(void)
     sbi_puts("module[top_linux]: init begin ...\n");
     REQUIRE_COMPONENT(locks);
     REQUIRE_COMPONENT(of_irq);
-    REQUIRE_COMPONENT(irqchip);
+    REQUIRE_COMPONENT(irq_riscv_intc);
+    REQUIRE_COMPONENT(irq_sifive_plic);
     REQUIRE_COMPONENT(timer_riscv);
     REQUIRE_COMPONENT(earlycon);
     REQUIRE_COMPONENT(show_mem);
