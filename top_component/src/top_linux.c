@@ -747,15 +747,16 @@ static noinline void __init kernel_init_freeable(void)
 
     integrity_load_keys();
 
+    // Note: Just for testing virtio_blk. Remove it later!
     {
         struct file *f = filp_open("/dev/vda", O_RDONLY, 0);
         if (f == NULL) {
             booter_panic("Open /dev/vda error!");
         }
         printk("Read [/dev/vda] ..\n");
-        sbi_puts("Read [/dev/vda] ..\n");
+        printk("++++++++++++++++++++++++++++++++++++++++\n");
 
-        loff_t pos = 1024;
+        loff_t pos = 1024*16;
         unsigned long buf[256/8];
         int ret = kernel_read(f, buf, sizeof(buf), &pos);
         if (ret != 256) {
@@ -763,14 +764,8 @@ static noinline void __init kernel_init_freeable(void)
         }
         printk("Read /dev/vda: [%lx, %lx, %lx, %lx]\n",
                buf[0], buf[1], buf[2], buf[3]);
-        sbi_put_u64(buf[0]);
-        sbi_puts("\n");
-        sbi_put_u64(buf[1]);
-        sbi_puts("\n");
-        sbi_put_u64(buf[2]);
-        sbi_puts("\n");
-        sbi_put_u64(buf[3]);
-        sbi_puts("\n");
+        printk("++++++++++++++++++++++++++++++++++++++++\n");
+        booter_panic("Read /dev/vda OK!");
     }
 }
 
