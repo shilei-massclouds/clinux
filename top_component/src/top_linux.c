@@ -748,7 +748,6 @@ static noinline void __init kernel_init_freeable(void)
     integrity_load_keys();
 
     // Note: Just for testing virtio_blk. Remove it later!
-    /*
     {
         struct file *f = filp_open("/dev/vda", O_RDONLY, 0);
         if (f == NULL) {
@@ -768,7 +767,6 @@ static noinline void __init kernel_init_freeable(void)
         printk("++++++++++++++++++++++++++++++++++++++++\n");
         booter_panic("Read /dev/vda OK!");
     }
-    */
 }
 
 int

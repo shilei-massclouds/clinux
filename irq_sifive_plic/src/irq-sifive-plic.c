@@ -273,7 +273,7 @@ static int plic_starting_cpu(unsigned int cpu)
 	return 0;
 }
 
-static int __init plic_init(struct device_node *node,
+int __init plic_init(struct device_node *node,
 		struct device_node *parent)
 {
 	int error = 0, nr_contexts, nr_handlers = 0, i;
