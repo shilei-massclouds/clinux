@@ -1,0 +1,2 @@
+arch/riscv/kernel/vmlinux.lds.o:_text,jiffies,_end,__timer_of_table,__lock_text_end,__start___bug_table,__reservedmem_of_table,__lock_text_start
+arch/riscv/kernel/vdso/vdso.lds.o:_vdso_data
