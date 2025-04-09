@@ -19,6 +19,22 @@ mod module;
 
 use module::{ModuleStatus, Module, ModuleRef};
 
+struct Trace {
+    route: Vec<String>,
+    max_depth: usize,
+    enabled: bool,
+}
+
+impl Trace {
+    pub fn new() -> Self {
+        Self {
+            route: vec![],
+            max_depth: 0,
+            enabled: false,
+        }
+    }
+}
+
 static BLACK_LIST: [&str; 5] = [
     "vmlinux",
     ".vmlinux.export",
@@ -33,7 +49,8 @@ static SAMPLE_LIST: [&str; 8] = [
     "kernel/sched/core",
     "lib/bitmap",
     "block/blk-core",
-    "net/socket",
+    //"net/socket",
+    "arch/riscv/kernel/smpboot",
     "fs/ext2/inode",
     "drivers/block/virtio_blk",
 ];
@@ -72,16 +89,19 @@ fn main() -> Result<()> {
 
     let mut total_elements = 0;
     let mut sum_depwide = 0;
+    let mut sum_cycles = 0;
     for m in &kmods {
         log::debug!("domain: {}, DepDirectWide: {}", m.name, m.dependencies.borrow().len());
         sum_depwide += m.dependencies.borrow().len();
         total_elements += m.nr_elements.get().unwrap_or(&0);
+        sum_cycles += m.max_cycles.load(Ordering::Relaxed);
     }
 
     let total_domains = kmods.len();
     let indicator_in_domain = total_elements as f64 / total_domains as f64;
     let adw = sum_depwide as f64 / total_domains as f64;
     let adl = sum_deplen as f64 / total_domains as f64;
+    let ac = sum_cycles as f64 / total_domains as f64;
     let di = (total_elements as f64 * adw * adl) / total_domains.pow(2) as f64;
 
     println!("******************* [Global] ********************");
@@ -91,6 +111,7 @@ fn main() -> Result<()> {
     println!("Average elements per domain:\t{:.2}", indicator_in_domain);
     println!("Average dependency wide (ADW):\t{:.2}", adw);
     println!("Average dependency len (ADL):\t{:.2}", adl);
+    println!("Average cycles (ADC):\t{:.2}", ac);
     println!("Diffusion Indicator (DI):\t{:.2}", di);
     println!("");
     println!("Formula: DI = (#E / #D) * (ADW / #D) * ADL");
@@ -105,7 +126,14 @@ fn main() -> Result<()> {
         for sample in SAMPLE_LIST {
             if m.name == sample {
                 let mut node_map = HashMap::<String, usize>::new();
-                traverse_simple(m.clone(), &mut node_map)?;
+
+                let mut trace = Trace::new();
+                if sample == "arch/riscv/kernel/smpboot" {
+                    trace.enabled = true;
+                }
+                trace.route.push(m.name.clone());
+                traverse_simple(m.clone(), &mut node_map, &mut trace)?;
+                trace.route.pop();
                 for node in &node_map {
                     log::debug!("{}: {}", node.0, node.1);
                 }
@@ -115,6 +143,7 @@ fn main() -> Result<()> {
                 let indicator_in_domain = nr_elements as f64 / nr_domains as f64;
                 let dw = m.dependencies.borrow().len() as f64;
                 let dl = m.max_deplen.load(Ordering::Relaxed) as f64;
+                let cycles = m.max_cycles.load(Ordering::Relaxed) as f64;
                 let di = (nr_elements as f64 * dw * dl) / (nr_domains as f64 * total_domains as f64);
                 println!("******************* [{}] ********************", sample);
                 println!("Number of domains (#D):\t\t{}", nr_domains);
@@ -123,6 +152,7 @@ fn main() -> Result<()> {
                 println!("Dependency wide (DW):\t\t{:.2}", dw);
                 println!("Max dependency length (DL):\t{:.2}", dl);
                 println!("Diffusion Indicator (DI):\t{:.2}", di);
+                println!("Number of cycles:\t{}", cycles);
                 println!("");
                 println!("Formula: DI = (#E / #D) * (DW / #TD) * DL");
                 println!("*********************************************\n");
@@ -171,7 +201,8 @@ fn get_last(path: &str) -> String {
 // Note: in traverse_simple, we ignore module's status.
 fn traverse_simple(
     kmod: ModuleRef,
-    node_map: &mut HashMap::<String, usize>
+    node_map: &mut HashMap::<String, usize>,
+    trace: &mut Trace,
 ) -> Result<()> {
     log::debug!("mod name: {}", kmod.name);
     if node_map.get(&kmod.name).is_some() {
@@ -179,8 +210,15 @@ fn traverse_simple(
     }
     node_map.insert(kmod.name.clone(), *kmod.nr_elements.get().unwrap());
 
+    if trace.enabled && trace.route.len() > trace.max_depth {
+        trace.max_depth = trace.route.len();
+        //log::error!("[{}] {}", trace.max_depth, trace.route.join(" -> "));
+    }
+
     for depend in kmod.dependencies.borrow().iter() {
-        traverse_simple(depend.clone(), node_map)?;
+        trace.route.push(depend.name.clone());
+        traverse_simple(depend.clone(), node_map, trace)?;
+        trace.route.pop();
     }
     Ok(())
 }
@@ -199,23 +237,29 @@ fn traverse(kmod: ModuleRef, level: usize) -> Result<usize> {
             log::debug!("Find cyclic chain level: {}!", level);
             let max_deplen = level * 2;
             kmod.max_deplen.store(max_deplen, Ordering::Relaxed);
+            kmod.max_cycles.fetch_add(1, Ordering::Relaxed);
             return Ok(max_deplen);
         }
     }
 
-    let mut max_deplen = 0;
+    let mut total_deplen = 0;
     for depend in kmod.dependencies.borrow().iter() {
         let cur_deplen = traverse(depend.clone(), level + 1)?;
+        total_deplen += cur_deplen;
+        /*
         if max_deplen < cur_deplen {
             max_deplen = cur_deplen;
             log::debug!("{} -> {}. max: {}.", kmod.name, depend.name, max_deplen);
         }
+        */
     }
 
+    let avg_deplen = total_deplen / (kmod.dependencies.borrow().len() + 1);
+
     let mut ret_deplen = kmod.max_deplen.load(Ordering::Relaxed);
-    if ret_deplen <= max_deplen {
+    if ret_deplen <= avg_deplen {
         // Add current level to deplen.
-        ret_deplen = max_deplen + 1;
+        ret_deplen = avg_deplen + 1;
         kmod.max_deplen.store(ret_deplen, Ordering::Relaxed);
     }
     kmod.status.fetch_or(ModuleStatus::DONE.bits(), Ordering::Relaxed);
