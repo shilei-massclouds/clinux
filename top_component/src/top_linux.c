@@ -765,7 +765,8 @@ static noinline void __init kernel_init_freeable(void)
         printk("Read /dev/vda: [%lx, %lx, %lx, %lx]\n",
                buf[0], buf[1], buf[2], buf[3]);
         printk("++++++++++++++++++++++++++++++++++++++++\n");
-        booter_panic("Read /dev/vda OK!");
+        //booter_panic("Read /dev/vda OK!");
+        printk("Read /dev/vda OK!");
     }
 }
 
