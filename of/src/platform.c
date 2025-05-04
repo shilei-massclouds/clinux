@@ -394,7 +394,7 @@ static int of_platform_bus_create(struct device_node *bus,
 		return 0;
 
 	for_each_child_of_node(bus, child) {
-        printk("%s: ==> child %s\n", __func__, child->name);
+        printk("%s: bus %s ==> child %s\n", __func__, bus->name, child->name);
 		pr_debug("   create child: %pOF\n", child);
 		rc = of_platform_bus_create(child, matches, lookup, &dev->dev, strict);
 		if (rc) {

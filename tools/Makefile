@@ -2,7 +2,7 @@
 
 PHONY := all clean run
 
-SUBDIRS := find_dep json2md
+SUBDIRS := find_dep json2dot
 
 CLEAN_DIRS := $(addprefix _clean_, $(SUBDIRS))
 RUN_DIRS := $(addprefix _run_, $(SUBDIRS))

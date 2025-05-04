@@ -7,7 +7,7 @@ all: build
 	@:
 
 build:
-	@printf "MK\tjson2dot\n"
+	@printf "MK\tjson2dot (It may cost several seconds.)\n"
 	@cargo build -q --release
 
 clean:

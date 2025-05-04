@@ -17,6 +17,8 @@ else
 endif
 export DEBUG_INC
 
+MAX_DEPLEVEL ?= 1
+
 FS_TYPE := ext2
 DISK_IMG := disk.img
 
@@ -154,6 +156,10 @@ disk_img: linux_apps
 	$(call make_disk_image,$(FS_TYPE),$(DISK_IMG))
 	$(call $(ARCH)_install_apps,$(DISK_IMG))
 
+depgraph: build
+	@./tools/json2dot/target/release/json2dot $(KMODULE_DIR)\$(TOP_COMPONENT).json $(TOP_COMPONENT) $(MAX_DEPLEVEL)
+	@dot -Tpng -o $(TOP_COMPONENT).png $(TOP_COMPONENT).dot
+
 FORCE:
 
-.PHONY: all build tools necessities components predirs vdso_payload clean top_component disk_img linux_apps FORCE
+.PHONY: all build tools necessities components predirs vdso_payload clean top_component disk_img linux_apps depgraph FORCE
