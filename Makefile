@@ -83,7 +83,7 @@ components := \
 	signal sysctl kallsyms read_write \
 	virtio_mmio virtio virtio_blk virtio_net ext2 binfmt_elf \
 	sys ioctl fcntl nlattr \
-	printk_itf printk panic bug dump_stack show_mem
+	printk_itf early_printk printk panic bug dump_stack show_mem
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init

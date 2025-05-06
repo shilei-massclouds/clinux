@@ -89,6 +89,12 @@ uart_console_write(struct uart_port *port, const char *s,
 }
 EXPORT_SYMBOL_GPL(uart_console_write);
 
+__weak const char *dev_driver_string(const struct device *dev)
+{
+    booter_panic("No impl.\n");
+}
+EXPORT_SYMBOL(dev_driver_string);
+
 int
 cl_printk_itf_init(void)
 {

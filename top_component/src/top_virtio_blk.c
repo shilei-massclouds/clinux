@@ -3,6 +3,7 @@
 #include <linux/types.h>
 #include <linux/export.h>
 #include <linux/printk.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 extern int virtio_blk_init(void);
@@ -12,6 +13,9 @@ cl_top_virtio_blk_init(void)
 {
     int ret;
     sbi_puts("module[top_virtio_blk]: init begin ...\n");
+
+    REQUIRE_COMPONENT(early_printk);
+    cl_init();
 
     ret = virtio_blk_init();
     if (ret < 0) {

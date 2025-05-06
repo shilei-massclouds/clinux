@@ -13,7 +13,8 @@ int early_vprintk(const char *fmt, va_list args)
     char *msg;
 
     if (!early_console) {
-        booter_panic("No early_console!");
+        sbi_puts("No early_console!\n");
+        return -1;
     }
 
     n = vscnprintf(buf, sizeof(buf), fmt, args);
@@ -24,4 +25,5 @@ int early_vprintk(const char *fmt, va_list args)
         msg = buf;
     }
     early_console->write(early_console, msg, n);
+    return 0;
 }
