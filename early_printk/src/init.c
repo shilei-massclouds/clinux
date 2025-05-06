@@ -10,21 +10,6 @@
 
 #define EARLYCON_NAME "sbi"
 
-int console_printk[4] = {
-	CONSOLE_LOGLEVEL_DEFAULT,	/* console_loglevel */
-	MESSAGE_LOGLEVEL_DEFAULT,	/* default_message_loglevel */
-	CONSOLE_LOGLEVEL_MIN,		/* minimum_console_loglevel */
-	CONSOLE_LOGLEVEL_DEFAULT,	/* default_console_loglevel */
-};
-EXPORT_SYMBOL_GPL(console_printk);
-
-/*
- * System may need to suppress printk message under certain
- * circumstances, like after kernel panic happens.
- */
-int __read_mostly suppress_printk;
-EXPORT_SYMBOL(suppress_printk);
-
 extern int early_sbi_setup(struct earlycon_device *device, const char *opt);
 extern int early_vprintk(const char *fmt, va_list args);
 
@@ -101,7 +86,7 @@ cl_early_printk_init(void)
 }
 EXPORT_SYMBOL(cl_early_printk_init);
 
-asmlinkage __visible __weak int printk(const char *fmt, ...)
+asmlinkage __visible int printk(const char *fmt, ...)
 {
     int ret;
     va_list args;
@@ -110,7 +95,6 @@ asmlinkage __visible __weak int printk(const char *fmt, ...)
     va_end(args);
     return ret;
 }
-EXPORT_SYMBOL(printk);
 
 asmlinkage __visible int cl_printk(const char *fmt, ...)
 {
@@ -123,49 +107,12 @@ asmlinkage __visible int cl_printk(const char *fmt, ...)
 }
 EXPORT_SYMBOL(cl_printk);
 
-/*
-void __warn_printk(const char *fmt, ...)
-{
-    int ret;
-    va_list args;
-    pr_warn(CUT_HERE);
-    va_start(args, fmt);
-    early_vprintk(printk_skip_level(fmt), args);
-    va_end(args);
-}
-*/
-
-__weak asmlinkage int vprintk(const char *fmt, va_list args)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(vprintk);
-
-__weak asmlinkage int vprintk_emit(int facility, int level,
+asmlinkage int vprintk_emit(int facility, int level,
 			    const char *dict, size_t dictlen,
 			    const char *fmt, va_list args)
 {
     booter_panic("No impl.\n");
 }
-EXPORT_SYMBOL(vprintk_emit);
-
-__weak void console_unblank(void)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(console_unblank);
-
-__weak struct tty_driver *console_device(int *index)
-{
-    booter_panic("No impl.\n");
-}
-EXPORT_SYMBOL(console_device);
-
-__weak const char *dev_driver_string(const struct device *dev)
-{
-    booter_panic("No impl.");
-}
-EXPORT_SYMBOL(dev_driver_string);
 
 __weak int dev_printk_emit(int level, const struct device *dev, const char *fmt, ...)
 {
@@ -207,7 +154,6 @@ void netdev_printk(const char *level, const struct net_device *dev,
 
 	va_end(args);
 }
-EXPORT_SYMBOL(netdev_printk);
 
 #define define_netdev_printk_level(func, level)			\
 void func(const struct net_device *dev, const char *fmt, ...)	\
@@ -224,7 +170,6 @@ void func(const struct net_device *dev, const char *fmt, ...)	\
 								\
 	va_end(args);						\
 }								\
-EXPORT_SYMBOL(func);
 
 define_netdev_printk_level(netdev_emerg, KERN_EMERG);
 define_netdev_printk_level(netdev_alert, KERN_ALERT);

@@ -72,7 +72,7 @@
 #include <linux/latencytop.h>
 #include <linux/pid.h>
 
-#include "../lib/src/kstrtox.h"
+#include "../vsprintf/src/kstrtox.h"
 
 #include <linux/uaccess.h>
 #include <asm/processor.h>

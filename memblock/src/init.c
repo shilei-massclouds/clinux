@@ -30,7 +30,6 @@ int
 cl_memblock_init(void)
 {
     sbi_puts("module[memblock]: init begin ...\n");
-    ENABLE_COMPONENT(early_printk);
     sbi_puts("module[memblock]: init end!\n");
     return 0;
 }

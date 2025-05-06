@@ -4,7 +4,8 @@ ARCH ?= riscv64
 export MAKE := @make --no-print-directory
 export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
-TOP ?= linux
+#TOP ?= linux
+TOP ?= virtio_blk
 export TOP_COMPONENT := top_$(TOP)
 
 DEP ?= err
@@ -44,10 +45,11 @@ QEMU_ARGS += \
 # All component subdir
 components := \
 	prebuilt booter lib lib_user math flex_proportions crc32 \
+	cmdline \
 	radix_tree idr xarray assoc_array list_lru klist logic_pio \
 	refcount ratelimit \
-	kasprintf random crypto uuid rhashtable iov_iter checksum \
-	sbitmap scatterlist bio mempool truncate interval_tree \
+	vsprintf kasprintf random crypto uuid rhashtable iov_iter checksum \
+	bitmap sbitmap scatterlist bio mempool truncate interval_tree \
 	traps irq softirq dec_and_lock mpage initcalls \
 	kobject driver_base resource devres dynamic_queue_limits \
 	of of_irq irq_work tty vt earlycon dummycon input \
@@ -65,7 +67,8 @@ components := \
 	fs inode dcache d_path file_table do_mounts file \
 	open readahead async xattr user readdir \
 	cred groups posix_acl user_namespace nsproxy fs_namespace pid_namespace \
-	ramfs kernfs sysfs proc block_dev char_dev filesystems shmem nsfs devtmpfs \
+	ramfs kernfs sysfs block_dev char_dev filesystems shmem nsfs devtmpfs \
+	proc_itf proc \
 	fs_context fs_parser fs_struct namei libfs debugfs \
 	ipc_namespace drv_char 8250 serial drv_clk \
 	net_core net_core_dev netlink string_helpers net_namespace net_sched \
@@ -80,7 +83,7 @@ components := \
 	signal sysctl kallsyms read_write \
 	virtio_mmio virtio virtio_blk virtio_net ext2 binfmt_elf \
 	sys ioctl fcntl nlattr \
-	early_printk printk panic bug dump_stack show_mem
+	printk_itf printk panic bug dump_stack show_mem
 
 SELECTED = $(shell cat $(KMODULE_DIR)selected.in)
 CL_INIT := $(KMODULE_DIR)cl_init
@@ -160,6 +163,9 @@ depgraph: build
 	@./tools/json2dot/target/release/json2dot $(KMODULE_DIR)\$(TOP_COMPONENT).json $(TOP_COMPONENT) $(MAX_DEPLEVEL)
 	@dot -Tpng -o $(TOP_COMPONENT).png $(TOP_COMPONENT).dot
 
+depshow:
+	@cat $(KMODULE_DIR)\$(TOP_COMPONENT).json | jq
+
 FORCE:
 
-.PHONY: all build tools necessities components predirs vdso_payload clean top_component disk_img linux_apps depgraph FORCE
+.PHONY: all build tools necessities components predirs vdso_payload clean top_component disk_img linux_apps depgraph depshow FORCE

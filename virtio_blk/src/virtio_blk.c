@@ -1041,6 +1041,7 @@ int __init virtio_blk_init(void)
 {
     return init();
 }
+EXPORT_SYMBOL(virtio_blk_init);
 
 MODULE_DEVICE_TABLE(virtio, id_table);
 MODULE_DESCRIPTION("Virtio block driver");

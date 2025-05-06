@@ -841,6 +841,7 @@ cl_top_linux_init(void)
     REQUIRE_COMPONENT(ip_sockglue);
     REQUIRE_COMPONENT(filter);
     REQUIRE_COMPONENT(task);
+    REQUIRE_COMPONENT(printk);
 
     //
     // start_kernel (init/main.c)

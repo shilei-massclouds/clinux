@@ -18,7 +18,7 @@
 
 #include <asm/page.h>
 
-#include "kstrtox.h"
+#include "../vsprintf/src/kstrtox.h"
 
 ///**
 // * DOC: bitmap introduction

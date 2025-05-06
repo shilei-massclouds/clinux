@@ -50,4 +50,3 @@ void uart_console_write(struct uart_port *port, const char *s,
         putchar(port, *s);
     }
 }
-EXPORT_SYMBOL_GPL(uart_console_write);

@@ -4,6 +4,7 @@
 #include <linux/export.h>
 #include <linux/irq_work.h>
 #include <linux/wait.h>
+#include <cl_hook.h>
 #include "../../booter/src/booter.h"
 
 int
@@ -14,3 +15,5 @@ cl_printk_init(void)
     return 0;
 }
 EXPORT_SYMBOL(cl_printk_init);
+
+DEFINE_ENABLE_FUNC(printk);

@@ -100,7 +100,7 @@
 #include "internal.h"
 #include "fd.h"
 
-#include "../../lib/src/kstrtox.h"
+#include "../../vsprintf/src/kstrtox.h"
 
 /* NOTE:
  *	Implementing inode permission operations in /proc is almost

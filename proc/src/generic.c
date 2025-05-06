@@ -605,7 +605,6 @@ struct proc_dir_entry *proc_create_seq_private(const char *name, umode_t mode,
 	p->state_size = state_size;
 	return proc_register(parent, p);
 }
-EXPORT_SYMBOL(proc_create_seq_private);
 
 static int proc_single_open(struct inode *inode, struct file *file)
 {
