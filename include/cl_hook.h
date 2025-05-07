@@ -45,12 +45,12 @@
 */
 
 #define DEFINE_ENABLE_FUNC(name) \
-    void enable_##name(void) {} \
-    EXPORT_SYMBOL(enable_##name);
+    void cl_enable_##name(void) {} \
+    EXPORT_SYMBOL(cl_enable_##name);
 
 #define ENABLE_COMPONENT(name) \
-    extern void enable_##name(); \
-    enable_##name();
+    extern void cl_enable_##name(); \
+    cl_enable_##name();
 
 // Alias for ENABLE_COMPONENT
 #define REQUIRE_COMPONENT(name) ENABLE_COMPONENT(name)

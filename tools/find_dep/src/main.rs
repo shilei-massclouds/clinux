@@ -4,7 +4,7 @@ use std::io::{Read, Write};
 use std::io::{BufReader, BufRead};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::cell::RefCell;
 use xmas_elf::ElfFile;
 use xmas_elf::sections::SectionData::SymbolTable64;
@@ -27,7 +27,7 @@ struct Module {
     name: String,
     status: AtomicUsize,
     undef_syms: RefCell<Vec<String>>,
-    dependencies: RefCell<Vec<ModuleRef>>,
+    dependencies: RefCell<VecDeque<ModuleRef>>,
 }
 
 impl Module {
@@ -36,7 +36,7 @@ impl Module {
             name: name.to_owned(),
             status: AtomicUsize::new(ModuleStatus::INITIAL.bits()),
             undef_syms: RefCell::new(vec![]),
-            dependencies: RefCell::new(vec![]),
+            dependencies: RefCell::new(VecDeque::new()),
         }
     }
 }
@@ -172,7 +172,13 @@ fn build_dependency(kmod: &ModuleRef, sym_map: &HashMap<String, ModuleRef>) -> R
         if let Some(dep) = sym_map.get(&undef) {
             info!("{} -> {}:{}", kmod.name, dep.name, undef);
             if !find_dependency(kmod, &dep.name) {
-                kmod.dependencies.borrow_mut().push(dep.clone());
+                // Components required should be handled first.
+                if undef.starts_with("cl_enable_") {
+                    log::error!("REQUIRE: {}", undef);
+                    kmod.dependencies.borrow_mut().push_front(dep.clone());
+                } else {
+                    kmod.dependencies.borrow_mut().push_back(dep.clone());
+                }
                 build_dependency(dep, sym_map)?;
             }
         } else {
