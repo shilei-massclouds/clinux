@@ -24,14 +24,10 @@ int
 cl_bootmem_init(void)
 {
     sbi_puts("module[bootmem]: init begin ...\n");
-    REQUIRE_COMPONENT(params);
-    setup_bootmem();
     sbi_puts("module[bootmem]: init end!\n");
     return 0;
 }
 EXPORT_SYMBOL(cl_bootmem_init);
-
-DEFINE_ENABLE_FUNC(bootmem);
 
 #ifdef CONFIG_BLK_DEV_INITRD
 void __init setup_initrd(void)

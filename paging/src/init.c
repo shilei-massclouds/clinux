@@ -20,8 +20,8 @@ int
 cl_paging_init(void)
 {
     sbi_puts("module[paging]: init begin ...\n");
-    REQUIRE_COMPONENT(bootmem);
 
+    setup_bootmem();
     setup_vm_final();
     sparse_init();
     setup_zero_page();

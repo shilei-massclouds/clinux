@@ -6,9 +6,12 @@ END_C='\033[0m'
 
 TESTCASES="
     booter
+    spinlock
     lib
     vsprintf
     early_printk
+    memblock
+    paging
     linux
 "
 
@@ -17,11 +20,8 @@ TESTCASES="
 #    early_fdt
 #    cgroup
 #    cpu
-#    memblock
 #    params
-#	spinlock
 #    semaphore
-#    paging
 #    bootmem
 #    resource
 #    of
