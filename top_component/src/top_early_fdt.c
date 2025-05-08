@@ -11,6 +11,8 @@ int
 cl_top_early_fdt_init(void)
 {
     sbi_puts("module[top_early_fdt]: init begin ...\n");
+
+    REQUIRE_COMPONENT(early_printk);
     cl_init();
 
     printk("boot command line: [%s]\n", boot_command_line);

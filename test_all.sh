@@ -6,23 +6,23 @@ END_C='\033[0m'
 
 TESTCASES="
     booter
+    task
     spinlock
     lib
+    params
+    early_fdt
     vsprintf
     early_printk
     memblock
+    bootmem
     paging
     linux
 "
 
 #TESTCASES="
-#    task
-#    early_fdt
 #    cgroup
 #    cpu
-#    params
 #    semaphore
-#    bootmem
 #    resource
 #    of
 #    dma
