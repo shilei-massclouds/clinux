@@ -4,12 +4,14 @@
 #include <linux/export.h>
 #include <linux/smp.h>
 #include <linux/kobject.h>
+#include <linux/slab.h>
 #include "../../booter/src/booter.h"
 
 int
 cl_slub_init(void)
 {
     sbi_puts("module[slub]: init begin ...\n");
+    kmem_cache_init();
     sbi_puts("module[slub]: init end!\n");
     return 0;
 }

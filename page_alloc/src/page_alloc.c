@@ -5253,6 +5253,12 @@ static inline void show_node(struct zone *zone)
 //}
 //EXPORT_SYMBOL_GPL(si_mem_available);
 
+__weak long nr_blockdev_pages(void)
+{
+    panic("No impl.");
+}
+EXPORT_SYMBOL(nr_blockdev_pages);
+
 void si_meminfo(struct sysinfo *val)
 {
 	val->totalram = totalram_pages();

@@ -12,8 +12,12 @@ int
 cl_top_paging_init(void)
 {
     sbi_puts("module[top_paging]: init begin ...\n");
-    REQUIRE_COMPONENT(paging);
+    REQUIRE_COMPONENT(early_printk);
     cl_init();
+
+    extern unsigned long nr_all_pages;
+    printk("nr_all_pages: %ld\n", nr_all_pages);
+
     sbi_puts("module[top_paging]: init end!\n");
     return 0;
 }

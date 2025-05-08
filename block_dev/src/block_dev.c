@@ -906,7 +906,6 @@ long nr_blockdev_pages(void)
 
 	return ret;
 }
-EXPORT_SYMBOL(nr_blockdev_pages);
 
 void bdput(struct block_device *bdev)
 {

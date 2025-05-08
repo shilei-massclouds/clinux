@@ -57,7 +57,7 @@ EXPORT_SYMBOL(parse_dtb);
 
 void __weak add_bootloader_randomness(const void *buf, unsigned int size)
 {
-    booter_panic("Need random driver take effect!\n");
+    pr_warn("Need random driver take effect!\n");
 }
 EXPORT_SYMBOL_GPL(add_bootloader_randomness);
 

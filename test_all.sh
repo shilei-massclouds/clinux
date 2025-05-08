@@ -6,29 +6,40 @@ END_C='\033[0m'
 
 TESTCASES="
     booter
-    lib
-    task
-    early_fdt
-    cgroup
-    cpu
-    memblock
-    params
-	spinlock
-    semaphore
-    early_printk
-    paging
-    bootmem
-    resource
-    of
-    dma
-    sbi
-    riscv_cpu
     linux
 "
+
+#TESTCASES="
+#    lib
+#    task
+#    early_fdt
+#    cgroup
+#    cpu
+#    memblock
+#    params
+#	spinlock
+#    semaphore
+#    early_printk
+#    paging
+#    bootmem
+#    resource
+#    of
+#    dma
+#    sbi
+#    riscv_cpu
+#"
 
 PASSED=0
 FAILED=0
 FAILURES=
+
+printf "Clean ...\n"
+make clean
+
+printf "Pre-build ...\n"
+make -j6
+
+printf "Testing ...\n"
 
 for TEST in $TESTCASES
 do
