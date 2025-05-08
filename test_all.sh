@@ -6,11 +6,13 @@ END_C='\033[0m'
 
 TESTCASES="
     booter
+    lib
+    vsprintf
+    early_printk
     linux
 "
 
 #TESTCASES="
-#    lib
 #    task
 #    early_fdt
 #    cgroup
@@ -19,7 +21,6 @@ TESTCASES="
 #    params
 #	spinlock
 #    semaphore
-#    early_printk
 #    paging
 #    bootmem
 #    resource
@@ -33,8 +34,8 @@ PASSED=0
 FAILED=0
 FAILURES=
 
-printf "Clean ...\n"
-make clean
+#printf "Clean ...\n"
+#make clean
 
 printf "Pre-build ...\n"
 make -j6
@@ -45,8 +46,17 @@ for TEST in $TESTCASES
 do
     printf "\n[$TEST]: ...\n"
 
+    if [ "$TEST" = "linux" ]; then
+        printf "\nIt may cost several seconds, please wait ...\n"
+        printf "We can execve cmdline [./test_all.sh VERBOSE] to check more details.\n\n"
+    fi
+
     set -e
-    make TOP=$TEST run > /tmp/output.log
+    if [ "$1" = "VERBOSE" ]; then
+        make TOP=$TEST run | tee /tmp/output.log
+    else
+        make TOP=$TEST run > /tmp/output.log
+    fi
 
     set +e
     ret_str=$(cat ${TEST}/expect_output 2>/dev/null)

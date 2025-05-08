@@ -6,8 +6,7 @@ export KMODULE_DIR = $(CURDIR)/target/_bootrd/
 
 #TOP ?= linux
 #TOP ?= virtio_blk
-#TOP ?= page_alloc
-TOP ?= booter
+TOP ?= page_alloc
 export TOP_COMPONENT := top_$(TOP)
 
 DEP ?= err
@@ -20,7 +19,7 @@ else
 endif
 export DEBUG_INC
 
-MAX_DEPLEVEL ?= 1
+MAX_DEPLEVEL ?= 3
 
 FS_TYPE := ext2
 DISK_IMG := disk.img

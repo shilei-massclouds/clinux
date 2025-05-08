@@ -91,6 +91,10 @@ fn output_dot(
     }
 
     for child in target.members() {
+        // ignore 'lds'
+        if child == "lds" {
+            continue;
+        }
         debug!("child: {}", child);
         writeln!(f, "{}->{}", name, child)?;
         *level += 1;
